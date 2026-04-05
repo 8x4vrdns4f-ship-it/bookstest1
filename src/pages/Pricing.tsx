@@ -17,7 +17,7 @@ const tiers = [
     name: "Gold",
     price: "$549",
     period: "/mo",
-    features: ["Up to 300 bookings/mo", "10 staff members", "Priority support", "Advanced analytics", "Custom branding"],
+    features: ["Up to 300 bookings/mo", "10 staff members", "Priority support", "Advanced analytics", "Custom branding", "7.5% fee per transaction"],
     accent: "from-yellow-500 to-amber-400",
     badge: "bg-yellow-500/20 text-yellow-300",
     popular: true,
