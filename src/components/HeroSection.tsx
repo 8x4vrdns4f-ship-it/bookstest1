@@ -16,8 +16,8 @@ const HeroSection = () => {
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 py-2.5 text-sm rounded-lg">
               Try now
             </Button>
-            <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg">
-              Explore Pricing
+            <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
+              <Link to="/pricing">Explore Pricing</Link>
             </Button>
           </div>
         </div>
