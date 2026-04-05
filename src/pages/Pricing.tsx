@@ -1,0 +1,93 @@
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+const tiers = [
+  {
+    name: "Silver",
+    price: "$199",
+    period: "/mo",
+    features: ["Up to 50 bookings/mo", "1 staff member", "Email support", "Basic analytics"],
+    accent: "from-zinc-400 to-zinc-300",
+    badge: "bg-zinc-400/20 text-zinc-300",
+  },
+  {
+    name: "Gold",
+    price: "$549",
+    period: "/mo",
+    features: ["Up to 300 bookings/mo", "10 staff members", "Priority support", "Advanced analytics", "Custom branding"],
+    accent: "from-yellow-500 to-amber-400",
+    badge: "bg-yellow-500/20 text-yellow-300",
+    popular: true,
+  },
+  {
+    name: "Platinum",
+    price: "$1,195",
+    period: "/mo",
+    features: ["Unlimited bookings", "Unlimited staff", "24/7 dedicated support", "Full analytics suite", "Custom branding", "API access"],
+    accent: "from-cyan-400 to-blue-300",
+    badge: "bg-cyan-400/20 text-cyan-200",
+  },
+];
+
+const Pricing = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <section className="px-8 md:px-16 pt-32 pb-24">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          <span className="text-primary">Choose</span>{" "}
+          <span className="text-foreground">Your Plan</span>
+        </h1>
+        <p className="text-muted-foreground text-center mb-16 max-w-lg mx-auto">
+          Pick the tier that fits your business. Upgrade or downgrade anytime.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {tiers.map((tier) => (
+            <Card
+              key={tier.name}
+              className={`relative bg-secondary/60 border-border hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 ${
+                tier.popular ? "ring-1 ring-primary/50" : ""
+              }`}
+            >
+              {tier.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-primary text-primary-foreground text-xs px-3">Most Popular</Badge>
+                </div>
+              )}
+              <CardHeader className="text-center pb-2">
+                <div className={`inline-block mx-auto mb-3 px-4 py-1 rounded-full text-xs font-semibold ${tier.badge}`}>
+                  {tier.name}
+                </div>
+                <CardTitle className="text-4xl font-bold text-foreground">
+                  {tier.price}
+                  <span className="text-sm font-normal text-muted-foreground">{tier.period}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <ul className="space-y-3">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span className="text-primary">✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg">
+                  Get Started
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
+};
+
+export default Pricing;
