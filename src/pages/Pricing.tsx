@@ -9,7 +9,7 @@ const tiers = [
     name: "Silver",
     price: "$199",
     period: "/mo",
-    features: ["Up to 50 bookings/mo", "1 staff member", "Email support", "Basic analytics"],
+    features: ["Up to 50 bookings/mo", "1 staff member", "Email support", "Basic analytics", "12.5% fee per successful booking"],
     accent: "from-zinc-400 to-zinc-300",
     badge: "bg-zinc-400/20 text-zinc-300",
   },
