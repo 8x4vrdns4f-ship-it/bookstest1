@@ -11,6 +11,7 @@ const Index = () => {
       <HeroSection />
       <InfoCards />
       <FeaturesStrip />
+      <Footer />
     </div>
   );
 };
