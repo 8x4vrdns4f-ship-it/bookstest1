@@ -26,7 +26,7 @@ const tiers = [
     name: "Platinum",
     price: "$1,195",
     period: "/mo",
-    features: ["Unlimited bookings", "Unlimited staff", "24/7 dedicated support", "Full analytics suite", "Custom branding", "API access"],
+    features: ["Unlimited bookings", "Unlimited staff", "24/7 dedicated support", "Full analytics suite", "Custom branding", "API access", "2.5% fee per transaction"],
     accent: "from-cyan-400 to-blue-300",
     badge: "bg-cyan-400/20 text-cyan-200",
   },
