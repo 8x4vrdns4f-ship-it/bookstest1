@@ -21,7 +21,7 @@ const Navbar = () => {
         )}
         <BrandLogo size="sm" />
       </div>
-      <a href="#" className="text-primary font-semibold text-sm hover:text-primary/80 transition-colors">
+      <a href="/auth" className="text-primary font-semibold text-sm hover:text-primary/80 transition-colors">
         Login
       </a>
     </nav>
