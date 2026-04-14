@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, Users, Clock, LogOut, Download, CheckCircle } from "lucide-react";
+import { CalendarDays, Users, Clock, LogOut, Download } from "lucide-react";
+import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -200,7 +201,8 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-foreground">Hey, {displayName} 👋</h1>
             <p className="text-muted-foreground mt-1">Here's your overview</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <AddEmployeeDialog userId={user.id} />
             <Button
               onClick={handleDownloadWidget}
               className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm"
