@@ -201,7 +201,8 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-foreground">Hey, {displayName} 👋</h1>
             <p className="text-muted-foreground mt-1">Here's your overview</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <AddEmployeeDialog userId={user.id} />
             <Button
               onClick={handleDownloadWidget}
               className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm"
