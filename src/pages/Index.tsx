@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import InfoCards from "@/components/InfoCards";
 import FeaturesStrip from "@/components/FeaturesStrip";
+import TierComparison from "@/components/TierComparison";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -11,6 +12,7 @@ const Index = () => {
       <HeroSection />
       <InfoCards />
       <FeaturesStrip />
+      <TierComparison />
       <Footer />
     </div>
   );
