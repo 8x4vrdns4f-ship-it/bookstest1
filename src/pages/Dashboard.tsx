@@ -204,8 +204,9 @@ const Dashboard = () => {
           <div className="flex items-center gap-3 flex-wrap">
             <AddEmployeeDialog userId={user.id} />
             <Button
-              onClick={handleDownloadWidget}
-              className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm"
+              disabled
+              aria-disabled="true"
+              className="gap-2 bg-accent text-accent-foreground font-semibold text-sm opacity-50 cursor-not-allowed pointer-events-none"
             >
               <Download size={16} />
               Download Calendar Widget
