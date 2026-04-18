@@ -94,6 +94,42 @@ const BookingsList = ({ userId }: { userId: string }) => {
     fetchBookings();
   };
 
+  const handleAccept = async (b: Booking) => {
+    const { data: codeData, error: codeErr } = await supabase.rpc("generate_booking_code");
+    if (codeErr || !codeData) {
+      toast({ title: "Could not generate code", description: codeErr?.message, variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "confirmed", confirmation_code: codeData })
+      .eq("id", b.id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({
+      title: `Accepted — code ${codeData}`,
+      description: b.client_email
+        ? `Share with ${b.client_name}. Email sending activates once your domain is set up.`
+        : `Share code ${codeData} with ${b.client_name} (no email on file).`,
+    });
+    fetchBookings();
+  };
+
+  const handleDecline = async (b: Booking) => {
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "cancelled", decline_reason: "Declined by business" })
+      .eq("id", b.id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Booking declined", description: b.client_email ? "Email sending activates once your domain is set up." : undefined });
+    fetchBookings();
+  };
+
   const handleDelete = async (id: string) => {
     await supabase.from("bookings").delete().eq("id", id);
     fetchBookings();
