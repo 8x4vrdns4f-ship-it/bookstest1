@@ -104,6 +104,7 @@ const Dashboard = () => {
             <p className="text-muted-foreground mt-1">Here's your overview</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
+            <BusinessSettingsDialog userId={user.id} />
             <AddEmployeeDialog userId={user.id} />
             <Button
               onClick={handleDownloadWidget}
