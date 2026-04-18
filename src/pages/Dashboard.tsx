@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Users, Clock, LogOut, Download } from "lucide-react";
 import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
+import BusinessSettingsDialog from "@/components/dashboard/BusinessSettingsDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -12,6 +13,7 @@ import Footer from "@/components/Footer";
 import BookingsList from "@/components/dashboard/BookingsList";
 import CalendarView from "@/components/dashboard/CalendarView";
 import ClientList from "@/components/dashboard/ClientList";
+import { buildWidgetHtml } from "@/lib/widgetTemplate";
 import type { User } from "@supabase/supabase-js";
 
 const Dashboard = () => {
@@ -68,11 +70,20 @@ const Dashboard = () => {
 
   const handleDownloadWidget = () => {
     if (!user) return;
-
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-    const widgetCode = `<!DOCTYPE html>
+    const widgetCode = buildWidgetHtml({
+      supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+      supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      userId: user.id,
+    });
+    const blob = new Blob([widgetCode], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "booking-calendar-widget.html";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "Widget downloaded!", description: "Embed this HTML file on your site to take bookings." });
+  };
 <html lang="en">
 <head>
 <meta charset="UTF-8">

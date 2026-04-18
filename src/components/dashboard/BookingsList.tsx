@@ -197,29 +197,46 @@ const BookingsList = ({ userId }: { userId: string }) => {
         ) : (
           <div className="space-y-3">
             {bookings.map((b) => (
-              <div key={b.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border">
+              <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-secondary/50 border border-border">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-semibold text-foreground text-sm">{b.client_name}</span>
                     <Badge variant="outline" className={statusColors[b.status]}>{b.status}</Badge>
+                    {b.confirmation_code && (
+                      <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 font-mono">
+                        {b.confirmation_code}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {b.service} · {b.booking_date} at {b.booking_time} · {b.duration_minutes}min
+                    {b.service} · {b.booking_date} at {b.booking_time.slice(0,5)} · {b.duration_minutes}min
+                    {b.client_email && <> · {b.client_email}</>}
                   </p>
                   {b.notes && <p className="text-xs text-muted-foreground mt-1">{b.notes}</p>}
                 </div>
-                <div className="flex items-center gap-1 ml-2">
-                  <Select value={b.status} onValueChange={(val) => handleStatusChange(b.id, val)}>
-                    <SelectTrigger className="w-[110px] h-8 text-xs bg-secondary border-border">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex items-center gap-1">
+                  {b.status === "pending" ? (
+                    <>
+                      <Button size="sm" onClick={() => handleAccept(b)} className="h-8 gap-1 bg-green-600 hover:bg-green-700 text-white">
+                        <Check size={14} /> Accept
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDecline(b)} className="h-8 gap-1 border-destructive/40 text-destructive hover:bg-destructive/10">
+                        <X size={14} /> Decline
+                      </Button>
+                    </>
+                  ) : (
+                    <Select value={b.status} onValueChange={(val) => handleStatusChange(b.id, val)}>
+                      <SelectTrigger className="w-[110px] h-8 text-xs bg-secondary border-border">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(b.id)}>
                     <Trash2 size={14} />
                   </Button>
