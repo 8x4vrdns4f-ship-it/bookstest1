@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Check, X } from "lucide-react";
 
 type Booking = {
   id: string;
@@ -21,6 +21,7 @@ type Booking = {
   duration_minutes: number;
   status: string;
   notes: string | null;
+  confirmation_code: string | null;
 };
 
 const statusColors: Record<string, string> = {
