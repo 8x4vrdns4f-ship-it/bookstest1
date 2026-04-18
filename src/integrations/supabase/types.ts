@@ -21,7 +21,9 @@ export type Database = {
           client_email: string | null
           client_id: string | null
           client_name: string
+          confirmation_code: string | null
           created_at: string
+          decline_reason: string | null
           duration_minutes: number
           id: string
           notes: string | null
@@ -36,7 +38,9 @@ export type Database = {
           client_email?: string | null
           client_id?: string | null
           client_name: string
+          confirmation_code?: string | null
           created_at?: string
+          decline_reason?: string | null
           duration_minutes?: number
           id?: string
           notes?: string | null
@@ -51,7 +55,9 @@ export type Database = {
           client_email?: string | null
           client_id?: string | null
           client_name?: string
+          confirmation_code?: string | null
           created_at?: string
+          decline_reason?: string | null
           duration_minutes?: number
           id?: string
           notes?: string | null
@@ -69,6 +75,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      business_settings: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          day_end_hour: number
+          day_start_hour: number
+          deposit_amount: number
+          id: string
+          platform_fee_percent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          day_end_hour?: number
+          day_start_hour?: number
+          deposit_amount?: number
+          id?: string
+          platform_fee_percent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          day_end_hour?: number
+          day_start_hour?: number
+          deposit_amount?: number
+          id?: string
+          platform_fee_percent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       clients: {
         Row: {
@@ -168,7 +210,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_booking_code: { Args: never; Returns: string }
+      get_busy_slots: {
+        Args: { p_from: string; p_to: string; p_user_id: string }
+        Returns: {
+          booking_date: string
+          booking_time: string
+          duration_minutes: number
+          status: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
