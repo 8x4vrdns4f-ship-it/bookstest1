@@ -78,37 +78,94 @@ export type Database = {
       }
       business_settings: {
         Row: {
+          accent_color: string
+          allow_same_day: boolean
+          auto_confirm: boolean
+          buffer_minutes: number
+          business_address: string | null
+          business_category: string | null
+          business_email: string | null
           business_name: string | null
+          business_phone: string | null
+          cancellation_hours: number
+          company_code: string | null
           created_at: string
+          currency: string
           day_end_hour: number
           day_start_hour: number
           deposit_amount: number
           id: string
+          max_advance_days: number
+          notify_client_confirmation: boolean
+          notify_client_reminder: boolean
+          notify_daily_summary: boolean
+          notify_new_booking: boolean
           platform_fee_percent: number
+          timezone: string
           updated_at: string
           user_id: string
+          welcome_message: string | null
+          working_hours: Json
         }
         Insert: {
+          accent_color?: string
+          allow_same_day?: boolean
+          auto_confirm?: boolean
+          buffer_minutes?: number
+          business_address?: string | null
+          business_category?: string | null
+          business_email?: string | null
           business_name?: string | null
+          business_phone?: string | null
+          cancellation_hours?: number
+          company_code?: string | null
           created_at?: string
+          currency?: string
           day_end_hour?: number
           day_start_hour?: number
           deposit_amount?: number
           id?: string
+          max_advance_days?: number
+          notify_client_confirmation?: boolean
+          notify_client_reminder?: boolean
+          notify_daily_summary?: boolean
+          notify_new_booking?: boolean
           platform_fee_percent?: number
+          timezone?: string
           updated_at?: string
           user_id: string
+          welcome_message?: string | null
+          working_hours?: Json
         }
         Update: {
+          accent_color?: string
+          allow_same_day?: boolean
+          auto_confirm?: boolean
+          buffer_minutes?: number
+          business_address?: string | null
+          business_category?: string | null
+          business_email?: string | null
           business_name?: string | null
+          business_phone?: string | null
+          cancellation_hours?: number
+          company_code?: string | null
           created_at?: string
+          currency?: string
           day_end_hour?: number
           day_start_hour?: number
           deposit_amount?: number
           id?: string
+          max_advance_days?: number
+          notify_client_confirmation?: boolean
+          notify_client_reminder?: boolean
+          notify_daily_summary?: boolean
+          notify_new_booking?: boolean
           platform_fee_percent?: number
+          timezone?: string
           updated_at?: string
           user_id?: string
+          welcome_message?: string | null
+          working_hours?: Json
         }
         Relationships: []
       }
@@ -147,6 +204,7 @@ export type Database = {
       }
       employees: {
         Row: {
+          auth_user_id: string | null
           created_at: string
           email: string
           id: string
@@ -157,6 +215,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auth_user_id?: string | null
           created_at?: string
           email: string
           id?: string
@@ -167,6 +226,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          auth_user_id?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -211,6 +271,7 @@ export type Database = {
     }
     Functions: {
       generate_booking_code: { Args: never; Returns: string }
+      generate_company_code: { Args: never; Returns: string }
       get_busy_slots: {
         Args: { p_from: string; p_to: string; p_user_id: string }
         Returns: {
