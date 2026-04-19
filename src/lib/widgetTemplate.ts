@@ -262,19 +262,29 @@ export const buildWidgetHtml = (opts: {
       body: JSON.stringify({
         p_user_id: UID,
         p_from: fmtDate(new Date()),
-        p_to: (function(){ var d = new Date(); d.setDate(d.getDate()+14); return fmtDate(d); })()
+        p_to: (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })()
       })
     }).then(function(r){ return r.json(); })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
-      settings = arr[0][0];
+      var s = arr[0][0];
+      // merge so defaults survive missing fields
+      Object.keys(s).forEach(function(k){ if (s[k] !== null && s[k] !== undefined) settings[k] = s[k]; });
       if (settings.business_name) document.getElementById('bw-title').textContent = 'Book at ' + settings.business_name;
+      if (settings.welcome_message) {
+        var sub = document.querySelector('.bw .sub');
+        if (sub) sub.textContent = settings.welcome_message;
+      }
       document.getElementById('bw-deposit').textContent = 'Deposit: £' + Number(settings.deposit_amount).toFixed(2) + ' (charged only if booking is accepted)';
     } else {
       document.getElementById('bw-deposit').textContent = 'Booking system';
     }
     busy = Array.isArray(arr[1]) ? arr[1] : [];
-    var today = new Date(); selDate = fmtDate(today);
+    // pre-select first available day
+    var today = new Date();
+    var startI = settings.allow_same_day ? 0 : 1;
+    var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
+    selDate = fmtDate(d0);
     renderAll();
   }).catch(function(e){
     document.getElementById('bw-deposit').textContent = 'Could not load. Refresh to try again.';
