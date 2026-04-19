@@ -7,6 +7,8 @@ import Index from "./pages/Index.tsx";
 import Pricing from "./pages/Pricing.tsx";
 import Auth from "./pages/Auth.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
+import Settings from "./pages/Settings.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

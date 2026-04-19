@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, Users, Clock, LogOut, Download } from "lucide-react";
+import { CalendarDays, Users, Clock, LogOut, Download, Settings as SettingsIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
-import BusinessSettingsDialog from "@/components/dashboard/BusinessSettingsDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -104,7 +104,9 @@ const Dashboard = () => {
             <p className="text-muted-foreground mt-1">Here's your overview</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            <BusinessSettingsDialog userId={user.id} />
+            <Button asChild variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
+              <Link to="/settings"><SettingsIcon size={16} /> Settings</Link>
+            </Button>
             <AddEmployeeDialog userId={user.id} />
             <Button
               onClick={handleDownloadWidget}

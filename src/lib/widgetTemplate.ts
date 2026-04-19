@@ -96,9 +96,27 @@ export const buildWidgetHtml = (opts: {
   var KEY = ${JSON.stringify(supabaseKey)};
   var UID = ${JSON.stringify(userId)};
 
-  var settings = { day_start_hour: 9, day_end_hour: 18, deposit_amount: 10, business_name: '' };
+  var settings = {
+    working_hours: {
+      mon:{open:'09:00',close:'18:00',closed:false},
+      tue:{open:'09:00',close:'18:00',closed:false},
+      wed:{open:'09:00',close:'18:00',closed:false},
+      thu:{open:'09:00',close:'18:00',closed:false},
+      fri:{open:'09:00',close:'18:00',closed:false},
+      sat:{open:'10:00',close:'16:00',closed:false},
+      sun:{open:'10:00',close:'16:00',closed:true}
+    },
+    deposit_amount: 10,
+    business_name: '',
+    welcome_message: '',
+    allow_same_day: true,
+    max_advance_days: 14,
+    buffer_minutes: 0
+  };
   var busy = []; // {booking_date, booking_time, duration_minutes}
   var selDate = null, selSlot = null, selDur = null;
+
+  var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
 
   function api(path, opts){
     opts = opts || {};
@@ -115,11 +133,19 @@ export const buildWidgetHtml = (opts: {
   function toMin(t){ var p = t.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); }
   function fmtMin(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
 
+  function dayHoursFor(dateStr){
+    var d = new Date(dateStr + 'T00:00:00');
+    var key = DAY_KEYS[d.getDay()];
+    return settings.working_hours[key] || { closed: true, open:'09:00', close:'18:00' };
+  }
+
   function busyMinutes(dateStr){
     var set = {};
+    var buf = settings.buffer_minutes || 0;
     busy.filter(function(b){ return b.booking_date === dateStr; }).forEach(function(b){
-      var s = toMin(b.booking_time), e = s + (b.duration_minutes || 30);
-      for (var m = s; m < e; m += 30) set[m] = true;
+      var s = toMin(b.booking_time) - buf;
+      var e = toMin(b.booking_time) + (b.duration_minutes || 30) + buf;
+      for (var m = Math.max(0, Math.floor(s/30)*30); m < e; m += 30) set[m] = true;
     });
     return set;
   }
@@ -128,15 +154,20 @@ export const buildWidgetHtml = (opts: {
     var wrap = document.getElementById('bw-dates');
     wrap.innerHTML = '';
     var today = new Date(); today.setHours(0,0,0,0);
-    for (var i=0;i<14;i++){
+    var startI = settings.allow_same_day ? 0 : 1;
+    var totalDays = Math.min(settings.max_advance_days || 14, 60);
+    for (var i=startI;i<=totalDays;i++){
       var d = new Date(today); d.setDate(d.getDate()+i);
       var ds = fmtDate(d);
+      var hrs = dayHoursFor(ds);
       var el = document.createElement('div');
-      el.className = 'date' + (selDate === ds ? ' sel' : '');
+      el.className = 'date' + (selDate === ds ? ' sel' : '') + (hrs.closed ? ' busy' : '');
       el.innerHTML = '<div class="dn">'+d.toLocaleDateString(undefined,{weekday:'short'})+'</div>'+
                      '<div class="dd">'+d.getDate()+'</div>'+
-                     '<div class="dm">'+d.toLocaleDateString(undefined,{month:'short'})+'</div>';
-      (function(ds_){ el.onclick = function(){ selDate = ds_; selSlot = null; selDur = null; renderAll(); }; })(ds);
+                     '<div class="dm">'+(hrs.closed ? 'Closed' : d.toLocaleDateString(undefined,{month:'short'}))+'</div>';
+      if (!hrs.closed){
+        (function(ds_){ el.onclick = function(){ selDate = ds_; selSlot = null; selDur = null; renderAll(); }; })(ds);
+      }
       wrap.appendChild(el);
     }
   }
@@ -145,8 +176,11 @@ export const buildWidgetHtml = (opts: {
     var wrap = document.getElementById('bw-slots');
     wrap.innerHTML = '';
     if (!selDate){ wrap.innerHTML = '<div style="grid-column:1/-1;color:#9ca3af;font-size:12px;text-align:center;padding:8px">Pick a day first</div>'; return; }
+    var hrs = dayHoursFor(selDate);
+    if (hrs.closed){ wrap.innerHTML = '<div style="grid-column:1/-1;color:#9ca3af;font-size:12px;text-align:center;padding:8px">Closed this day</div>'; return; }
     var bset = busyMinutes(selDate);
-    for (var m = settings.day_start_hour*60; m < settings.day_end_hour*60; m += 30){
+    var startM = toMin(hrs.open), endM = toMin(hrs.close);
+    for (var m = startM; m < endM; m += 30){
       var el = document.createElement('div');
       var isBusy = !!bset[m];
       el.className = 'slot' + (isBusy?' busy':'') + (selSlot === m?' sel':'');
@@ -163,13 +197,15 @@ export const buildWidgetHtml = (opts: {
     wrap.innerHTML = '';
     var durs = [30,60,90,120];
     var bset = selDate ? busyMinutes(selDate) : {};
+    var hrs = selDate ? dayHoursFor(selDate) : null;
+    var endLimit = hrs ? toMin(hrs.close) : 0;
     durs.forEach(function(d){
       var el = document.createElement('button');
       el.type = 'button';
       var disabled = !selSlot;
       if (selSlot){
         var endM = selSlot + d;
-        if (endM > settings.day_end_hour*60) disabled = true;
+        if (endM > endLimit) disabled = true;
         for (var mm = selSlot; mm < endM; mm += 30){ if (bset[mm]) { disabled = true; break; } }
       }
       el.disabled = disabled;
@@ -226,19 +262,29 @@ export const buildWidgetHtml = (opts: {
       body: JSON.stringify({
         p_user_id: UID,
         p_from: fmtDate(new Date()),
-        p_to: (function(){ var d = new Date(); d.setDate(d.getDate()+14); return fmtDate(d); })()
+        p_to: (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })()
       })
     }).then(function(r){ return r.json(); })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
-      settings = arr[0][0];
+      var s = arr[0][0];
+      // merge so defaults survive missing fields
+      Object.keys(s).forEach(function(k){ if (s[k] !== null && s[k] !== undefined) settings[k] = s[k]; });
       if (settings.business_name) document.getElementById('bw-title').textContent = 'Book at ' + settings.business_name;
+      if (settings.welcome_message) {
+        var sub = document.querySelector('.bw .sub');
+        if (sub) sub.textContent = settings.welcome_message;
+      }
       document.getElementById('bw-deposit').textContent = 'Deposit: £' + Number(settings.deposit_amount).toFixed(2) + ' (charged only if booking is accepted)';
     } else {
       document.getElementById('bw-deposit').textContent = 'Booking system';
     }
     busy = Array.isArray(arr[1]) ? arr[1] : [];
-    var today = new Date(); selDate = fmtDate(today);
+    // pre-select first available day
+    var today = new Date();
+    var startI = settings.allow_same_day ? 0 : 1;
+    var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
+    selDate = fmtDate(d0);
     renderAll();
   }).catch(function(e){
     document.getElementById('bw-deposit').textContent = 'Could not load. Refresh to try again.';
