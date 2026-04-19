@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getDashboardRoute } from "@/lib/routeAfterAuth";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -47,7 +48,8 @@ const Auth = () => {
         toast({ title: "Login failed", description: error.message, variant: "destructive" });
       } else {
         toast({ title: "Welcome back!" });
-        navigate("/dashboard");
+        const route = await getDashboardRoute();
+        navigate(route);
       }
     } else {
       const { error } = await supabase.auth.signUp({
