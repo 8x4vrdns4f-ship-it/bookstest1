@@ -43,7 +43,10 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
       toast({ title: "Error", description: "Failed to add employee.", variant: "destructive" });
       return;
     }
-    toast({ title: "Employee added!", description: `${name} has been added to your team.` });
+    toast({
+      title: "Employee added!",
+      description: `${name} can now join with your company code (Settings → Company Info). Email invites coming soon.`,
+    });
     setName("");
     setEmail("");
     setPhone("");
