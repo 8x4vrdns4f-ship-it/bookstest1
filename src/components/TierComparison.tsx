@@ -12,18 +12,13 @@ interface Feature {
 }
 
 const features: Feature[] = [
-  { name: "Online Bookings", silver: true, gold: true, platinum: true },
-  { name: "Calendar Widget", silver: true, gold: true, platinum: true },
-  { name: "Client Management", silver: "Up to 50", gold: "Up to 500", platinum: "Unlimited" },
+  { name: "Monthly Bookings", silver: "Up to 100", gold: "Up to 1,000", platinum: "Unlimited" },
   { name: "Team Members", silver: "1", gold: "Up to 5", platinum: "Unlimited" },
-  { name: "Payment Processing", silver: true, gold: true, platinum: true },
   { name: "Transaction Fee", silver: "12.5%", gold: "7.5%", platinum: "2.5%" },
-  { name: "Automated Reminders", silver: "Email only", gold: "Email & SMS", platinum: "Email & SMS" },
-  { name: "Analytics Dashboard", silver: false, gold: true, platinum: true },
+  { name: "Automated Reminders", silver: "Email", gold: "Email & SMS", platinum: "Email & SMS" },
+  { name: "Analytics & Reports", silver: false, gold: true, platinum: "Advanced" },
   { name: "Custom Branding", silver: false, gold: true, platinum: true },
-  { name: "Priority Support", silver: false, gold: false, platinum: true },
-  { name: "API Access", silver: false, gold: false, platinum: true },
-  { name: "Multi-location Support", silver: false, gold: false, platinum: true },
+  { name: "Priority Support", silver: "Email", gold: "24h response", platinum: "1h response" },
 ];
 
 const tiers = [

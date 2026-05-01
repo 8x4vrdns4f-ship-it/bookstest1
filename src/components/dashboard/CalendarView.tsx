@@ -1,41 +1,39 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import DayScheduleDialog from "./DayScheduleDialog";
+import DateOverrideDialog from "./DateOverrideDialog";
+import BookingDetailDialog from "./BookingDetailDialog";
 
 type Booking = {
+  id: string;
   booking_date: string;
   booking_time: string;
   duration_minutes: number;
   client_name: string;
+  client_email: string | null;
   service: string;
   status: string;
+  notes: string | null;
+  confirmation_code: string | null;
+  assigned_employee_id: string | null;
 };
 
-const HOURS_KEY = "booksuite.businessHours";
+type Override = { override_date: string; closed: boolean; open_time: string | null; close_time: string | null };
 
-const CalendarView = () => {
+const CalendarView = ({ userId }: { userId: string }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [overrides, setOverrides] = useState<Override[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [overrideDate, setOverrideDate] = useState<Date | null>(null);
+  const [overrideOpen, setOverrideOpen] = useState(false);
+  const [bookingDetail, setBookingDetail] = useState<Booking | null>(null);
 
-  const [hours, setHours] = useState<{ start: number; end: number }>(() => {
-    try {
-      const raw = localStorage.getItem(HOURS_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch {}
-    return { start: 9, end: 18 };
-  });
-
-  useEffect(() => {
-    localStorage.setItem(HOURS_KEY, JSON.stringify(hours));
-  }, [hours]);
+  const [defaultHours, setDefaultHours] = useState({ start: 9, end: 18 });
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -43,24 +41,34 @@ const CalendarView = () => {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const monthName = currentDate.toLocaleString("default", { month: "long", year: "numeric" });
 
-  useEffect(() => {
+  const fetchAll = async () => {
     const startDate = `${year}-${String(month + 1).padStart(2, "0")}-01`;
     const endDate = `${year}-${String(month + 1).padStart(2, "0")}-${daysInMonth}`;
-
-    supabase
-      .from("bookings")
-      .select("booking_date, booking_time, duration_minutes, client_name, service, status")
-      .gte("booking_date", startDate)
-      .lte("booking_date", endDate)
-      .then(({ data }) => {
-        if (data) setBookings(data);
-      });
-  }, [year, month, daysInMonth]);
-
-  const getBookingsForDay = (day: number) => {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return bookings.filter((b) => b.booking_date === dateStr);
+    const [bk, ov, st] = await Promise.all([
+      supabase.from("bookings").select("*").gte("booking_date", startDate).lte("booking_date", endDate),
+      supabase.from("date_overrides").select("override_date, closed, open_time, close_time").eq("user_id", userId).gte("override_date", startDate).lte("override_date", endDate),
+      supabase.from("business_settings").select("day_start_hour, day_end_hour").eq("user_id", userId).maybeSingle(),
+    ]);
+    if (bk.data) setBookings(bk.data as Booking[]);
+    if (ov.data) setOverrides(ov.data as Override[]);
+    if (st.data) setDefaultHours({ start: st.data.day_start_hour ?? 9, end: st.data.day_end_hour ?? 18 });
   };
+
+  useEffect(() => {
+    fetchAll();
+    const ch = supabase
+      .channel("calendar-bookings")
+      .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, fetchAll)
+      .on("postgres_changes", { event: "*", schema: "public", table: "date_overrides" }, fetchAll)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year, month, daysInMonth, userId]);
+
+  const dateStrFor = (day: number) => `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+  const getBookingsForDay = (day: number) => bookings.filter((b) => b.booking_date === dateStrFor(day));
+  const getOverrideForDay = (day: number) => overrides.find((o) => o.override_date === dateStrFor(day));
 
   const days: (number | null)[] = [];
   for (let i = 0; i < firstDay; i++) days.push(null);
@@ -75,54 +83,28 @@ const CalendarView = () => {
     setDialogOpen(true);
   };
 
+  // Compute hours for the open day (override beats defaults)
+  const hoursForSelected = (() => {
+    if (!selectedDate) return defaultHours;
+    const ds = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+    const ov = overrides.find((o) => o.override_date === ds);
+    if (ov && !ov.closed && ov.open_time && ov.close_time) {
+      return { start: parseInt(ov.open_time.slice(0, 2)), end: parseInt(ov.close_time.slice(0, 2)) || defaultHours.end };
+    }
+    return defaultHours;
+  })();
+
+  const selectedClosed = (() => {
+    if (!selectedDate) return false;
+    const ds = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+    return !!overrides.find((o) => o.override_date === ds)?.closed;
+  })();
+
   return (
     <Card className="bg-card border-border">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-foreground">Calendar</CardTitle>
         <div className="flex items-center gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8" title="Business hours">
-                <Settings size={16} />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 bg-card border-border" align="end">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Business hours</p>
-                  <p className="text-xs text-muted-foreground">Used for the day view</p>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Start</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={23}
-                      value={hours.start}
-                      onChange={(e) =>
-                        setHours((h) => ({ ...h, start: Math.max(0, Math.min(23, Number(e.target.value) || 0)) }))
-                      }
-                      className="bg-secondary border-border"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">End</Label>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={24}
-                      value={hours.end}
-                      onChange={(e) =>
-                        setHours((h) => ({ ...h, end: Math.max(1, Math.min(24, Number(e.target.value) || 1)) }))
-                      }
-                      className="bg-secondary border-border"
-                    />
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(new Date(year, month - 1))}>
             <ChevronLeft size={16} />
           </Button>
@@ -142,17 +124,23 @@ const CalendarView = () => {
           {days.map((day, idx) => {
             if (!day) return <div key={`e-${idx}`} />;
             const dayBookings = getBookingsForDay(day);
+            const ov = getOverrideForDay(day);
             return (
               <button
                 key={day}
                 onClick={() => handleDayClick(day)}
                 className={`min-h-[60px] p-1 rounded-md border text-xs text-left transition-colors hover:bg-primary/20 hover:border-primary/50 ${
-                  isToday(day)
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-secondary/30"
-                }`}
+                  isToday(day) ? "border-primary bg-primary/10" : "border-border bg-secondary/30"
+                } ${ov?.closed ? "opacity-50" : ""}`}
               >
-                <span className={`font-medium ${isToday(day) ? "text-primary" : "text-foreground"}`}>{day}</span>
+                <div className="flex items-center justify-between">
+                  <span className={`font-medium ${isToday(day) ? "text-primary" : "text-foreground"}`}>{day}</span>
+                  {ov && (
+                    <span className="text-[8px] uppercase tracking-wide text-accent font-bold">
+                      {ov.closed ? "Closed" : "Custom"}
+                    </span>
+                  )}
+                </div>
                 {dayBookings.slice(0, 2).map((b, i) => (
                   <div key={i} className="mt-0.5 truncate text-[10px] text-muted-foreground bg-primary/10 rounded px-1">
                     {b.booking_time.slice(0, 5)} {b.client_name}
@@ -165,6 +153,9 @@ const CalendarView = () => {
             );
           })}
         </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          Tip: click a day to view its schedule, set custom hours, or open bookings.
+        </p>
       </CardContent>
 
       <DayScheduleDialog
@@ -172,8 +163,29 @@ const CalendarView = () => {
         onOpenChange={setDialogOpen}
         date={selectedDate}
         bookings={bookings}
-        startHour={hours.start}
-        endHour={hours.end}
+        startHour={hoursForSelected.start}
+        endHour={hoursForSelected.end}
+        closed={selectedClosed}
+        onEditHours={() => {
+          setOverrideDate(selectedDate);
+          setOverrideOpen(true);
+        }}
+        onBookingClick={(b) => setBookingDetail(b as Booking)}
+      />
+
+      <DateOverrideDialog
+        open={overrideOpen}
+        onOpenChange={setOverrideOpen}
+        date={overrideDate}
+        userId={userId}
+        onSaved={fetchAll}
+      />
+
+      <BookingDetailDialog
+        booking={bookingDetail}
+        open={!!bookingDetail}
+        onOpenChange={(o) => !o && setBookingDetail(null)}
+        ownerId={userId}
       />
     </Card>
   );

@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          assigned_employee_id: string | null
           booking_date: string
           booking_time: string
           client_email: string | null
@@ -33,6 +34,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_employee_id?: string | null
           booking_date: string
           booking_time: string
           client_email?: string | null
@@ -50,6 +52,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_employee_id?: string | null
           booking_date?: string
           booking_time?: string
           client_email?: string | null
@@ -67,6 +70,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_assigned_employee_id_fkey"
+            columns: ["assigned_employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_client_id_fkey"
             columns: ["client_id"]
@@ -197,6 +207,39 @@ export type Database = {
           name?: string
           notes?: string | null
           phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      date_overrides: {
+        Row: {
+          close_time: string | null
+          closed: boolean
+          created_at: string
+          id: string
+          open_time: string | null
+          override_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          close_time?: string | null
+          closed?: boolean
+          created_at?: string
+          id?: string
+          open_time?: string | null
+          override_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          close_time?: string | null
+          closed?: boolean
+          created_at?: string
+          id?: string
+          open_time?: string | null
+          override_date?: string
           updated_at?: string
           user_id?: string
         }

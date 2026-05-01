@@ -44,7 +44,11 @@ export const buildWidgetHtml = (opts: {
   .bw input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2d3548;background:#263040;color:#fff;font-size:14px;outline:none}
   .bw input:focus{border-color:#5bade8}
   .bw .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .bw .card-stub{background:#0f1420;border:1px dashed #2d3548;padding:10px;border-radius:8px;font-size:11px;color:#9ca3af;text-align:center;margin-top:8px}
+  .bw .card-box{background:#0f1420;border:1px solid #2d3548;padding:12px;border-radius:8px;margin-top:10px}
+  .bw .card-box h4{margin:0 0 8px;font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  .bw .card-box .row3{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .bw .card-note{font-size:10px;color:#6b7280;margin-top:8px;text-align:center;font-style:italic}
+  .bw input.invalid{border-color:#ef4444}
   .bw button.submit{width:100%;padding:12px;border:none;border-radius:8px;background:#5bade8;color:#0f1420;font-weight:700;font-size:14px;cursor:pointer;margin-top:14px;transition:.15s}
   .bw button.submit:hover{background:#4a9ad8}
   .bw button.submit:disabled{opacity:.5;cursor:not-allowed}
@@ -76,7 +80,15 @@ export const buildWidgetHtml = (opts: {
     <input id="bw-email" type="email" placeholder="Email" required>
   </div>
 
-  <div class="card-stub">💳 Card details collected at confirmation. Nothing charged until the business accepts.</div>
+  <div class="card-box">
+    <h4>💳 Card Details</h4>
+    <input id="bw-card" placeholder="Card number" inputmode="numeric" maxlength="19" autocomplete="cc-number">
+    <div class="row3">
+      <input id="bw-exp" placeholder="MM/YY" inputmode="numeric" maxlength="5" autocomplete="cc-exp">
+      <input id="bw-cvc" placeholder="CVC" inputmode="numeric" maxlength="4" autocomplete="cc-csc">
+    </div>
+    <div class="card-note">You won't be charged unless your booking is accepted.</div>
+  </div>
 
   <div id="bw-err"></div>
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
@@ -114,6 +126,7 @@ export const buildWidgetHtml = (opts: {
     buffer_minutes: 0
   };
   var busy = []; // {booking_date, booking_time, duration_minutes}
+  var overrides = {}; // dateStr -> {closed, open_time, close_time}
   var selDate = null, selSlot = null, selDur = null;
 
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
@@ -134,6 +147,11 @@ export const buildWidgetHtml = (opts: {
   function fmtMin(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
 
   function dayHoursFor(dateStr){
+    var ov = overrides[dateStr];
+    if (ov) {
+      if (ov.closed) return { closed: true, open: '09:00', close: '18:00' };
+      return { closed: false, open: (ov.open_time||'09:00').slice(0,5), close: (ov.close_time||'18:00').slice(0,5) };
+    }
     var d = new Date(dateStr + 'T00:00:00');
     var key = DAY_KEYS[d.getDay()];
     return settings.working_hours[key] || { closed: true, open:'09:00', close:'18:00' };
@@ -216,16 +234,50 @@ export const buildWidgetHtml = (opts: {
     });
   }
 
+  function luhn(num){
+    var s = (num||'').replace(/\\D/g,''); if (s.length < 12) return false;
+    var sum=0, alt=false;
+    for (var i=s.length-1;i>=0;i--){
+      var n = parseInt(s.charAt(i),10);
+      if (alt){ n*=2; if(n>9) n-=9; }
+      sum+=n; alt=!alt;
+    }
+    return sum % 10 === 0;
+  }
+  function expValid(v){
+    var m = (v||'').match(/^(\\d{2})\\/(\\d{2})$/); if(!m) return false;
+    var mm = parseInt(m[1],10), yy = parseInt(m[2],10);
+    if (mm<1||mm>12) return false;
+    var now = new Date(); var curYY = now.getFullYear()%100; var curMM = now.getMonth()+1;
+    if (yy<curYY) return false;
+    if (yy===curYY && mm<curMM) return false;
+    return true;
+  }
+  function cvcValid(v){ return /^\\d{3,4}$/.test(v||''); }
+
+  function formatCard(v){ return v.replace(/\\D/g,'').slice(0,19).replace(/(\\d{4})/g,'$1 ').trim(); }
+  function formatExp(v){ var s = v.replace(/\\D/g,'').slice(0,4); if (s.length>=3) return s.slice(0,2)+'/'+s.slice(2); return s; }
+
   function renderAll(){
     renderDates(); renderSlots(); renderDurs();
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
-    btn.disabled = !(selDate && selSlot !== null && selDur && name && email);
+    var card = document.getElementById('bw-card').value;
+    var exp = document.getElementById('bw-exp').value;
+    var cvc = document.getElementById('bw-cvc').value;
+    var cardOk = luhn(card), expOk = expValid(exp), cvcOk = cvcValid(cvc);
+    document.getElementById('bw-card').classList.toggle('invalid', card.length>0 && !cardOk);
+    document.getElementById('bw-exp').classList.toggle('invalid', exp.length>0 && !expOk);
+    document.getElementById('bw-cvc').classList.toggle('invalid', cvc.length>0 && !cvcOk);
+    btn.disabled = !(selDate && selSlot !== null && selDur && name && email && cardOk && expOk && cvcOk);
   }
 
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
+  document.getElementById('bw-card').addEventListener('input', function(e){ e.target.value = formatCard(e.target.value); renderAll(); });
+  document.getElementById('bw-exp').addEventListener('input', function(e){ e.target.value = formatExp(e.target.value); renderAll(); });
+  document.getElementById('bw-cvc').addEventListener('input', function(e){ e.target.value = e.target.value.replace(/\\D/g,'').slice(0,4); renderAll(); });
 
   document.getElementById('bw-submit').addEventListener('click', async function(){
     var btn = this; btn.disabled = true; btn.textContent = 'Submitting...';
@@ -254,21 +306,18 @@ export const buildWidgetHtml = (opts: {
     }
   });
 
-  // Load settings + busy slots
+  // Load settings + busy slots + date overrides
+  var endRange = (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })();
   Promise.all([
     api('/rest/v1/business_settings?user_id=eq.' + UID + '&select=*').then(function(r){ return r.json(); }),
     api('/rest/v1/rpc/get_busy_slots', {
       method: 'POST',
-      body: JSON.stringify({
-        p_user_id: UID,
-        p_from: fmtDate(new Date()),
-        p_to: (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })()
-      })
-    }).then(function(r){ return r.json(); })
+      body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange })
+    }).then(function(r){ return r.json(); }),
+    api('/rest/v1/date_overrides?user_id=eq.' + UID + '&override_date=gte.' + fmtDate(new Date()) + '&override_date=lte.' + endRange + '&select=*').then(function(r){ return r.json(); })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];
-      // merge so defaults survive missing fields
       Object.keys(s).forEach(function(k){ if (s[k] !== null && s[k] !== undefined) settings[k] = s[k]; });
       if (settings.business_name) document.getElementById('bw-title').textContent = 'Book at ' + settings.business_name;
       if (settings.welcome_message) {
@@ -280,6 +329,7 @@ export const buildWidgetHtml = (opts: {
       document.getElementById('bw-deposit').textContent = 'Booking system';
     }
     busy = Array.isArray(arr[1]) ? arr[1] : [];
+    (Array.isArray(arr[2]) ? arr[2] : []).forEach(function(o){ overrides[o.override_date] = o; });
     // pre-select first available day
     var today = new Date();
     var startI = settings.allow_same_day ? 0 : 1;
