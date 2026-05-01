@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import BookingsList from "@/components/dashboard/BookingsList";
 import CalendarView from "@/components/dashboard/CalendarView";
 import ClientList from "@/components/dashboard/ClientList";
+import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
 import type { User } from "@supabase/supabase-js";
 
@@ -152,7 +153,7 @@ const Dashboard = () => {
             <BookingsList userId={user.id} />
           </TabsContent>
           <TabsContent value="calendar">
-            <CalendarView />
+            <CalendarView userId={user.id} />
           </TabsContent>
           <TabsContent value="clients">
             <ClientList userId={user.id} />
