@@ -33,7 +33,7 @@ const EmployeeDashboard = () => {
 
       const { data: emp } = await supabase
         .from("employees")
-        .select("name, user_id")
+        .select("id, name, user_id")
         .eq("auth_user_id", session.user.id)
         .maybeSingle();
 
@@ -56,6 +56,7 @@ const EmployeeDashboard = () => {
         .from("bookings")
         .select("id, booking_date, booking_time, duration_minutes, client_name, service, status")
         .eq("user_id", emp.user_id)
+        .eq("assigned_employee_id", emp.id)
         .gte("booking_date", today)
         .order("booking_date", { ascending: true })
         .order("booking_time", { ascending: true });
