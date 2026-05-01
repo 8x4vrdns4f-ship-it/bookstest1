@@ -94,7 +94,7 @@ const EmployeeDashboard = () => {
             {loading ? (
               <p className="text-muted-foreground text-sm">Loading…</p>
             ) : bookings.length === 0 ? (
-              <p className="text-muted-foreground text-sm">No upcoming bookings.</p>
+              <p className="text-muted-foreground text-sm">No bookings assigned to you yet.</p>
             ) : (
               <div className="space-y-2">
                 {bookings.map((b) => (
