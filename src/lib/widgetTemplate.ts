@@ -306,21 +306,18 @@ export const buildWidgetHtml = (opts: {
     }
   });
 
-  // Load settings + busy slots
+  // Load settings + busy slots + date overrides
+  var endRange = (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })();
   Promise.all([
     api('/rest/v1/business_settings?user_id=eq.' + UID + '&select=*').then(function(r){ return r.json(); }),
     api('/rest/v1/rpc/get_busy_slots', {
       method: 'POST',
-      body: JSON.stringify({
-        p_user_id: UID,
-        p_from: fmtDate(new Date()),
-        p_to: (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })()
-      })
-    }).then(function(r){ return r.json(); })
+      body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange })
+    }).then(function(r){ return r.json(); }),
+    api('/rest/v1/date_overrides?user_id=eq.' + UID + '&override_date=gte.' + fmtDate(new Date()) + '&override_date=lte.' + endRange + '&select=*').then(function(r){ return r.json(); })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];
-      // merge so defaults survive missing fields
       Object.keys(s).forEach(function(k){ if (s[k] !== null && s[k] !== undefined) settings[k] = s[k]; });
       if (settings.business_name) document.getElementById('bw-title').textContent = 'Book at ' + settings.business_name;
       if (settings.welcome_message) {
@@ -332,6 +329,7 @@ export const buildWidgetHtml = (opts: {
       document.getElementById('bw-deposit').textContent = 'Booking system';
     }
     busy = Array.isArray(arr[1]) ? arr[1] : [];
+    (Array.isArray(arr[2]) ? arr[2] : []).forEach(function(o){ overrides[o.override_date] = o; });
     // pre-select first available day
     var today = new Date();
     var startI = settings.allow_same_day ? 0 : 1;
