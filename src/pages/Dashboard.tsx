@@ -142,6 +142,11 @@ const Dashboard = () => {
           ))}
         </div>
 
+        {/* Charts row */}
+        <div className="mb-8">
+          <DashboardCharts userId={user.id} />
+        </div>
+
         {/* Tabs */}
         <Tabs defaultValue="bookings" className="space-y-6">
           <TabsList className="bg-secondary border border-border">
