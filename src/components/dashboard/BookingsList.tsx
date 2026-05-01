@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Check, X } from "lucide-react";
+import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight } from "lucide-react";
+import BookingDetailDialog from "./BookingDetailDialog";
 
 type Booking = {
   id: string;
@@ -22,19 +23,24 @@ type Booking = {
   status: string;
   notes: string | null;
   confirmation_code: string | null;
+  assigned_employee_id: string | null;
 };
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
   confirmed: "bg-green-500/20 text-green-400 border-green-500/30",
+  in_progress: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   cancelled: "bg-destructive/20 text-destructive border-destructive/30",
   completed: "bg-primary/20 text-primary border-primary/30",
 };
 
 const BookingsList = ({ userId }: { userId: string }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [employeesMap, setEmployeesMap] = useState<Record<string, string>>({});
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [detail, setDetail] = useState<Booking | null>(null);
   const { toast } = useToast();
 
   const [form, setForm] = useState({
@@ -53,21 +59,47 @@ const BookingsList = ({ userId }: { userId: string }) => {
       .select("*")
       .order("booking_date", { ascending: true })
       .order("booking_time", { ascending: true });
-    if (data) setBookings(data);
+    if (data) setBookings(data as Booking[]);
+  };
+
+  const fetchEmployees = async () => {
+    const { data } = await supabase.from("employees").select("id, name").eq("user_id", userId);
+    const map: Record<string, string> = {};
+    (data || []).forEach((e) => { map[e.id] = e.name; });
+    setEmployeesMap(map);
   };
 
   useEffect(() => {
     fetchBookings();
+    fetchEmployees();
 
     const channel = supabase
-      .channel("bookings-changes")
+      .channel("bookings-list-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => {
         fetchBookings();
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  // Keep open detail in sync with realtime updates
+  useEffect(() => {
+    if (!detail) return;
+    const fresh = bookings.find((b) => b.id === detail.id);
+    if (fresh && fresh !== detail) setDetail(fresh);
+  }, [bookings, detail]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toUpperCase();
+    if (!q) return bookings;
+    return bookings.filter((b) =>
+      (b.confirmation_code || "").toUpperCase().includes(q) ||
+      b.client_name.toUpperCase().includes(q) ||
+      (b.client_email || "").toUpperCase().includes(q)
+    );
+  }, [bookings, search]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,7 +123,6 @@ const BookingsList = ({ userId }: { userId: string }) => {
 
   const handleStatusChange = async (id: string, status: string) => {
     await supabase.from("bookings").update({ status }).eq("id", id);
-    fetchBookings();
   };
 
   const handleAccept = async (b: Booking) => {
@@ -108,13 +139,7 @@ const BookingsList = ({ userId }: { userId: string }) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
     }
-    toast({
-      title: `Accepted — code ${codeData}`,
-      description: b.client_email
-        ? `Share with ${b.client_name}. Email sending activates once your domain is set up.`
-        : `Share code ${codeData} with ${b.client_name} (no email on file).`,
-    });
-    fetchBookings();
+    toast({ title: `Accepted — code ${codeData}`, description: `Share with ${b.client_name}` });
   };
 
   const handleDecline = async (b: Booking) => {
@@ -126,18 +151,16 @@ const BookingsList = ({ userId }: { userId: string }) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Booking declined", description: b.client_email ? "Email sending activates once your domain is set up." : undefined });
-    fetchBookings();
+    toast({ title: "Booking declined" });
   };
 
   const handleDelete = async (id: string) => {
     await supabase.from("bookings").delete().eq("id", id);
-    fetchBookings();
   };
 
   return (
     <Card className="bg-card border-border">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between gap-3 flex-wrap">
         <CardTitle className="text-foreground">Bookings</CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -192,29 +215,48 @@ const BookingsList = ({ userId }: { userId: string }) => {
         </Dialog>
       </CardHeader>
       <CardContent>
-        {bookings.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No bookings yet. Add one or share your calendar widget!</p>
+        {/* Search bar */}
+        <div className="relative mb-4">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by code, name, or email…"
+            className="pl-9 bg-secondary border-border h-9 text-sm"
+          />
+        </div>
+
+        {filtered.length === 0 ? (
+          <p className="text-muted-foreground text-sm">{search ? "No bookings match your search." : "No bookings yet. Add one or share your calendar widget!"}</p>
         ) : (
           <div className="space-y-3">
-            {bookings.map((b) => (
-              <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-secondary/50 border border-border">
+            {filtered.map((b) => (
+              <div
+                key={b.id}
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-secondary/50 border border-border hover:border-primary/40 transition-colors cursor-pointer"
+                onClick={() => setDetail(b)}
+              >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-semibold text-foreground text-sm">{b.client_name}</span>
-                    <Badge variant="outline" className={statusColors[b.status]}>{b.status}</Badge>
+                    <Badge variant="outline" className={statusColors[b.status]}>{b.status.replace("_", " ")}</Badge>
                     {b.confirmation_code && (
                       <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 font-mono">
                         {b.confirmation_code}
                       </Badge>
                     )}
+                    {b.assigned_employee_id && employeesMap[b.assigned_employee_id] && (
+                      <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500/30 gap-1">
+                        <UserCheck size={10} /> {employeesMap[b.assigned_employee_id]}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {b.service} · {b.booking_date} at {b.booking_time.slice(0,5)} · {b.duration_minutes}min
+                    {b.service} · {b.booking_date} at {b.booking_time.slice(0, 5)} · {b.duration_minutes}min
                     {b.client_email && <> · {b.client_email}</>}
                   </p>
-                  {b.notes && <p className="text-xs text-muted-foreground mt-1">{b.notes}</p>}
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                   {b.status === "pending" ? (
                     <>
                       <Button size="sm" onClick={() => handleAccept(b)} className="h-8 gap-1 bg-green-600 hover:bg-green-700 text-white">
@@ -226,12 +268,13 @@ const BookingsList = ({ userId }: { userId: string }) => {
                     </>
                   ) : (
                     <Select value={b.status} onValueChange={(val) => handleStatusChange(b.id, val)}>
-                      <SelectTrigger className="w-[110px] h-8 text-xs bg-secondary border-border">
+                      <SelectTrigger className="w-[120px] h-8 text-xs bg-secondary border-border">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border">
                         <SelectItem value="pending">Pending</SelectItem>
                         <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="in_progress">In Progress</SelectItem>
                         <SelectItem value="completed">Completed</SelectItem>
                         <SelectItem value="cancelled">Cancelled</SelectItem>
                       </SelectContent>
@@ -240,12 +283,21 @@ const BookingsList = ({ userId }: { userId: string }) => {
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(b.id)}>
                     <Trash2 size={14} />
                   </Button>
+                  <ChevronRight size={14} className="text-muted-foreground hidden sm:block" />
                 </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
+
+      <BookingDetailDialog
+        booking={detail}
+        open={!!detail}
+        onOpenChange={(o) => !o && setDetail(null)}
+        ownerId={userId}
+        onChanged={() => { /* realtime will refresh */ }}
+      />
     </Card>
   );
 };
