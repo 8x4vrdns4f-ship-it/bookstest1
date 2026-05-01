@@ -147,6 +147,11 @@ export const buildWidgetHtml = (opts: {
   function fmtMin(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
 
   function dayHoursFor(dateStr){
+    var ov = overrides[dateStr];
+    if (ov) {
+      if (ov.closed) return { closed: true, open: '09:00', close: '18:00' };
+      return { closed: false, open: (ov.open_time||'09:00').slice(0,5), close: (ov.close_time||'18:00').slice(0,5) };
+    }
     var d = new Date(dateStr + 'T00:00:00');
     var key = DAY_KEYS[d.getDay()];
     return settings.working_hours[key] || { closed: true, open:'09:00', close:'18:00' };
