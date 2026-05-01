@@ -1,9 +1,18 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BrandLogo from "./BrandLogo";
 import { Button } from "@/components/ui/button";
 import JoinCompanyDialog from "./JoinCompanyDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const HeroSection = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setIsLoggedIn(!!s));
+    supabase.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session));
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <section className="px-8 md:px-16 pt-20 md:pt-32 pb-16 md:pb-24">
       <div className="flex flex-col md:flex-row items-start md:items-center gap-10 md:gap-16">
@@ -17,6 +26,11 @@ const HeroSection = () => {
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
               <Link to="/auth?mode=signup">Try now</Link>
             </Button>
+            {!isLoggedIn && (
+              <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
+                <Link to="/auth?mode=login">Login</Link>
+              </Button>
+            )}
             <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
               <Link to="/pricing">Explore Pricing</Link>
             </Button>
