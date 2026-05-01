@@ -23,3 +23,6 @@ Two dashboards: owners → /dashboard, employees → /employee-dashboard. Route 
 - [Booking Lifecycle](mem://features/booking-lifecycle) — Pending → confirmed/declined flow with 6-char codes
 - [Business Settings](mem://features/business-settings) — Per-business settings table (deposit, hours, name)
 - [Settings Page & Employee Flow](mem://features/settings-page) — Full /settings page, company code, join-a-company, employee dashboard
+- [Booking Detail & Assign](mem://features/booking-detail-and-assign) — Shared expandable detail dialog, assign employees, search bar, in_progress status, realtime
+- [Date Overrides](mem://features/date-overrides) — Per-date business hours that beat weekly defaults
+- [Dashboard Charts](mem://features/dashboard-charts) — Revenue stat, completed-today donut, switchable bookings bar chart
