@@ -44,7 +44,11 @@ export const buildWidgetHtml = (opts: {
   .bw input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2d3548;background:#263040;color:#fff;font-size:14px;outline:none}
   .bw input:focus{border-color:#5bade8}
   .bw .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .bw .card-stub{background:#0f1420;border:1px dashed #2d3548;padding:10px;border-radius:8px;font-size:11px;color:#9ca3af;text-align:center;margin-top:8px}
+  .bw .card-box{background:#0f1420;border:1px solid #2d3548;padding:12px;border-radius:8px;margin-top:10px}
+  .bw .card-box h4{margin:0 0 8px;font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  .bw .card-box .row3{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .bw .card-note{font-size:10px;color:#6b7280;margin-top:8px;text-align:center;font-style:italic}
+  .bw input.invalid{border-color:#ef4444}
   .bw button.submit{width:100%;padding:12px;border:none;border-radius:8px;background:#5bade8;color:#0f1420;font-weight:700;font-size:14px;cursor:pointer;margin-top:14px;transition:.15s}
   .bw button.submit:hover{background:#4a9ad8}
   .bw button.submit:disabled{opacity:.5;cursor:not-allowed}
@@ -76,7 +80,15 @@ export const buildWidgetHtml = (opts: {
     <input id="bw-email" type="email" placeholder="Email" required>
   </div>
 
-  <div class="card-stub">💳 Card details collected at confirmation. Nothing charged until the business accepts.</div>
+  <div class="card-box">
+    <h4>💳 Card Details</h4>
+    <input id="bw-card" placeholder="Card number" inputmode="numeric" maxlength="19" autocomplete="cc-number">
+    <div class="row3">
+      <input id="bw-exp" placeholder="MM/YY" inputmode="numeric" maxlength="5" autocomplete="cc-exp">
+      <input id="bw-cvc" placeholder="CVC" inputmode="numeric" maxlength="4" autocomplete="cc-csc">
+    </div>
+    <div class="card-note">You won't be charged unless your booking is accepted.</div>
+  </div>
 
   <div id="bw-err"></div>
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
