@@ -126,6 +126,7 @@ export const buildWidgetHtml = (opts: {
     buffer_minutes: 0
   };
   var busy = []; // {booking_date, booking_time, duration_minutes}
+  var overrides = {}; // dateStr -> {closed, open_time, close_time}
   var selDate = null, selSlot = null, selDur = null;
 
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
