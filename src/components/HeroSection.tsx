@@ -26,11 +26,9 @@ const HeroSection = () => {
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
               <Link to="/auth?mode=signup">Try now</Link>
             </Button>
-            {!isLoggedIn && (
-              <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
-                <Link to="/auth?mode=login">Login</Link>
-              </Button>
-            )}
+            <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
+              <Link to={isLoggedIn ? "/dashboard" : "/auth?mode=login"}>{isLoggedIn ? "Dashboard" : "Login"}</Link>
+            </Button>
             <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
               <Link to="/pricing">Explore Pricing</Link>
             </Button>
