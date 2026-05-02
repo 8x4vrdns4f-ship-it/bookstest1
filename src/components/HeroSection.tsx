@@ -27,9 +27,6 @@ const HeroSection = () => {
               <Link to="/auth?mode=signup">Try now</Link>
             </Button>
             <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
-              <Link to={isLoggedIn ? "/dashboard" : "/auth?mode=login"}>{isLoggedIn ? "Dashboard" : "Login"}</Link>
-            </Button>
-            <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/10 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>
               <Link to="/pricing">Explore Pricing</Link>
             </Button>
             <JoinCompanyDialog />
