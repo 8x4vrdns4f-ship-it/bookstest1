@@ -34,7 +34,7 @@ const Navbar = () => {
       </div>
       <a
         href={isLoggedIn ? "/dashboard" : "/auth?mode=login"}
-        className="text-primary font-semibold text-sm hover:text-primary/80 transition-colors"
+        className="border border-primary/50 text-primary hover:bg-primary/10 font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
       >
         {isLoggedIn ? "Dashboard" : "Login"}
       </a>
