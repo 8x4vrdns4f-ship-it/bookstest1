@@ -22,7 +22,8 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // 1. Create the auth account marked as employee
+      // 1. Try to create the auth account marked as employee.
+      //    If the user already exists, fall back to signing in with the supplied password.
       const { data: signUp, error: signErr } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -31,9 +32,23 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
           emailRedirectTo: `${window.location.origin}/employee-dashboard`,
         },
       });
-      if (signErr) throw signErr;
-      const newUserId = signUp.user?.id;
-      if (!newUserId) throw new Error("Could not create account.");
+
+      let newUserId: string | undefined = signUp?.user?.id;
+
+      if (signErr) {
+        const msg = signErr.message?.toLowerCase() ?? "";
+        const alreadyExists = msg.includes("already") || msg.includes("registered");
+        if (!alreadyExists) throw signErr;
+        // user exists — sign in instead
+        const { data: si, error: siErr } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (siErr) throw new Error("Account already exists. Use the password you set previously, or reset it.");
+        newUserId = si.user?.id;
+      }
+
+      if (!newUserId) throw new Error("Could not create or sign in to your account.");
 
       // 2. Find the company by code
       const { data: business, error: bizErr } = await supabase
@@ -44,9 +59,12 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
       if (bizErr) throw bizErr;
       if (!business) throw new Error("Company code not found.");
 
-      // 3. Sign in so we have an authenticated session for the next update
-      const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-      if (signInErr) throw signInErr;
+      // 3. Make sure we have an authenticated session before the update
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) {
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (signInErr) throw signInErr;
+      }
 
       // 4. Link the employees row by email
       const { data: empRow, error: empErr } = await supabase
