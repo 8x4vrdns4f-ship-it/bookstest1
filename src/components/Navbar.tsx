@@ -32,11 +32,12 @@ const Navbar = () => {
         )}
         <BrandLogo size="sm" />
       </div>
-      {!isLoggedIn && (
-        <a href="/auth?mode=login" className="text-primary font-semibold text-sm hover:text-primary/80 transition-colors">
-          Login
-        </a>
-      )}
+      <a
+        href={isLoggedIn ? "/dashboard" : "/auth?mode=login"}
+        className="text-primary font-semibold text-sm hover:text-primary/80 transition-colors"
+      >
+        {isLoggedIn ? "Dashboard" : "Login"}
+      </a>
     </nav>
   );
 };
