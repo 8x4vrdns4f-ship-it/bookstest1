@@ -154,6 +154,7 @@ const Dashboard = () => {
             <TabsTrigger value="bookings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Bookings</TabsTrigger>
             <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Calendar</TabsTrigger>
             <TabsTrigger value="clients" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Clients</TabsTrigger>
+            <TabsTrigger value="staff" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Staff</TabsTrigger>
           </TabsList>
           <TabsContent value="bookings">
             <BookingsList userId={user.id} />
@@ -163,6 +164,9 @@ const Dashboard = () => {
           </TabsContent>
           <TabsContent value="clients">
             <ClientList userId={user.id} />
+          </TabsContent>
+          <TabsContent value="staff">
+            <StaffList userId={user.id} />
           </TabsContent>
         </Tabs>
       </div>
