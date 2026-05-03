@@ -245,12 +245,47 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_shifts: {
+        Row: {
+          created_at: string
+          employee_id: string
+          end_time: string
+          id: string
+          shift_date: string
+          start_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          end_time?: string
+          id?: string
+          shift_date: string
+          start_time?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          end_time?: string
+          id?: string
+          shift_date?: string
+          start_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           auth_user_id: string | null
           created_at: string
           email: string
           id: string
+          manual_status: string | null
+          manual_status_date: string | null
           name: string
           phone: string | null
           position: string | null
@@ -262,6 +297,8 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          manual_status?: string | null
+          manual_status_date?: string | null
           name: string
           phone?: string | null
           position?: string | null
@@ -273,6 +310,8 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          manual_status?: string | null
+          manual_status_date?: string | null
           name?: string
           phone?: string | null
           position?: string | null
