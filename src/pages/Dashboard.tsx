@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import BookingsList from "@/components/dashboard/BookingsList";
 import CalendarView from "@/components/dashboard/CalendarView";
 import ClientList from "@/components/dashboard/ClientList";
+import StaffList from "@/components/dashboard/StaffList";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
 import type { User } from "@supabase/supabase-js";
@@ -153,6 +154,7 @@ const Dashboard = () => {
             <TabsTrigger value="bookings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Bookings</TabsTrigger>
             <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Calendar</TabsTrigger>
             <TabsTrigger value="clients" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Clients</TabsTrigger>
+            <TabsTrigger value="staff" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Staff</TabsTrigger>
           </TabsList>
           <TabsContent value="bookings">
             <BookingsList userId={user.id} />
@@ -162,6 +164,9 @@ const Dashboard = () => {
           </TabsContent>
           <TabsContent value="clients">
             <ClientList userId={user.id} />
+          </TabsContent>
+          <TabsContent value="staff">
+            <StaffList userId={user.id} />
           </TabsContent>
         </Tabs>
       </div>
