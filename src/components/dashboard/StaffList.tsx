@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import AddEmployeeDialog from "./AddEmployeeDialog";
 import ManageShiftsDialog from "./ManageShiftsDialog";
+import PlanShiftsDialog from "./PlanShiftsDialog";
 import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./EmployeeActionsDialog";
 import { CheckCircle2, AlertCircle, Activity } from "lucide-react";
 
