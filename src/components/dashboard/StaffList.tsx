@@ -177,12 +177,22 @@ const StaffList = ({ userId }: { userId: string }) => {
         items.map((m) => (
           <Card
             key={m.id}
-            onClick={() => setSelected(m)}
-            className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors"
+            className="bg-card border-border hover:border-primary/50 transition-colors"
           >
-            <CardContent className="p-4">
-              <p className="font-medium text-foreground">{m.name}</p>
-              {m.position && <p className="text-xs text-muted-foreground">{m.position}</p>}
+            <CardContent className="p-4 flex items-center justify-between gap-2">
+              <button
+                onClick={() => setProfileId(m.id)}
+                className="text-left flex-1 min-w-0"
+              >
+                <p className="font-medium text-foreground truncate">{m.name}</p>
+                {m.position && <p className="text-xs text-muted-foreground truncate">{m.position}</p>}
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setSelected(m); }}
+                className="text-xs text-primary hover:underline shrink-0"
+              >
+                Assign
+              </button>
             </CardContent>
           </Card>
         ))
