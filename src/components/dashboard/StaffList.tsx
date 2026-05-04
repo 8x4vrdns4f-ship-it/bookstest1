@@ -195,7 +195,7 @@ const StaffList = ({ userId }: { userId: string }) => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-foreground">Staff on duty</h2>
-          <p className="text-sm text-muted-foreground">Click any staff member to assign bookings or change status.</p>
+          <p className="text-sm text-muted-foreground">Click a name to view their profile, or use the columns below to assign bookings.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Input
