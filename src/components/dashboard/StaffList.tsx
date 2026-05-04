@@ -235,11 +235,55 @@ const StaffList = ({ userId }: { userId: string }) => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-5 md:grid-cols-3">
-          <Column title="In Progress" icon={Activity} color="text-primary" items={inProgress} />
-          <Column title="Free" icon={CheckCircle2} color="text-emerald-400" items={free} />
-          <Column title="Unavailable" icon={AlertCircle} color="text-destructive" items={unavailable} />
-        </div>
+        <>
+          {/* On shift now (today only) */}
+          {date === todayStr() && (
+            <Card className="bg-card border-border">
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock size={16} className="text-primary" />
+                  <h3 className="font-semibold text-foreground">On shift now</h3>
+                  <span className="text-xs text-muted-foreground">({onShiftNow.length})</span>
+                </div>
+                {onShiftNow.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-2">Nobody is currently within their shift hours.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {onShiftNow.map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => setProfileId(m.id)}
+                        className="w-full flex items-center justify-between gap-3 p-3 rounded border border-border bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50 transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                            <User size={16} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{m.name}</p>
+                            {m.position && <p className="text-xs text-muted-foreground truncate">{m.position}</p>}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs text-foreground">{m.shiftStart} – {m.shiftEnd}</p>
+                          <p className={`text-[10px] uppercase tracking-wide ${m.status === "in_progress" ? "text-primary" : "text-emerald-400"}`}>
+                            {m.status === "in_progress" ? "In booking" : "Free"}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid gap-5 md:grid-cols-3">
+            <Column title="In Progress" icon={Activity} color="text-primary" items={inProgress} />
+            <Column title="Free" icon={CheckCircle2} color="text-emerald-400" items={free} />
+            <Column title="Unavailable" icon={AlertCircle} color="text-destructive" items={unavailable} />
+          </div>
+        </>
       )}
 
       <EmployeeActionsDialog
@@ -249,6 +293,13 @@ const StaffList = ({ userId }: { userId: string }) => {
         userId={userId}
         date={date}
         onChanged={load}
+      />
+
+      <EmployeeProfileDialog
+        open={!!profileId}
+        onOpenChange={(v) => !v && setProfileId(null)}
+        employeeId={profileId}
+        userId={userId}
       />
     </div>
   );
