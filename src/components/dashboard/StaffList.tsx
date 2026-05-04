@@ -178,6 +178,7 @@ const StaffList = ({ userId }: { userId: string }) => {
             className="bg-secondary border-border w-auto"
           />
           <ManageShiftsDialog userId={userId} date={date} onChanged={load} />
+          <PlanShiftsDialog userId={userId} onChanged={load} />
           <AddEmployeeDialog userId={userId} onEmployeeAdded={load} />
         </div>
       </div>
