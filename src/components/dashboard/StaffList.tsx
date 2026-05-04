@@ -41,6 +41,7 @@ const StaffList = ({ userId }: { userId: string }) => {
   const [bookings, setBookings] = useState<BookingSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<StaffMember | null>(null);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
   // re-evaluate "in progress" every minute
