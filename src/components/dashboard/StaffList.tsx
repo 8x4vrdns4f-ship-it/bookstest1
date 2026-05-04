@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import AddEmployeeDialog from "./AddEmployeeDialog";
 import ManageShiftsDialog from "./ManageShiftsDialog";
+import PlanShiftsDialog from "./PlanShiftsDialog";
 import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./EmployeeActionsDialog";
 import { CheckCircle2, AlertCircle, Activity } from "lucide-react";
 
@@ -177,6 +178,7 @@ const StaffList = ({ userId }: { userId: string }) => {
             className="bg-secondary border-border w-auto"
           />
           <ManageShiftsDialog userId={userId} date={date} onChanged={load} />
+          <PlanShiftsDialog userId={userId} onChanged={load} />
           <AddEmployeeDialog userId={userId} onEmployeeAdded={load} />
         </div>
       </div>
