@@ -79,19 +79,36 @@ const StaffList = ({ userId }: { userId: string }) => {
     load();
   }, [userId, date]);
 
-  const { inProgress, free, unavailable } = useMemo(() => {
+  const { inProgress, free, unavailable, onShiftNow } = useMemo(() => {
     void tick;
     const isToday = date === todayStr();
     const now = new Date();
     const nowMins = now.getHours() * 60 + now.getMinutes();
 
-    const onShift = new Set(shifts.map((s) => s.employee_id));
-    const working = employees.filter((e) => onShift.has(e.id));
+    const shiftByEmp = new Map(shifts.map((s) => [s.employee_id, s]));
+    const working = employees.filter((e) => shiftByEmp.has(e.id));
 
-    const groups = { inProgress: [] as StaffMember[], free: [] as StaffMember[], unavailable: [] as StaffMember[] };
+    const groups = {
+      inProgress: [] as StaffMember[],
+      free: [] as StaffMember[],
+      unavailable: [] as StaffMember[],
+      onShiftNow: [] as Array<StaffMember & { shiftStart: string; shiftEnd: string }>,
+    };
 
     for (const emp of working) {
-      // check if currently in a booking
+      const shift = shiftByEmp.get(emp.id)!;
+
+      // Currently within shift window?
+      let withinShift = false;
+      if (isToday) {
+        const [sh, sm] = shift.start_time.split(":").map(Number);
+        const [eh, em] = shift.end_time.split(":").map(Number);
+        const start = sh * 60 + sm;
+        const end = eh * 60 + em;
+        withinShift = nowMins >= start && nowMins < end;
+      }
+
+      // Currently in a booking?
       let activeNow = false;
       if (isToday) {
         for (const b of bookings) {
@@ -123,6 +140,14 @@ const StaffList = ({ userId }: { userId: string }) => {
         status,
       };
       groups[status === "in_progress" ? "inProgress" : status].push(member);
+
+      if (withinShift && status !== "unavailable") {
+        groups.onShiftNow.push({
+          ...member,
+          shiftStart: shift.start_time.slice(0, 5),
+          shiftEnd: shift.end_time.slice(0, 5),
+        });
+      }
     }
     return groups;
   }, [employees, shifts, bookings, date, tick]);
