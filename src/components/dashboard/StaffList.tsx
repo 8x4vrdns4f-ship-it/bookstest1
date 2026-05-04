@@ -6,7 +6,8 @@ import AddEmployeeDialog from "./AddEmployeeDialog";
 import ManageShiftsDialog from "./ManageShiftsDialog";
 import PlanShiftsDialog from "./PlanShiftsDialog";
 import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./EmployeeActionsDialog";
-import { CheckCircle2, AlertCircle, Activity } from "lucide-react";
+import EmployeeProfileDialog from "./EmployeeProfileDialog";
+import { CheckCircle2, AlertCircle, Activity, Clock, User } from "lucide-react";
 
 interface Employee {
   id: string;
@@ -40,6 +41,7 @@ const StaffList = ({ userId }: { userId: string }) => {
   const [bookings, setBookings] = useState<BookingSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<StaffMember | null>(null);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
   // re-evaluate "in progress" every minute
@@ -77,19 +79,36 @@ const StaffList = ({ userId }: { userId: string }) => {
     load();
   }, [userId, date]);
 
-  const { inProgress, free, unavailable } = useMemo(() => {
+  const { inProgress, free, unavailable, onShiftNow } = useMemo(() => {
     void tick;
     const isToday = date === todayStr();
     const now = new Date();
     const nowMins = now.getHours() * 60 + now.getMinutes();
 
-    const onShift = new Set(shifts.map((s) => s.employee_id));
-    const working = employees.filter((e) => onShift.has(e.id));
+    const shiftByEmp = new Map(shifts.map((s) => [s.employee_id, s]));
+    const working = employees.filter((e) => shiftByEmp.has(e.id));
 
-    const groups = { inProgress: [] as StaffMember[], free: [] as StaffMember[], unavailable: [] as StaffMember[] };
+    const groups = {
+      inProgress: [] as StaffMember[],
+      free: [] as StaffMember[],
+      unavailable: [] as StaffMember[],
+      onShiftNow: [] as Array<StaffMember & { shiftStart: string; shiftEnd: string }>,
+    };
 
     for (const emp of working) {
-      // check if currently in a booking
+      const shift = shiftByEmp.get(emp.id)!;
+
+      // Currently within shift window?
+      let withinShift = false;
+      if (isToday) {
+        const [sh, sm] = shift.start_time.split(":").map(Number);
+        const [eh, em] = shift.end_time.split(":").map(Number);
+        const start = sh * 60 + sm;
+        const end = eh * 60 + em;
+        withinShift = nowMins >= start && nowMins < end;
+      }
+
+      // Currently in a booking?
       let activeNow = false;
       if (isToday) {
         for (const b of bookings) {
@@ -121,6 +140,14 @@ const StaffList = ({ userId }: { userId: string }) => {
         status,
       };
       groups[status === "in_progress" ? "inProgress" : status].push(member);
+
+      if (withinShift && status !== "unavailable") {
+        groups.onShiftNow.push({
+          ...member,
+          shiftStart: shift.start_time.slice(0, 5),
+          shiftEnd: shift.end_time.slice(0, 5),
+        });
+      }
     }
     return groups;
   }, [employees, shifts, bookings, date, tick]);
@@ -150,12 +177,22 @@ const StaffList = ({ userId }: { userId: string }) => {
         items.map((m) => (
           <Card
             key={m.id}
-            onClick={() => setSelected(m)}
-            className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors"
+            className="bg-card border-border hover:border-primary/50 transition-colors"
           >
-            <CardContent className="p-4">
-              <p className="font-medium text-foreground">{m.name}</p>
-              {m.position && <p className="text-xs text-muted-foreground">{m.position}</p>}
+            <CardContent className="p-4 flex items-center justify-between gap-2">
+              <button
+                onClick={() => setProfileId(m.id)}
+                className="text-left flex-1 min-w-0"
+              >
+                <p className="font-medium text-foreground truncate">{m.name}</p>
+                {m.position && <p className="text-xs text-muted-foreground truncate">{m.position}</p>}
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setSelected(m); }}
+                className="text-xs text-primary hover:underline shrink-0"
+              >
+                Assign
+              </button>
             </CardContent>
           </Card>
         ))
@@ -168,7 +205,7 @@ const StaffList = ({ userId }: { userId: string }) => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-foreground">Staff on duty</h2>
-          <p className="text-sm text-muted-foreground">Click any staff member to assign bookings or change status.</p>
+          <p className="text-sm text-muted-foreground">Click a name to view their profile, or use the columns below to assign bookings.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Input
@@ -198,11 +235,55 @@ const StaffList = ({ userId }: { userId: string }) => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-5 md:grid-cols-3">
-          <Column title="In Progress" icon={Activity} color="text-primary" items={inProgress} />
-          <Column title="Free" icon={CheckCircle2} color="text-emerald-400" items={free} />
-          <Column title="Unavailable" icon={AlertCircle} color="text-destructive" items={unavailable} />
-        </div>
+        <>
+          {/* On shift now (today only) */}
+          {date === todayStr() && (
+            <Card className="bg-card border-border">
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock size={16} className="text-primary" />
+                  <h3 className="font-semibold text-foreground">On shift now</h3>
+                  <span className="text-xs text-muted-foreground">({onShiftNow.length})</span>
+                </div>
+                {onShiftNow.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-2">Nobody is currently within their shift hours.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {onShiftNow.map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => setProfileId(m.id)}
+                        className="w-full flex items-center justify-between gap-3 p-3 rounded border border-border bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50 transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                            <User size={16} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{m.name}</p>
+                            {m.position && <p className="text-xs text-muted-foreground truncate">{m.position}</p>}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs text-foreground">{m.shiftStart} – {m.shiftEnd}</p>
+                          <p className={`text-[10px] uppercase tracking-wide ${m.status === "in_progress" ? "text-primary" : "text-emerald-400"}`}>
+                            {m.status === "in_progress" ? "In booking" : "Free"}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid gap-5 md:grid-cols-3">
+            <Column title="In Progress" icon={Activity} color="text-primary" items={inProgress} />
+            <Column title="Free" icon={CheckCircle2} color="text-emerald-400" items={free} />
+            <Column title="Unavailable" icon={AlertCircle} color="text-destructive" items={unavailable} />
+          </div>
+        </>
       )}
 
       <EmployeeActionsDialog
@@ -212,6 +293,13 @@ const StaffList = ({ userId }: { userId: string }) => {
         userId={userId}
         date={date}
         onChanged={load}
+      />
+
+      <EmployeeProfileDialog
+        open={!!profileId}
+        onOpenChange={(v) => !v && setProfileId(null)}
+        employeeId={profileId}
+        userId={userId}
       />
     </div>
   );
