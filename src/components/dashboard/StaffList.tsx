@@ -6,7 +6,8 @@ import AddEmployeeDialog from "./AddEmployeeDialog";
 import ManageShiftsDialog from "./ManageShiftsDialog";
 import PlanShiftsDialog from "./PlanShiftsDialog";
 import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./EmployeeActionsDialog";
-import { CheckCircle2, AlertCircle, Activity } from "lucide-react";
+import EmployeeProfileDialog from "./EmployeeProfileDialog";
+import { CheckCircle2, AlertCircle, Activity, Clock, User } from "lucide-react";
 
 interface Employee {
   id: string;
