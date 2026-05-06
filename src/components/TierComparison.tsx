@@ -73,7 +73,12 @@ const TierComparison = () => {
                 </td>
                 <td className="py-3 px-3 md:px-6 text-center">{renderValue(feature.silver)}</td>
                 <td className="py-3 px-3 md:px-6 text-center">{renderValue(feature.gold)}</td>
-                <td className="py-3 px-3 md:px-6 text-center">{renderValue(feature.platinum)}</td>
+                <td className="py-3 px-3 md:px-6 text-center bg-primary/5">
+                  {typeof feature.platinum === "boolean"
+                    ? renderValue(feature.platinum)
+                    : <span className="text-primary text-xs md:text-sm font-medium">{feature.platinum}</span>
+                  }
+                </td>
               </tr>
             ))}
           </tbody>
