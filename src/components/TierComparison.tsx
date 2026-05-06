@@ -53,9 +53,9 @@ const TierComparison = () => {
                 Feature
               </th>
               {tiers.map((tier) => (
-                <th key={tier.name} className="py-4 px-3 md:px-6 text-center min-w-[100px]">
-                  <span className="block text-foreground font-bold text-base md:text-lg">{tier.name}</span>
-                  <span className="block text-muted-foreground text-xs mt-0.5">{tier.price}/mo</span>
+                <th key={tier.name} className={`py-4 px-3 md:px-6 text-center min-w-[100px] ${tier.name === "Platinum" ? "bg-primary/5" : ""}`}>
+                  <span className={`block font-bold text-base md:text-lg ${tier.name === "Platinum" ? "text-primary" : "text-foreground"}`}>{tier.name}</span>
+                  <span className={`block text-xs mt-0.5 ${tier.name === "Platinum" ? "text-primary/70" : "text-muted-foreground"}`}>{tier.price}/mo</span>
                 </th>
               ))}
             </tr>
@@ -73,7 +73,12 @@ const TierComparison = () => {
                 </td>
                 <td className="py-3 px-3 md:px-6 text-center">{renderValue(feature.silver)}</td>
                 <td className="py-3 px-3 md:px-6 text-center">{renderValue(feature.gold)}</td>
-                <td className="py-3 px-3 md:px-6 text-center">{renderValue(feature.platinum)}</td>
+                <td className="py-3 px-3 md:px-6 text-center bg-primary/5">
+                  {typeof feature.platinum === "boolean"
+                    ? renderValue(feature.platinum)
+                    : <span className="text-primary text-xs md:text-sm font-medium">{feature.platinum}</span>
+                  }
+                </td>
               </tr>
             ))}
           </tbody>
