@@ -5,10 +5,15 @@ import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const tiers = [
   {
     name: "Silver",
+    tier: "silver" as const,
     price: "£199",
     period: "/mo",
     features: ["Up to 50 bookings/mo", "1 staff member", "Email support", "Basic analytics", "12.5% fee per successful booking"],
@@ -17,6 +22,7 @@ const tiers = [
   },
   {
     name: "Gold",
+    tier: "gold" as const,
     price: "£549",
     period: "/mo",
     features: ["Up to 300 bookings/mo", "10 staff members", "Priority support", "Advanced analytics", "Custom branding", "7.5% fee per transaction"],
@@ -26,6 +32,7 @@ const tiers = [
   },
   {
     name: "Platinum",
+    tier: "platinum" as const,
     price: "£1,195",
     period: "/mo",
     features: ["Unlimited bookings", "Unlimited staff", "24/7 dedicated support", "Full analytics suite", "Custom branding", "API access", "2.5% fee per transaction"],
@@ -35,6 +42,31 @@ const tiers = [
 ];
 
 const Pricing = () => {
+  const [loading, setLoading] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleSubscribe = async (tier: "silver" | "gold" | "platinum") => {
+    setLoading(tier);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.info("Please sign up or log in to subscribe");
+        navigate("/auth");
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("create-checkout", { body: { tier } });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Could not start checkout");
+    } finally {
+      setLoading(null);
+    }
+  };
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -102,8 +134,12 @@ const Pricing = () => {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg">
-                  Get Started
+                <Button
+                  onClick={() => handleSubscribe(tier.tier)}
+                  disabled={loading === tier.tier}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
+                >
+                  {loading === tier.tier ? "Loading..." : "Get Started"}
                 </Button>
               </CardFooter>
             </Card>
