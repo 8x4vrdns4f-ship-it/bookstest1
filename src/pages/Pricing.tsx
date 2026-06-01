@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import SEO from "@/components/SEO";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
