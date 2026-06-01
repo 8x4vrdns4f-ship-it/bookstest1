@@ -67,6 +67,8 @@ type SettingsForm = {
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { tier } = useSubscription();
+  const canBrand = tier ? TIER_LIMITS[tier].customBranding : false;
   const [userId, setUserId] = useState<string | null>(null);
   const [companyCode, setCompanyCode] = useState("");
   const [copied, setCopied] = useState(false);
