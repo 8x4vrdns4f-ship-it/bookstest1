@@ -134,8 +134,12 @@ const Pricing = () => {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg">
-                  Get Started
+                <Button
+                  onClick={() => handleSubscribe(tier.tier)}
+                  disabled={loading === tier.tier}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
+                >
+                  {loading === tier.tier ? "Loading..." : "Get Started"}
                 </Button>
               </CardFooter>
             </Card>
