@@ -1,0 +1,14 @@
+# BookSuite
+
+> All-in-one booking, scheduling, and client management platform for small service businesses — barbers, salons, clinics, studios, and more.
+
+BookSuite gives service businesses a hosted booking page, an embeddable booking widget for their own site, a calendar dashboard, staff scheduling, client records, and automated booking confirmations. Owners manage their availability, deposits, and team from a single dashboard; clients book in a few taps without creating an account.
+
+## Pages
+
+- [Home](/): Product overview, features, and call to action.
+- [Pricing](/pricing): Subscription tiers, transaction fees, and plan comparison.
+
+## Optional
+
+- [Sign in](/auth): Owner and employee login.
