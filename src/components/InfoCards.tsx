@@ -8,7 +8,8 @@ const cards = [
 
 const InfoCards = () => {
   return (
-    <section className="px-6 md:px-12 py-16">
+    <section className="px-6 md:px-12 py-16" aria-labelledby="infocards-heading">
+      <h2 id="infocards-heading" className="sr-only">Built for businesses, staff, and customers</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cards.map((card, i) => (
           <motion.div
