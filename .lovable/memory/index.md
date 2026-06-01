@@ -27,3 +27,4 @@ Two dashboards: owners → /dashboard, employees → /employee-dashboard. Route 
 - [Booking Detail & Assign](mem://features/booking-detail-and-assign) — Shared expandable detail dialog, assign employees, search bar, in_progress status, realtime
 - [Date Overrides](mem://features/date-overrides) — Per-date business hours that beat weekly defaults
 - [Dashboard Charts](mem://features/dashboard-charts) — Revenue stat, completed-today donut, switchable bookings bar chart
+- [Roles & Join Requests](mem://features/roles-and-join-requests) — Per-business company_roles, employee_join_requests approval flow, pending-approval page, role-based routing

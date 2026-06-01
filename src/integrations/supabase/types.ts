@@ -212,6 +212,45 @@ export type Database = {
         }
         Relationships: []
       }
+      company_roles: {
+        Row: {
+          can_approve_requests: boolean
+          can_check_in: boolean
+          can_manage_settings: boolean
+          can_view_all_bookings: boolean
+          created_at: string
+          id: string
+          is_builtin: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_approve_requests?: boolean
+          can_check_in?: boolean
+          can_manage_settings?: boolean
+          can_view_all_bookings?: boolean
+          created_at?: string
+          id?: string
+          is_builtin?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_approve_requests?: boolean
+          can_check_in?: boolean
+          can_manage_settings?: boolean
+          can_view_all_bookings?: boolean
+          created_at?: string
+          id?: string
+          is_builtin?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       date_overrides: {
         Row: {
           close_time: string | null
@@ -244,6 +283,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      employee_join_requests: {
+        Row: {
+          assigned_role_id: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decline_reason: string | null
+          id: string
+          requester_auth_id: string
+          requester_email: string
+          requester_name: string
+          requester_phone: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_role_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          id?: string
+          requester_auth_id: string
+          requester_email: string
+          requester_name: string
+          requester_phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_role_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          id?: string
+          requester_auth_id?: string
+          requester_email?: string
+          requester_name?: string
+          requester_phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_join_requests_assigned_role_id_fkey"
+            columns: ["assigned_role_id"]
+            isOneToOne: false
+            referencedRelation: "company_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       employee_shifts: {
         Row: {
@@ -281,6 +376,7 @@ export type Database = {
       employees: {
         Row: {
           auth_user_id: string | null
+          available_now: boolean
           created_at: string
           email: string
           id: string
@@ -289,11 +385,13 @@ export type Database = {
           name: string
           phone: string | null
           position: string | null
+          role_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           auth_user_id?: string | null
+          available_now?: boolean
           created_at?: string
           email: string
           id?: string
@@ -302,11 +400,13 @@ export type Database = {
           name: string
           phone?: string | null
           position?: string | null
+          role_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           auth_user_id?: string | null
+          available_now?: boolean
           created_at?: string
           email?: string
           id?: string
@@ -315,10 +415,19 @@ export type Database = {
           name?: string
           phone?: string | null
           position?: string | null
+          role_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "employees_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "company_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -360,6 +469,15 @@ export type Database = {
           employee_id: string
         }[]
       }
+      decide_join_request: {
+        Args: {
+          p_decision: string
+          p_decline_reason: string
+          p_request_id: string
+          p_role_id: string
+        }
+        Returns: undefined
+      }
       generate_booking_code: { Args: never; Returns: string }
       generate_company_code: { Args: never; Returns: string }
       get_busy_slots: {
@@ -396,12 +514,23 @@ export type Database = {
           working_hours: Json
         }[]
       }
+      has_company_permission: {
+        Args: { _auth_uid: string; _business_user_id: string; _perm: string }
+        Returns: boolean
+      }
       lookup_business_by_code: {
         Args: { p_code: string }
         Returns: {
           business_name: string
           company_code: string
           user_id: string
+        }[]
+      }
+      request_to_join_company: {
+        Args: { p_company_code: string; p_name: string; p_phone: string }
+        Returns: {
+          business_name: string
+          request_id: string
         }[]
       }
     }
