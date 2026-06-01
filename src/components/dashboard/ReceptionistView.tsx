@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Search, ScanLine, UserCheck, Clock } from "lucide-react";
+import { Search, ScanLine, UserCheck, Clock, Camera, X } from "lucide-react";
+import CameraScanner from "@/components/CameraScanner";
 
 type Booking = {
   id: string;
@@ -36,6 +37,7 @@ const ReceptionistView = ({ businessUserId }: { businessUserId: string }) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [code, setCode] = useState("");
   const [search, setSearch] = useState("");
+  const [scanning, setScanning] = useState(false);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
@@ -75,8 +77,8 @@ const ReceptionistView = ({ businessUserId }: { businessUserId: string }) => {
     toast({ title: "Assigned" });
   };
 
-  const checkInByCode = async () => {
-    const c = code.trim().toUpperCase();
+  const checkInWithCode = async (raw: string) => {
+    const c = raw.trim().toUpperCase().slice(-6);
     if (c.length !== 6) {
       toast({ title: "Enter a 6-character code", variant: "destructive" });
       return;
@@ -88,9 +90,11 @@ const ReceptionistView = ({ businessUserId }: { businessUserId: string }) => {
     }
     await updateStatus(match.id, "in_progress");
     setCode("");
-    // scroll the booking into view via search
+    setScanning(false);
     setSearch(c);
   };
+
+  const checkInByCode = () => checkInWithCode(code);
 
   const filtered = useMemo(() => {
     const q = search.trim().toUpperCase();
@@ -110,20 +114,35 @@ const ReceptionistView = ({ businessUserId }: { businessUserId: string }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Input
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
-              onKeyDown={(e) => e.key === "Enter" && checkInByCode()}
-              placeholder="Enter 6-char code"
-              maxLength={6}
-              className="bg-secondary border-border font-mono tracking-widest text-lg uppercase"
-            />
-            <Button onClick={checkInByCode} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Check In
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">Camera scanner coming next. For now, type or paste the customer's code.</p>
+          {scanning ? (
+            <div className="space-y-2">
+              <CameraScanner
+                onScan={(t) => checkInWithCode(t)}
+                onError={(m) => { toast({ title: "Camera error", description: m, variant: "destructive" }); setScanning(false); }}
+              />
+              <Button variant="outline" size="sm" onClick={() => setScanning(false)} className="w-full">
+                <X size={14} className="mr-1" /> Stop scanning
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Input
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === "Enter" && checkInByCode()}
+                placeholder="Enter 6-char code"
+                maxLength={6}
+                className="bg-secondary border-border font-mono tracking-widest text-lg uppercase"
+              />
+              <Button onClick={checkInByCode} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Check In
+              </Button>
+              <Button variant="outline" onClick={() => setScanning(true)} className="border-border">
+                <Camera size={16} className="mr-1" /> Scan
+              </Button>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">Scan the customer's QR code or type their 6-character code.</p>
         </CardContent>
       </Card>
 
