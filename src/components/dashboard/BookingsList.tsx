@@ -111,7 +111,8 @@ const BookingsList = ({ userId }: { userId: string }) => {
       notes: form.notes || null,
     });
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      if (!handleTierError(error)) toast({ title: "Error", description: error.message, variant: "destructive" });
+
     } else {
       toast({ title: "Booking added!" });
       setOpen(false);
