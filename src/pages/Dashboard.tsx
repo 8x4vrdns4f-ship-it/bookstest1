@@ -36,6 +36,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState({ todayBookings: 0, totalClients: 0, upcoming: 0 });
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { tier } = useSubscription();
+  const canSeeAdvanced = tier ? TIER_LIMITS[tier].advancedAnalytics : false;
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
