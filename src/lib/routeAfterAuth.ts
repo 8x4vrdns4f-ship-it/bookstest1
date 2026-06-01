@@ -1,17 +1,51 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Returns the right dashboard route for the current signed-in user.
- * - Linked employee row → /employee-dashboard
- * - Otherwise (owner) → /dashboard
+ * Returns the right post-login route for the current signed-in user.
+ * - Pending or declined join request, no employee link → /pending-approval
+ * - Linked employee with role 'owner' or 'manager' → /dashboard
+ * - Linked employee with role 'receptionist' → /dashboard (receptionist view)
+ * - Linked employee (any other role) → /employee-dashboard
+ * - Otherwise (business owner with business_settings) → /dashboard
  */
 export const getDashboardRoute = async (): Promise<string> => {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return "/auth";
-  const { data } = await supabase
+  const uid = session.user.id;
+
+  // Linked employee?
+  const { data: emp } = await supabase
     .from("employees")
-    .select("id")
-    .eq("auth_user_id", session.user.id)
+    .select("id, role_id, company_roles:role_id(name)")
+    .eq("auth_user_id", uid)
     .maybeSingle();
-  return data ? "/employee-dashboard" : "/dashboard";
+  if (emp) {
+    const roleName = (emp as any).company_roles?.name ?? "employee";
+    if (roleName === "owner" || roleName === "manager" || roleName === "receptionist") {
+      return "/dashboard";
+    }
+    return "/employee-dashboard";
+  }
+
+  // Business owner?
+  const { data: biz } = await supabase
+    .from("business_settings")
+    .select("user_id")
+    .eq("user_id", uid)
+    .maybeSingle();
+  if (biz) return "/dashboard";
+
+  // Otherwise check for pending/declined join request
+  const { data: req } = await supabase
+    .from("employee_join_requests")
+    .select("status")
+    .eq("requester_auth_id", uid)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (req && (req.status === "pending" || req.status === "declined")) {
+    return "/pending-approval";
+  }
+
+  return "/dashboard";
 };

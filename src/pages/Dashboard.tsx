@@ -17,6 +17,7 @@ import ClientList from "@/components/dashboard/ClientList";
 import StaffList from "@/components/dashboard/StaffList";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
+import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import type { User } from "@supabase/supabase-js";
 
 const Dashboard = () => {
@@ -148,6 +149,11 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Join requests */}
+        <div className="mb-8">
+          <JoinRequestsCard businessUserId={user.id} />
         </div>
 
         {/* Charts row */}
