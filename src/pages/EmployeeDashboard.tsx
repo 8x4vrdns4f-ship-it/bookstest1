@@ -80,7 +80,7 @@ const EmployeeDashboard = () => {
         noIndex
       />
       <Navbar />
-      <div className="flex-1 px-6 md:px-16 py-10 max-w-5xl w-full mx-auto">
+      <main className="flex-1 px-6 md:px-16 py-10 max-w-5xl w-full mx-auto">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <p className="text-primary text-sm font-semibold uppercase tracking-wide">{companyName}</p>
@@ -120,7 +120,7 @@ const EmployeeDashboard = () => {
             )}
           </CardContent>
         </Card>
-      </div>
+      </main>
       <Footer />
     </div>
   );

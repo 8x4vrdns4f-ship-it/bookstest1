@@ -18,6 +18,7 @@ const HeroSection = () => {
       <div className="flex flex-col md:flex-row items-start md:items-center gap-10 md:gap-16">
         {/* Left - Title & Buttons */}
         <div className="flex-1 space-y-6">
+          <h1 className="sr-only">BookSuite — booking, client, and staff management for service businesses</h1>
           <BrandLogo size="lg" />
           <p className="text-muted-foreground text-base md:text-lg max-w-md">
             Bookings, Clients, and Staff schedules, all in one place

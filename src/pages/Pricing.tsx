@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import SEO from "@/components/SEO";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -41,7 +42,25 @@ const Pricing = () => {
         description="BookSuite pricing plans for service businesses. Silver, Gold, and Platinum tiers with transparent transaction fees and staff limits."
         path="/pricing"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: "BookSuite",
+          description: "All-in-one booking platform for small service businesses.",
+          brand: { "@type": "Brand", name: "BookSuite" },
+          offers: tiers.map((t) => ({
+            "@type": "Offer",
+            name: t.name,
+            price: t.price.replace(/[^0-9.]/g, ""),
+            priceCurrency: "USD",
+            url: "https://booksuite.online/pricing",
+            availability: "https://schema.org/InStock",
+          })),
+        })}</script>
+      </Helmet>
       <Navbar />
+      <main>
       <section className="px-8 md:px-16 pt-32 pb-24">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">
           <span className="text-primary">Choose</span>{" "}
@@ -91,6 +110,7 @@ const Pricing = () => {
           ))}
         </div>
       </section>
+      </main>
       <Footer />
     </div>
   );
