@@ -5,10 +5,15 @@ import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const tiers = [
   {
     name: "Silver",
+    tier: "silver" as const,
     price: "£199",
     period: "/mo",
     features: ["Up to 50 bookings/mo", "1 staff member", "Email support", "Basic analytics", "12.5% fee per successful booking"],
