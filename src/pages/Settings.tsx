@@ -56,6 +56,8 @@ type SettingsForm = {
   notify_client_reminder: boolean;
   welcome_message: string;
   accent_color: string;
+  self_checkin_enabled: boolean;
+  reception_checkin_enabled: boolean;
 };
 
 const Settings = () => {
@@ -74,6 +76,7 @@ const Settings = () => {
     notify_new_booking: true, notify_daily_summary: false,
     notify_client_confirmation: true, notify_client_reminder: true,
     welcome_message: "", accent_color: "#3B82F6",
+    self_checkin_enabled: false, reception_checkin_enabled: true,
   });
 
   useEffect(() => {
@@ -110,6 +113,8 @@ const Settings = () => {
             notify_client_reminder: data.notify_client_reminder,
             welcome_message: data.welcome_message || "",
             accent_color: data.accent_color || "#3B82F6",
+            self_checkin_enabled: !!data.self_checkin_enabled,
+            reception_checkin_enabled: data.reception_checkin_enabled ?? true,
           });
         }
         setLoading(false);
@@ -130,6 +135,9 @@ const Settings = () => {
   const handleSave = async () => {
     if (!userId) return;
     if (form.deposit_amount < 10) { toast({ title: "Deposit must be at least £10", variant: "destructive" }); return; }
+    if (!form.self_checkin_enabled && !form.reception_checkin_enabled) {
+      toast({ title: "Enable at least one check-in method", variant: "destructive" }); return;
+    }
     setSaving(true);
     const { error } = await supabase.from("business_settings").upsert(
       { user_id: userId, ...form, working_hours: form.working_hours as never },
@@ -307,6 +315,27 @@ const Settings = () => {
             </AccordionTrigger>
             <AccordionContent className="pb-5">
               {userId && <RolesManager userId={userId} />}
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Check-In */}
+          <AccordionItem value="checkin" className="bg-card border border-border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline">
+              <span className="text-foreground font-semibold">Check-In</span>
+            </AccordionTrigger>
+            <AccordionContent className="space-y-3 pb-5">
+              <ToggleRow
+                label="Self check-in kiosk"
+                hint={`Customers scan the QR code on their booking at a kiosk. Kiosk URL: ${window.location.origin}/kiosk/${companyCode}`}
+                checked={form.self_checkin_enabled}
+                onChange={(v) => setForm({ ...form, self_checkin_enabled: v })}
+              />
+              <ToggleRow
+                label="Receptionist check-in"
+                hint="Receptionists scan or type the customer's code, then handle the next steps."
+                checked={form.reception_checkin_enabled}
+                onChange={(v) => setForm({ ...form, reception_checkin_enabled: v })}
+              />
             </AccordionContent>
           </AccordionItem>
 
