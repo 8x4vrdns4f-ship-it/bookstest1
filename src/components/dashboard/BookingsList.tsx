@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight } from "lucide-react";
 import BookingDetailDialog from "./BookingDetailDialog";
+import { handleTierError } from "@/lib/tierError";
+
 
 type Booking = {
   id: string;

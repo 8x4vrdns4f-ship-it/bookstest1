@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { handleTierError } from "@/lib/tierError";
+
 import {
   Dialog,
   DialogContent,
