@@ -107,7 +107,10 @@ const Dashboard = () => {
     toast({ title: "Widget downloaded!", description: "Embed this HTML file on your site to take bookings." });
   };
 
-  if (!user) return null;
+  if (!user || !businessUserId) return null;
+
+  const isOwner = role.name === "owner";
+  const isReceptionist = role.name === "receptionist";
 
   const statCards = [
     { label: "Bookings Today", value: String(stats.todayBookings), icon: CalendarDays },
@@ -129,20 +132,24 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Hey, {displayName} 👋</h1>
-            <p className="text-muted-foreground mt-1">Here's your overview</p>
+            <p className="text-muted-foreground mt-1 capitalize">{role.name} view</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            <Button asChild variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
-              <Link to="/settings"><SettingsIcon size={16} /> Settings</Link>
-            </Button>
-            <AddEmployeeDialog userId={user.id} />
-            <Button
-              onClick={handleDownloadWidget}
-              className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm"
-            >
-              <Download size={16} />
-              Download Calendar Widget
-            </Button>
+            {isOwner && (
+              <Button asChild variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
+                <Link to="/settings"><SettingsIcon size={16} /> Settings</Link>
+              </Button>
+            )}
+            {isOwner && <AddEmployeeDialog userId={user.id} />}
+            {isOwner && (
+              <Button
+                onClick={handleDownloadWidget}
+                className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm"
+              >
+                <Download size={16} />
+                Download Calendar Widget
+              </Button>
+            )}
             <Button
               onClick={handleLogout}
               variant="outline"
@@ -154,52 +161,60 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {statCards.map((stat) => (
-            <Card key={stat.label} className="bg-card border-border">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
-                <stat.icon size={18} className="text-primary" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {isReceptionist ? (
+          <ReceptionistView businessUserId={businessUserId} />
+        ) : (
+          <>
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {statCards.map((stat) => (
+                <Card key={stat.label} className="bg-card border-border">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+                    <stat.icon size={18} className="text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-        {/* Join requests */}
-        <div className="mb-8">
-          <JoinRequestsCard businessUserId={user.id} />
-        </div>
+            {/* Join requests — owners + roles with approve permission */}
+            {role.canApprove && (
+              <div className="mb-8">
+                <JoinRequestsCard businessUserId={businessUserId} />
+              </div>
+            )}
 
-        {/* Charts row */}
-        <div className="mb-8">
-          <DashboardCharts userId={user.id} />
-        </div>
+            {/* Charts row */}
+            <div className="mb-8">
+              <DashboardCharts userId={businessUserId} />
+            </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="bookings" className="space-y-6">
-          <TabsList className="bg-secondary border border-border">
-            <TabsTrigger value="bookings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Bookings</TabsTrigger>
-            <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Calendar</TabsTrigger>
-            <TabsTrigger value="clients" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Clients</TabsTrigger>
-            <TabsTrigger value="staff" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Staff</TabsTrigger>
-          </TabsList>
-          <TabsContent value="bookings">
-            <BookingsList userId={user.id} />
-          </TabsContent>
-          <TabsContent value="calendar">
-            <CalendarView userId={user.id} />
-          </TabsContent>
-          <TabsContent value="clients">
-            <ClientList userId={user.id} />
-          </TabsContent>
-          <TabsContent value="staff">
-            <StaffList userId={user.id} />
-          </TabsContent>
-        </Tabs>
+            {/* Tabs */}
+            <Tabs defaultValue="bookings" className="space-y-6">
+              <TabsList className="bg-secondary border border-border">
+                <TabsTrigger value="bookings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Bookings</TabsTrigger>
+                <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Calendar</TabsTrigger>
+                <TabsTrigger value="clients" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Clients</TabsTrigger>
+                <TabsTrigger value="staff" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Staff</TabsTrigger>
+              </TabsList>
+              <TabsContent value="bookings">
+                <BookingsList userId={businessUserId} />
+              </TabsContent>
+              <TabsContent value="calendar">
+                <CalendarView userId={businessUserId} />
+              </TabsContent>
+              <TabsContent value="clients">
+                <ClientList userId={businessUserId} />
+              </TabsContent>
+              <TabsContent value="staff">
+                <StaffList userId={businessUserId} />
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
       </main>
       <Footer />
     </div>
