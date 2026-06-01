@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
 
 const Auth = () => {
@@ -73,6 +74,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title={isLogin ? "Log In — BookSuite" : "Sign Up — BookSuite"}
+        description={isLogin ? "Log in to BookSuite to manage your bookings, clients, and staff." : "Create a BookSuite account and start taking online bookings for your service business."}
+        path="/auth"
+      />
       <Navbar />
       <div className="flex-1 flex items-center justify-center px-4 py-16">
         <Card className="w-full max-w-md bg-card border-border">

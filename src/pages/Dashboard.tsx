@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import BookingsList from "@/components/dashboard/BookingsList";
 import CalendarView from "@/components/dashboard/CalendarView";
 import ClientList from "@/components/dashboard/ClientList";
@@ -97,6 +98,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Dashboard — BookSuite"
+        description="Your BookSuite dashboard: today's bookings, upcoming appointments, clients, and staff at a glance."
+        path="/dashboard"
+        noIndex
+      />
       <Navbar />
       <div className="flex-1 px-8 md:px-16 py-10">
         {/* Header */}

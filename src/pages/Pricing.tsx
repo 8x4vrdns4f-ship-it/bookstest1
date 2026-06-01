@@ -1,3 +1,4 @@
+import SEO from "@/components/SEO";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
@@ -35,6 +36,11 @@ const tiers = [
 const Pricing = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Pricing — BookSuite"
+        description="BookSuite pricing plans for service businesses. Silver, Gold, and Platinum tiers with transparent transaction fees and staff limits."
+        path="/pricing"
+      />
       <Navbar />
       <section className="px-8 md:px-16 pt-32 pb-24">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">

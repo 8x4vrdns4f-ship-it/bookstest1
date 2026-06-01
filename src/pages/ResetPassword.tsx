@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -77,6 +78,12 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Reset Password — BookSuite"
+        description="Set a new password for your BookSuite account."
+        path="/reset-password"
+        noIndex
+      />
       <Navbar />
       <div className="flex-1 flex items-center justify-center px-4 py-16">
         <Card className="w-full max-w-md bg-card border-border">
