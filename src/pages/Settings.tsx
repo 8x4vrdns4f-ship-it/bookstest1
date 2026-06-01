@@ -16,6 +16,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
+import { useSubscription } from "@/hooks/useSubscription";
+import { TIER_LIMITS } from "@/lib/tierLimits";
+import { Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type DayHours = { open: string; close: string; closed: boolean };
 type WorkingHours = Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", DayHours>;
@@ -63,6 +67,8 @@ type SettingsForm = {
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { tier } = useSubscription();
+  const canBrand = tier ? TIER_LIMITS[tier].customBranding : false;
   const [userId, setUserId] = useState<string | null>(null);
   const [companyCode, setCompanyCode] = useState("");
   const [copied, setCopied] = useState(false);
@@ -345,16 +351,34 @@ const Settings = () => {
               <span className="text-foreground font-semibold">Booking Page</span>
             </AccordionTrigger>
             <AccordionContent className="space-y-4 pb-5">
+              {!canBrand && (
+                <div className="flex items-center justify-between gap-3 bg-secondary/60 border border-border rounded-lg px-4 py-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Lock size={14} className="text-primary" />
+                    Custom branding is a Gold &amp; Platinum feature.
+                  </div>
+                  <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Link to="/pricing">Upgrade</Link>
+                  </Button>
+                </div>
+              )}
               <Field label="Welcome Message" hint="Shown at the top of your public booking page.">
-                <Textarea value={form.welcome_message} onChange={(e) => setForm({ ...form, welcome_message: e.target.value })} className="bg-secondary border-border" rows={2} />
+                <Textarea
+                  value={form.welcome_message}
+                  onChange={(e) => setForm({ ...form, welcome_message: e.target.value })}
+                  className="bg-secondary border-border"
+                  rows={2}
+                  disabled={!canBrand}
+                />
               </Field>
               <Field label="Accent Color" hint="Primary color for your booking page.">
                 <div className="flex items-center gap-3">
-                  <input type="color" value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className="h-10 w-16 rounded cursor-pointer bg-secondary border border-border" />
-                  <Input value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className="bg-secondary border-border max-w-[140px]" />
+                  <input type="color" value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className="h-10 w-16 rounded cursor-pointer bg-secondary border border-border disabled:opacity-50 disabled:cursor-not-allowed" disabled={!canBrand} />
+                  <Input value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className="bg-secondary border-border max-w-[140px]" disabled={!canBrand} />
                 </div>
               </Field>
             </AccordionContent>
+
           </AccordionItem>
         </Accordion>
 

@@ -16,6 +16,10 @@ import CalendarView from "@/components/dashboard/CalendarView";
 import ClientList from "@/components/dashboard/ClientList";
 import StaffList from "@/components/dashboard/StaffList";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
+import UsageBanner from "@/components/dashboard/UsageBanner";
+import LockedFeature from "@/components/LockedFeature";
+import { useSubscription } from "@/hooks/useSubscription";
+import { TIER_LIMITS } from "@/lib/tierLimits";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
@@ -32,6 +36,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState({ todayBookings: 0, totalClients: 0, upcoming: 0 });
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { tier } = useSubscription();
+  const canSeeAdvanced = tier ? TIER_LIMITS[tier].advancedAnalytics : false;
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -165,6 +171,8 @@ const Dashboard = () => {
           <ReceptionistView businessUserId={businessUserId} />
         ) : (
           <>
+            {isOwner && <UsageBanner userId={businessUserId} />}
+
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {statCards.map((stat) => (
@@ -187,10 +195,23 @@ const Dashboard = () => {
               </div>
             )}
 
-            {/* Charts row */}
+            {/* Charts row — Gold/Platinum only */}
             <div className="mb-8">
-              <DashboardCharts userId={businessUserId} />
+              {canSeeAdvanced ? (
+                <DashboardCharts userId={businessUserId} />
+              ) : (
+                <div className="relative min-h-[260px]">
+                  <LockedFeature
+                    requiredTier="gold"
+                    title="Advanced Analytics"
+                    description="Charts, trends and revenue insights are available on Gold and Platinum."
+                  >
+                    <DashboardCharts userId={businessUserId} />
+                  </LockedFeature>
+                </div>
+              )}
             </div>
+
 
             {/* Tabs */}
             <Tabs defaultValue="bookings" className="space-y-6">
