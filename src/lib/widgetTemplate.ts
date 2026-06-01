@@ -225,50 +225,16 @@ export const buildWidgetHtml = (opts: {
     });
   }
 
-  function luhn(num){
-    var s = (num||'').replace(/\\D/g,''); if (s.length < 12) return false;
-    var sum=0, alt=false;
-    for (var i=s.length-1;i>=0;i--){
-      var n = parseInt(s.charAt(i),10);
-      if (alt){ n*=2; if(n>9) n-=9; }
-      sum+=n; alt=!alt;
-    }
-    return sum % 10 === 0;
-  }
-  function expValid(v){
-    var m = (v||'').match(/^(\\d{2})\\/(\\d{2})$/); if(!m) return false;
-    var mm = parseInt(m[1],10), yy = parseInt(m[2],10);
-    if (mm<1||mm>12) return false;
-    var now = new Date(); var curYY = now.getFullYear()%100; var curMM = now.getMonth()+1;
-    if (yy<curYY) return false;
-    if (yy===curYY && mm<curMM) return false;
-    return true;
-  }
-  function cvcValid(v){ return /^\\d{3,4}$/.test(v||''); }
-
-  function formatCard(v){ return v.replace(/\\D/g,'').slice(0,19).replace(/(\\d{4})/g,'$1 ').trim(); }
-  function formatExp(v){ var s = v.replace(/\\D/g,'').slice(0,4); if (s.length>=3) return s.slice(0,2)+'/'+s.slice(2); return s; }
-
   function renderAll(){
     renderDates(); renderSlots(); renderDurs();
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
-    var card = document.getElementById('bw-card').value;
-    var exp = document.getElementById('bw-exp').value;
-    var cvc = document.getElementById('bw-cvc').value;
-    var cardOk = luhn(card), expOk = expValid(exp), cvcOk = cvcValid(cvc);
-    document.getElementById('bw-card').classList.toggle('invalid', card.length>0 && !cardOk);
-    document.getElementById('bw-exp').classList.toggle('invalid', exp.length>0 && !expOk);
-    document.getElementById('bw-cvc').classList.toggle('invalid', cvc.length>0 && !cvcOk);
-    btn.disabled = !(selDate && selSlot !== null && selDur && name && email && cardOk && expOk && cvcOk);
+    btn.disabled = !(selDate && selSlot !== null && selDur && name && email);
   }
 
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
-  document.getElementById('bw-card').addEventListener('input', function(e){ e.target.value = formatCard(e.target.value); renderAll(); });
-  document.getElementById('bw-exp').addEventListener('input', function(e){ e.target.value = formatExp(e.target.value); renderAll(); });
-  document.getElementById('bw-cvc').addEventListener('input', function(e){ e.target.value = e.target.value.replace(/\\D/g,'').slice(0,4); renderAll(); });
 
   document.getElementById('bw-submit').addEventListener('click', async function(){
     var btn = this; btn.disabled = true; btn.textContent = 'Submitting...';
