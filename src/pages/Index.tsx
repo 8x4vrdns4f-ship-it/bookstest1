@@ -15,10 +15,12 @@ const Index = () => {
         path="/"
       />
       <Navbar />
-      <HeroSection />
-      <InfoCards />
-      <FeaturesStrip />
-      <TierComparison />
+      <main>
+        <HeroSection />
+        <InfoCards />
+        <FeaturesStrip />
+        <TierComparison />
+      </main>
       <Footer />
     </div>
   );

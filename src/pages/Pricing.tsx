@@ -42,6 +42,7 @@ const Pricing = () => {
         path="/pricing"
       />
       <Navbar />
+      <main>
       <section className="px-8 md:px-16 pt-32 pb-24">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">
           <span className="text-primary">Choose</span>{" "}
