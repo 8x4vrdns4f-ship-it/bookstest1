@@ -657,6 +657,7 @@ export type Database = {
       }
       generate_booking_code: { Args: never; Returns: string }
       generate_company_code: { Args: never; Returns: string }
+      get_active_tier: { Args: { _user_id: string }; Returns: string }
       get_busy_slots: {
         Args: { p_from: string; p_to: string; p_user_id: string }
         Returns: {
@@ -727,6 +728,8 @@ export type Database = {
           request_id: string
         }[]
       }
+      tier_booking_limit: { Args: { _tier: string }; Returns: number }
+      tier_staff_limit: { Args: { _tier: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never
