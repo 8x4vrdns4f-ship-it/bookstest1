@@ -7,6 +7,7 @@ import { LogOut, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 type Booking = {
   id: string;
@@ -72,6 +73,12 @@ const EmployeeDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Employee Dashboard — BookSuite"
+        description="Your BookSuite employee view: see upcoming bookings assigned to you."
+        path="/employee-dashboard"
+        noIndex
+      />
       <Navbar />
       <div className="flex-1 px-6 md:px-16 py-10 max-w-5xl w-full mx-auto">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">

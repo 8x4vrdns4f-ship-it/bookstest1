@@ -14,6 +14,7 @@ import { Copy, Check, LogOut, KeyRound, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 type DayHours = { open: string; close: string; closed: boolean };
 type WorkingHours = Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", DayHours>;
@@ -165,6 +166,12 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Settings — BookSuite"
+        description="Manage your BookSuite business profile, working hours, booking preferences, and notifications."
+        path="/settings"
+        noIndex
+      />
       <Navbar />
       <div className="flex-1 px-6 md:px-16 py-8 max-w-4xl w-full mx-auto">
         <div className="mb-8">
