@@ -309,12 +309,18 @@ export const buildWidgetHtml = (opts: {
   // Load settings + busy slots + date overrides
   var endRange = (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })();
   Promise.all([
-    api('/rest/v1/business_settings?user_id=eq.' + UID + '&select=*').then(function(r){ return r.json(); }),
+    api('/rest/v1/rpc/get_widget_settings', {
+      method: 'POST',
+      body: JSON.stringify({ p_user_id: UID })
+    }).then(function(r){ return r.json(); }),
     api('/rest/v1/rpc/get_busy_slots', {
       method: 'POST',
       body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange })
     }).then(function(r){ return r.json(); }),
-    api('/rest/v1/date_overrides?user_id=eq.' + UID + '&override_date=gte.' + fmtDate(new Date()) + '&override_date=lte.' + endRange + '&select=*').then(function(r){ return r.json(); })
+    api('/rest/v1/rpc/get_widget_date_overrides', {
+      method: 'POST',
+      body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange })
+    }).then(function(r){ return r.json(); })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];

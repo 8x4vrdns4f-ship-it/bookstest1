@@ -50,39 +50,26 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
 
       if (!newUserId) throw new Error("Could not create or sign in to your account.");
 
-      // 2. Find the company by code
-      const { data: business, error: bizErr } = await supabase
-        .from("business_settings")
-        .select("user_id, business_name, company_code")
-        .eq("company_code", code.trim().toUpperCase())
-        .maybeSingle();
-      if (bizErr) throw bizErr;
-      if (!business) throw new Error("Company code not found.");
-
-      // 3. Make sure we have an authenticated session before the update
+      // 2. Make sure we have an authenticated session before the secure RPC
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) {
         const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (signInErr) throw signInErr;
       }
 
-      // 4. Link the employees row by email
-      const { data: empRow, error: empErr } = await supabase
-        .from("employees")
-        .select("id")
-        .eq("user_id", business.user_id)
-        .eq("email", email.trim())
-        .maybeSingle();
-      if (empErr) throw empErr;
-      if (!empRow) throw new Error("Your email isn't on the company's employee list. Ask the owner to add you first.");
+      // 3. Claim the employee seat (verifies company code + caller email server-side)
+      const { data: claim, error: claimErr } = await supabase.rpc("claim_employee_seat", {
+        p_company_code: code.trim().toUpperCase(),
+      });
+      if (claimErr) {
+        const m = claimErr.message || "";
+        if (m.includes("Company code not found")) throw new Error("Company code not found.");
+        if (m.includes("No matching employee")) throw new Error("Your email isn't on the company's employee list. Ask the owner to add you first.");
+        throw claimErr;
+      }
+      const row = Array.isArray(claim) ? claim[0] : claim;
 
-      const { error: linkErr } = await supabase
-        .from("employees")
-        .update({ auth_user_id: newUserId })
-        .eq("id", empRow.id);
-      if (linkErr) throw linkErr;
-
-      toast({ title: `Welcome to ${business.business_name || "the team"}!` });
+      toast({ title: `Welcome to ${row?.business_name || "the team"}!` });
       setOpen(false);
       navigate("/employee-dashboard");
     } catch (err) {
