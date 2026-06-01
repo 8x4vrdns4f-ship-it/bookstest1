@@ -85,7 +85,7 @@ const ResetPassword = () => {
         noIndex
       />
       <Navbar />
-      <div className="flex-1 flex items-center justify-center px-4 py-16">
+      <main className="flex-1 flex items-center justify-center px-4 py-16">
         <Card className="w-full max-w-md bg-card border-border">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-foreground">Set New Password</CardTitle>
@@ -136,7 +136,7 @@ const ResetPassword = () => {
             </form>
           </CardContent>
         </Card>
-      </div>
+      </main>
       <Footer />
     </div>
   );

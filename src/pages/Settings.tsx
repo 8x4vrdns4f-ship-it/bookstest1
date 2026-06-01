@@ -173,7 +173,7 @@ const Settings = () => {
         noIndex
       />
       <Navbar />
-      <div className="flex-1 px-6 md:px-16 py-8 max-w-4xl w-full mx-auto">
+      <main className="flex-1 px-6 md:px-16 py-8 max-w-4xl w-full mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Settings</h1>
           <p className="text-muted-foreground mt-1">Manage your business, hours, booking preferences and more.</p>
@@ -334,7 +334,7 @@ const Settings = () => {
             <DangerRow icon={<Trash2 size={16} />} title="Delete Account" hint="Permanently delete your account. (Coming soon.)" action={<Button variant="destructive" disabled>Delete Account</Button>} />
           </CardContent>
         </Card>
-      </div>
+      </main>
       <Footer />
     </div>
   );
