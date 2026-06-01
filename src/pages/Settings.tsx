@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import RolesManager from "@/components/dashboard/RolesManager";
 
 type DayHours = { open: string; close: string; closed: boolean };
 type WorkingHours = Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", DayHours>;
@@ -296,6 +297,16 @@ const Settings = () => {
               <ToggleRow label="Daily Summary Email" hint="Recap of tomorrow's appointments." checked={form.notify_daily_summary} onChange={(v) => setForm({ ...form, notify_daily_summary: v })} />
               <ToggleRow label="Client Booking Confirmation" hint="Email clients when their booking is confirmed." checked={form.notify_client_confirmation} onChange={(v) => setForm({ ...form, notify_client_confirmation: v })} />
               <ToggleRow label="Reminder Before Appointment" hint="Send a reminder before the appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Roles & Permissions */}
+          <AccordionItem value="roles" className="bg-card border border-border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline">
+              <span className="text-foreground font-semibold">Roles &amp; Permissions</span>
+            </AccordionTrigger>
+            <AccordionContent className="pb-5">
+              {userId && <RolesManager userId={userId} />}
             </AccordionContent>
           </AccordionItem>
 
