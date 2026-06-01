@@ -80,15 +80,6 @@ export const buildWidgetHtml = (opts: {
     <input id="bw-email" type="email" placeholder="Email" required>
   </div>
 
-  <div class="card-box">
-    <h4>💳 Card Details</h4>
-    <input id="bw-card" placeholder="Card number" inputmode="numeric" maxlength="19" autocomplete="cc-number">
-    <div class="row3">
-      <input id="bw-exp" placeholder="MM/YY" inputmode="numeric" maxlength="5" autocomplete="cc-exp">
-      <input id="bw-cvc" placeholder="CVC" inputmode="numeric" maxlength="4" autocomplete="cc-csc">
-    </div>
-    <div class="card-note">You won't be charged unless your booking is accepted.</div>
-  </div>
 
   <div id="bw-err"></div>
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
