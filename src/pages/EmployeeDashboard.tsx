@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, CalendarDays } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { LogOut, CalendarDays, Radio } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -22,10 +23,13 @@ type Booking = {
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [employeeId, setEmployeeId] = useState<string | null>(null);
   const [employeeName, setEmployeeName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [availableNow, setAvailableNow] = useState(false);
+  const [savingAvail, setSavingAvail] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -34,7 +38,7 @@ const EmployeeDashboard = () => {
 
       const { data: emp } = await supabase
         .from("employees")
-        .select("id, name, user_id")
+        .select("id, name, user_id, available_now")
         .eq("auth_user_id", session.user.id)
         .maybeSingle();
 
@@ -43,7 +47,9 @@ const EmployeeDashboard = () => {
         navigate("/");
         return;
       }
+      setEmployeeId(emp.id);
       setEmployeeName(emp.name);
+      setAvailableNow(!!emp.available_now);
 
       const { data: biz } = await supabase
         .from("business_settings")
