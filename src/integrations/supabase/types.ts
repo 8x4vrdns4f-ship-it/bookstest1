@@ -111,6 +111,8 @@ export type Database = {
           notify_daily_summary: boolean
           notify_new_booking: boolean
           platform_fee_percent: number
+          reception_checkin_enabled: boolean
+          self_checkin_enabled: boolean
           timezone: string
           updated_at: string
           user_id: string
@@ -141,6 +143,8 @@ export type Database = {
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           platform_fee_percent?: number
+          reception_checkin_enabled?: boolean
+          self_checkin_enabled?: boolean
           timezone?: string
           updated_at?: string
           user_id: string
@@ -171,6 +175,8 @@ export type Database = {
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           platform_fee_percent?: number
+          reception_checkin_enabled?: boolean
+          self_checkin_enabled?: boolean
           timezone?: string
           updated_at?: string
           user_id?: string
@@ -461,6 +467,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_in_by_code: {
+        Args: { p_company_code: string; p_confirmation_code: string }
+        Returns: {
+          booking_id: string
+          booking_time: string
+          client_name: string
+          service: string
+          status: string
+        }[]
+      }
       claim_employee_seat: {
         Args: { p_company_code: string }
         Returns: {
