@@ -22,9 +22,9 @@ const features: Feature[] = [
 ];
 
 const tiers = [
-  { name: "Silver", price: "$199" },
-  { name: "Gold", price: "$549" },
-  { name: "Platinum", price: "$1,195" },
+  { name: "Silver", price: "£199" },
+  { name: "Gold", price: "£549" },
+  { name: "Platinum", price: "£1,195" },
 ];
 
 const renderValue = (value: FeatureValue) => {

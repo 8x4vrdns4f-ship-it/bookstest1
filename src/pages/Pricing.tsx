@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 const tiers = [
   {
     name: "Silver",
-    price: "$199",
+    price: "£199",
     period: "/mo",
     features: ["Up to 50 bookings/mo", "1 staff member", "Email support", "Basic analytics", "12.5% fee per successful booking"],
     accent: "from-zinc-400 to-zinc-300",
@@ -17,7 +17,7 @@ const tiers = [
   },
   {
     name: "Gold",
-    price: "$549",
+    price: "£549",
     period: "/mo",
     features: ["Up to 300 bookings/mo", "10 staff members", "Priority support", "Advanced analytics", "Custom branding", "7.5% fee per transaction"],
     accent: "from-yellow-500 to-amber-400",
@@ -26,7 +26,7 @@ const tiers = [
   },
   {
     name: "Platinum",
-    price: "$1,195",
+    price: "£1,195",
     period: "/mo",
     features: ["Unlimited bookings", "Unlimited staff", "24/7 dedicated support", "Full analytics suite", "Custom branding", "API access", "2.5% fee per transaction"],
     accent: "from-cyan-400 to-blue-300",
