@@ -352,6 +352,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_employee_seat: {
+        Args: { p_company_code: string }
+        Returns: {
+          business_name: string
+          business_user_id: string
+          employee_id: string
+        }[]
+      }
       generate_booking_code: { Args: never; Returns: string }
       generate_company_code: { Args: never; Returns: string }
       get_busy_slots: {
@@ -361,6 +369,39 @@ export type Database = {
           booking_time: string
           duration_minutes: number
           status: string
+        }[]
+      }
+      get_widget_date_overrides: {
+        Args: { p_from: string; p_to: string; p_user_id: string }
+        Returns: {
+          close_time: string
+          closed: boolean
+          open_time: string
+          override_date: string
+        }[]
+      }
+      get_widget_settings: {
+        Args: { p_user_id: string }
+        Returns: {
+          accent_color: string
+          allow_same_day: boolean
+          buffer_minutes: number
+          business_name: string
+          currency: string
+          deposit_amount: number
+          max_advance_days: number
+          timezone: string
+          user_id: string
+          welcome_message: string
+          working_hours: Json
+        }[]
+      }
+      lookup_business_by_code: {
+        Args: { p_code: string }
+        Returns: {
+          business_name: string
+          company_code: string
+          user_id: string
         }[]
       }
     }
