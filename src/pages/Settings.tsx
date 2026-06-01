@@ -318,6 +318,27 @@ const Settings = () => {
             </AccordionContent>
           </AccordionItem>
 
+          {/* Check-In */}
+          <AccordionItem value="checkin" className="bg-card border border-border rounded-lg px-4">
+            <AccordionTrigger className="hover:no-underline">
+              <span className="text-foreground font-semibold">Check-In</span>
+            </AccordionTrigger>
+            <AccordionContent className="space-y-3 pb-5">
+              <ToggleRow
+                label="Self check-in kiosk"
+                hint={`Customers scan the QR code on their booking at a kiosk. Kiosk URL: ${window.location.origin}/kiosk/${companyCode}`}
+                checked={form.self_checkin_enabled}
+                onChange={(v) => setForm({ ...form, self_checkin_enabled: v })}
+              />
+              <ToggleRow
+                label="Receptionist check-in"
+                hint="Receptionists scan or type the customer's code, then handle the next steps."
+                checked={form.reception_checkin_enabled}
+                onChange={(v) => setForm({ ...form, reception_checkin_enabled: v })}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
           {/* Booking Page */}
           <AccordionItem value="page" className="bg-card border border-border rounded-lg px-4">
             <AccordionTrigger className="hover:no-underline">
