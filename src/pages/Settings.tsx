@@ -16,6 +16,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
+import { useSubscription } from "@/hooks/useSubscription";
+import { TIER_LIMITS } from "@/lib/tierLimits";
+import { Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type DayHours = { open: string; close: string; closed: boolean };
 type WorkingHours = Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", DayHours>;
