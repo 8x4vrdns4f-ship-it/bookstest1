@@ -77,6 +77,16 @@ const EmployeeDashboard = () => {
     navigate("/");
   };
 
+  const toggleAvailable = async (v: boolean) => {
+    if (!employeeId) return;
+    setSavingAvail(true);
+    const { error } = await supabase.from("employees").update({ available_now: v }).eq("id", employeeId);
+    setSavingAvail(false);
+    if (error) { toast({ title: "Could not update", description: error.message, variant: "destructive" }); return; }
+    setAvailableNow(v);
+    toast({ title: v ? "You're on call" : "Marked unavailable" });
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
@@ -93,9 +103,16 @@ const EmployeeDashboard = () => {
             <h1 className="text-3xl font-bold text-foreground mt-1">Hey, {employeeName} 👋</h1>
             <p className="text-muted-foreground mt-1">Your upcoming schedule</p>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
-            <LogOut size={16} /> Log Out
-          </Button>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-secondary/60 border border-border">
+              <Radio size={14} className={availableNow ? "text-green-400" : "text-muted-foreground"} />
+              <span className="text-sm text-foreground">Available now</span>
+              <Switch checked={availableNow} disabled={savingAvail} onCheckedChange={toggleAvailable} />
+            </div>
+            <Button onClick={handleLogout} variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
+              <LogOut size={16} /> Log Out
+            </Button>
+          </div>
         </div>
 
         <Card className="bg-card border-border">
