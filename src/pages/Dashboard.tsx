@@ -18,11 +18,16 @@ import StaffList from "@/components/dashboard/StaffList";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
+import ReceptionistView from "@/components/dashboard/ReceptionistView";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
 import type { User } from "@supabase/supabase-js";
 
+type RoleInfo = { name: string; canApprove: boolean };
+
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [businessUserId, setBusinessUserId] = useState<string | null>(null);
+  const [role, setRole] = useState<RoleInfo>({ name: "owner", canApprove: true });
   const [displayName, setDisplayName] = useState("");
   const [stats, setStats] = useState({ todayBookings: 0, totalClients: 0, upcoming: 0 });
   const { toast } = useToast();
@@ -30,24 +35,33 @@ const Dashboard = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
+      if (!session) { navigate("/auth"); return; }
       setUser(session.user);
       setDisplayName(session.user.user_metadata?.display_name || session.user.email || "");
     });
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      // Route guard: bounce to the correct dashboard if this user shouldn't be here.
+      if (!session) { navigate("/auth"); return; }
       const target = await getDashboardRoute();
       if (target !== "/dashboard") { navigate(target); return; }
       setUser(session.user);
       setDisplayName(session.user.user_metadata?.display_name || session.user.email || "");
+
+      // Determine business + role context
+      const { data: emp } = await supabase
+        .from("employees")
+        .select("user_id, company_roles:role_id(name, can_approve_requests)")
+        .eq("auth_user_id", session.user.id)
+        .maybeSingle();
+      if (emp) {
+        setBusinessUserId(emp.user_id);
+        const cr = (emp as any).company_roles;
+        setRole({ name: cr?.name ?? "employee", canApprove: !!cr?.can_approve_requests });
+      } else {
+        // Business owner
+        setBusinessUserId(session.user.id);
+        setRole({ name: "owner", canApprove: true });
+      }
     });
 
     return () => subscription.unsubscribe();
