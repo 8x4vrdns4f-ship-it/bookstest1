@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, CalendarDays } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { LogOut, CalendarDays, Radio } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -22,10 +23,13 @@ type Booking = {
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [employeeId, setEmployeeId] = useState<string | null>(null);
   const [employeeName, setEmployeeName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [availableNow, setAvailableNow] = useState(false);
+  const [savingAvail, setSavingAvail] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -34,7 +38,7 @@ const EmployeeDashboard = () => {
 
       const { data: emp } = await supabase
         .from("employees")
-        .select("id, name, user_id")
+        .select("id, name, user_id, available_now")
         .eq("auth_user_id", session.user.id)
         .maybeSingle();
 
@@ -43,7 +47,9 @@ const EmployeeDashboard = () => {
         navigate("/");
         return;
       }
+      setEmployeeId(emp.id);
       setEmployeeName(emp.name);
+      setAvailableNow(!!emp.available_now);
 
       const { data: biz } = await supabase
         .from("business_settings")
@@ -71,6 +77,16 @@ const EmployeeDashboard = () => {
     navigate("/");
   };
 
+  const toggleAvailable = async (v: boolean) => {
+    if (!employeeId) return;
+    setSavingAvail(true);
+    const { error } = await supabase.from("employees").update({ available_now: v }).eq("id", employeeId);
+    setSavingAvail(false);
+    if (error) { toast({ title: "Could not update", description: error.message, variant: "destructive" }); return; }
+    setAvailableNow(v);
+    toast({ title: v ? "You're on call" : "Marked unavailable" });
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
@@ -87,9 +103,16 @@ const EmployeeDashboard = () => {
             <h1 className="text-3xl font-bold text-foreground mt-1">Hey, {employeeName} 👋</h1>
             <p className="text-muted-foreground mt-1">Your upcoming schedule</p>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
-            <LogOut size={16} /> Log Out
-          </Button>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-secondary/60 border border-border">
+              <Radio size={14} className={availableNow ? "text-green-400" : "text-muted-foreground"} />
+              <span className="text-sm text-foreground">Available now</span>
+              <Switch checked={availableNow} disabled={savingAvail} onCheckedChange={toggleAvailable} />
+            </div>
+            <Button onClick={handleLogout} variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
+              <LogOut size={16} /> Log Out
+            </Button>
+          </div>
         </div>
 
         <Card className="bg-card border-border">
