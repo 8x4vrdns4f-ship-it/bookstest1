@@ -42,6 +42,23 @@ const Pricing = () => {
         description="BookSuite pricing plans for service businesses. Silver, Gold, and Platinum tiers with transparent transaction fees and staff limits."
         path="/pricing"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: "BookSuite",
+          description: "All-in-one booking platform for small service businesses.",
+          brand: { "@type": "Brand", name: "BookSuite" },
+          offers: tiers.map((t) => ({
+            "@type": "Offer",
+            name: t.name,
+            price: t.price.replace(/[^0-9.]/g, ""),
+            priceCurrency: "USD",
+            url: "https://booksuite.online/pricing",
+            availability: "https://schema.org/InStock",
+          })),
+        })}</script>
+      </Helmet>
       <Navbar />
       <main>
       <section className="px-8 md:px-16 pt-32 pb-24">
