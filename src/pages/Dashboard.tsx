@@ -18,6 +18,7 @@ import StaffList from "@/components/dashboard/StaffList";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
+import { getDashboardRoute } from "@/lib/routeAfterAuth";
 import type { User } from "@supabase/supabase-js";
 
 const Dashboard = () => {
@@ -37,11 +38,14 @@ const Dashboard = () => {
       setDisplayName(session.user.user_metadata?.display_name || session.user.email || "");
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         navigate("/auth");
         return;
       }
+      // Route guard: bounce to the correct dashboard if this user shouldn't be here.
+      const target = await getDashboardRoute();
+      if (target !== "/dashboard") { navigate(target); return; }
       setUser(session.user);
       setDisplayName(session.user.user_metadata?.display_name || session.user.email || "");
     });
