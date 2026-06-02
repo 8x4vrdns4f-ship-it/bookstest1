@@ -10,7 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Copy, Check, LogOut, KeyRound, Trash2 } from "lucide-react";
+import { Copy, Check, LogOut, KeyRound, Trash2, XCircle } from "lucide-react";
+import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -394,6 +395,7 @@ const Settings = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             <DangerRow icon={<KeyRound size={16} />} title="Reset Password" hint="Send a password reset email." action={<Button variant="outline" onClick={handleResetPassword}>Reset Password</Button>} />
+            <DangerRow icon={<XCircle size={16} />} title="Cancel Subscription" hint="Instantly ends your plan and removes access. You won't be eligible for the free trial again." action={<CancelSubscriptionDialog />} />
             <DangerRow icon={<LogOut size={16} />} title="Log Out" hint="Sign out on this device." action={<Button variant="outline" onClick={handleLogout}>Log Out</Button>} />
             <DangerRow icon={<Trash2 size={16} />} title="Delete Account" hint="Permanently delete your account. (Coming soon.)" action={<Button variant="destructive" disabled>Delete Account</Button>} />
           </CardContent>
