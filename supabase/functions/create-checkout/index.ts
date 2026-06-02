@@ -19,9 +19,10 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { tier } = await req.json();
+    const { tier, mode = "paid" } = await req.json();
     const priceId = PRICE_IDS[tier];
     if (!priceId) throw new Error("Invalid tier");
+    const wantsTrial = mode === "trial";
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -42,25 +43,23 @@ serve(async (req) => {
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", { apiVersion: "2025-08-27.basil" });
 
-    // --- Anti-abuse: one trial per person ---
-    // A user is eligible for the 30-day free trial only if:
-    //  (a) we have no record of them ever having a trial in our DB, AND
-    //  (b) Stripe has no record of any prior subscription for this email.
-    let eligibleForTrial = true;
+    // --- Trial eligibility (only matters if mode === "trial") ---
+    // Once a user has cancelled (or ever had any subscription), no more free trials.
+    let eligibleForTrial = wantsTrial;
 
-    // (a) Local DB: any prior subscription row for this user_id?
-    const { data: priorRows } = await admin
-      .from("subscriptions")
-      .select("id")
-      .eq("user_id", user.id)
-      .limit(1);
-    if (priorRows && priorRows.length > 0) eligibleForTrial = false;
+    if (wantsTrial) {
+      const { data: priorRows } = await admin
+        .from("subscriptions")
+        .select("id, canceled_at")
+        .eq("user_id", user.id)
+        .limit(1);
+      if (priorRows && priorRows.length > 0) eligibleForTrial = false;
+    }
 
-    // (b) Stripe: find/create customer, check for ANY subscriptions ever.
     const existing = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId = existing.data[0]?.id;
 
-    if (customerId && eligibleForTrial) {
+    if (wantsTrial && eligibleForTrial && customerId) {
       const allSubs = await stripe.subscriptions.list({
         customer: customerId,
         status: "all",
@@ -69,23 +68,26 @@ serve(async (req) => {
       if (allSubs.data.length > 0) eligibleForTrial = false;
     }
 
+    if (wantsTrial && !eligibleForTrial) {
+      throw new Error("You're not eligible for a free trial. You can still subscribe at the regular price.");
+    }
+
     const origin = req.headers.get("origin") || "https://booksuite.online";
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      // Force card collection even during trial so we can auto-charge at trial end.
       payment_method_collection: "always",
       success_url: `${origin}/dashboard?subscribed=1`,
       cancel_url: `${origin}/pricing`,
       subscription_data: {
         metadata: { user_id: user.id, tier },
-        ...(eligibleForTrial ? { trial_period_days: TRIAL_DAYS } : {}),
+        ...(wantsTrial ? { trial_period_days: TRIAL_DAYS } : {}),
       },
     });
 
-    return new Response(JSON.stringify({ url: session.url, trial: eligibleForTrial }), {
+    return new Response(JSON.stringify({ url: session.url, trial: wantsTrial }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
