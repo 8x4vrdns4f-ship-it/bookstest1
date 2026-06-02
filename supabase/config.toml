@@ -37,3 +37,5 @@ project_id = "rehafgjaqbdeuatnfiyk"
     verify_jwt = false
   [functions.stripe-connect-webhook]
     verify_jwt = false
+  [functions.setup-stripe-webhook]
+    verify_jwt = false
