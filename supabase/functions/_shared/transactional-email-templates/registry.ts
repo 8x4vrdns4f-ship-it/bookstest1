@@ -14,6 +14,7 @@ import { template as bookingDeclined } from './booking-declined.tsx'
 import { template as bookingFollowup } from './booking-followup.tsx'
 import { template as joinRequestApproved } from './join-request-approved.tsx'
 import { template as joinRequestDeclined } from './join-request-declined.tsx'
+import { template as subscriptionCanceled } from './subscription-canceled.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-confirmed': bookingConfirmed,
@@ -21,4 +22,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-followup': bookingFollowup,
   'join-request-approved': joinRequestApproved,
   'join-request-declined': joinRequestDeclined,
+  'subscription-canceled': subscriptionCanceled,
 }

@@ -13,3 +13,11 @@ project_id = "rehafgjaqbdeuatnfiyk"
     verify_jwt = true
   [functions.send-transactional-email]
     verify_jwt = true
+  [functions.create-checkout]
+    verify_jwt = false
+  [functions.check-subscription]
+    verify_jwt = false
+  [functions.cancel-subscription]
+    verify_jwt = false
+  [functions.apply-retention]
+    verify_jwt = false

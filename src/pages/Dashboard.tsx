@@ -17,6 +17,7 @@ import ClientList from "@/components/dashboard/ClientList";
 import StaffList from "@/components/dashboard/StaffList";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import UsageBanner from "@/components/dashboard/UsageBanner";
+import SubscriptionWidget from "@/components/dashboard/SubscriptionWidget";
 import LockedFeature from "@/components/LockedFeature";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS } from "@/lib/tierLimits";
@@ -171,6 +172,7 @@ const Dashboard = () => {
           <ReceptionistView businessUserId={businessUserId} />
         ) : (
           <>
+            {isOwner && <SubscriptionWidget />}
             {isOwner && <UsageBanner userId={businessUserId} />}
 
             {/* Stats */}
