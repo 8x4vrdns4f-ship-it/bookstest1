@@ -7,6 +7,7 @@ import { CalendarDays, Users, Clock, LogOut, Code2, Settings as SettingsIcon } f
 import { Link } from "react-router-dom";
 import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
 import EmbedWidgetDialog from "@/components/dashboard/EmbedWidgetDialog";
+import PaymentsCard from "@/components/dashboard/PaymentsCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -160,6 +161,7 @@ const Dashboard = () => {
         ) : (
           <>
             {isOwner && <SubscriptionWidget />}
+            {isOwner && <PaymentsCard userId={user.id} />}
             {isOwner && <UsageBanner userId={businessUserId} />}
 
             {/* Stats */}

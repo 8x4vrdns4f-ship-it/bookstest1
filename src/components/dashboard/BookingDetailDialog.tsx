@@ -19,6 +19,9 @@ type Booking = {
   notes: string | null;
   confirmation_code: string | null;
   assigned_employee_id?: string | null;
+  payment_status?: string | null;
+  deposit_amount?: number | null;
+  stripe_payment_intent_id?: string | null;
 };
 
 type Employee = { id: string; name: string; position: string | null };
@@ -150,6 +153,26 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, onChanged }
             </Select>
           </div>
         </div>
+
+        {booking.payment_status === "paid" && booking.stripe_payment_intent_id && (
+          <Button
+            variant="outline"
+            className="border-destructive/40 text-destructive hover:bg-destructive/10"
+            onClick={async () => {
+              if (!confirm(`Refund £${Number(booking.deposit_amount || 0).toFixed(2)} deposit to the customer?`)) return;
+              const { error } = await supabase.functions.invoke("refund-booking-deposit", { body: { booking_id: booking.id } });
+              if (error) { toast({ title: "Refund failed", description: error.message, variant: "destructive" }); return; }
+              toast({ title: "Deposit refunded" });
+              onChanged?.();
+              onOpenChange(false);
+            }}
+          >
+            Refund deposit (£{Number(booking.deposit_amount || 0).toFixed(2)})
+          </Button>
+        )}
+        {booking.payment_status === "refunded" && (
+          <div className="text-xs text-muted-foreground">Deposit was refunded.</div>
+        )}
 
         <Button variant="outline" onClick={() => onOpenChange(false)} className="border-border">Close</Button>
       </DialogContent>
