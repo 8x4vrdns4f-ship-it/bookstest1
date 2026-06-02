@@ -1,16 +1,16 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createStripeClient, resolveEnv, resolvePriceIdByLookupKey } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PRICE_IDS: Record<string, string> = {
-  silver: "price_1TInwDFXQZu4XzM9fqghpFl5",
-  gold: "price_1TInx0FXQZu4XzM9J8VzF7aP",
-  platinum: "price_1TIpE2FXQZu4XzM9eAyvflcc",
+const LOOKUP_KEYS: Record<string, string> = {
+  silver: "silver_monthly",
+  gold: "gold_monthly",
+  platinum: "platinum_monthly",
 };
 
 const TRIAL_DAYS = 30;
@@ -19,10 +19,11 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { tier, mode = "paid" } = await req.json();
-    const priceId = PRICE_IDS[tier];
-    if (!priceId) throw new Error("Invalid tier");
+    const { tier, mode = "paid", environment } = await req.json();
+    const lookupKey = LOOKUP_KEYS[tier];
+    if (!lookupKey) throw new Error("Invalid tier");
     const wantsTrial = mode === "trial";
+    const env = resolveEnv(environment);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -41,12 +42,10 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", { apiVersion: "2025-08-27.basil" });
+    const stripe = createStripeClient(env);
+    const priceId = await resolvePriceIdByLookupKey(stripe, lookupKey);
 
-    // --- Trial eligibility (only matters if mode === "trial") ---
-    // Once a user has cancelled (or ever had any subscription), no more free trials.
     let eligibleForTrial = wantsTrial;
-
     if (wantsTrial) {
       const { data: priorRows } = await admin
         .from("subscriptions")
@@ -72,10 +71,17 @@ serve(async (req) => {
       throw new Error("You're not eligible for a free trial. You can still subscribe at the regular price.");
     }
 
+    if (!customerId) {
+      const created = await stripe.customers.create({
+        email: user.email,
+        metadata: { userId: user.id },
+      });
+      customerId = created.id;
+    }
+
     const origin = req.headers.get("origin") || "https://booksuite.online";
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       payment_method_collection: "always",

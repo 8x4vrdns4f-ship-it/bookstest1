@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,13 +22,20 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("Not authenticated");
 
+    let environment: unknown = undefined;
+    try {
+      const body = await req.json();
+      environment = body?.environment;
+    } catch (_) { /* no body */ }
+    const env = resolveEnv(environment);
+
     const admin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", { apiVersion: "2025-08-27.basil" });
+    const stripe = createStripeClient(env);
 
     // Find the active/trialing Stripe subscription for this user.
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });

@@ -1,16 +1,17 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const TIER_BY_PRICE: Record<string, string> = {
-  price_1TInwDFXQZu4XzM9fqghpFl5: "silver",
-  price_1TInx0FXQZu4XzM9J8VzF7aP: "gold",
-  price_1TIpE2FXQZu4XzM9eAyvflcc: "platinum",
+// Map lookup keys to tier names. Falls back to subscription metadata.tier when lookup_key absent.
+const TIER_BY_LOOKUP: Record<string, string> = {
+  silver_monthly: "silver",
+  gold_monthly: "gold",
+  platinum_monthly: "platinum",
 };
 
 serve(async (req) => {
@@ -33,7 +34,14 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("Not authenticated");
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", { apiVersion: "2025-08-27.basil" });
+    let environment: unknown = undefined;
+    try {
+      const body = await req.json();
+      environment = body?.environment;
+    } catch (_) { /* no body */ }
+    const env = resolveEnv(environment);
+
+    const stripe = createStripeClient(env);
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
     let subscribed = false;
@@ -42,21 +50,21 @@ serve(async (req) => {
     let customerId: string | null = null;
     let subscriptionId: string | null = null;
     let periodEnd: string | null = null;
-
     let status: string | null = null;
     let trialEnd: string | null = null;
 
     if (customers.data.length) {
       customerId = customers.data[0].id;
-      // Pick the most recent active OR trialing subscription.
       const subs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 10 });
       const live = subs.data.find((s) => s.status === "active" || s.status === "trialing");
       if (live) {
         subscribed = true;
         subscriptionId = live.id;
-        priceId = live.items.data[0].price.id;
-        tier = TIER_BY_PRICE[priceId] ?? null;
-        periodEnd = new Date(live.current_period_end * 1000).toISOString();
+        const item = live.items.data[0];
+        priceId = item.price.id;
+        const lookupKey = (item.price as any).lookup_key as string | undefined;
+        tier = (lookupKey && TIER_BY_LOOKUP[lookupKey]) || (live.metadata?.tier as string) || null;
+        periodEnd = new Date((live as any).current_period_end * 1000).toISOString();
         status = live.status;
         trialEnd = live.trial_end ? new Date(live.trial_end * 1000).toISOString() : null;
       }
