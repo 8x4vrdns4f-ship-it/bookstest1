@@ -6,6 +6,8 @@ export interface SubscriptionState {
   loading: boolean;
   tier: Tier | null;
   isActive: boolean;
+  isTrialing: boolean;
+  trialEnd: string | null;
   currentPeriodEnd: string | null;
   refresh: () => Promise<void>;
 }
@@ -14,27 +16,47 @@ export function useSubscription(): SubscriptionState {
   const [loading, setLoading] = useState(true);
   const [tier, setTier] = useState<Tier | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+  const [trialEnd, setTrialEnd] = useState<string | null>(null);
+  const [isTrialing, setIsTrialing] = useState(false);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      // Ask Stripe for the latest status, then read the row.
-      await supabase.functions.invoke("check-subscription").catch(() => {});
+      // Ask Stripe for the latest status (returns tier + status + trial info).
+      const { data: fn } = await supabase.functions.invoke("check-subscription").catch(() => ({ data: null }));
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        setTier(null); setCurrentPeriodEnd(null); return;
+        setTier(null); setCurrentPeriodEnd(null); setTrialEnd(null); setIsTrialing(false); return;
       }
-      const { data } = await supabase
-        .from("subscriptions")
-        .select("tier, subscribed, current_period_end")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
 
-      const stillValid = data?.subscribed && (!data.current_period_end || new Date(data.current_period_end) > new Date());
-      setTier(stillValid && data?.tier ? (data.tier as Tier) : null);
-      setCurrentPeriodEnd(data?.current_period_end ?? null);
+      // Prefer the fresh response from the edge function; fall back to row.
+      let resolvedTier: Tier | null = null;
+      let resolvedEnd: string | null = null;
+      let resolvedTrialEnd: string | null = null;
+      let trialing = false;
+
+      if (fn && (fn as any).subscribed) {
+        resolvedTier = ((fn as any).tier as Tier) ?? null;
+        resolvedEnd = (fn as any).current_period_end ?? null;
+        resolvedTrialEnd = (fn as any).trial_end ?? null;
+        trialing = (fn as any).status === "trialing";
+      } else {
+        const { data } = await supabase
+          .from("subscriptions")
+          .select("tier, subscribed, current_period_end")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const stillValid = data?.subscribed && (!data.current_period_end || new Date(data.current_period_end) > new Date());
+        resolvedTier = stillValid && data?.tier ? (data.tier as Tier) : null;
+        resolvedEnd = data?.current_period_end ?? null;
+      }
+
+      setTier(resolvedTier);
+      setCurrentPeriodEnd(resolvedEnd);
+      setTrialEnd(resolvedTrialEnd);
+      setIsTrialing(trialing);
     } finally {
       setLoading(false);
     }
@@ -46,6 +68,8 @@ export function useSubscription(): SubscriptionState {
     loading,
     tier,
     isActive: tier !== null,
+    isTrialing,
+    trialEnd,
     currentPeriodEnd,
     refresh,
   };

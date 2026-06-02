@@ -13,6 +13,8 @@ const PRICE_IDS: Record<string, string> = {
   platinum: "price_1TIpE2FXQZu4XzM9eAyvflcc",
 };
 
+const TRIAL_DAYS = 30;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -32,10 +34,40 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("Not authenticated");
 
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", { apiVersion: "2025-08-27.basil" });
 
+    // --- Anti-abuse: one trial per person ---
+    // A user is eligible for the 30-day free trial only if:
+    //  (a) we have no record of them ever having a trial in our DB, AND
+    //  (b) Stripe has no record of any prior subscription for this email.
+    let eligibleForTrial = true;
+
+    // (a) Local DB: any prior subscription row for this user_id?
+    const { data: priorRows } = await admin
+      .from("subscriptions")
+      .select("id")
+      .eq("user_id", user.id)
+      .limit(1);
+    if (priorRows && priorRows.length > 0) eligibleForTrial = false;
+
+    // (b) Stripe: find/create customer, check for ANY subscriptions ever.
     const existing = await stripe.customers.list({ email: user.email, limit: 1 });
-    const customerId = existing.data[0]?.id;
+    let customerId = existing.data[0]?.id;
+
+    if (customerId && eligibleForTrial) {
+      const allSubs = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "all",
+        limit: 1,
+      });
+      if (allSubs.data.length > 0) eligibleForTrial = false;
+    }
 
     const origin = req.headers.get("origin") || "https://booksuite.online";
     const session = await stripe.checkout.sessions.create({
@@ -43,12 +75,17 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
+      // Force card collection even during trial so we can auto-charge at trial end.
+      payment_method_collection: "always",
       success_url: `${origin}/dashboard?subscribed=1`,
       cancel_url: `${origin}/pricing`,
-      subscription_data: { metadata: { user_id: user.id, tier } },
+      subscription_data: {
+        metadata: { user_id: user.id, tier },
+        ...(eligibleForTrial ? { trial_period_days: TRIAL_DAYS } : {}),
+      },
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify({ url: session.url, trial: eligibleForTrial }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

@@ -98,8 +98,11 @@ const Pricing = () => {
           <span className="text-primary">Choose</span>{" "}
           <span className="text-foreground">Your Plan</span>
         </h1>
-        <p className="text-muted-foreground text-center mb-16 max-w-lg mx-auto">
+        <p className="text-muted-foreground text-center mb-4 max-w-lg mx-auto">
           Pick the tier that fits your business. Upgrade or downgrade anytime.
+        </p>
+        <p className="text-center text-sm text-primary mb-16">
+          ✨ Start with a <span className="font-semibold">30-day free trial</span> on any plan — card required, cancel anytime before it ends.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -139,7 +142,7 @@ const Pricing = () => {
                   disabled={loading === tier.tier}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
                 >
-                  {loading === tier.tier ? "Loading..." : "Get Started"}
+                  {loading === tier.tier ? "Loading..." : "Start 30-day free trial"}
                 </Button>
               </CardFooter>
             </Card>
