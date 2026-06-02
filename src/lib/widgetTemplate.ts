@@ -215,26 +215,27 @@ export const buildWidgetScript = (opts: {
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
   document.getElementById('bw-submit').addEventListener('click', async function(){
-    var btn = this; btn.disabled = true; btn.textContent = 'Submitting...';
+    var btn = this; btn.disabled = true; btn.textContent = 'Continuing to payment...';
     var errEl = document.getElementById('bw-err'); errEl.innerHTML = '';
     try {
-      var res = await api('/rest/v1/bookings', {
+      var res = await fetch(URL_ + '/functions/v1/create-booking-checkout', {
         method: 'POST',
-        headers: { 'Prefer': 'return=minimal' },
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: UID,
+          userId: UID,
           client_name: document.getElementById('bw-name').value.trim(),
           client_email: document.getElementById('bw-email').value.trim(),
           service: 'Booking',
           booking_date: selDate,
           booking_time: fmtMin(selSlot) + ':00',
           duration_minutes: selDur,
-          status: 'pending'
+          origin: window.location.origin
         })
       });
-      if (!res.ok) throw new Error('Could not submit. Slot may have just been booked.');
-      document.getElementById('bw').style.display = 'none';
-      document.getElementById('bw-done').style.display = 'block';
+      var data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || 'Could not start checkout. Please try again.');
+      // Redirect top window (escape iframe if embedded)
+      try { window.top.location.href = data.url; } catch(_){ window.location.href = data.url; }
     } catch(e){
       errEl.innerHTML = '<div class="err">'+e.message+'</div>';
       btn.disabled = false; btn.textContent = 'Request Booking';
