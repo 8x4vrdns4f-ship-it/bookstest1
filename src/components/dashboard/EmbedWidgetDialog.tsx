@@ -15,6 +15,16 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
   const { toast } = useToast();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [aiRequest, setAiRequest] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState<null | {
+    method: string;
+    platform: string;
+    placement_summary: string;
+    snippet: string;
+    steps: string[];
+    notes?: string;
+  }>(null);
 
   const origin =
     typeof window !== "undefined"
