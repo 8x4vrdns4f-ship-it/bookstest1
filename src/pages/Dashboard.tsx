@@ -22,7 +22,7 @@ import SubscriptionWidget from "@/components/dashboard/SubscriptionWidget";
 import LockedFeature from "@/components/LockedFeature";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS } from "@/lib/tierLimits";
-import { buildWidgetHtml } from "@/lib/widgetTemplate";
+
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
