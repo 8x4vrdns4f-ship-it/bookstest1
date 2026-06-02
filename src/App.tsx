@@ -42,6 +42,11 @@ const App = () => (
           <Route path="/kiosk/:companyCode" element={<Kiosk />} />
           <Route path="/embed/:userId" element={<EmbedWidget />} />
           <Route path="/book/:userId" element={<PublicBooking />} />
+          <Route path="/book/:userId/success" element={<BookingSuccess />} />
+          <Route path="/book/:userId/cancelled" element={<BookingCancelled />} />
+          <Route path="/payments" element={<RequireSubscription><Payments /></RequireSubscription>} />
+          <Route path="/payments/return" element={<RequireSubscription><PaymentsReturn /></RequireSubscription>} />
+          <Route path="/payments/refresh" element={<RequireSubscription><PaymentsRefresh /></RequireSubscription>} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
