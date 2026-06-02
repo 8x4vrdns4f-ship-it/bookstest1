@@ -255,7 +255,7 @@ export const buildWidgetScript = (opts: {
         var sub = document.querySelector('.bw .sub');
         if (sub) sub.textContent = settings.welcome_message;
       }
-      document.getElementById('bw-deposit').textContent = 'Deposit: £' + Number(settings.deposit_amount).toFixed(2) + ' (charged only if booking is accepted)';
+      document.getElementById('bw-deposit').textContent = 'Deposit: £' + Number(settings.deposit_amount).toFixed(2) + ' (paid securely at checkout)';
     } else {
       document.getElementById('bw-deposit').textContent = 'Booking system';
     }
