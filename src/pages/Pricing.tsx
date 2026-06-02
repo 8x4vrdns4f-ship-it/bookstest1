@@ -142,7 +142,7 @@ const Pricing = () => {
                   disabled={loading === tier.tier}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
                 >
-                  {loading === tier.tier ? "Loading..." : "Get Started"}
+                  {loading === tier.tier ? "Loading..." : "Start 30-day free trial"}
                 </Button>
               </CardFooter>
             </Card>
