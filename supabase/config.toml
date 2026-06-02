@@ -21,3 +21,5 @@ project_id = "rehafgjaqbdeuatnfiyk"
     verify_jwt = false
   [functions.apply-retention]
     verify_jwt = false
+  [functions.embed-assistant]
+    verify_jwt = false
