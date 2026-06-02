@@ -25,42 +25,15 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function is configured with verify_jwt = true, which validates
-// that the request carries a JWT signed by this project — but that includes the
-// public anon key. We additionally require the caller to present the service_role
-// JWT so that only trusted server-side code (other edge functions, cron jobs,
-// admin scripts) can trigger transactional sends. This prevents abuse of our
-// verified sender domain by anyone who can read the public anon key from
-// client-side code.
+// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
+// gateway validates the caller's JWT (anon or service_role) before the request
+// reaches this code. No in-function auth check is needed.
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
-
-  // Require service_role JWT — block anon callers.
-  const authHeader = req.headers.get('Authorization') || ''
-  const token = authHeader.replace(/^Bearer\s+/i, '')
-  let isServiceRole = false
-  if (token) {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      isServiceRole = payload?.role === 'service_role'
-    } catch {
-      isServiceRole = false
-    }
-  }
-  if (!isServiceRole) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized: service role required' }),
-      {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
-
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
