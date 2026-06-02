@@ -23,3 +23,15 @@ project_id = "rehafgjaqbdeuatnfiyk"
     verify_jwt = false
   [functions.embed-assistant]
     verify_jwt = false
+  [functions.create-booking-checkout]
+    verify_jwt = false
+  [functions.verify-booking-payment]
+    verify_jwt = false
+  [functions.connect-create-account]
+    verify_jwt = false
+  [functions.connect-account-status]
+    verify_jwt = false
+  [functions.connect-dashboard-link]
+    verify_jwt = false
+  [functions.refund-booking-deposit]
+    verify_jwt = false
