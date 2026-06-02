@@ -98,22 +98,6 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  const handleDownloadWidget = () => {
-    if (!user) return;
-    const widgetCode = buildWidgetHtml({
-      supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-      supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      userId: user.id,
-    });
-    const blob = new Blob([widgetCode], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "booking-calendar-widget.html";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: "Widget downloaded!", description: "Embed this HTML file on your site to take bookings." });
-  };
 
   if (!user || !businessUserId) return null;
 
@@ -150,13 +134,15 @@ const Dashboard = () => {
             )}
             {isOwner && <AddEmployeeDialog userId={user.id} />}
             {isOwner && (
-              <Button
-                onClick={handleDownloadWidget}
-                className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm"
-              >
-                <Download size={16} />
-                Download Calendar Widget
-              </Button>
+              <EmbedWidgetDialog
+                userId={user.id}
+                trigger={
+                  <Button className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm">
+                    <Code2 size={16} />
+                    Embed Widget
+                  </Button>
+                }
+              />
             )}
             <Button
               onClick={handleLogout}
