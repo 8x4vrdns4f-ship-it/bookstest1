@@ -160,6 +160,7 @@ const Dashboard = () => {
         ) : (
           <>
             {isOwner && <SubscriptionWidget />}
+            {isOwner && <PaymentsCard userId={user.id} />}
             {isOwner && <UsageBanner userId={businessUserId} />}
 
             {/* Stats */}
