@@ -91,13 +91,75 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="script" className="mt-2">
-          <TabsList className="bg-secondary">
+        <Tabs defaultValue="ai" className="mt-2">
+          <TabsList className="bg-secondary flex-wrap h-auto">
+            <TabsTrigger value="ai" className="gap-1.5"><Sparkles size={14} /> Ask AI</TabsTrigger>
             <TabsTrigger value="script">Script tag</TabsTrigger>
             <TabsTrigger value="iframe">iframe</TabsTrigger>
             <TabsTrigger value="link">Direct link</TabsTrigger>
             <TabsTrigger value="download">Download HTML</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="ai" className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Describe where you want the widget. For example:&nbsp;
+              <span className="italic text-foreground/80">"Centred in the middle of my Squarespace homepage under the hero, max 480px wide."</span>
+              &nbsp;The AI will generate the exact code and step-by-step instructions.
+            </p>
+            <Textarea
+              value={aiRequest}
+              onChange={(e) => setAiRequest(e.target.value)}
+              placeholder="e.g. I want it on my WordPress homepage, centred, below the welcome banner, with a heading that says 'Book now'."
+              rows={3}
+              className="bg-secondary border-border"
+            />
+            <Button
+              onClick={async () => {
+                if (!aiRequest.trim()) return;
+                setAiLoading(true);
+                setAiResult(null);
+                try {
+                  const { data, error } = await supabase.functions.invoke("embed-assistant", {
+                    body: { userId, request: aiRequest, origin },
+                  });
+                  if (error) throw error;
+                  if ((data as any)?.error) throw new Error((data as any).error);
+                  setAiResult(data as any);
+                } catch (e: any) {
+                  toast({ title: "Could not generate", description: e?.message ?? "Try again.", variant: "destructive" });
+                } finally {
+                  setAiLoading(false);
+                }
+              }}
+              disabled={aiLoading || !aiRequest.trim()}
+              className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              {aiLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+              {aiLoading ? "Generating…" : "Generate code"}
+            </Button>
+
+            {aiResult && (
+              <div className="mt-4 space-y-3 rounded-md border border-border bg-secondary/40 p-4">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide font-semibold">
+                  {aiResult.platform} · {aiResult.method}
+                </div>
+                <p className="text-sm text-foreground">{aiResult.placement_summary}</p>
+                <div>
+                  <div className="text-xs text-muted-foreground font-semibold mb-1">Paste this:</div>
+                  <SnippetBox text={aiResult.snippet} copyKey="ai-snippet" />
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground font-semibold mb-1">Steps:</div>
+                  <ol className="list-decimal list-inside text-sm text-foreground space-y-1">
+                    {aiResult.steps.map((s, i) => <li key={i}>{s}</li>)}
+                  </ol>
+                </div>
+                {aiResult.notes && (
+                  <p className="text-xs text-muted-foreground italic">{aiResult.notes}</p>
+                )}
+              </div>
+            )}
+          </TabsContent>
 
           <TabsContent value="script" className="space-y-3">
             <p className="text-sm text-muted-foreground">
