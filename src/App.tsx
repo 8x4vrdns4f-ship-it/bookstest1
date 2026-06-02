@@ -14,6 +14,11 @@ import PendingApproval from "./pages/PendingApproval.tsx";
 import Kiosk from "./pages/Kiosk.tsx";
 import EmbedWidget from "./pages/EmbedWidget.tsx";
 import PublicBooking from "./pages/PublicBooking.tsx";
+import BookingSuccess from "./pages/BookingSuccess.tsx";
+import BookingCancelled from "./pages/BookingCancelled.tsx";
+import Payments from "./pages/Payments.tsx";
+import PaymentsReturn from "./pages/PaymentsReturn.tsx";
+import PaymentsRefresh from "./pages/PaymentsRefresh.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 
