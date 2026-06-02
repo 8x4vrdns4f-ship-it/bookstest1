@@ -74,7 +74,7 @@ serve(async (req) => {
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
 
-    return new Response(JSON.stringify({ subscribed, tier, current_period_end: periodEnd }), {
+    return new Response(JSON.stringify({ subscribed, tier, current_period_end: periodEnd, status, trial_end: trialEnd }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
