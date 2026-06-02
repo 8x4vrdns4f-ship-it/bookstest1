@@ -12,6 +12,8 @@ import Settings from "./pages/Settings.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import PendingApproval from "./pages/PendingApproval.tsx";
 import Kiosk from "./pages/Kiosk.tsx";
+import EmbedWidget from "./pages/EmbedWidget.tsx";
+import PublicBooking from "./pages/PublicBooking.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 
@@ -33,6 +35,8 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/pending-approval" element={<PendingApproval />} />
           <Route path="/kiosk/:companyCode" element={<Kiosk />} />
+          <Route path="/embed/:userId" element={<EmbedWidget />} />
+          <Route path="/book/:userId" element={<PublicBooking />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

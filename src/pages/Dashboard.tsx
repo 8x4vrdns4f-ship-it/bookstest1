@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, Users, Clock, LogOut, Download, Settings as SettingsIcon } from "lucide-react";
+import { CalendarDays, Users, Clock, LogOut, Code2, Settings as SettingsIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
+import EmbedWidgetDialog from "@/components/dashboard/EmbedWidgetDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -21,7 +22,7 @@ import SubscriptionWidget from "@/components/dashboard/SubscriptionWidget";
 import LockedFeature from "@/components/LockedFeature";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS } from "@/lib/tierLimits";
-import { buildWidgetHtml } from "@/lib/widgetTemplate";
+
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
@@ -97,22 +98,6 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  const handleDownloadWidget = () => {
-    if (!user) return;
-    const widgetCode = buildWidgetHtml({
-      supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-      supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      userId: user.id,
-    });
-    const blob = new Blob([widgetCode], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "booking-calendar-widget.html";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast({ title: "Widget downloaded!", description: "Embed this HTML file on your site to take bookings." });
-  };
 
   if (!user || !businessUserId) return null;
 
@@ -149,13 +134,15 @@ const Dashboard = () => {
             )}
             {isOwner && <AddEmployeeDialog userId={user.id} />}
             {isOwner && (
-              <Button
-                onClick={handleDownloadWidget}
-                className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm"
-              >
-                <Download size={16} />
-                Download Calendar Widget
-              </Button>
+              <EmbedWidgetDialog
+                userId={user.id}
+                trigger={
+                  <Button className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm">
+                    <Code2 size={16} />
+                    Embed Widget
+                  </Button>
+                }
+              />
             )}
             <Button
               onClick={handleLogout}
