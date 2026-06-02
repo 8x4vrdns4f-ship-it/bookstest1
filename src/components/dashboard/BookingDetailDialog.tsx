@@ -19,6 +19,9 @@ type Booking = {
   notes: string | null;
   confirmation_code: string | null;
   assigned_employee_id?: string | null;
+  payment_status?: string | null;
+  deposit_amount?: number | null;
+  stripe_payment_intent_id?: string | null;
 };
 
 type Employee = { id: string; name: string; position: string | null };
