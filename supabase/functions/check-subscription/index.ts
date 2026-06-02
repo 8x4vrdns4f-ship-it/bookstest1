@@ -43,16 +43,22 @@ serve(async (req) => {
     let subscriptionId: string | null = null;
     let periodEnd: string | null = null;
 
+    let status: string | null = null;
+    let trialEnd: string | null = null;
+
     if (customers.data.length) {
       customerId = customers.data[0].id;
-      const subs = await stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 });
-      if (subs.data.length) {
-        const sub = subs.data[0];
+      // Pick the most recent active OR trialing subscription.
+      const subs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 10 });
+      const live = subs.data.find((s) => s.status === "active" || s.status === "trialing");
+      if (live) {
         subscribed = true;
-        subscriptionId = sub.id;
-        priceId = sub.items.data[0].price.id;
+        subscriptionId = live.id;
+        priceId = live.items.data[0].price.id;
         tier = TIER_BY_PRICE[priceId] ?? null;
-        periodEnd = new Date(sub.current_period_end * 1000).toISOString();
+        periodEnd = new Date(live.current_period_end * 1000).toISOString();
+        status = live.status;
+        trialEnd = live.trial_end ? new Date(live.trial_end * 1000).toISOString() : null;
       }
     }
 
