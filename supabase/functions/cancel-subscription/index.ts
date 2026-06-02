@@ -65,8 +65,8 @@ serve(async (req) => {
     try {
       await admin.functions.invoke("send-transactional-email", {
         body: {
-          template: "subscription-canceled",
-          to: user.email,
+          templateName: "subscription-canceled",
+          recipientEmail: user.email,
           templateData: {
             businessName: biz?.business_name || user.email,
             tier: tier.charAt(0).toUpperCase() + tier.slice(1),
@@ -74,7 +74,6 @@ serve(async (req) => {
             resubscribeUrl: "https://booksuite.online/pricing",
           },
           idempotencyKey: `cancel-${live.id}`,
-          purpose: "transactional",
         },
       });
     } catch (mailErr) {
