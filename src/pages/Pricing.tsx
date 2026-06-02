@@ -45,8 +45,9 @@ const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubscribe = async (tier: "silver" | "gold" | "platinum") => {
-    setLoading(tier);
+  const handleSubscribe = async (tier: "silver" | "gold" | "platinum", mode: "paid" | "trial") => {
+    const key = `${tier}-${mode}`;
+    setLoading(key);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -54,7 +55,7 @@ const Pricing = () => {
         navigate("/auth");
         return;
       }
-      const { data, error } = await supabase.functions.invoke("create-checkout", { body: { tier } });
+      const { data, error } = await supabase.functions.invoke("create-checkout", { body: { tier, mode } });
       if (error) throw error;
       if (data?.url) {
         window.open(data.url, "_blank");
@@ -136,13 +137,21 @@ const Pricing = () => {
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex flex-col gap-2">
                 <Button
-                  onClick={() => handleSubscribe(tier.tier)}
-                  disabled={loading === tier.tier}
+                  onClick={() => handleSubscribe(tier.tier, "paid")}
+                  disabled={loading !== null}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg"
                 >
-                  {loading === tier.tier ? "Loading..." : "Start 30-day free trial"}
+                  {loading === `${tier.tier}-paid` ? "Loading…" : "Get Started"}
+                </Button>
+                <Button
+                  onClick={() => handleSubscribe(tier.tier, "trial")}
+                  disabled={loading !== null}
+                  variant="outline"
+                  className="w-full rounded-lg border-border bg-secondary/40 text-muted-foreground hover:text-foreground hover:bg-secondary"
+                >
+                  {loading === `${tier.tier}-trial` ? "Loading…" : "Start 30-day free trial"}
                 </Button>
               </CardFooter>
             </Card>
