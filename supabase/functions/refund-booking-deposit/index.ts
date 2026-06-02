@@ -1,4 +1,5 @@
 // Owner refunds a booking's deposit (and reverses both platform fee + transfer).
+// Also fires customer refund email (idempotent with the webhook via refund_id key).
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 
@@ -6,6 +7,13 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+function formatDate(d: string): string {
+  try {
+    return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  } catch { return d; }
+}
+function formatTime(t: string): string { return (t || "").slice(0, 5); }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -54,6 +62,38 @@ Deno.serve(async (req) => {
       .from("bookings")
       .update({ payment_status: "refunded", refund_id: refund.id, updated_at: new Date().toISOString() })
       .eq("id", booking_id);
+
+    // Fetch business name + currency for the email
+    const { data: settings } = await admin
+      .from("business_settings")
+      .select("business_name, currency")
+      .eq("user_id", booking.user_id)
+      .maybeSingle();
+
+    const currency = (settings?.currency || "GBP").toUpperCase();
+    const refundAmount = booking.deposit_amount
+      ? `${currency} ${Number(booking.deposit_amount).toFixed(2)}`
+      : undefined;
+
+    if (booking.client_email) {
+      try {
+        await admin.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "booking-refunded",
+            recipientEmail: booking.client_email,
+            idempotencyKey: `refund-${booking.id}-${refund.id}`,
+            templateData: {
+              businessName: settings?.business_name || "the business",
+              clientName: booking.client_name,
+              service: booking.service,
+              date: formatDate(booking.booking_date),
+              time: formatTime(booking.booking_time),
+              refundAmount,
+            },
+          },
+        });
+      } catch (e) { console.error("refund email failed", e); }
+    }
 
     return new Response(JSON.stringify({ ok: true, refund_id: refund.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
