@@ -1,20 +1,8 @@
 // Generates the standalone HTML widget that businesses embed on their site.
 // Reads business_settings + busy slots from Supabase via anon key.
-// Tap-start + duration chips, horizontal date strip (today + 13 days).
+// The same parts are reused by the React /embed/:userId and /book/:userId pages.
 
-export const buildWidgetHtml = (opts: {
-  supabaseUrl: string;
-  supabaseKey: string;
-  userId: string;
-}) => {
-  const { supabaseUrl, supabaseKey, userId } = opts;
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book an Appointment</title>
-<style>
+export const WIDGET_STYLES = `
   *,*::before,*::after{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:transparent}
   .bw{max-width:460px;margin:0 auto;background:#1a1f2e;border-radius:16px;padding:20px;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.3)}
@@ -44,11 +32,6 @@ export const buildWidgetHtml = (opts: {
   .bw input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2d3548;background:#263040;color:#fff;font-size:14px;outline:none}
   .bw input:focus{border-color:#5bade8}
   .bw .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .bw .card-box{background:#0f1420;border:1px solid #2d3548;padding:12px;border-radius:8px;margin-top:10px}
-  .bw .card-box h4{margin:0 0 8px;font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-  .bw .card-box .row3{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-  .bw .card-note{font-size:10px;color:#6b7280;margin-top:8px;text-align:center;font-style:italic}
-  .bw input.invalid{border-color:#ef4444}
   .bw button.submit{width:100%;padding:12px;border:none;border-radius:8px;background:#5bade8;color:#0f1420;font-weight:700;font-size:14px;cursor:pointer;margin-top:14px;transition:.15s}
   .bw button.submit:hover{background:#4a9ad8}
   .bw button.submit:disabled{opacity:.5;cursor:not-allowed}
@@ -57,9 +40,9 @@ export const buildWidgetHtml = (opts: {
   .bw .ok h3{margin:0 0 6px;font-size:16px}
   .bw .ok p{margin:0;font-size:13px;color:#9ca3af}
   .bw .err{background:#3a1c1c;color:#fca5a5;padding:8px 10px;border-radius:6px;font-size:12px;margin-top:8px}
-</style>
-</head>
-<body>
+`;
+
+export const WIDGET_MARKUP = `
 <div class="bw" id="bw">
   <h2 id="bw-title">Book an Appointment</h2>
   <p class="sub">Pick a day, then tap a start time and duration.</p>
@@ -80,7 +63,6 @@ export const buildWidgetHtml = (opts: {
     <input id="bw-email" type="email" placeholder="Email" required>
   </div>
 
-
   <div id="bw-err"></div>
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
 </div>
@@ -92,12 +74,17 @@ export const buildWidgetHtml = (opts: {
     <p>You'll receive an email when the business confirms or declines.</p>
   </div>
 </div>
+`;
 
-<script>
+export const buildWidgetScript = (opts: {
+  supabaseUrl: string;
+  supabaseKey: string;
+  userId: string;
+}) => `
 (function(){
-  var URL_ = ${JSON.stringify(supabaseUrl)};
-  var KEY = ${JSON.stringify(supabaseKey)};
-  var UID = ${JSON.stringify(userId)};
+  var URL_ = ${JSON.stringify(opts.supabaseUrl)};
+  var KEY = ${JSON.stringify(opts.supabaseKey)};
+  var UID = ${JSON.stringify(opts.userId)};
 
   var settings = {
     working_hours: {
@@ -116,10 +103,9 @@ export const buildWidgetHtml = (opts: {
     max_advance_days: 14,
     buffer_minutes: 0
   };
-  var busy = []; // {booking_date, booking_time, duration_minutes}
-  var overrides = {}; // dateStr -> {closed, open_time, close_time}
+  var busy = [];
+  var overrides = {};
   var selDate = null, selSlot = null, selDur = null;
-
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
 
   function api(path, opts){
@@ -131,7 +117,6 @@ export const buildWidgetHtml = (opts: {
     }, opts.headers || {});
     return fetch(URL_ + path, opts);
   }
-
   function pad(n){ return String(n).padStart(2,'0'); }
   function fmtDate(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
   function toMin(t){ var p = t.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); }
@@ -147,7 +132,6 @@ export const buildWidgetHtml = (opts: {
     var key = DAY_KEYS[d.getDay()];
     return settings.working_hours[key] || { closed: true, open:'09:00', close:'18:00' };
   }
-
   function busyMinutes(dateStr){
     var set = {};
     var buf = settings.buffer_minutes || 0;
@@ -158,7 +142,6 @@ export const buildWidgetHtml = (opts: {
     });
     return set;
   }
-
   function renderDates(){
     var wrap = document.getElementById('bw-dates');
     wrap.innerHTML = '';
@@ -180,7 +163,6 @@ export const buildWidgetHtml = (opts: {
       wrap.appendChild(el);
     }
   }
-
   function renderSlots(){
     var wrap = document.getElementById('bw-slots');
     wrap.innerHTML = '';
@@ -200,7 +182,6 @@ export const buildWidgetHtml = (opts: {
       wrap.appendChild(el);
     }
   }
-
   function renderDurs(){
     var wrap = document.getElementById('bw-durs');
     wrap.innerHTML = '';
@@ -224,7 +205,6 @@ export const buildWidgetHtml = (opts: {
       wrap.appendChild(el);
     });
   }
-
   function renderAll(){
     renderDates(); renderSlots(); renderDurs();
     var btn = document.getElementById('bw-submit');
@@ -232,10 +212,8 @@ export const buildWidgetHtml = (opts: {
     var email = document.getElementById('bw-email').value.trim();
     btn.disabled = !(selDate && selSlot !== null && selDur && name && email);
   }
-
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
-
   document.getElementById('bw-submit').addEventListener('click', async function(){
     var btn = this; btn.disabled = true; btn.textContent = 'Submitting...';
     var errEl = document.getElementById('bw-err'); errEl.innerHTML = '';
@@ -262,22 +240,11 @@ export const buildWidgetHtml = (opts: {
       btn.disabled = false; btn.textContent = 'Request Booking';
     }
   });
-
-  // Load settings + busy slots + date overrides
   var endRange = (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })();
   Promise.all([
-    api('/rest/v1/rpc/get_widget_settings', {
-      method: 'POST',
-      body: JSON.stringify({ p_user_id: UID })
-    }).then(function(r){ return r.json(); }),
-    api('/rest/v1/rpc/get_busy_slots', {
-      method: 'POST',
-      body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange })
-    }).then(function(r){ return r.json(); }),
-    api('/rest/v1/rpc/get_widget_date_overrides', {
-      method: 'POST',
-      body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange })
-    }).then(function(r){ return r.json(); })
+    api('/rest/v1/rpc/get_widget_settings', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); }),
+    api('/rest/v1/rpc/get_busy_slots', { method: 'POST', body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange }) }).then(function(r){ return r.json(); }),
+    api('/rest/v1/rpc/get_widget_date_overrides', { method: 'POST', body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange }) }).then(function(r){ return r.json(); })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];
@@ -293,7 +260,6 @@ export const buildWidgetHtml = (opts: {
     }
     busy = Array.isArray(arr[1]) ? arr[1] : [];
     (Array.isArray(arr[2]) ? arr[2] : []).forEach(function(o){ overrides[o.override_date] = o; });
-    // pre-select first available day
     var today = new Date();
     var startI = settings.allow_same_day ? 0 : 1;
     var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
@@ -303,7 +269,22 @@ export const buildWidgetHtml = (opts: {
     document.getElementById('bw-deposit').textContent = 'Could not load. Refresh to try again.';
   });
 })();
-</script>
+`;
+
+export const buildWidgetHtml = (opts: {
+  supabaseUrl: string;
+  supabaseKey: string;
+  userId: string;
+}) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book an Appointment</title>
+<style>${WIDGET_STYLES}</style>
+</head>
+<body>
+${WIDGET_MARKUP}
+<script>${buildWidgetScript(opts)}</script>
 </body>
 </html>`;
-};
