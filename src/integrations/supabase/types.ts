@@ -25,11 +25,18 @@ export type Database = {
           confirmation_code: string | null
           created_at: string
           decline_reason: string | null
+          deposit_amount: number | null
           duration_minutes: number
           id: string
           notes: string | null
+          payment_status: string
+          platform_fee_amount: number | null
+          refund_id: string | null
           service: string
           status: string
+          stripe_charge_id: string | null
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
           updated_at: string
           user_id: string
         }
@@ -43,11 +50,18 @@ export type Database = {
           confirmation_code?: string | null
           created_at?: string
           decline_reason?: string | null
+          deposit_amount?: number | null
           duration_minutes?: number
           id?: string
           notes?: string | null
+          payment_status?: string
+          platform_fee_amount?: number | null
+          refund_id?: string | null
           service: string
           status?: string
+          stripe_charge_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -61,11 +75,18 @@ export type Database = {
           confirmation_code?: string | null
           created_at?: string
           decline_reason?: string | null
+          deposit_amount?: number | null
           duration_minutes?: number
           id?: string
           notes?: string | null
+          payment_status?: string
+          platform_fee_amount?: number | null
+          refund_id?: string | null
           service?: string
           status?: string
+          stripe_charge_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -112,6 +133,7 @@ export type Database = {
           notify_new_booking: boolean
           platform_fee_percent: number
           reception_checkin_enabled: boolean
+          require_deposit: boolean
           self_checkin_enabled: boolean
           timezone: string
           updated_at: string
@@ -144,6 +166,7 @@ export type Database = {
           notify_new_booking?: boolean
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
+          require_deposit?: boolean
           self_checkin_enabled?: boolean
           timezone?: string
           updated_at?: string
@@ -176,6 +199,7 @@ export type Database = {
           notify_new_booking?: boolean
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
+          require_deposit?: boolean
           self_checkin_enabled?: boolean
           timezone?: string
           updated_at?: string
@@ -252,6 +276,48 @@ export type Database = {
           id?: string
           is_builtin?: boolean
           name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      connect_accounts: {
+        Row: {
+          charges_enabled: boolean
+          country: string | null
+          created_at: string
+          default_currency: string | null
+          details_submitted: boolean
+          environment: string
+          id: string
+          payouts_enabled: boolean
+          stripe_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          charges_enabled?: boolean
+          country?: string | null
+          created_at?: string
+          default_currency?: string | null
+          details_submitted?: boolean
+          environment?: string
+          id?: string
+          payouts_enabled?: boolean
+          stripe_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          charges_enabled?: boolean
+          country?: string | null
+          created_at?: string
+          default_currency?: string | null
+          details_submitted?: boolean
+          environment?: string
+          id?: string
+          payouts_enabled?: boolean
+          stripe_account_id?: string
           updated_at?: string
           user_id?: string
         }
@@ -521,6 +587,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pending_bookings: {
+        Row: {
+          booking_date: string
+          booking_time: string
+          client_email: string
+          client_name: string
+          created_at: string
+          currency: string
+          deposit_amount: number
+          duration_minutes: number
+          expires_at: string
+          id: string
+          notes: string | null
+          platform_fee_amount: number
+          service: string
+          status: string
+          stripe_account_id: string
+          stripe_checkout_session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          booking_date: string
+          booking_time: string
+          client_email: string
+          client_name: string
+          created_at?: string
+          currency?: string
+          deposit_amount: number
+          duration_minutes?: number
+          expires_at?: string
+          id?: string
+          notes?: string | null
+          platform_fee_amount: number
+          service: string
+          status?: string
+          stripe_account_id: string
+          stripe_checkout_session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          booking_date?: string
+          booking_time?: string
+          client_email?: string
+          client_name?: string
+          created_at?: string
+          currency?: string
+          deposit_amount?: number
+          duration_minutes?: number
+          expires_at?: string
+          id?: string
+          notes?: string | null
+          platform_fee_amount?: number
+          service?: string
+          status?: string
+          stripe_account_id?: string
+          stripe_checkout_session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
