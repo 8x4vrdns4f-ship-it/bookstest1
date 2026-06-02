@@ -1,89 +1,54 @@
-# BookSuite — Roles, Approvals, Check-in & Emails
+## Goal
 
-This is a large build. I'll deliver in 4 phases so each piece is testable before the next. Tell me to start phase 1 (or skip to a specific phase).
+Make it trivial for a business owner to put the booking widget on their own site — no downloading, no editing HTML, no developer required.
 
----
+## The better approach: hosted embed script
 
-## Phase 1 — Roles & Join-request approval
+Instead of downloading a self-contained `.html` file, give each owner a **one-line `<script>` snippet** they paste into their site (Wix, Squarespace, Shopify, WordPress, plain HTML — all support a custom HTML block). The script auto-renders the widget inside whatever container they drop it into.
 
-**Database**
-- New table `company_roles` — per-business role definitions. Built-in seeds: `owner`, `manager`, `receptionist`, `employee` (marked `is_builtin=true`, undeletable). Owners add custom roles in Settings → Roles (these inherit employee-level permissions).
-- Add `role_id` (FK → company_roles) to `employees`.
-- New table `employee_join_requests` — `id, user_id (business owner), requester_auth_id, requester_name, requester_email, requester_phone, status (pending/accepted/declined), decline_reason, assigned_role_id, created_at, decided_at, decided_by`.
-- DB function `has_company_permission(auth_uid, business_user_id, perm)` — returns true if caller is owner OR has manager/receptionist/etc. role at that business. Used by RLS.
-- RLS: requests visible to owner + anyone with `can_approve_requests` (owner + manager).
+```html
+<div id="booksuite-widget"></div>
+<script src="https://booksuite.online/embed.js" data-user="USER_ID"></script>
+```
 
-**Flow**
-- `JoinCompanyDialog` → button label changes to **"Request to Join Company"**. Fields: company code, full name, email, phone, password. Creates auth user with `app_status='pending'` in metadata; inserts a `employee_join_requests` row; signs the user out and shows: *"Request submitted. You can't log in yet — we'll email you once approved."*
-- Existing pre-add invite path stays (owner adds email → person joins → auto-approved, no request row).
-- Login guard: if signed-in user has a pending request and no `employees.auth_user_id` link, redirect to `/pending-approval` page with the waiting message.
-- Owner/manager dashboard: bell icon with pending count + a "Join Requests" card listing each request with **Accept** (opens role-picker dialog with the business's `company_roles`) and **Decline** (opens textarea for reason + Submit).
-- On Accept: insert/update `employees` row linking `auth_user_id`, set `role_id`, mark request `accepted` → triggers welcome email.
-- On Decline: mark request `declined` with reason → triggers decline email; user can re-request later.
+Behind the scenes `embed.js` is the same widget code we already generate, served from a stable URL. Owners never see the source. We can also ship updates/bug fixes without anyone having to re-download.
 
-**Notifications**
-- In-app realtime toast + bell badge (Supabase Realtime on `employee_join_requests`).
-- Email to owner + all managers (after Phase 4 wires email).
+## What changes for the owner
 
----
+Replace the "Download Calendar Widget" button with an **"Embed Widget"** button that opens a dialog containing:
 
-## Phase 2 — Role-based dashboards
+1. **Tabs for install method**
+   - **Universal `<script>` snippet** (default) — copy button, works anywhere that accepts custom HTML
+   - **iframe snippet** — `<iframe src="https://booksuite.online/embed/USER_ID" …>` for platforms that block scripts (some Squarespace/Wix free tiers)
+   - **Direct link** — `https://booksuite.online/book/USER_ID` they can put behind any "Book Now" button or share on Instagram/WhatsApp
+   - **Download HTML** — keep the existing option as a fallback for advanced users
 
-- `/dashboard` (existing) = owner + manager. Manager hides "Settings → Danger Zone", "Roles", "Pricing/Billing" sections.
-- `/dashboard` for **receptionist** = a focused view: today's bookings list + big **"Check-in"** button (camera scanner) + manual code entry + waiting-area list + assign-to-employee dropdown (filters employees on shift / "available now").
-- `/employee-dashboard` (existing) = unchanged for `employee` and any custom role.
-- `routeAfterAuth.ts` extended: looks up `employees.role_id` → returns correct route.
-- Settings → new **Roles** accordion: list builtin (locked) + custom roles, add/rename/delete custom ones.
-- Employee "available now" toggle (boolean column on `employees`) for receptionist's assign dropdown.
+2. **Platform guides** — short collapsible "How to add this to…" sections for Wix, Squarespace, Shopify, WordPress, Webflow, plain HTML (3–5 steps each, with screenshots later).
 
----
+3. **Live preview** of the widget inside the dialog so they see exactly what their customers will see.
 
-## Phase 3 — QR check-in flow
+## Technical sketch
 
-**Booking lifecycle**
-- `confirmation_code` already exists. Generate QR client-side from a URL: `https://booksuite.online/checkin/:code` (uses `qrcode` npm lib). QR + code shown in the confirmation email and on a booking-detail page the customer can reopen via the email link.
-- Add `checked_in_at` and `arrived_via` (`self_kiosk` | `reception`) columns to `bookings`.
+```text
+src/pages/EmbedScript.tsx     -> serves the JS at /embed.js (querystring user id)
+src/pages/EmbedFrame.tsx      -> /embed/:userId -> renders widget standalone
+src/pages/PublicBooking.tsx   -> /book/:userId -> branded full-page booking link
+src/components/dashboard/EmbedWidgetDialog.tsx -> tabs + copy buttons + preview
+```
 
-**Self check-in kiosk**
-- New public `/kiosk/:companyCode` route — full-screen camera scanner the business runs on a tablet at their entrance. Scanning a QR → POSTs to RPC `kiosk_check_in(company_code, booking_code)` → flips booking to `arrived` → shows "Welcome [Name]!" → realtime push to receptionist's screen → receptionist clicks "Send to waiting area" / "Assign to X" / "Mark in progress".
+- `embed.js` is generated from the existing `buildWidgetHtml` logic, refactored so the JS body lives in one place and is reused by all three surfaces (script tag, iframe page, public page).
+- Script-tag mode: finds `<div id="booksuite-widget">` (or the script's parent) and injects the widget HTML + styles scoped under `.bw`.
+- iframe + `/book/:id` mode: reuses the same renderer inside a React page.
+- No backend changes needed — widget already talks to Supabase RPCs with the anon key.
 
-**Receptionist-led check-in**
-- Receptionist dashboard: **Scan** button opens camera (`html5-qrcode`) OR types the 6-char code. Same booking pops up with action menu: *Waiting area*, *Assign on-call employee*, *Assign to specific employee*, *Mark in progress*, *Add note*. Choosing "Mark in progress" flips status; the popup actions are configurable so each business picks what to enable.
+## Dashboard change
 
-**Settings**
-- New "Reception" accordion: toggle `self_checkin_enabled` (default off), `reception_checkin_enabled` (default on). At least one must be on.
+Swap the current `Download Calendar Widget` button for `Embed Widget`, opening the new dialog. Keep download as one tab inside so nothing regresses.
 
----
+## Out of scope (for now)
 
-## Phase 4 — Email automation (noreply@booksuite.online)
+- Custom theming per-business (colors/fonts) — can be a follow-up.
+- Analytics on embed loads.
+- npm package / React component version.
 
-**Setup**
-- Configure email domain `booksuite.online` (sender subdomain `notify.booksuite.online`, display From `noreply@booksuite.online`). I'll open the email setup dialog so you can paste the DNS records at your registrar.
-- Once domain is added, set up email infrastructure + scaffold transactional templates.
-
-**Templates**
-1. `booking-confirmed` — sent on Accept. Contains: business name, date/time, service, deposit info, **QR code image** (rendered server-side with `qrcode` lib), 6-char fallback code, link to self check-in URL.
-2. `booking-declined` — sent on Decline. Contains the reason the manager typed.
-3. `booking-followup` — sent **45 min after booking flips to `completed`**. Contains link to business's external review URL (configured per business in Settings → Booking Preferences, new field `review_url`). If empty, follow-up email is skipped.
-4. `join-request-approved` — sent when owner/manager accepts; includes role assigned + login link.
-5. `join-request-declined` — sent on decline with reason.
-6. `join-request-new` — sent to owner + all managers when a request is submitted.
-
-**Scheduling**
-- Confirmation/decline/approval/decline emails fire inline from the Accept/Decline handlers.
-- Follow-up emails: pg_cron job every 5 min scans `bookings` where `status='completed'`, `completed_at <= now() - 45 min`, `followup_sent_at IS NULL`, and `business.review_url IS NOT NULL` → enqueues the email and stamps `followup_sent_at`.
-
----
-
-## Tech notes
-
-- Libs to add: `qrcode` (QR generation), `html5-qrcode` (camera scanner).
-- All new tables get GRANTs + RLS in the same migration.
-- Memory updates: new memory files for roles, join-requests, check-in flow, and email triggers.
-
----
-
-## What I need from you to start
-
-1. **Confirm phase order** — start with Phase 1, or rearrange?
-2. **For Phase 4**, the email domain `booksuite.online` needs DNS records added at your registrar. Ready to do that when we reach Phase 4, or set it up upfront?
+Want me to build this?
