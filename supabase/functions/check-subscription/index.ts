@@ -100,7 +100,7 @@ serve(async (req) => {
             templateData: {
               name: (user.user_metadata as any)?.display_name,
               tier,
-              dashboardUrl: `${new URL(req.url).origin.replace(/\.supabase\.co.*$/, "")}` || "https://booksuite.online/dashboard",
+              dashboardUrl: "https://booksuite.online/dashboard",
             },
           },
         });
