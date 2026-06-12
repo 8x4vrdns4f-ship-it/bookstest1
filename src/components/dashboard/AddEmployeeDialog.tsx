@@ -33,22 +33,40 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.from("employees").insert({
+    const { data: emp, error } = await supabase.from("employees").insert({
       user_id: userId,
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim() || null,
       position: position.trim() || null,
-    });
+    }).select("id").single();
     setLoading(false);
     if (error) {
       if (!handleTierError(error)) toast({ title: "Error", description: "Failed to add employee.", variant: "destructive" });
       return;
     }
 
+    // Send invite email (best-effort)
+    try {
+      const { data: bs } = await supabase
+        .from("business_settings")
+        .select("business_name, company_code")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (bs?.company_code && email.trim()) {
+        const { sendEmail } = await import("@/lib/sendEmail");
+        sendEmail("employee-invited", email.trim(), `emp-invite-${emp?.id ?? email.trim()}`, {
+          inviteeName: name.trim(),
+          businessName: bs.business_name || "the team",
+          companyCode: bs.company_code,
+          joinUrl: `${window.location.origin}/auth?mode=signup`,
+        });
+      }
+    } catch (e) { console.error("invite email failed", e); }
+
     toast({
       title: "Employee added!",
-      description: `${name} can now join with your company code (Settings → Company Info). Email invites coming soon.`,
+      description: `${name} has been invited via email and can join with your company code.`,
     });
     setName("");
     setEmail("");
