@@ -44,9 +44,12 @@ const Auth = () => {
     setLoading(true);
 
     if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      } else if (data.user && !data.user.email_confirmed_at) {
+        toast({ title: "Verify your email", description: "Please confirm your email to continue." });
+        navigate("/verify-email");
       } else {
         toast({ title: "Welcome back!" });
         const route = await getDashboardRoute();
@@ -58,14 +61,14 @@ const Auth = () => {
         password,
         options: {
           data: { display_name: displayName },
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: `${window.location.origin}/verify-email`,
         },
       });
       if (error) {
         toast({ title: "Signup failed", description: error.message, variant: "destructive" });
       } else {
-        toast({ title: "Account created!", description: "Check your email to confirm, then log in." });
-        setIsLogin(true);
+        toast({ title: "Account created!", description: "Check your email to verify." });
+        navigate("/verify-email");
       }
     }
 
