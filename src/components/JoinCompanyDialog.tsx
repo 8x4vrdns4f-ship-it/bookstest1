@@ -74,6 +74,28 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
       }
       const row = Array.isArray(req) ? req[0] : req;
       const biz = row?.business_name || "the company";
+      const requestId = row?.request_id;
+
+      // Look up owner email + send notification BEFORE signing out (still authed)
+      try {
+        const { data: bs } = await supabase
+          .from("business_settings")
+          .select("user_id")
+          .eq("company_code", code.trim().toUpperCase())
+          .maybeSingle();
+        if (bs?.user_id) {
+          const { data: ownerEmail } = await supabase.rpc("get_owner_email", { _user_id: bs.user_id });
+          if (ownerEmail) {
+            const { sendEmail } = await import("@/lib/sendEmail");
+            sendEmail("join-request-received-owner", ownerEmail as unknown as string,
+              `join-received-${requestId || `${bs.user_id}-${email}`}`,
+              {
+                applicantName: name, applicantEmail: email.trim(), applicantPhone: phone,
+                businessName: biz, dashboardUrl: `${window.location.origin}/dashboard`,
+              });
+          }
+        }
+      } catch (e) { console.error("owner notify failed", e); }
 
       // Sign out so they can't access anything until approved
       await supabase.auth.signOut();

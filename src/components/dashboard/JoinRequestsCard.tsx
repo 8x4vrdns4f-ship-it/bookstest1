@@ -72,6 +72,15 @@ const JoinRequestsCard = ({ businessUserId }: { businessUserId: string }) => {
     });
     setBusy(false);
     if (error) { toast({ title: "Could not accept", description: error.message, variant: "destructive" }); return; }
+    const roleName = roles.find((r) => r.id === selectedRole)?.name || "team member";
+    const { data: bs } = await supabase.from("business_settings").select("business_name").eq("user_id", businessUserId).maybeSingle();
+    const { sendEmail } = await import("@/lib/sendEmail");
+    sendEmail("join-request-approved", acceptOpen.requester_email, `join-approve-${acceptOpen.id}`, {
+      applicantName: acceptOpen.requester_name,
+      businessName: bs?.business_name || "the team",
+      role: roleName,
+      loginUrl: `${window.location.origin}/auth`,
+    });
     toast({ title: `${acceptOpen.requester_name} accepted` });
     setAcceptOpen(null); setSelectedRole(""); load();
   };
@@ -87,6 +96,13 @@ const JoinRequestsCard = ({ businessUserId }: { businessUserId: string }) => {
     });
     setBusy(false);
     if (error) { toast({ title: "Could not decline", description: error.message, variant: "destructive" }); return; }
+    const { data: bs } = await supabase.from("business_settings").select("business_name").eq("user_id", businessUserId).maybeSingle();
+    const { sendEmail } = await import("@/lib/sendEmail");
+    sendEmail("join-request-declined", declineOpen.requester_email, `join-decline-${declineOpen.id}`, {
+      applicantName: declineOpen.requester_name,
+      businessName: bs?.business_name || "the team",
+      reason: reason.trim(),
+    });
     toast({ title: "Request declined" });
     setDeclineOpen(null); setReason(""); load();
   };

@@ -20,6 +20,16 @@ const VerifyEmail = () => {
   useEffect(() => {
     let cancelled = false;
 
+    const fireWelcome = async (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
+      if (!user.email) return;
+      const { sendEmail } = await import("@/lib/sendEmail");
+      const displayName = (user.user_metadata?.display_name as string | undefined) || undefined;
+      sendEmail("welcome", user.email, `welcome-${user.id}`, {
+        name: displayName,
+        dashboardUrl: `${window.location.origin}/dashboard`,
+      });
+    };
+
     const check = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (cancelled) return;
@@ -30,6 +40,7 @@ const VerifyEmail = () => {
       setEmail(user.email ?? null);
       setChecking(false);
       if (user.email_confirmed_at) {
+        fireWelcome(user);
         const route = await getDashboardRoute();
         navigate(route, { replace: true });
       }
@@ -40,6 +51,7 @@ const VerifyEmail = () => {
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user?.email_confirmed_at) {
+        fireWelcome(session.user);
         const route = await getDashboardRoute();
         navigate(route, { replace: true });
       }

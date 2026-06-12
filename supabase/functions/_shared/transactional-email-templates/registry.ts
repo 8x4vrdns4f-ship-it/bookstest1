@@ -14,9 +14,14 @@ import { template as bookingDeclined } from './booking-declined.tsx'
 import { template as bookingFollowup } from './booking-followup.tsx'
 import { template as bookingPaidOwner } from './booking-paid-owner.tsx'
 import { template as bookingRefunded } from './booking-refunded.tsx'
+import { template as bookingCancelledClient } from './booking-cancelled-client.tsx'
 import { template as joinRequestApproved } from './join-request-approved.tsx'
 import { template as joinRequestDeclined } from './join-request-declined.tsx'
+import { template as joinRequestReceivedOwner } from './join-request-received-owner.tsx'
 import { template as subscriptionCanceled } from './subscription-canceled.tsx'
+import { template as subscriptionActivated } from './subscription-activated.tsx'
+import { template as employeeInvited } from './employee-invited.tsx'
+import { template as welcome } from './welcome.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-confirmed': bookingConfirmed,
@@ -24,7 +29,12 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-followup': bookingFollowup,
   'booking-paid-owner': bookingPaidOwner,
   'booking-refunded': bookingRefunded,
+  'booking-cancelled-client': bookingCancelledClient,
   'join-request-approved': joinRequestApproved,
   'join-request-declined': joinRequestDeclined,
+  'join-request-received-owner': joinRequestReceivedOwner,
   'subscription-canceled': subscriptionCanceled,
+  'subscription-activated': subscriptionActivated,
+  'employee-invited': employeeInvited,
+  'welcome': welcome,
 }
