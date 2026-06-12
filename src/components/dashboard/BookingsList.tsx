@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight } from "lucide-react";
 import BookingDetailDialog from "./BookingDetailDialog";
 import { handleTierError } from "@/lib/tierError";
+import { sendEmail, formatDate, formatTime } from "@/lib/sendEmail";
 
 
 type Booking = {
@@ -39,6 +40,8 @@ const statusColors: Record<string, string> = {
 const BookingsList = ({ userId }: { userId: string }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [employeesMap, setEmployeesMap] = useState<Record<string, string>>({});
+  const [businessName, setBusinessName] = useState<string>("");
+  const [companyCode, setCompanyCode] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -74,6 +77,10 @@ const BookingsList = ({ userId }: { userId: string }) => {
   useEffect(() => {
     fetchBookings();
     fetchEmployees();
+    supabase.from("business_settings").select("business_name, company_code").eq("user_id", userId).maybeSingle()
+      .then(({ data }) => {
+        if (data) { setBusinessName(data.business_name || ""); setCompanyCode(data.company_code || ""); }
+      });
 
     const channel = supabase
       .channel("bookings-list-changes")
@@ -142,17 +149,34 @@ const BookingsList = ({ userId }: { userId: string }) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
     }
+    if (b.client_email) {
+      const checkInUrl = companyCode
+        ? `${window.location.origin}/kiosk/${companyCode}?code=${codeData}`
+        : undefined;
+      sendEmail("booking-confirmed", b.client_email, `booking-confirm-${b.id}`, {
+        businessName, clientName: b.client_name, service: b.service,
+        date: formatDate(b.booking_date), time: formatTime(b.booking_time),
+        confirmationCode: codeData, checkInUrl,
+      });
+    }
     toast({ title: `Accepted — code ${codeData}`, description: `Share with ${b.client_name}` });
   };
 
   const handleDecline = async (b: Booking) => {
+    const reason = "Declined by business";
     const { error } = await supabase
       .from("bookings")
-      .update({ status: "cancelled", decline_reason: "Declined by business" })
+      .update({ status: "cancelled", decline_reason: reason })
       .eq("id", b.id);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
+    }
+    if (b.client_email) {
+      sendEmail("booking-declined", b.client_email, `booking-decline-${b.id}`, {
+        businessName, clientName: b.client_name, service: b.service,
+        date: formatDate(b.booking_date), time: formatTime(b.booking_time), reason,
+      });
     }
     toast({ title: "Booking declined" });
   };
