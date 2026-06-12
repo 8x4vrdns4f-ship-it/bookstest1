@@ -805,6 +805,7 @@ export type Database = {
           status: string
         }[]
       }
+      get_owner_email: { Args: { _user_id: string }; Returns: string }
       get_widget_date_overrides: {
         Args: { p_from: string; p_to: string; p_user_id: string }
         Returns: {
