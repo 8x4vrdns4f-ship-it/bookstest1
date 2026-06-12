@@ -21,6 +21,8 @@ import PaymentsReturn from "./pages/PaymentsReturn.tsx";
 import PaymentsRefresh from "./pages/PaymentsRefresh.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
+import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
+import VerifyEmail from "./pages/VerifyEmail.tsx";
 
 const queryClient = new QueryClient();
 
@@ -34,19 +36,20 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
-          <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
-          <Route path="/settings" element={<RequireSubscription><Settings /></RequireSubscription>} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/dashboard" element={<RequireVerifiedEmail><RequireSubscription><Dashboard /></RequireSubscription></RequireVerifiedEmail>} />
+          <Route path="/employee-dashboard" element={<RequireVerifiedEmail><EmployeeDashboard /></RequireVerifiedEmail>} />
+          <Route path="/settings" element={<RequireVerifiedEmail><RequireSubscription><Settings /></RequireSubscription></RequireVerifiedEmail>} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/pending-approval" element={<PendingApproval />} />
+          <Route path="/pending-approval" element={<RequireVerifiedEmail><PendingApproval /></RequireVerifiedEmail>} />
           <Route path="/kiosk/:companyCode" element={<Kiosk />} />
           <Route path="/embed/:userId" element={<EmbedWidget />} />
           <Route path="/book/:userId" element={<PublicBooking />} />
           <Route path="/book/:userId/success" element={<BookingSuccess />} />
           <Route path="/book/:userId/cancelled" element={<BookingCancelled />} />
-          <Route path="/payments" element={<RequireSubscription><Payments /></RequireSubscription>} />
-          <Route path="/payments/return" element={<RequireSubscription><PaymentsReturn /></RequireSubscription>} />
-          <Route path="/payments/refresh" element={<RequireSubscription><PaymentsRefresh /></RequireSubscription>} />
+          <Route path="/payments" element={<RequireVerifiedEmail><RequireSubscription><Payments /></RequireSubscription></RequireVerifiedEmail>} />
+          <Route path="/payments/return" element={<RequireVerifiedEmail><RequireSubscription><PaymentsReturn /></RequireSubscription></RequireVerifiedEmail>} />
+          <Route path="/payments/refresh" element={<RequireVerifiedEmail><RequireSubscription><PaymentsRefresh /></RequireSubscription></RequireVerifiedEmail>} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

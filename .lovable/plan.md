@@ -1,86 +1,51 @@
-# Stripe Webhooks + Booking Confirmation Emails
+## Email verification before dashboard (Option C)
 
-## Goal
+After signup, users see a "Check your email" page. Clicking the verification link in the email automatically logs them in and drops them straight on the dashboard — no need to re-enter their password. Unverified users cannot reach the dashboard.
 
-Right now, a booking is only created in the database if the customer's browser successfully makes it back to `/book/:userId/success` after Stripe Checkout. If they close the tab, lose signal, or their bank takes a moment to settle — Stripe takes the money but your app never knows. This plan fixes that by:
+### What changes for the user
 
-1. Having **Stripe tell your server directly** ("webhook") when a payment succeeds or a refund happens.
-2. **Automatically emailing** the customer (and the business owner) once payment is confirmed.
-3. Doing the same for refunds.
+**Signup flow:**
+1. Click "Try Now" → fill signup form → click Sign Up
+2. Land on a friendly "Check your email" page showing their email address, a "Resend email" button (with 60s cooldown), and a "Wrong email? Sign out" link
+3. Open the email → click the verification button
+4. Land directly on the dashboard, already logged in ✓
+5. From the dashboard they can pick a plan and pay (existing flow unchanged)
 
-The browser-based success page stays — it just becomes a "thank you" screen, not the source of truth.
+**Login flow:**
+- Verified users log in normally → dashboard
+- If an unverified user logs in, they're sent to the "Check your email" page instead, with the Resend button ready
 
----
+**Employee join flow:**
+- Same pattern — employees must verify their email before a manager can approve them. Keeps junk accounts out.
 
-## What gets built
+### Technical changes
 
-### 1. Stripe webhook endpoint (`stripe-connect-webhook` edge function)
+1. **Auth settings:** turn off auto-confirm so the verification email is actually required.
 
-A public endpoint Stripe calls server-to-server. It verifies the request really came from Stripe (using a signing secret), then handles three event types:
+2. **New page `/verify-email`** (public route):
+   - Shows the email address, "Resend verification email" button with cooldown, and "Sign out and use a different email" link
+   - Polls every few seconds — as soon as `email_confirmed_at` is set, forwards to the right dashboard via existing `getDashboardRoute()`
+   - Also the landing page Supabase redirects to after the user clicks the link, so verification → auto-login → dashboard happens seamlessly
 
-- **`checkout.session.completed`** → look up the matching `pending_bookings` row, promote it into `bookings` with `payment_status = 'paid'`, then trigger the customer + owner emails. Idempotent (safe if Stripe retries).
-- **`charge.refunded`** → find the booking by payment intent, set `payment_status = 'refunded'`, save `refund_id`, trigger the refund email.
-- **`account.updated`** (Connect) → update the business owner's `connect_accounts` row (`charges_enabled`, `payouts_enabled`, `details_submitted`) so the Payments page shows live status without them clicking "refresh".
+3. **`Auth.tsx`:**
+   - After signup, navigate to `/verify-email` instead of flipping to login mode
+   - On login, if `email_confirmed_at` is null, route to `/verify-email`
+   - Set `emailRedirectTo: ${origin}/verify-email` on signup
 
-### 2. Register the webhook with Stripe
+4. **Dashboard guards:** extend `RequireSubscription` (or add a small `RequireVerifiedEmail` wrapper) so any signed-in user with an unverified email is redirected to `/verify-email`. Applies to `/dashboard`, `/employee-dashboard`, `/settings`, `/payments`.
 
-Use Stripe's API to register the endpoint URL once per environment (sandbox + live). Stripe gives back a signing secret which gets stored as `STRIPE_CONNECT_WEBHOOK_SECRET`.
+5. **Routing:** add `/verify-email` to `App.tsx`.
 
-### 3. Three email templates (using your existing Lovable email system)
+### Out of scope
 
-Built as branded React Email templates matching your dark-blue BookSuite look:
+- Pay-first / pre-payment signup flow (we discussed; sticking with current order: signup → verify → dashboard → pay)
+- The 4 security scan findings shown in your panel (can tackle in a separate pass)
+- Email template branding (already done)
+- Password reset (already works)
 
-- **`booking-paid-customer`** — "Your booking with [Business Name] is confirmed." Includes date, time, service, confirmation code, deposit amount paid, business address.
-- **`booking-new-owner`** — "New booking: [Client Name] booked [Service]." Sent to the business owner's email so they know money came in. Respects their existing `notify_new_booking` toggle in `business_settings`.
-- **`booking-refunded-customer`** — "Your deposit has been refunded." Includes booking details and refund amount.
+### Edge cases handled
 
-All three are triggered by the webhook (server-side), not the browser, so they fire even if the customer never sees the success page.
-
-### 4. Tighten the success/cancelled pages
-
-The existing `/book/:userId/success` page keeps calling `verify-booking-payment` as a fast-path (so the customer sees confirmation immediately instead of waiting for the webhook). Both paths are idempotent — whichever finishes first wins, the other becomes a no-op.
-
----
-
-## Technical details
-
-### Files created
-- `supabase/functions/stripe-connect-webhook/index.ts` — webhook handler
-- `supabase/functions/_shared/transactional-email-templates/booking-paid-customer.tsx`
-- `supabase/functions/_shared/transactional-email-templates/booking-new-owner.tsx`
-- `supabase/functions/_shared/transactional-email-templates/booking-refunded-customer.tsx`
-- Page at `/unsubscribe` (required by the email system if not already present)
-
-### Files edited
-- `supabase/functions/_shared/transactional-email-templates/registry.ts` — register 3 new templates
-- `supabase/functions/verify-booking-payment/index.ts` — make idempotent with webhook (use upsert on `stripe_checkout_session_id`, also send emails if it wins the race)
-- `supabase/functions/refund-booking-deposit/index.ts` — same idempotency note; emails moved to webhook so they fire regardless of trigger source
-- `supabase/config.toml` — add `[functions.stripe-connect-webhook]` with `verify_jwt = false` (Stripe doesn't send a JWT)
-
-### Database
-- Small migration: add unique index on `bookings.stripe_checkout_session_id` (for upsert idempotency) and on `bookings.stripe_payment_intent_id` (for refund lookup).
-- No new tables needed.
-
-### Secrets
-- `STRIPE_CONNECT_WEBHOOK_SECRET` — gathered after webhook is registered with Stripe. I'll request this via the secrets tool at the right moment.
-
-### Email prerequisites
-Your project already has the email infrastructure (`email_send_log`, queues, etc.) — I just need to confirm the sender domain is set up. If it isn't yet, I'll surface the email domain setup dialog as the first step.
-
-### Order of work
-1. Verify email domain status; if missing, prompt setup.
-2. Create the 3 email templates + register them.
-3. Create `stripe-connect-webhook` edge function (Connect-aware, handles all 3 event types).
-4. Add unique indexes for idempotency.
-5. Register the webhook with Stripe via API, store the signing secret.
-6. Wire the webhook to call `send-transactional-email` for each event.
-7. Make `verify-booking-payment` + `refund-booking-deposit` race-safe with the webhook.
-8. End-to-end test in sandbox: pay → check email + booking created; refund → check email + status updated.
-
----
-
-## What you'll see when it's done
-
-- Customer pays the deposit on any embedded widget → within ~2 seconds, both they and you get a confirmation email, and the booking appears in your dashboard. Closing the browser doesn't break this anymore.
-- You refund a deposit (from the booking detail dialog or directly in Stripe) → customer gets a refund email automatically, booking shows `refunded` status.
-- Business owners finishing Connect onboarding no longer need to click "refresh status" — it updates itself.
+- Email in spam → Resend button with cooldown
+- Typo'd email → "Sign out and use a different email" link
+- Already-confirmed existing users → unaffected, their `email_confirmed_at` is already set
+- Returning unverified user from a previous session → guard catches them and routes to `/verify-email`
