@@ -70,6 +70,13 @@ serve(async (req) => {
       }
     }
 
+    // Check previous state to detect activation transition
+    const { data: prevSub } = await admin
+      .from("subscriptions")
+      .select("subscribed, current_period_end")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
     await admin.from("subscriptions").upsert({
       user_id: user.id,
       email: user.email,
@@ -81,6 +88,24 @@ serve(async (req) => {
       current_period_end: periodEnd,
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
+
+    // Fire activation email on first transition false -> true OR new billing period
+    if (subscribed && tier && (!prevSub?.subscribed || prevSub?.current_period_end !== periodEnd)) {
+      try {
+        await admin.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "subscription-activated",
+            recipientEmail: user.email,
+            idempotencyKey: `sub-active-${user.id}-${periodEnd ?? "none"}`,
+            templateData: {
+              name: (user.user_metadata as any)?.display_name,
+              tier,
+              dashboardUrl: `${new URL(req.url).origin.replace(/\.supabase\.co.*$/, "")}` || "https://booksuite.online/dashboard",
+            },
+          },
+        });
+      } catch (e) { console.error("activation email failed", e); }
+    }
 
     return new Response(JSON.stringify({ subscribed, tier, current_period_end: periodEnd, status, trial_end: trialEnd }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
