@@ -75,10 +75,20 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, onChanged }
   };
 
   const handleStatus = async (status: string) => {
+    const prevStatus = booking.status;
     const { error } = await supabase.from("bookings").update({ status }).eq("id", booking.id);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
+    }
+    if (status === "cancelled" && prevStatus !== "cancelled" && booking.client_email) {
+      const { sendEmail, formatDate, formatTime } = await import("@/lib/sendEmail");
+      const { data: bs } = await supabase.from("business_settings").select("business_name").eq("user_id", ownerId).maybeSingle();
+      sendEmail("booking-cancelled-client", booking.client_email, `booking-cancel-${booking.id}`, {
+        businessName: bs?.business_name || "the business",
+        clientName: booking.client_name, service: booking.service,
+        date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
+      });
     }
     onChanged?.();
   };
