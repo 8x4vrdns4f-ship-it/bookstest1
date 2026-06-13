@@ -588,6 +588,39 @@ export type Database = {
           },
         ]
       }
+      gift_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          redeemed_at: string | null
+          redeemed_by: string | null
+          tier: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          tier: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          tier?: string
+        }
+        Relationships: []
+      }
       pending_bookings: {
         Row: {
           booking_date: string
@@ -795,6 +828,7 @@ export type Database = {
       }
       generate_booking_code: { Args: never; Returns: string }
       generate_company_code: { Args: never; Returns: string }
+      generate_gift_code: { Args: never; Returns: string }
       get_active_tier: { Args: { _user_id: string }; Returns: string }
       get_busy_slots: {
         Args: { p_from: string; p_to: string; p_user_id: string }
@@ -858,6 +892,13 @@ export type Database = {
           message: Json
           msg_id: number
           read_ct: number
+        }[]
+      }
+      redeem_gift_code: {
+        Args: { p_code: string }
+        Returns: {
+          current_period_end: string
+          tier: string
         }[]
       }
       request_to_join_company: {
