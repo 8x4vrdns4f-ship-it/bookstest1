@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import GiftCodeRedeem from "@/components/GiftCodeRedeem";
 
 const tiers = [
   {
@@ -156,6 +157,10 @@ const Pricing = () => {
               </CardFooter>
             </Card>
           ))}
+        </div>
+
+        <div className="mt-20">
+          <GiftCodeRedeem />
         </div>
       </section>
       </main>

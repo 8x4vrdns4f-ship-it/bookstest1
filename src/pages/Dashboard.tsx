@@ -25,6 +25,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS } from "@/lib/tierLimits";
 
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
+import GiftCodesCard from "@/components/dashboard/GiftCodesCard";
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
 import type { User } from "@supabase/supabase-js";
@@ -163,6 +164,7 @@ const Dashboard = () => {
             {isOwner && <SubscriptionWidget />}
             {isOwner && <PaymentsCard userId={user.id} />}
             {isOwner && <UsageBanner userId={businessUserId} />}
+            {isOwner && <GiftCodesCard />}
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
