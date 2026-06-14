@@ -897,8 +897,8 @@ export type Database = {
       redeem_gift_code: {
         Args: { p_code: string }
         Returns: {
-          current_period_end: string
-          tier: string
+          out_period_end: string
+          out_tier: string
         }[]
       }
       request_to_join_company: {
