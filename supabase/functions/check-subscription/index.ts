@@ -73,9 +73,25 @@ serve(async (req) => {
     // Check previous state to detect activation transition
     const { data: prevSub } = await admin
       .from("subscriptions")
-      .select("subscribed, current_period_end")
+      .select("subscribed, current_period_end, tier, price_id")
       .eq("user_id", user.id)
       .maybeSingle();
+
+    // Preserve active gift subscriptions — treat them as paid access.
+    const hasActiveGift = !!prevSub?.subscribed
+      && typeof prevSub?.price_id === "string"
+      && prevSub.price_id.startsWith("gift_")
+      && (!prevSub.current_period_end || new Date(prevSub.current_period_end) > new Date());
+
+    if (!subscribed && hasActiveGift) {
+      return new Response(JSON.stringify({
+        subscribed: true,
+        tier: prevSub!.tier,
+        current_period_end: prevSub!.current_period_end,
+        status: "active",
+        trial_end: null,
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
+    }
 
     await admin.from("subscriptions").upsert({
       user_id: user.id,
@@ -88,6 +104,7 @@ serve(async (req) => {
       current_period_end: periodEnd,
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
+
 
     // Fire activation email on first transition false -> true OR new billing period
     if (subscribed && tier && (!prevSub?.subscribed || prevSub?.current_period_end !== periodEnd)) {
