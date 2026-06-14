@@ -36,7 +36,8 @@ const GiftCodeRedeem = () => {
       }
 
       const row = Array.isArray(data) ? data[0] : data;
-      toast.success(`Gift redeemed! You now have 30 days of ${row?.tier?.toUpperCase()} access.`);
+      const tier = row?.out_tier ?? row?.tier;
+      toast.success(`Gift redeemed! You now have 30 days of ${tier?.toUpperCase?.() ?? "full"} access.`);
       navigate("/dashboard");
     } catch (e: any) {
       toast.error(e.message || "Could not redeem code");
