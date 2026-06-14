@@ -30,7 +30,7 @@ const GiftCodeRedeem = () => {
         const msg = error.message || "Could not redeem code";
         if (msg.includes("INVALID_CODE")) toast.error("That gift code is not valid");
         else if (msg.includes("ALREADY_USED")) toast.error("That code has already been redeemed");
-        else if (msg.includes("ACTIVE_GIFT")) toast.error("You already have an active gift subscription");
+        else if (msg.includes("ACTIVE_SUBSCRIPTION") || msg.includes("ACTIVE_GIFT")) toast.error("You already have an active subscription");
         else toast.error(msg);
         return;
       }
