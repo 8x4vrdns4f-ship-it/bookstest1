@@ -37,6 +37,10 @@ const GiftCodeRedeem = () => {
 
       const row = Array.isArray(data) ? data[0] : data;
       const tier = row?.out_tier ?? row?.tier;
+      await Promise.allSettled([
+        supabase.functions.invoke("check-subscription", { body: {} }),
+        supabase.auth.refreshSession(),
+      ]);
       toast.success(`Gift redeemed! You now have 30 days of ${tier?.toUpperCase?.() ?? "full"} access.`);
       navigate("/dashboard");
     } catch (e: any) {

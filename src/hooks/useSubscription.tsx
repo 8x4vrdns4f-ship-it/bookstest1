@@ -43,12 +43,15 @@ export function useSubscription(): SubscriptionState {
       } else {
         const { data } = await supabase
           .from("subscriptions")
-          .select("tier, subscribed, current_period_end")
+          .select("tier, subscribed, current_period_end, price_id, status")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
-        const stillValid = data?.subscribed && (!data.current_period_end || new Date(data.current_period_end) > new Date());
+        const now = new Date();
+        const hasUnexpiredWindow = !data?.current_period_end || new Date(data.current_period_end) > now;
+        const isGiftBacked = typeof data?.price_id === "string" && data.price_id.startsWith("gift_");
+        const stillValid = !!data?.tier && hasUnexpiredWindow && (data?.subscribed || data?.status === "active" || isGiftBacked);
         resolvedTier = stillValid && data?.tier ? (data.tier as Tier) : null;
         resolvedEnd = data?.current_period_end ?? null;
       }
