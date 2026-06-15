@@ -7,8 +7,19 @@ const Footer = () => {
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <BrandLogo size="sm" />
         <div className="flex items-center gap-5">
-          {[Instagram, Twitter, Linkedin, Facebook].map((Icon, i) => (
-            <a key={i} href="#" className="text-muted-foreground hover:text-primary transition-colors">
+          {[
+            { Icon: Instagram, href: "https://www.instagram.com/booksuite.online" },
+            { Icon: Twitter, href: "#" },
+            { Icon: Linkedin, href: "#" },
+            { Icon: Facebook, href: "#" },
+          ].map(({ Icon, href }, i) => (
+            <a 
+              key={i} 
+              href={href} 
+              target={href !== "#" ? "_blank" : undefined}
+              rel={href !== "#" ? "noopener noreferrer" : undefined}
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
               <Icon size={20} />
             </a>
           ))}
