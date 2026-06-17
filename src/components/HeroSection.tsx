@@ -20,8 +20,13 @@ const HeroSection = () => {
         <div className="flex-1 space-y-6">
           <h1 className="sr-only">BookSuite — booking, client, and staff management for service businesses</h1>
           <BrandLogo size="lg" />
-          <p className="text-muted-foreground text-base md:text-lg max-w-md">
-            Bookings, Clients, and Staff schedules, all in one place
+          <p className="text-foreground text-xl md:text-2xl font-semibold max-w-xl leading-snug">
+            Run your entire booking business from one beautiful dashboard.
+          </p>
+          <p className="text-muted-foreground text-base md:text-lg max-w-xl">
+            BookSuite is the all-in-one platform for service businesses — take bookings and deposits,
+            manage staff shifts, send automatic confirmations and reminders, and get paid through Stripe.
+            Embed a booking widget on any site in minutes.
           </p>
           <div className="flex gap-3 pt-2 flex-wrap">
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 py-2.5 text-sm rounded-lg" asChild>

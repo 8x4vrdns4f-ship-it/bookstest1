@@ -4,6 +4,11 @@ import HeroSection from "@/components/HeroSection";
 import InfoCards from "@/components/InfoCards";
 import FeaturesStrip from "@/components/FeaturesStrip";
 import TierComparison from "@/components/TierComparison";
+import HowItWorks from "@/components/landing/HowItWorks";
+import ExpandedFeatures from "@/components/landing/ExpandedFeatures";
+import Testimonials from "@/components/landing/Testimonials";
+import FAQ from "@/components/landing/FAQ";
+import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -18,8 +23,13 @@ const Index = () => {
       <main>
         <HeroSection />
         <InfoCards />
+        <HowItWorks />
         <FeaturesStrip />
+        <ExpandedFeatures />
         <TierComparison />
+        <Testimonials />
+        <FAQ />
+        <FinalCTA />
       </main>
       <Footer />
     </div>
