@@ -1,5 +1,11 @@
-import { Instagram, Twitter, Linkedin, Facebook } from "lucide-react";
+import { Instagram, Youtube, Music2 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
+
+const socials = [
+  { Icon: Instagram, href: "https://www.instagram.com/booksuite.online", label: "Instagram" },
+  { Icon: Youtube, href: "https://youtube.com/@booksuite.online", label: "YouTube" },
+  { Icon: Music2, href: "https://www.tiktok.com/@booksuite", label: "TikTok" },
+];
 
 const Footer = () => {
   return (
@@ -7,17 +13,13 @@ const Footer = () => {
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <BrandLogo size="sm" />
         <div className="flex items-center gap-5">
-          {[
-            { Icon: Instagram, href: "https://www.instagram.com/booksuite.online" },
-            { Icon: Twitter, href: "#" },
-            { Icon: Linkedin, href: "#" },
-            { Icon: Facebook, href: "#" },
-          ].map(({ Icon, href }, i) => (
-            <a 
-              key={i} 
-              href={href} 
-              target={href !== "#" ? "_blank" : undefined}
-              rel={href !== "#" ? "noopener noreferrer" : undefined}
+          {socials.map(({ Icon, href, label }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               <Icon size={20} />
