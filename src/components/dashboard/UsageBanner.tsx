@@ -99,7 +99,17 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
         </div>
       </CardContent>
     </Card>
+    <StaffMembersDialog
+      open={staffOpen}
+      onOpenChange={setStaffOpen}
+      userId={userId}
+      tierName={limits.name}
+      limit={limits.staff}
+      count={staff}
+    />
+    </>
   );
 };
+
 
 export default UsageBanner;
