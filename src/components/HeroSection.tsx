@@ -20,9 +20,6 @@ const HeroSection = () => {
         <div className="flex-1 space-y-6">
           <h1 className="sr-only">BookSuite — booking, client, and staff management for service businesses</h1>
           <BrandLogo size="lg" />
-          <p className="text-foreground text-xl md:text-2xl font-semibold max-w-xl leading-snug">
-            Run your entire booking business from one beautiful dashboard.
-          </p>
           <p className="text-muted-foreground text-base md:text-lg max-w-xl">
             BookSuite is the all-in-one platform for service businesses — take bookings and deposits,
             manage staff shifts, send automatic confirmations and reminders, and get paid through Stripe.
