@@ -61,7 +61,6 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
               </div>
               {limits.bookingsPerMonth !== null && <Progress value={bPct} className="h-2" />}
             </div>
-            <div>
             <button
               type="button"
               onClick={() => setStaffOpen(true)}
@@ -77,6 +76,7 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
               {limits.staff !== null && <Progress value={sPct} className="h-2" />}
             </button>
           </div>
+
 
           <div className="flex items-center gap-3 shrink-0">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2.5 py-1 rounded-full">
