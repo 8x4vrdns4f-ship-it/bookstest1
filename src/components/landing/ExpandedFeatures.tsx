@@ -19,12 +19,12 @@ const features = [
   {
     Icon: Gift,
     title: "Gift codes & subscriptions",
-    body: "Hand out gift codes that unlock a full subscription tier — perfect for partners, launches, and promotions.",
+    body: "Coming soon.",
   },
   {
     Icon: Mail,
     title: "Automatic transactional emails",
-    body: "Booking confirmations, reminders, payment receipts, refund notices, and staff invites — all sent automatically from your own domain.",
+    body: "Booking confirmations, reminders, payment receipts, refund notices, and staff invites — all sent automatically from BookSuite on your behalf.",
   },
   {
     Icon: CreditCard,
