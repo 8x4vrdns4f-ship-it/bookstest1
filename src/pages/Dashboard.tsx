@@ -17,7 +17,9 @@ import BookingsList from "@/components/dashboard/BookingsList";
 import CalendarView from "@/components/dashboard/CalendarView";
 import ClientList from "@/components/dashboard/ClientList";
 import StaffList from "@/components/dashboard/StaffList";
+import ShiftsView from "@/components/dashboard/ShiftsView";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
+
 import UsageBanner from "@/components/dashboard/UsageBanner";
 import SubscriptionWidget from "@/components/dashboard/SubscriptionWidget";
 import LockedFeature from "@/components/LockedFeature";
