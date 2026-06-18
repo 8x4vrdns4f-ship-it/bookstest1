@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Sparkles, AlertTriangle } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS, nextTier } from "@/lib/tierLimits";
+import StaffMembersDialog from "./StaffMembersDialog";
 
 interface UsageBannerProps {
   userId: string;
@@ -16,6 +17,8 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
   const { tier, loading } = useSubscription();
   const [bookings, setBookings] = useState(0);
   const [staff, setStaff] = useState(0);
+  const [staffOpen, setStaffOpen] = useState(false);
+
 
   useEffect(() => {
     const load = async () => {
@@ -45,7 +48,9 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
   const showUpgrade = tier !== "platinum" && (nearBookings || nearStaff);
 
   return (
+    <>
     <Card className="bg-card border-border mb-8">
+
       <CardContent className="p-5">
         <div className="flex flex-col md:flex-row md:items-center gap-5 justify-between">
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -58,16 +63,23 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
               </div>
               {limits.bookingsPerMonth !== null && <Progress value={bPct} className="h-2" />}
             </div>
-            <div>
+            <button
+              type="button"
+              onClick={() => setStaffOpen(true)}
+              className="text-left rounded-md -m-1 p-1 hover:bg-secondary/40 transition-colors cursor-pointer"
+              aria-label="View staff members"
+            >
               <div className="flex items-center justify-between text-sm mb-1.5">
-                <span className="text-muted-foreground">Staff members</span>
+                <span className="text-muted-foreground underline-offset-2 hover:underline">Staff members</span>
                 <span className="text-foreground font-medium">
                   {staff} / {limits.staff ?? "∞"}
                 </span>
               </div>
               {limits.staff !== null && <Progress value={sPct} className="h-2" />}
-            </div>
+            </button>
           </div>
+
+
           <div className="flex items-center gap-3 shrink-0">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2.5 py-1 rounded-full">
               <Sparkles size={12} /> {limits.name} plan
@@ -89,7 +101,17 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
         </div>
       </CardContent>
     </Card>
+    <StaffMembersDialog
+      open={staffOpen}
+      onOpenChange={setStaffOpen}
+      userId={userId}
+      tierName={limits.name}
+      limit={limits.staff}
+      count={staff}
+    />
+    </>
   );
 };
+
 
 export default UsageBanner;

@@ -17,7 +17,9 @@ import BookingsList from "@/components/dashboard/BookingsList";
 import CalendarView from "@/components/dashboard/CalendarView";
 import ClientList from "@/components/dashboard/ClientList";
 import StaffList from "@/components/dashboard/StaffList";
+import ShiftsView from "@/components/dashboard/ShiftsView";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
+
 import UsageBanner from "@/components/dashboard/UsageBanner";
 import SubscriptionWidget from "@/components/dashboard/SubscriptionWidget";
 import LockedFeature from "@/components/LockedFeature";
@@ -213,6 +215,7 @@ const Dashboard = () => {
                 <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Calendar</TabsTrigger>
                 <TabsTrigger value="clients" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Clients</TabsTrigger>
                 <TabsTrigger value="staff" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Staff</TabsTrigger>
+                <TabsTrigger value="shifts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Shifts</TabsTrigger>
               </TabsList>
               <TabsContent value="bookings">
                 <BookingsList userId={businessUserId} />
@@ -226,7 +229,11 @@ const Dashboard = () => {
               <TabsContent value="staff">
                 <StaffList userId={businessUserId} />
               </TabsContent>
+              <TabsContent value="shifts">
+                <ShiftsView userId={businessUserId} />
+              </TabsContent>
             </Tabs>
+
           </>
         )}
       </main>
