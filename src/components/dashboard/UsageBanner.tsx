@@ -48,7 +48,9 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
   const showUpgrade = tier !== "platinum" && (nearBookings || nearStaff);
 
   return (
+    <>
     <Card className="bg-card border-border mb-8">
+
       <CardContent className="p-5">
         <div className="flex flex-col md:flex-row md:items-center gap-5 justify-between">
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-5">
