@@ -62,15 +62,22 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
               {limits.bookingsPerMonth !== null && <Progress value={bPct} className="h-2" />}
             </div>
             <div>
+            <button
+              type="button"
+              onClick={() => setStaffOpen(true)}
+              className="text-left rounded-md -m-1 p-1 hover:bg-secondary/40 transition-colors cursor-pointer"
+              aria-label="View staff members"
+            >
               <div className="flex items-center justify-between text-sm mb-1.5">
-                <span className="text-muted-foreground">Staff members</span>
+                <span className="text-muted-foreground underline-offset-2 hover:underline">Staff members</span>
                 <span className="text-foreground font-medium">
                   {staff} / {limits.staff ?? "∞"}
                 </span>
               </div>
               {limits.staff !== null && <Progress value={sPct} className="h-2" />}
-            </div>
+            </button>
           </div>
+
           <div className="flex items-center gap-3 shrink-0">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2.5 py-1 rounded-full">
               <Sparkles size={12} /> {limits.name} plan
