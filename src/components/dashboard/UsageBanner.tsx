@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Sparkles, AlertTriangle } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS, nextTier } from "@/lib/tierLimits";
+import StaffMembersDialog from "./StaffMembersDialog";
 
 interface UsageBannerProps {
   userId: string;
@@ -16,6 +17,8 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
   const { tier, loading } = useSubscription();
   const [bookings, setBookings] = useState(0);
   const [staff, setStaff] = useState(0);
+  const [staffOpen, setStaffOpen] = useState(false);
+
 
   useEffect(() => {
     const load = async () => {
