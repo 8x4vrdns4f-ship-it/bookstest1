@@ -183,12 +183,35 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
               <span className="italic text-foreground/80">"Centred in the middle of my Squarespace homepage under the hero, max 480px wide."</span>
               &nbsp;The AI will generate the exact code and step-by-step instructions.
             </p>
+
+            <div className="rounded-md border border-border bg-secondary/40 px-3 py-2 text-xs">
+              {usageLoading ? (
+                <span className="text-muted-foreground">Checking your plan…</span>
+              ) : !tier ? (
+                <span className="text-muted-foreground">
+                  Subscribe to use the embed AI assistant.
+                </span>
+              ) : overLimit ? (
+                <span className="text-muted-foreground">
+                  {TIER_LABEL[tier]} · Next available{" "}
+                  <span className="text-foreground font-medium">
+                    {formatNext(nextAvailableAt!)}
+                  </span>
+                </span>
+              ) : (
+                <span className="text-muted-foreground">
+                  {TIER_LABEL[tier]} · Ready to use
+                </span>
+              )}
+            </div>
+
             <Textarea
               value={aiRequest}
               onChange={(e) => setAiRequest(e.target.value)}
               placeholder="e.g. I want it on my WordPress homepage, centred, below the welcome banner, with a heading that says 'Book now'."
               rows={3}
               className="bg-secondary border-border"
+              disabled={!tier || overLimit}
             />
             <Button
               onClick={async () => {
@@ -206,6 +229,10 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
                       if (ctx && typeof ctx.json === "function") {
                         const body = await ctx.json();
                         if (body?.error) msg = body.error;
+                        if (body?.next_available_at) {
+                          setNextAvailableAt(new Date(body.next_available_at));
+                        }
+                        if (body?.tier) setTier(body.tier as Tier);
                       }
                     } catch {}
                     throw new Error(msg);
@@ -218,7 +245,7 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
                   setAiLoading(false);
                 }
               }}
-              disabled={aiLoading || !aiRequest.trim()}
+              disabled={aiLoading || !aiRequest.trim() || !tier || overLimit}
               className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
             >
               {aiLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
