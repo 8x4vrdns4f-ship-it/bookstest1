@@ -1,10 +1,41 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
+
+type Tier = "silver" | "gold" | "platinum";
+
+const TIER_LABEL: Record<Tier, string> = {
+  silver: "Silver plan · 1 AI request per month",
+  gold: "Gold plan · 1 AI request per week",
+  platinum: "Platinum plan · 1 AI request per 24 hours",
+};
+
+function windowStart(tier: Tier): Date {
+  const now = new Date();
+  if (tier === "silver") {
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  }
+  if (tier === "gold") {
+    return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  }
+  return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+}
+
+function nextAvailable(tier: Tier, lastUsedAt: Date): Date {
+  if (tier === "silver") {
+    const d = new Date(lastUsedAt);
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1));
+  }
+  if (tier === "gold") {
+    return new Date(lastUsedAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+  }
+  return new Date(lastUsedAt.getTime() + 24 * 60 * 60 * 1000);
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -16,6 +47,65 @@ serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // 1. Resolve active tier
+    const { data: tierRow, error: tierErr } = await supabase.rpc("get_active_tier", {
+      _user_id: userId,
+    });
+    if (tierErr) {
+      console.error("get_active_tier error", tierErr);
+    }
+    const tier = (tierRow as Tier | null) ?? null;
+
+    if (!tier) {
+      return new Response(
+        JSON.stringify({
+          error: "Subscribe to use the embed AI assistant.",
+          code: "NO_SUBSCRIPTION",
+        }),
+        {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // 2. Rate limit check
+    const since = windowStart(tier);
+    const { data: usageRows, error: usageErr } = await supabase
+      .from("embed_assistant_usage")
+      .select("created_at")
+      .eq("user_id", userId)
+      .gte("created_at", since.toISOString())
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (usageErr) {
+      console.error("usage lookup error", usageErr);
+    }
+
+    if (usageRows && usageRows.length > 0) {
+      const last = new Date(usageRows[0].created_at);
+      const next = nextAvailable(tier, last);
+      return new Response(
+        JSON.stringify({
+          error: `You've used your AI request for this period. Next available ${next.toUTCString()}.`,
+          code: "RATE_LIMIT",
+          tier,
+          tier_label: TIER_LABEL[tier],
+          next_available_at: next.toISOString(),
+        }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -135,6 +225,15 @@ Always call the return_embed_instructions tool. Keep steps short, concrete, and 
     }
 
     const parsed = JSON.parse(call.function.arguments);
+
+    // 3. Record successful usage
+    const { error: insertErr } = await supabase
+      .from("embed_assistant_usage")
+      .insert({ user_id: userId });
+    if (insertErr) {
+      console.error("usage insert error", insertErr);
+    }
+
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
