@@ -26,6 +26,83 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
     notes?: string;
   }>(null);
 
+  type Tier = "silver" | "gold" | "platinum";
+  const TIER_LABEL: Record<Tier, string> = {
+    silver: "Silver plan · 1 AI request per month",
+    gold: "Gold plan · 1 AI request per week",
+    platinum: "Platinum plan · 1 AI request per 24 hours",
+  };
+
+  const [tier, setTier] = useState<Tier | null>(null);
+  const [nextAvailableAt, setNextAvailableAt] = useState<Date | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+
+  const computeNext = (t: Tier, last: Date): Date => {
+    if (t === "silver") {
+      return new Date(Date.UTC(last.getUTCFullYear(), last.getUTCMonth() + 1, 1));
+    }
+    if (t === "gold") return new Date(last.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return new Date(last.getTime() + 24 * 60 * 60 * 1000);
+  };
+  const windowStart = (t: Tier): Date => {
+    const now = new Date();
+    if (t === "silver") return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    if (t === "gold") return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    (async () => {
+      setUsageLoading(true);
+      try {
+        const { data: sub } = await supabase
+          .from("subscriptions")
+          .select("tier, subscribed, current_period_end")
+          .eq("user_id", userId)
+          .eq("subscribed", true)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const activeTier =
+          sub &&
+          (sub.current_period_end == null || new Date(sub.current_period_end) > new Date())
+            ? ((sub.tier as Tier) ?? null)
+            : null;
+        if (cancelled) return;
+        setTier(activeTier);
+        if (!activeTier) {
+          setNextAvailableAt(null);
+          return;
+        }
+        const since = windowStart(activeTier);
+        const { data: rows } = await supabase
+          .from("embed_assistant_usage")
+          .select("created_at")
+          .eq("user_id", userId)
+          .gte("created_at", since.toISOString())
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (cancelled) return;
+        if (rows && rows.length > 0) {
+          setNextAvailableAt(computeNext(activeTier, new Date(rows[0].created_at)));
+        } else {
+          setNextAvailableAt(null);
+        }
+      } finally {
+        if (!cancelled) setUsageLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, userId, aiResult]);
+
+  const overLimit = !!nextAvailableAt && nextAvailableAt > new Date();
+  const formatNext = (d: Date) =>
+    d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+
   const origin =
     typeof window !== "undefined"
       ? window.location.origin.includes("lovable.app") || window.location.origin.includes("localhost")
