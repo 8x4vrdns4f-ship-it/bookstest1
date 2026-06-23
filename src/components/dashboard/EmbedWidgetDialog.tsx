@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,83 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
     steps: string[];
     notes?: string;
   }>(null);
+
+  type Tier = "silver" | "gold" | "platinum";
+  const TIER_LABEL: Record<Tier, string> = {
+    silver: "Silver plan · 1 AI request per month",
+    gold: "Gold plan · 1 AI request per week",
+    platinum: "Platinum plan · 1 AI request per 24 hours",
+  };
+
+  const [tier, setTier] = useState<Tier | null>(null);
+  const [nextAvailableAt, setNextAvailableAt] = useState<Date | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+
+  const computeNext = (t: Tier, last: Date): Date => {
+    if (t === "silver") {
+      return new Date(Date.UTC(last.getUTCFullYear(), last.getUTCMonth() + 1, 1));
+    }
+    if (t === "gold") return new Date(last.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return new Date(last.getTime() + 24 * 60 * 60 * 1000);
+  };
+  const windowStart = (t: Tier): Date => {
+    const now = new Date();
+    if (t === "silver") return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    if (t === "gold") return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    (async () => {
+      setUsageLoading(true);
+      try {
+        const { data: sub } = await supabase
+          .from("subscriptions")
+          .select("tier, subscribed, current_period_end")
+          .eq("user_id", userId)
+          .eq("subscribed", true)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const activeTier =
+          sub &&
+          (sub.current_period_end == null || new Date(sub.current_period_end) > new Date())
+            ? ((sub.tier as Tier) ?? null)
+            : null;
+        if (cancelled) return;
+        setTier(activeTier);
+        if (!activeTier) {
+          setNextAvailableAt(null);
+          return;
+        }
+        const since = windowStart(activeTier);
+        const { data: rows } = await supabase
+          .from("embed_assistant_usage")
+          .select("created_at")
+          .eq("user_id", userId)
+          .gte("created_at", since.toISOString())
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (cancelled) return;
+        if (rows && rows.length > 0) {
+          setNextAvailableAt(computeNext(activeTier, new Date(rows[0].created_at)));
+        } else {
+          setNextAvailableAt(null);
+        }
+      } finally {
+        if (!cancelled) setUsageLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, userId, aiResult]);
+
+  const overLimit = !!nextAvailableAt && nextAvailableAt > new Date();
+  const formatNext = (d: Date) =>
+    d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 
   const origin =
     typeof window !== "undefined"
@@ -106,12 +183,35 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
               <span className="italic text-foreground/80">"Centred in the middle of my Squarespace homepage under the hero, max 480px wide."</span>
               &nbsp;The AI will generate the exact code and step-by-step instructions.
             </p>
+
+            <div className="rounded-md border border-border bg-secondary/40 px-3 py-2 text-xs">
+              {usageLoading ? (
+                <span className="text-muted-foreground">Checking your plan…</span>
+              ) : !tier ? (
+                <span className="text-muted-foreground">
+                  Subscribe to use the embed AI assistant.
+                </span>
+              ) : overLimit ? (
+                <span className="text-muted-foreground">
+                  {TIER_LABEL[tier]} · Next available{" "}
+                  <span className="text-foreground font-medium">
+                    {formatNext(nextAvailableAt!)}
+                  </span>
+                </span>
+              ) : (
+                <span className="text-muted-foreground">
+                  {TIER_LABEL[tier]} · Ready to use
+                </span>
+              )}
+            </div>
+
             <Textarea
               value={aiRequest}
               onChange={(e) => setAiRequest(e.target.value)}
               placeholder="e.g. I want it on my WordPress homepage, centred, below the welcome banner, with a heading that says 'Book now'."
               rows={3}
               className="bg-secondary border-border"
+              disabled={!tier || overLimit}
             />
             <Button
               onClick={async () => {
@@ -129,6 +229,10 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
                       if (ctx && typeof ctx.json === "function") {
                         const body = await ctx.json();
                         if (body?.error) msg = body.error;
+                        if (body?.next_available_at) {
+                          setNextAvailableAt(new Date(body.next_available_at));
+                        }
+                        if (body?.tier) setTier(body.tier as Tier);
                       }
                     } catch {}
                     throw new Error(msg);
@@ -141,7 +245,7 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
                   setAiLoading(false);
                 }
               }}
-              disabled={aiLoading || !aiRequest.trim()}
+              disabled={aiLoading || !aiRequest.trim() || !tier || overLimit}
               className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
             >
               {aiLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
