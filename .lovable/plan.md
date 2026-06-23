@@ -1,33 +1,36 @@
-## Tasks
+# Per-person Shifts editor
 
-### 1. Update the 'Automatic transactional emails' card
-- File: `src/components/landing/ExpandedFeatures.tsx`
-- Change description text for "Automatic transactional emails" to state that they are sent automatically from BookSuite on your behalf, instead of referencing custom domains.
+Rework the **Shifts** tab so the owner picks an employee, then edits each day individually across a date range — toggling days on/off and setting unique start/end times per day. Default range is 1 week; the owner can extend it.
 
-### 2. Update the 'Gift codes & subscriptions' card
-- File: `src/components/landing/ExpandedFeatures.tsx`
-- Change description text for "Gift codes & subscriptions" to indicate "Coming soon" while maintaining the context of future features.
+## UX
 
----
+- Top bar of the Shifts tab:
+  - **Employee selector** (dropdown of all staff).
+  - **Range selector**: 1 week (default), 2 weeks, 4 weeks, or Custom (from/to date pickers).
+  - **Prev / Next** arrows that jump the window by its current length.
+  - Existing **Plan Schedule** and **Add Employee** buttons stay.
+- Body: one row per day in the range for the selected employee.
+  - Checkbox: working that day (on/off).
+  - Two time inputs: start and end (disabled when off).
+  - Shows the weekday + date on the left.
+- Footer: single **Save shifts for {Employee Name}** button that writes only the changed rows.
+- Empty state when no employees: same "Add your first team member" card as today.
 
-## Technical Details
+## Behavior
 
-We will edit `src/components/landing/ExpandedFeatures.tsx` directly to adjust the content of the `features` array:
+- Switching employee or range reloads that employee's shifts for the visible dates.
+- Times default to 09:00–17:00 for newly-toggled days.
+- Save logic per row:
+  - Was off, now on → insert into `employee_shifts`.
+  - Was on, still on, times changed → update.
+  - Was on, now off → delete.
+  - Unchanged rows are skipped.
+- Toast on save, then reload.
 
-1. Update index 3 ("Gift codes & subscriptions"):
-   ```typescript
-   {
-     Icon: Gift,
-     title: "Gift codes & subscriptions",
-     body: "Coming soon. Offer custom promo codes and subscription tiers to your clients on BookSuite.",
-   }
-   ```
+## Technical notes
 
-2. Update index 4 ("Automatic transactional emails"):
-   ```typescript
-   {
-     Icon: Mail,
-     title: "Automatic transactional emails",
-     body: "Booking confirmations, reminders, payment receipts, refund notices, and staff invites — all sent automatically from BookSuite on your behalf.",
-   }
-   ```
+- Replace `src/components/dashboard/ShiftsView.tsx` content; reuse existing `employee_shifts` table (`user_id`, `employee_id`, `shift_date`, `start_time`, `end_time`) — no schema changes.
+- Keep `PlanShiftsDialog` and `AddEmployeeDialog` integrations intact.
+- The date-first `ManageShiftsDialog` stays available where it's already used elsewhere; no changes there.
+- Use a simple `Select` from `@/components/ui/select` for employee + range pickers, and `Input type="date"` for custom range.
+- Range generation done in-component with `date-fns` (already in deps) — `eachDayOfInterval`.
