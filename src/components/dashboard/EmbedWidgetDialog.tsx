@@ -122,7 +122,17 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
                   const { data, error } = await supabase.functions.invoke("embed-assistant", {
                     body: { userId, request: aiRequest, origin },
                   });
-                  if (error) throw error;
+                  if (error) {
+                    let msg = error.message || "Could not generate";
+                    try {
+                      const ctx: any = (error as any).context;
+                      if (ctx && typeof ctx.json === "function") {
+                        const body = await ctx.json();
+                        if (body?.error) msg = body.error;
+                      }
+                    } catch {}
+                    throw new Error(msg);
+                  }
                   if ((data as any)?.error) throw new Error((data as any).error);
                   setAiResult(data as any);
                 } catch (e: any) {
