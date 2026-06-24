@@ -57,7 +57,7 @@ const CalendarView = ({ userId }: { userId: string }) => {
   useEffect(() => {
     fetchAll();
     const ch = supabase
-      .channel("calendar-bookings")
+      .channel(`calendar-bookings-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, fetchAll)
       .on("postgres_changes", { event: "*", schema: "public", table: "date_overrides" }, fetchAll)
       .subscribe();
