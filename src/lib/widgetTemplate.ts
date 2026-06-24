@@ -237,7 +237,11 @@ export const buildWidgetScript = (opts: {
       // Redirect top window (escape iframe if embedded)
       try { window.top.location.href = data.url; } catch(_){ window.location.href = data.url; }
     } catch(e){
-      errEl.innerHTML = '<div class="err">'+e.message+'</div>';
+      var ed = document.createElement('div');
+      ed.className = 'err';
+      ed.textContent = (e && e.message) ? String(e.message) : 'Something went wrong';
+      errEl.textContent = '';
+      errEl.appendChild(ed);
       btn.disabled = false; btn.textContent = 'Request Booking';
     }
   });
