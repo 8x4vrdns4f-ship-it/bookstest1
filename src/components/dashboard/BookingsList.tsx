@@ -83,7 +83,7 @@ const BookingsList = ({ userId }: { userId: string }) => {
       });
 
     const channel = supabase
-      .channel("bookings-list-changes")
+      .channel(`bookings-list-changes-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => {
         fetchBookings();
       })
