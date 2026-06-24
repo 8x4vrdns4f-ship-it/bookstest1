@@ -49,6 +49,34 @@ Deno.serve(async (req) => {
     )
   }
 
+  // Reject anon-key callers. verify_jwt=true only validates signature and
+  // accepts both anon and authenticated JWTs; the anon key is public, so
+  // require a real signed-in user (or service_role) to call this endpoint.
+  const authHeader = req.headers.get('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  try {
+    const token = authHeader.replace('Bearer ', '')
+    const authClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? supabaseServiceKey)
+    const { data: claimsData, error: claimsErr } = await authClient.auth.getClaims(token)
+    const role = claimsData?.claims?.role
+    if (claimsErr || (role !== 'authenticated' && role !== 'service_role')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+  } catch {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
   // Parse request body
   let templateName: string
   let recipientEmail: string
