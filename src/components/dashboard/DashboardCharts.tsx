@@ -54,7 +54,7 @@ const DashboardCharts = ({ userId }: Props) => {
   useEffect(() => {
     fetchAll();
     const ch = supabase
-      .channel("dashboard-charts")
+      .channel(`dashboard-charts-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, fetchAll)
       .subscribe();
     return () => { supabase.removeChannel(ch); };
