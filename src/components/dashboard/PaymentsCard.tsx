@@ -20,9 +20,16 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
+  const authHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) throw new Error("Please log in again to connect Stripe.");
+    return { Authorization: `Bearer ${session.access_token}` };
+  };
+
   const refresh = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke("connect-account-status");
+      const headers = await authHeaders();
+      const { data, error } = await supabase.functions.invoke("connect-account-status", { headers });
       if (error) throw error;
       setStatus(data as Status);
     } catch (e: any) {
@@ -37,10 +44,13 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const startOnboarding = async () => {
     setActionLoading(true);
     try {
+      const headers = await authHeaders();
       const { data, error } = await supabase.functions.invoke("connect-create-account", {
         body: { origin: window.location.origin },
+        headers,
       });
       if (error) throw error;
+      if (!(data as any)?.url) throw new Error((data as any)?.error || "No onboarding URL returned");
       window.location.href = (data as any).url;
     } catch (e: any) {
       toast.error(e.message || "Could not start onboarding");
@@ -51,7 +61,8 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const openStripeDashboard = async () => {
     setActionLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("connect-dashboard-link");
+      const headers = await authHeaders();
+      const { data, error } = await supabase.functions.invoke("connect-dashboard-link", { headers });
       if (error) throw error;
       window.open((data as any).url, "_blank");
     } catch (e: any) {
