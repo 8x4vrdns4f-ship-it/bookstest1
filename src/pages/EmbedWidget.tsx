@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
+import { getStripeEnvironment } from "@/lib/connectPayments";
 
 // Renders the booking widget standalone for use in an iframe.
 // Uses srcDoc to keep styles fully isolated from the host page / app.
@@ -20,6 +21,7 @@ const EmbedWidget = () => {
     supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
     supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     userId,
+    paymentEnvironment: getStripeEnvironment(),
   });
 
   return (

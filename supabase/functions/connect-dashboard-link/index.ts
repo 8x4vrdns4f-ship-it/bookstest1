@@ -27,15 +27,18 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+    const body = await req.json().catch(() => ({}));
+    const env = resolveEnv(body.environment);
+
     const { data: row } = await admin
       .from("connect_accounts")
       .select("stripe_account_id")
       .eq("user_id", userData.user.id)
+      .eq("environment", env)
       .maybeSingle();
 
     if (!row) throw new Error("No connected Stripe account");
 
-    const env = resolveEnv(undefined);
     const stripe = createStripeClient(env);
     const link = await stripe.accounts.createLoginLink(row.stripe_account_id);
 

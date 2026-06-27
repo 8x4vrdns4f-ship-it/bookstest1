@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
+import { getStripeEnvironment } from "@/lib/connectPayments";
 import SEO from "@/components/SEO";
 
 // Full-page branded booking link, ideal for "Book Now" buttons or social bios.
@@ -11,6 +12,7 @@ const PublicBooking = () => {
     supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
     supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     userId,
+    paymentEnvironment: getStripeEnvironment(),
   });
 
   return (
