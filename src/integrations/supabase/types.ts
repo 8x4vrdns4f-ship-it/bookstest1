@@ -29,6 +29,7 @@ export type Database = {
           duration_minutes: number
           id: string
           notes: string | null
+          payment_environment: string
           payment_status: string
           platform_fee_amount: number | null
           refund_id: string | null
@@ -54,6 +55,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          payment_environment?: string
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
@@ -79,6 +81,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          payment_environment?: string
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
@@ -652,6 +655,7 @@ export type Database = {
           expires_at: string
           id: string
           notes: string | null
+          payment_environment: string
           platform_fee_amount: number
           service: string
           status: string
@@ -671,6 +675,7 @@ export type Database = {
           expires_at?: string
           id?: string
           notes?: string | null
+          payment_environment?: string
           platform_fee_amount: number
           service: string
           status?: string
@@ -690,6 +695,7 @@ export type Database = {
           expires_at?: string
           id?: string
           notes?: string | null
+          payment_environment?: string
           platform_fee_amount?: number
           service?: string
           status?: string
