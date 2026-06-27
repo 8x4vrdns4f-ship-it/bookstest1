@@ -55,7 +55,11 @@ Deno.serve(async (req) => {
       country: account.country,
       default_currency: account.default_currency,
     };
-    await admin.from("connect_accounts").update(update).eq("user_id", user.id);
+    await admin
+      .from("connect_accounts")
+      .update(update)
+      .eq("user_id", user.id)
+      .eq("environment", env);
 
     return new Response(
       JSON.stringify({
