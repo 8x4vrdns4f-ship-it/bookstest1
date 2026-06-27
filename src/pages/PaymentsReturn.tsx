@@ -2,14 +2,17 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { getConnectAuthHeaders } from "@/lib/connectPayments";
 
 const PaymentsReturn = () => {
   const navigate = useNavigate();
   useEffect(() => {
     // Refresh the account status, then go back to payments page.
-    supabase.functions.invoke("connect-account-status").finally(() => {
-      navigate("/payments", { replace: true });
-    });
+    getConnectAuthHeaders()
+      .then((headers) => supabase.functions.invoke("connect-account-status", { headers }))
+      .finally(() => {
+        navigate("/payments", { replace: true });
+      });
   }, [navigate]);
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">

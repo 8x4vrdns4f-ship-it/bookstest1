@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { CreditCard, ExternalLink, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getConnectAuthHeaders, getConnectErrorMessage } from "@/lib/connectPayments";
 
 type Status = {
   connected: boolean;
@@ -20,15 +21,9 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const authHeaders = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) throw new Error("Please log in again to connect Stripe.");
-    return { Authorization: `Bearer ${session.access_token}` };
-  };
-
   const refresh = async () => {
     try {
-      const headers = await authHeaders();
+      const headers = await getConnectAuthHeaders();
       const { data, error } = await supabase.functions.invoke("connect-account-status", { headers });
       if (error) throw error;
       setStatus(data as Status);
@@ -44,16 +39,17 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const startOnboarding = async () => {
     setActionLoading(true);
     try {
-      const headers = await authHeaders();
+      const headers = await getConnectAuthHeaders();
       const { data, error } = await supabase.functions.invoke("connect-create-account", {
         body: { origin: window.location.origin },
         headers,
       });
       if (error) throw error;
-      if (!(data as any)?.url) throw new Error((data as any)?.error || "No onboarding URL returned");
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if (!(data as any)?.url) throw new Error("Stripe returned no onboarding link.");
       window.location.href = (data as any).url;
     } catch (e: any) {
-      toast.error(e.message || "Could not start onboarding");
+      toast.error(getConnectErrorMessage(e, "Stripe onboarding could not be started."));
       setActionLoading(false);
     }
   };
@@ -61,12 +57,14 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const openStripeDashboard = async () => {
     setActionLoading(true);
     try {
-      const headers = await authHeaders();
+      const headers = await getConnectAuthHeaders();
       const { data, error } = await supabase.functions.invoke("connect-dashboard-link", { headers });
       if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if (!(data as any)?.url) throw new Error("Stripe returned no dashboard link.");
       window.open((data as any).url, "_blank");
     } catch (e: any) {
-      toast.error(e.message || "Could not open Stripe dashboard");
+      toast.error(getConnectErrorMessage(e, "Could not open Stripe dashboard."));
     } finally {
       setActionLoading(false);
     }
