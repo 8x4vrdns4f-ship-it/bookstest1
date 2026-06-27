@@ -177,6 +177,7 @@ async function handleCheckoutCompleted(
       stripe_charge_id: chargeId,
       deposit_amount: pending.deposit_amount,
       platform_fee_amount: pending.platform_fee_amount,
+      payment_environment: env,
       payment_status: "paid",
     })
     .select()
