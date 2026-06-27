@@ -22,7 +22,10 @@ Deno.serve(async (req) => {
       client_email,
       notes,
       origin,
+      environment,
     } = body;
+
+    const env = resolveEnv(environment);
 
     if (!userId || !service || !booking_date || !booking_time || !client_name || !client_email) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -47,6 +50,7 @@ Deno.serve(async (req) => {
       .from("connect_accounts")
       .select("stripe_account_id, charges_enabled")
       .eq("user_id", userId)
+      .eq("environment", env)
       .maybeSingle();
 
     if (!connect || !connect.charges_enabled) {
@@ -78,12 +82,12 @@ Deno.serve(async (req) => {
         deposit_amount: deposit,
         platform_fee_amount: (deposit * feePct) / 100,
         currency: settings.currency || "GBP",
+        payment_environment: env,
       })
       .select()
       .single();
     if (pErr || !pending) throw new Error(pErr?.message || "Failed to reserve booking");
 
-    const env = resolveEnv(undefined);
     const stripe = createStripeClient(env);
     const baseOrigin = origin || req.headers.get("origin") || "https://booksuite.online";
 

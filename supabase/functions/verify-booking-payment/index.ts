@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (!pending) throw new Error("Pending booking not found");
 
-    const env = resolveEnv(undefined);
+    const env = resolveEnv((pending as any).payment_environment);
     const stripe = createStripeClient(env);
     const session = await stripe.checkout.sessions.retrieve(session_id, {
       expand: ["payment_intent"],

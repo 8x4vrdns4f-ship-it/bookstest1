@@ -29,10 +29,14 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const body = await req.json().catch(() => ({}));
+    const env = resolveEnv(body.environment);
+
     const { data: row } = await admin
       .from("connect_accounts")
       .select("*")
       .eq("user_id", user.id)
+      .eq("environment", env)
       .maybeSingle();
 
     if (!row) {
@@ -41,7 +45,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const env = resolveEnv(undefined);
     const stripe = createStripeClient(env);
     const account = await stripe.accounts.retrieve(row.stripe_account_id);
 

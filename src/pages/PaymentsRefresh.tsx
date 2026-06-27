@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { getConnectAuthHeaders } from "@/lib/connectPayments";
+import { getConnectAuthHeaders, getStripeEnvironment } from "@/lib/connectPayments";
 
 const PaymentsRefresh = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const PaymentsRefresh = () => {
     getConnectAuthHeaders()
       .then((headers) =>
         supabase.functions.invoke("connect-create-account", {
-          body: { origin: window.location.origin },
+          body: { origin: window.location.origin, environment: getStripeEnvironment() },
           headers,
         }),
       )

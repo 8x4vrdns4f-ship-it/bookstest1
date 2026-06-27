@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     if (booking.payment_status !== "paid") throw new Error("Booking has no captured payment");
     if (!booking.stripe_payment_intent_id) throw new Error("No payment intent on booking");
 
-    const env = resolveEnv(undefined);
+    const env = resolveEnv((booking as any).payment_environment);
     const stripe = createStripeClient(env);
     const refund = await stripe.refunds.create({
       payment_intent: booking.stripe_payment_intent_id,

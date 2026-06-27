@@ -29,7 +29,8 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const env = resolveEnv(undefined);
+    const body = await req.json().catch(() => ({}));
+    const env = resolveEnv(body.environment);
     const stripe = createStripeClient(env);
 
     // Get business settings for country / business name
@@ -44,6 +45,7 @@ Deno.serve(async (req) => {
       .from("connect_accounts")
       .select("*")
       .eq("user_id", user.id)
+      .eq("environment", env)
       .maybeSingle();
 
     let accountId = existing?.stripe_account_id;
@@ -74,7 +76,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body = await req.json().catch(() => ({}));
     const origin = body.origin || req.headers.get("origin") || "https://booksuite.online";
 
     const link = await stripe.accountLinks.create({

@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Check, Copy, Download, ExternalLink, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
+import { getStripeEnvironment } from "@/lib/connectPayments";
 import { supabase } from "@/integrations/supabase/client";
 
 type Props = { userId: string; trigger: React.ReactNode };
@@ -130,6 +131,7 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
       supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
       supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       userId,
+      paymentEnvironment: getStripeEnvironment(),
     });
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);

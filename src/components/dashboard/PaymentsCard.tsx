@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { CreditCard, ExternalLink, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { getConnectAuthHeaders, getConnectErrorMessage } from "@/lib/connectPayments";
+import { getConnectAuthHeaders, getConnectErrorMessage, getStripeEnvironment } from "@/lib/connectPayments";
 
 type Status = {
   connected: boolean;
@@ -24,7 +24,10 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const refresh = async () => {
     try {
       const headers = await getConnectAuthHeaders();
-      const { data, error } = await supabase.functions.invoke("connect-account-status", { headers });
+      const { data, error } = await supabase.functions.invoke("connect-account-status", {
+        body: { environment: getStripeEnvironment() },
+        headers,
+      });
       if (error) throw error;
       setStatus(data as Status);
     } catch (e: any) {
@@ -41,7 +44,7 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
     try {
       const headers = await getConnectAuthHeaders();
       const { data, error } = await supabase.functions.invoke("connect-create-account", {
-        body: { origin: window.location.origin },
+        body: { origin: window.location.origin, environment: getStripeEnvironment() },
         headers,
       });
       if (error) throw error;
@@ -58,7 +61,10 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
     setActionLoading(true);
     try {
       const headers = await getConnectAuthHeaders();
-      const { data, error } = await supabase.functions.invoke("connect-dashboard-link", { headers });
+      const { data, error } = await supabase.functions.invoke("connect-dashboard-link", {
+        body: { environment: getStripeEnvironment() },
+        headers,
+      });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
       if (!(data as any)?.url) throw new Error("Stripe returned no dashboard link.");

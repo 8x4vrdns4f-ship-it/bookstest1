@@ -2,14 +2,19 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { getConnectAuthHeaders } from "@/lib/connectPayments";
+import { getConnectAuthHeaders, getStripeEnvironment } from "@/lib/connectPayments";
 
 const PaymentsReturn = () => {
   const navigate = useNavigate();
   useEffect(() => {
     // Refresh the account status, then go back to payments page.
     getConnectAuthHeaders()
-      .then((headers) => supabase.functions.invoke("connect-account-status", { headers }))
+      .then((headers) =>
+        supabase.functions.invoke("connect-account-status", {
+          body: { environment: getStripeEnvironment() },
+          headers,
+        }),
+      )
       .finally(() => {
         navigate("/payments", { replace: true });
       });

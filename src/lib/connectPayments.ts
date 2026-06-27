@@ -17,6 +17,13 @@ export const getConnectAuthHeaders = async () => {
   return { Authorization: `Bearer ${session.access_token}` };
 };
 
+export type StripeEnvironment = "sandbox" | "live";
+
+export const getStripeEnvironment = (): StripeEnvironment => {
+  const token = String(import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN || "");
+  return token.startsWith("pk_live_") ? "live" : "sandbox";
+};
+
 export const getConnectErrorMessage = (error: unknown, fallback: string) => {
   if (!error) return fallback;
   if (error instanceof Error) return error.message || fallback;

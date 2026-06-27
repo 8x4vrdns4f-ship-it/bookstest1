@@ -80,11 +80,13 @@ export const buildWidgetScript = (opts: {
   supabaseUrl: string;
   supabaseKey: string;
   userId: string;
+  paymentEnvironment?: "sandbox" | "live";
 }) => `
 (function(){
   var URL_ = ${JSON.stringify(opts.supabaseUrl)};
   var KEY = ${JSON.stringify(opts.supabaseKey)};
   var UID = ${JSON.stringify(opts.userId)};
+  var PAYMENT_ENV = ${JSON.stringify(opts.paymentEnvironment || "live")};
 
   var settings = {
     working_hours: {
@@ -229,6 +231,7 @@ export const buildWidgetScript = (opts: {
           booking_date: selDate,
           booking_time: fmtMin(selSlot) + ':00',
           duration_minutes: selDur,
+          environment: PAYMENT_ENV,
           origin: window.location.origin
         })
       });
@@ -280,6 +283,7 @@ export const buildWidgetHtml = (opts: {
   supabaseUrl: string;
   supabaseKey: string;
   userId: string;
+  paymentEnvironment?: "sandbox" | "live";
 }) => `<!DOCTYPE html>
 <html lang="en">
 <head>
