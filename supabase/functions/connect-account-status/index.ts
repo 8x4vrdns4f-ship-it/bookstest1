@@ -69,10 +69,12 @@ Deno.serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (e) {
+  } catch (e: any) {
     console.error("connect-account-status error", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }), {
-      status: 500,
+    const stripeMsg = e?.raw?.message || e?.message || String(e);
+    const isStripe = e?.type?.toString?.().startsWith("Stripe") || !!e?.raw;
+    return new Response(JSON.stringify({ error: isStripe ? `Stripe: ${stripeMsg}` : stripeMsg }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
