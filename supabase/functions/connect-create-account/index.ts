@@ -88,10 +88,16 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ url: link.url, account_id: accountId }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (e) {
+  } catch (e: any) {
     console.error("connect-create-account error", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }), {
-      status: 500,
+    const stripeMsg = e?.raw?.message || e?.message || String(e);
+    const isStripe = e?.type?.toString?.().startsWith("Stripe") || !!e?.raw;
+    const hint = /platform-profile|managing losses|responsibilities/i.test(stripeMsg)
+      ? " (Platform setup required: complete the Connect platform profile in your Stripe dashboard — Settings → Connect → Platform profile, in Live mode.)"
+      : "";
+    const message = (isStripe ? `Stripe: ${stripeMsg}` : stripeMsg) + hint;
+    return new Response(JSON.stringify({ error: message }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
