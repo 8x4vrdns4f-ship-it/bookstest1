@@ -1,5 +1,6 @@
 import { Instagram, Youtube, Music2 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
+import { useLocale } from "@/contexts/LocaleContext";
 
 const socials = [
   { Icon: Instagram, href: "https://www.instagram.com/booksuite.online", label: "Instagram" },
@@ -8,6 +9,7 @@ const socials = [
 ];
 
 const Footer = () => {
+  const { t } = useLocale();
   return (
     <footer className="border-t border-border px-6 md:px-12 py-10 mt-12">
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -28,7 +30,7 @@ const Footer = () => {
         </div>
       </div>
       <p className="text-center text-muted-foreground text-xs mt-8">
-        © {new Date().getFullYear()} BookSuite. All rights reserved.
+        © {new Date().getFullYear()} BookSuite. {t("footer.rights")}
       </p>
     </footer>
   );

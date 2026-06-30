@@ -23,11 +23,13 @@ import NotFound from "./pages/NotFound.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
+import { LocaleProvider } from "./contexts/LocaleContext.tsx";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <LocaleProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -56,6 +58,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </LocaleProvider>
   </QueryClientProvider>
 );
 
