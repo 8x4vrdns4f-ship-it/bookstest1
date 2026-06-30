@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import BrandLogo from "./BrandLogo";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
+import { useLocale } from "@/contexts/LocaleContext";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === "/";
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { t } = useLocale();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -43,13 +46,16 @@ const Navbar = () => {
         )}
         <BrandLogo size="sm" />
       </div>
-      <a
-        href={isLoggedIn ? "/dashboard" : "/auth?mode=login"}
-        onClick={isLoggedIn ? handleDashboardClick : undefined}
-        className="border border-primary/50 text-primary hover:bg-primary/10 font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
-      >
-        {isLoggedIn ? "Dashboard" : "Login"}
-      </a>
+      <div className="flex items-center gap-3">
+        <LanguageSwitcher />
+        <a
+          href={isLoggedIn ? "/dashboard" : "/auth?mode=login"}
+          onClick={isLoggedIn ? handleDashboardClick : undefined}
+          className="border border-primary/50 text-primary hover:bg-primary/10 font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
+        >
+          {isLoggedIn ? t("nav.dashboard") : t("nav.login")}
+        </a>
+      </div>
     </nav>
   );
 };

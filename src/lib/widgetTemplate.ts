@@ -262,7 +262,27 @@ export const buildWidgetScript = (opts: {
         var sub = document.querySelector('.bw .sub');
         if (sub) sub.textContent = settings.welcome_message;
       }
-      document.getElementById('bw-deposit').textContent = 'Deposit: £' + Number(settings.deposit_amount).toFixed(2) + ' (paid securely at checkout)';
+      var depAmt = Number(settings.deposit_amount);
+      var ccy = (settings.currency || 'GBP').toUpperCase();
+      var sym = ccy === 'USD' ? '$' : ccy === 'EUR' ? '€' : ccy === 'JPY' ? '¥' : ccy === 'AUD' ? 'A$' : ccy === 'CAD' ? 'C$' : '£';
+      document.getElementById('bw-deposit').textContent = 'Deposit: ' + sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' (paid securely at checkout)';
+      // FX hint for international visitors
+      try {
+        var navLang = (navigator.language || 'en-GB');
+        var visitorCcy = navLang.startsWith('en-US') ? 'USD' : (navLang.startsWith('ja') ? 'JPY' : (navLang.startsWith('en-GB') ? 'GBP' : (navLang.startsWith('en-AU') ? 'AUD' : (navLang.startsWith('en-CA') ? 'CAD' : 'EUR'))));
+        if (visitorCcy !== ccy) {
+          fetch('https://open.er-api.com/v6/latest/' + ccy).then(function(r){ return r.json(); }).then(function(fx){
+            if (fx && fx.result === 'success' && fx.rates && fx.rates[visitorCcy]) {
+              var conv = depAmt * fx.rates[visitorCcy];
+              var vsym = visitorCcy === 'USD' ? '$' : visitorCcy === 'EUR' ? '€' : visitorCcy === 'JPY' ? '¥' : visitorCcy === 'AUD' ? 'A$' : visitorCcy === 'CAD' ? 'C$' : '£';
+              var hint = document.createElement('div');
+              hint.style.fontSize = '10px'; hint.style.opacity = '.7'; hint.style.marginTop = '4px';
+              hint.textContent = '≈ ' + vsym + (visitorCcy === 'JPY' ? Math.round(conv) : conv.toFixed(2)) + ' ' + visitorCcy + ' (charged in ' + ccy + ')';
+              document.getElementById('bw-deposit').appendChild(hint);
+            }
+          }).catch(function(){});
+        }
+      } catch(_){}
     } else {
       document.getElementById('bw-deposit').textContent = 'Booking system';
     }
