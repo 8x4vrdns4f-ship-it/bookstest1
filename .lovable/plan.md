@@ -1,41 +1,63 @@
-## What's actually happening
 
-The edge function is working. The 500 the customer sees comes from Stripe itself, returned to your function:
+## Goal
 
-> "Please review the responsibilities of managing losses for connected accounts."
+Add a small language switcher in the top navigation. Selecting a language also switches the **display currency** on marketing/pricing pages, converted from the base price using live exchange rates. Owner-set deposits on the booking widget stay in the business's real currency (that's what Stripe actually charges) but show a converted "≈ €9.20" hint next to the price so international customers understand the amount.
 
-Stripe requires every platform to acknowledge **loss liability** on its Connect platform profile in **live mode** before it will let you create any connected accounts. Until you do that, every customer who clicks "Connect Stripe" on the live site will see "Edge Function returned a non‑2xx status code", because Stripe rejects the `accounts.create` call with HTTP 400.
+This is display-only conversion. Stripe charges are unchanged — only what the visitor sees in the UI is translated/converted.
 
-This is a one‑time setting in your Stripe dashboard — not a code bug. Test mode worked because test mode doesn't enforce it.
+## Scope of this first pass
 
-## What you need to do (no code change, ~2 minutes)
+**In scope**
+- Language switcher button in the top-right of the `Navbar` (globe icon + current language label, dropdown with 6 starter languages).
+- 6 starter locales: English (GB), English (US), Spanish, French, German, Italian. Each maps to a default display currency (GBP, USD, EUR, EUR, EUR, EUR).
+- User can independently override currency from the same dropdown (GBP, USD, EUR, AUD, CAD, JPY).
+- Selection persists in `localStorage` and applies instantly without reload.
+- All visible strings on **landing page, pricing page, footer, navbar, auth page** translated.
+- All prices on the **pricing page** and **landing hero/CTA** shown in the selected currency, converted live.
+- Booking widget shows a small "≈ $13.50 USD" hint under the deposit when the visitor's currency differs from the business's currency. Stripe still charges in the business currency.
 
-1. Open `https://dashboard.stripe.com/settings/connect/platform-profile` while logged in as the **platform** Stripe account (the BookSuite account, not a customer's account).
-2. Make sure the toggle in the top‑right of the dashboard is set to **Live mode** (not Test mode).
-3. Complete every section that shows a warning. The one Stripe is blocking on is **"Responsibilities for managing losses"** — pick who covers negative balances on connected accounts (for a destination‑charges model like BookSuite, the platform usually accepts liability).
-4. Save. Then go back to BookSuite on the other device and click **Connect Stripe** again.
+**Out of scope for this pass** (will follow in the "real proper stuff")
+- Translating dashboard, settings, emails, edge function responses.
+- Letting business owners pick their charging currency per-business (already partially exists via `business_settings.currency`).
+- Server-side locale detection / SEO `hreflang` tags (comes with the SEO work in direction A).
 
-## Small code improvement I'll make at the same time
+## How it works
 
-Right now the dashboard just shows the generic "Edge Function returned a non‑2xx status code". I'll update `connect-create-account` (and the matching `PaymentsCard` toast) so that when Stripe returns a structured error like this one, the user sees Stripe's actual message (e.g. "Please review the responsibilities of managing losses…") plus a hint that it's a platform‑side setting, not their fault. That way if anything similar happens in future you'll know exactly which Stripe setting to fix without having to read edge function logs.
+```text
+ ┌──────────────────────┐      ┌────────────────────────┐
+ │ Navbar               │      │ LocaleContext          │
+ │  [🌐 English ▾]──────┼─────▶│  language: 'en-GB'     │
+ └──────────────────────┘      │  currency: 'GBP'       │
+                               │  rates: { USD: 1.27 …} │
+                               └─────────┬──────────────┘
+                                         │ useLocale()
+              ┌──────────────────────────┼─────────────────────┐
+              ▼                          ▼                     ▼
+       <Trans id="hero.title"/>   formatPrice(29)        BookingWidget
+       (i18n lookup)              → "£29 / month"        (shows ≈ converted hint)
+```
+
+### Technical pieces
+
+1. **Library: `react-i18next`** for translations, with JSON resource files under `src/i18n/locales/{en-GB,en-US,es,fr,de,it}.json`. Lightweight, no SSR concerns, works with Vite out of the box.
+2. **`LocaleContext`** (`src/contexts/LocaleContext.tsx`) holds `{ language, currency, rates, setLanguage, setCurrency, format }`. Wraps `App.tsx`.
+3. **Exchange rates** fetched once per session from a free public endpoint (`https://open.er-api.com/v6/latest/GBP` — no key required, GBP base). Cached in `localStorage` for 24h. Fallback to a hard-coded rate table if the network call fails so the UI never shows broken prices.
+4. **`LanguageSwitcher`** component in `src/components/LanguageSwitcher.tsx` rendered in `Navbar.tsx` (desktop: right side, before auth buttons; mobile: inside the existing menu). Uses the existing `DropdownMenu` shadcn primitive — no new UI library.
+5. **`formatPrice(amountInBaseCurrency, baseCurrency='GBP')`** helper on the context: converts via `rates`, formats with `Intl.NumberFormat(language, { style:'currency', currency })`.
+6. **Booking widget hint**: in `widgetTemplate.ts`, when rendering the deposit line, also render a `<span class="fx-hint">` populated from a tiny inline fetch to the same rates endpoint, only if the visitor's `navigator.language` implies a different currency than the business's. Pure cosmetic — no change to checkout amount.
 
 ### Files touched
 
-- `supabase/functions/connect-create-account/index.ts` — catch `StripeInvalidRequestError` and forward `error.raw.message` in the JSON response with a 400 status.
-- `supabase/functions/connect-account-status/index.ts` and `connect-dashboard-link/index.ts` — same treatment for consistency.
-- `src/components/dashboard/PaymentsCard.tsx` — already uses `getConnectErrorMessage`, so it will pick up the clearer message automatically; I'll just prepend "Stripe: " so it's obvious where the message came from.
+- New: `src/contexts/LocaleContext.tsx`, `src/components/LanguageSwitcher.tsx`, `src/i18n/index.ts`, `src/i18n/locales/*.json` (6 files).
+- Edit: `src/App.tsx` (wrap with provider, init i18n), `src/components/Navbar.tsx` (mount switcher), `src/components/Footer.tsx`, `src/components/HeroSection.tsx`, `src/components/landing/*` (replace hardcoded copy with `t()` calls), `src/pages/Pricing.tsx` (use `formatPrice`), `src/pages/Auth.tsx` (translate form labels), `src/lib/widgetTemplate.ts` (FX hint).
+- Add deps: `react-i18next`, `i18next`, `i18next-browser-languagedetector`.
 
-No database, schema, or auth changes.
+No database, edge function, or Stripe changes. No secrets needed (the FX API is keyless).
 
-## Why I'm confident this is the cause
+## Translations
 
-Edge function logs for `connect-create-account` show, at the time the other device tried:
+I'll write all 6 locales in this pass. Auto-translated by me from the canonical English copy and reviewed for the obvious booking/SaaS terms (deposit, booking, dashboard, subscribe). You can correct any wording later — the JSON files are designed to be edited by hand without touching code.
 
-```
-StripeInvalidRequestError
-statusCode: 400
-message: "Please review the responsibilities of managing losses for connected accounts…"
-x-stripe-routing-context-priority-tier: "livemode"
-```
+## After this lands
 
-The request reached Stripe in live mode with valid credentials; Stripe refused it because the platform profile is incomplete.
+The next ticket is **Direction A — Growth foundation** (SEO landing pages, public directory, referral system, Terms/Privacy). Internationalisation here unblocks B but A is still the priority for actually getting users.
