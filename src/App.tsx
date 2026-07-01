@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Pricing from "./pages/Pricing.tsx";
+import Privacy from "./pages/Privacy.tsx";
+import Terms from "./pages/Terms.tsx";
+import Security from "./pages/Security.tsx";
 import Auth from "./pages/Auth.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
@@ -37,6 +40,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/security" element={<Security />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/dashboard" element={<RequireVerifiedEmail><RequireSubscription><Dashboard /></RequireSubscription></RequireVerifiedEmail>} />

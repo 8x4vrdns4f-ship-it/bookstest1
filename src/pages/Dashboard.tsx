@@ -28,6 +28,7 @@ import { TIER_LIMITS } from "@/lib/tierLimits";
 
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import GiftCodesCard from "@/components/dashboard/GiftCodesCard";
+import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
 import type { User } from "@supabase/supabase-js";
@@ -164,6 +165,7 @@ const Dashboard = () => {
         ) : (
           <>
             {isOwner && <SubscriptionWidget />}
+            {isOwner && <OnboardingChecklist userId={user.id} />}
             {isOwner && <PaymentsCard userId={user.id} />}
             {isOwner && <UsageBanner userId={businessUserId} />}
             {isOwner && <GiftCodesCard />}
