@@ -13,8 +13,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Copy, Check, LogOut, KeyRound, Trash2, XCircle } from "lucide-react";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
+
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
 import { useSubscription } from "@/hooks/useSubscription";
