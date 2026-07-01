@@ -154,6 +154,58 @@ Deno.serve(async (req) => {
   // Create Supabase client with service role (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+  // Ownership guard: an authenticated (non-service_role) caller may only send
+  // to recipients they own — self, their clients, bookings, employees, or a
+  // join-request they submitted. This prevents platform-branded email abuse.
+  if (callerRole === 'authenticated') {
+    const recipLower = effectiveRecipient.toLowerCase()
+    let allowed = false
+    if (callerEmail && recipLower === callerEmail) {
+      allowed = true
+    }
+    if (!allowed && callerUserId) {
+      const checks = await Promise.all([
+        supabase.from('clients').select('id').eq('user_id', callerUserId).ilike('email', recipLower).limit(1).maybeSingle(),
+        supabase.from('bookings').select('id').eq('user_id', callerUserId).ilike('client_email', recipLower).limit(1).maybeSingle(),
+        supabase.from('employees').select('id').eq('user_id', callerUserId).ilike('email', recipLower).limit(1).maybeSingle(),
+        supabase.from('employee_join_requests').select('id').eq('requester_auth_id', callerUserId).ilike('requester_email', recipLower).limit(1).maybeSingle(),
+        // Owner-notification templates: allow sending to the business owner's email when the caller is the owner
+        supabase.from('business_settings').select('user_id').eq('user_id', callerUserId).ilike('business_email', recipLower).limit(1).maybeSingle(),
+      ])
+      allowed = checks.some((r) => r.data)
+      // Also allow the caller to email the owner of a company they submitted a join request to.
+      if (!allowed) {
+        const { data: joinOwner } = await supabase
+          .from('employee_join_requests')
+          .select('user_id')
+          .eq('requester_auth_id', callerUserId)
+          .limit(50)
+        if (joinOwner && joinOwner.length) {
+          const ownerIds = joinOwner.map((r: any) => r.user_id)
+          const { data: ownerMatch } = await supabase
+            .from('business_settings')
+            .select('user_id')
+            .in('user_id', ownerIds)
+            .ilike('business_email', recipLower)
+            .limit(1)
+            .maybeSingle()
+          if (ownerMatch) allowed = true
+        }
+      }
+    }
+    if (!allowed) {
+      console.warn('send-transactional-email: recipient not owned by caller', {
+        callerUserId,
+        templateName,
+      })
+      return new Response(
+        JSON.stringify({ error: 'Recipient not permitted for this account' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  }
+
+
   // 2. Check suppression list (fail-closed: if we can't verify, don't send)
   const { data: suppressed, error: suppressionError } = await supabase
     .from('suppressed_emails')
