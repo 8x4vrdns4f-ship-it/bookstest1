@@ -8,6 +8,7 @@ import PlanShiftsDialog from "./PlanShiftsDialog";
 import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./EmployeeActionsDialog";
 import EmployeeProfileDialog from "./EmployeeProfileDialog";
 import { CheckCircle2, AlertCircle, Activity, Clock, User } from "lucide-react";
+import EmptyState from "@/components/app/EmptyState";
 
 interface Employee {
   id: string;
