@@ -13,8 +13,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Copy, Check, LogOut, KeyRound, Trash2, XCircle } from "lucide-react";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
+
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -171,29 +171,23 @@ const Settings = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center text-muted-foreground">Loading settings…</div>
-        <Footer />
-      </div>
-    );
+    return <div className="py-24 text-center text-muted-foreground">Loading settings…</div>;
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
       <SEO
         title="Settings — BookSuite"
         description="Manage your BookSuite business profile, working hours, booking preferences, and notifications."
         path="/settings"
         noIndex
       />
-      <Navbar />
-      <main className="flex-1 px-6 md:px-16 py-8 max-w-4xl w-full mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage your business, hours, booking preferences and more.</p>
+          <h1 className="page-title">Settings</h1>
+          <p className="page-subtitle">Manage your business, hours, booking preferences and more.</p>
         </div>
+
 
         <Accordion type="multiple" defaultValue={["company", "hours"]} className="space-y-3">
           {/* Company Info */}
@@ -400,10 +394,10 @@ const Settings = () => {
             <DangerRow icon={<Trash2 size={16} />} title="Delete Account" hint="Permanently delete your account. (Coming soon.)" action={<Button variant="destructive" disabled>Delete Account</Button>} />
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </>
   );
+
 };
 
 const Field = ({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) => (

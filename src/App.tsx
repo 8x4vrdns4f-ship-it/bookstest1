@@ -10,6 +10,11 @@ import Terms from "./pages/Terms.tsx";
 import Security from "./pages/Security.tsx";
 import Auth from "./pages/Auth.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import BookingsPage from "./pages/dashboard/BookingsPage.tsx";
+import CalendarPage from "./pages/dashboard/CalendarPage.tsx";
+import ClientsPage from "./pages/dashboard/ClientsPage.tsx";
+import StaffPage from "./pages/dashboard/StaffPage.tsx";
+import ShiftsPage from "./pages/dashboard/ShiftsPage.tsx";
 import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
 import Settings from "./pages/Settings.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
@@ -26,9 +31,16 @@ import NotFound from "./pages/NotFound.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
+import AppLayout from "./components/app/AppLayout.tsx";
 import { LocaleProvider } from "./contexts/LocaleContext.tsx";
 
 const queryClient = new QueryClient();
+
+const Guarded = ({ children }: { children: React.ReactNode }) => (
+  <RequireVerifiedEmail>
+    <RequireSubscription>{children}</RequireSubscription>
+  </RequireVerifiedEmail>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -38,6 +50,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public */}
           <Route path="/" element={<Index />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/privacy" element={<Privacy />} />
@@ -45,9 +58,6 @@ const App = () => (
           <Route path="/security" element={<Security />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/dashboard" element={<RequireVerifiedEmail><RequireSubscription><Dashboard /></RequireSubscription></RequireVerifiedEmail>} />
-          <Route path="/employee-dashboard" element={<RequireVerifiedEmail><EmployeeDashboard /></RequireVerifiedEmail>} />
-          <Route path="/settings" element={<RequireVerifiedEmail><RequireSubscription><Settings /></RequireSubscription></RequireVerifiedEmail>} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/pending-approval" element={<RequireVerifiedEmail><PendingApproval /></RequireVerifiedEmail>} />
           <Route path="/kiosk/:companyCode" element={<Kiosk />} />
@@ -55,9 +65,21 @@ const App = () => (
           <Route path="/book/:userId" element={<PublicBooking />} />
           <Route path="/book/:userId/success" element={<BookingSuccess />} />
           <Route path="/book/:userId/cancelled" element={<BookingCancelled />} />
-          <Route path="/payments" element={<RequireVerifiedEmail><RequireSubscription><Payments /></RequireSubscription></RequireVerifiedEmail>} />
-          <Route path="/payments/return" element={<RequireVerifiedEmail><RequireSubscription><PaymentsReturn /></RequireSubscription></RequireVerifiedEmail>} />
-          <Route path="/payments/refresh" element={<RequireVerifiedEmail><RequireSubscription><PaymentsRefresh /></RequireSubscription></RequireVerifiedEmail>} />
+          <Route path="/employee-dashboard" element={<RequireVerifiedEmail><EmployeeDashboard /></RequireVerifiedEmail>} />
+
+          {/* Authenticated app shell */}
+          <Route element={<Guarded><AppLayout /></Guarded>}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/bookings" element={<BookingsPage />} />
+            <Route path="/dashboard/calendar" element={<CalendarPage />} />
+            <Route path="/dashboard/clients" element={<ClientsPage />} />
+            <Route path="/dashboard/staff" element={<StaffPage />} />
+            <Route path="/dashboard/shifts" element={<ShiftsPage />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/payments/return" element={<PaymentsReturn />} />
+            <Route path="/payments/refresh" element={<PaymentsRefresh />} />
+          </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
