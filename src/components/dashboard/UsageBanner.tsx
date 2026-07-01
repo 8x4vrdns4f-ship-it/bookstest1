@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Sparkles, AlertTriangle } from "lucide-react";
+import { Sparkles, AlertTriangle, TrendingUp } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS, nextTier } from "@/lib/tierLimits";
 import StaffMembersDialog from "./StaffMembersDialog";
+import SectionCard from "@/components/app/SectionCard";
 
 interface UsageBannerProps {
   userId: string;
@@ -18,7 +18,6 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
   const [bookings, setBookings] = useState(0);
   const [staff, setStaff] = useState(0);
   const [staffOpen, setStaffOpen] = useState(false);
-
 
   useEffect(() => {
     const load = async () => {
@@ -49,69 +48,66 @@ const UsageBanner = ({ userId }: UsageBannerProps) => {
 
   return (
     <>
-    <Card className="bg-card border-border mb-8">
-
-      <CardContent className="p-5">
-        <div className="flex flex-col md:flex-row md:items-center gap-5 justify-between">
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <div className="flex items-center justify-between text-sm mb-1.5">
-                <span className="text-muted-foreground">Bookings this month</span>
-                <span className="text-foreground font-medium">
-                  {bookings} / {limits.bookingsPerMonth ?? "∞"}
-                </span>
-              </div>
-              {limits.bookingsPerMonth !== null && <Progress value={bPct} className="h-2" />}
+      <SectionCard
+        className="mb-8"
+        icon={<TrendingUp size={18} />}
+        title="This month's usage"
+        description={
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
+            <Sparkles size={12} /> {limits.name} plan
+          </span>
+        }
+        actions={
+          showUpgrade ? (
+            <Button asChild size="sm" variant="premium">
+              <Link to="/pricing">
+                <AlertTriangle size={14} />
+                Upgrade to {TIER_LIMITS[next].name}
+              </Link>
+            </Button>
+          ) : tier !== "platinum" ? (
+            <Button asChild size="sm" variant="outline">
+              <Link to="/pricing">Upgrade</Link>
+            </Button>
+          ) : null
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <div className="flex items-center justify-between text-sm mb-1.5">
+              <span className="text-muted-foreground">Bookings this month</span>
+              <span className="text-foreground font-medium">
+                {bookings} / {limits.bookingsPerMonth ?? "∞"}
+              </span>
             </div>
-            <button
-              type="button"
-              onClick={() => setStaffOpen(true)}
-              className="text-left rounded-md -m-1 p-1 hover:bg-secondary/40 transition-colors cursor-pointer"
-              aria-label="View staff members"
-            >
-              <div className="flex items-center justify-between text-sm mb-1.5">
-                <span className="text-muted-foreground underline-offset-2 hover:underline">Staff members</span>
-                <span className="text-foreground font-medium">
-                  {staff} / {limits.staff ?? "∞"}
-                </span>
-              </div>
-              {limits.staff !== null && <Progress value={sPct} className="h-2" />}
-            </button>
+            {limits.bookingsPerMonth !== null && <Progress value={bPct} className="h-2" />}
           </div>
-
-
-          <div className="flex items-center gap-3 shrink-0">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-              <Sparkles size={12} /> {limits.name} plan
-            </span>
-            {showUpgrade && (
-              <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                <Link to="/pricing">
-                  <AlertTriangle size={14} className="mr-1.5" />
-                  Upgrade to {TIER_LIMITS[next].name}
-                </Link>
-              </Button>
-            )}
-            {!showUpgrade && tier !== "platinum" && (
-              <Button asChild size="sm" variant="outline">
-                <Link to="/pricing">Upgrade</Link>
-              </Button>
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={() => setStaffOpen(true)}
+            className="text-left rounded-md -m-1 p-1 hover:bg-secondary/40 transition-colors cursor-pointer"
+            aria-label="View staff members"
+          >
+            <div className="flex items-center justify-between text-sm mb-1.5">
+              <span className="text-muted-foreground underline-offset-2 hover:underline">Staff members</span>
+              <span className="text-foreground font-medium">
+                {staff} / {limits.staff ?? "∞"}
+              </span>
+            </div>
+            {limits.staff !== null && <Progress value={sPct} className="h-2" />}
+          </button>
         </div>
-      </CardContent>
-    </Card>
-    <StaffMembersDialog
-      open={staffOpen}
-      onOpenChange={setStaffOpen}
-      userId={userId}
-      tierName={limits.name}
-      limit={limits.staff}
-      count={staff}
-    />
+      </SectionCard>
+      <StaffMembersDialog
+        open={staffOpen}
+        onOpenChange={setStaffOpen}
+        userId={userId}
+        tierName={limits.name}
+        limit={limits.staff}
+        count={staff}
+      />
     </>
   );
 };
-
 
 export default UsageBanner;
