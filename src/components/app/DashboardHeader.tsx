@@ -65,6 +65,7 @@ export default function DashboardHeader() {
   const navigate = useNavigate();
   const [initials, setInitials] = useState("BS");
   const [email, setEmail] = useState("");
+  const { notifications, unreadCount, markAllRead, markRead, clearAll } = useNotifications();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
