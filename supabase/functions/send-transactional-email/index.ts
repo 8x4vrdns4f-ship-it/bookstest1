@@ -59,6 +59,9 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
+  let callerRole: 'authenticated' | 'service_role' | null = null
+  let callerUserId: string | null = null
+  let callerEmail: string | null = null
   try {
     const token = authHeader.replace('Bearer ', '')
     const authClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? supabaseServiceKey)
@@ -70,6 +73,9 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
+    callerRole = role as 'authenticated' | 'service_role'
+    callerUserId = (claimsData?.claims?.sub as string) || null
+    callerEmail = ((claimsData?.claims?.email as string) || '').toLowerCase() || null
   } catch {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
