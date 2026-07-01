@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight, Calendar } from "lucide-react";
 import BookingDetailDialog from "./BookingDetailDialog";
 import { handleTierError } from "@/lib/tierError";
 import { sendEmail, formatDate, formatTime } from "@/lib/sendEmail";
+import SectionCard from "@/components/app/SectionCard";
+import EmptyState from "@/components/app/EmptyState";
 
 
 type Booking = {
