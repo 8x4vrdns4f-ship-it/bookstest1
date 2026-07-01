@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight, Calendar } from "lucide-react";
 import BookingDetailDialog from "./BookingDetailDialog";
 import { handleTierError } from "@/lib/tierError";
 import { sendEmail, formatDate, formatTime } from "@/lib/sendEmail";
+import SectionCard from "@/components/app/SectionCard";
+import EmptyState from "@/components/app/EmptyState";
 
 
 type Booking = {
@@ -186,12 +187,14 @@ const BookingsList = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <Card className="bg-card border-border">
-      <CardHeader className="flex flex-row items-center justify-between gap-3 flex-wrap">
-        <CardTitle className="text-foreground">Bookings</CardTitle>
+    <SectionCard
+      icon={<Calendar size={18} />}
+      title="Bookings"
+      description="Manage incoming requests and confirmed sessions."
+      actions={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button size="sm" variant="premium" className="gap-1">
               <Plus size={14} /> Add Booking
             </Button>
           </DialogTrigger>
@@ -234,89 +237,92 @@ const BookingsList = ({ userId }: { userId: string }) => {
                   <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-secondary border-border" rows={1} />
                 </div>
               </div>
-              <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground">
+              <Button type="submit" disabled={loading} variant="premium" className="w-full">
                 {loading ? "Adding..." : "Add Booking"}
               </Button>
             </form>
           </DialogContent>
         </Dialog>
-      </CardHeader>
-      <CardContent>
-        {/* Search bar */}
-        <div className="relative mb-4">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by code, name, or email…"
-            className="pl-9 bg-secondary border-border h-9 text-sm"
-          />
-        </div>
+      }
+    >
+      {/* Search bar */}
+      <div className="relative mb-4">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by code, name, or email…"
+          className="pl-9 bg-secondary border-border h-9 text-sm"
+        />
+      </div>
 
-        {filtered.length === 0 ? (
-          <p className="text-muted-foreground text-sm">{search ? "No bookings match your search." : "No bookings yet. Add one or share your calendar widget!"}</p>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map((b) => (
-              <div
-                key={b.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-secondary/50 border border-border hover:border-primary/40 transition-colors cursor-pointer"
-                onClick={() => setDetail(b)}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="font-semibold text-foreground text-sm">{b.client_name}</span>
-                    <Badge variant="outline" className={statusColors[b.status]}>{b.status.replace("_", " ")}</Badge>
-                    {b.confirmation_code && (
-                      <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 font-mono">
-                        {b.confirmation_code}
-                      </Badge>
-                    )}
-                    {b.assigned_employee_id && employeesMap[b.assigned_employee_id] && (
-                      <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500/30 gap-1">
-                        <UserCheck size={10} /> {employeesMap[b.assigned_employee_id]}
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {b.service} · {b.booking_date} at {b.booking_time.slice(0, 5)} · {b.duration_minutes}min
-                    {b.client_email && <> · {b.client_email}</>}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                  {b.status === "pending" ? (
-                    <>
-                      <Button size="sm" onClick={() => handleAccept(b)} className="h-8 gap-1 bg-green-600 hover:bg-green-700 text-white">
-                        <Check size={14} /> Accept
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDecline(b)} className="h-8 gap-1 border-destructive/40 text-destructive hover:bg-destructive/10">
-                        <X size={14} /> Decline
-                      </Button>
-                    </>
-                  ) : (
-                    <Select value={b.status} onValueChange={(val) => handleStatusChange(b.id, val)}>
-                      <SelectTrigger className="w-[120px] h-8 text-xs bg-secondary border-border">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border">
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="confirmed">Confirmed</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
+      {filtered.length === 0 ? (
+        <EmptyState
+          icon={<Calendar size={20} />}
+          title={search ? "No bookings match your search" : "No bookings yet"}
+          description={search ? "Try a different code, name, or email." : "Add one manually or share your calendar widget to start receiving bookings."}
+        />
+      ) : (
+        <div className="space-y-2">
+          {filtered.map((b) => (
+            <div
+              key={b.id}
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-lg bg-secondary/40 border border-border hover:border-primary/40 hover:bg-secondary/60 transition-colors cursor-pointer"
+              onClick={() => setDetail(b)}
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <span className="font-semibold text-foreground text-sm">{b.client_name}</span>
+                  <Badge variant="outline" className={statusColors[b.status]}>{b.status.replace("_", " ")}</Badge>
+                  {b.confirmation_code && (
+                    <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 font-mono">
+                      {b.confirmation_code}
+                    </Badge>
                   )}
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(b.id)}>
-                    <Trash2 size={14} />
-                  </Button>
-                  <ChevronRight size={14} className="text-muted-foreground hidden sm:block" />
+                  {b.assigned_employee_id && employeesMap[b.assigned_employee_id] && (
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 gap-1">
+                      <UserCheck size={10} /> {employeesMap[b.assigned_employee_id]}
+                    </Badge>
+                  )}
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  {b.service} · {b.booking_date} at {b.booking_time.slice(0, 5)} · {b.duration_minutes}min
+                  {b.client_email && <> · {b.client_email}</>}
+                </p>
               </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
+              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                {b.status === "pending" ? (
+                  <>
+                    <Button size="sm" onClick={() => handleAccept(b)} className="h-8 gap-1 bg-success text-success-foreground hover:bg-success/90">
+                      <Check size={14} /> Accept
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleDecline(b)} className="h-8 gap-1 border-destructive/40 text-destructive hover:bg-destructive/10">
+                      <X size={14} /> Decline
+                    </Button>
+                  </>
+                ) : (
+                  <Select value={b.status} onValueChange={(val) => handleStatusChange(b.id, val)}>
+                    <SelectTrigger className="w-[120px] h-8 text-xs bg-secondary border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="confirmed">Confirmed</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(b.id)}>
+                  <Trash2 size={14} />
+                </Button>
+                <ChevronRight size={14} className="text-muted-foreground hidden sm:block" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <BookingDetailDialog
         booking={detail}
@@ -325,7 +331,7 @@ const BookingsList = ({ userId }: { userId: string }) => {
         ownerId={userId}
         onChanged={() => { /* realtime will refresh */ }}
       />
-    </Card>
+    </SectionCard>
   );
 };
 
