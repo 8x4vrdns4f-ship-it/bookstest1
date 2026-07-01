@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Check, X, Bell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import SectionCard from "@/components/app/SectionCard";
+import EmptyState from "@/components/app/EmptyState";
 
 type JoinRequest = {
   id: string;
@@ -109,40 +110,47 @@ const JoinRequestsCard = ({ businessUserId }: { businessUserId: string }) => {
 
   return (
     <>
-      <Card className="bg-card border-border">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-foreground flex items-center gap-2">
-            <UserPlus size={18} className="text-primary" /> Join Requests
+      <SectionCard
+        icon={<UserPlus size={18} />}
+        title={
+          <span className="flex items-center gap-2">
+            Join Requests
             {requests.length > 0 && (
-              <Badge className="ml-1 bg-primary text-primary-foreground"><Bell size={12} className="mr-1" />{requests.length}</Badge>
+              <Badge className="bg-primary text-primary-foreground gap-1">
+                <Bell size={12} />{requests.length}
+              </Badge>
             )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {requests.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No pending join requests.</p>
-          ) : (
-            <div className="space-y-2">
-              {requests.map((r) => (
-                <div key={r.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 rounded-md bg-secondary/40 border border-border">
-                  <div>
-                    <p className="text-foreground font-medium">{r.requester_name}</p>
-                    <p className="text-xs text-muted-foreground">{r.requester_email}{r.requester_phone ? ` · ${r.requester_phone}` : ""}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => setAcceptOpen(r)} className="gap-1 bg-green-600 hover:bg-green-700 text-white">
-                      <Check size={14} /> Accept
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => setDeclineOpen(r)} className="gap-1">
-                      <X size={14} /> Decline
-                    </Button>
-                  </div>
+          </span>
+        }
+        description="Approve or decline people trying to join your team."
+      >
+        {requests.length === 0 ? (
+          <EmptyState
+            icon={<UserPlus size={20} />}
+            title="No pending requests"
+            description="You'll see new applicants here in real time."
+          />
+        ) : (
+          <div className="space-y-2">
+            {requests.map((r) => (
+              <div key={r.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 rounded-lg bg-secondary/40 border border-border hover:border-primary/30 transition-colors">
+                <div>
+                  <p className="text-foreground font-medium">{r.requester_name}</p>
+                  <p className="text-xs text-muted-foreground">{r.requester_email}{r.requester_phone ? ` · ${r.requester_phone}` : ""}</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => setAcceptOpen(r)} className="gap-1 bg-success text-success-foreground hover:bg-success/90">
+                    <Check size={14} /> Accept
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => setDeclineOpen(r)} className="gap-1">
+                    <X size={14} /> Decline
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </SectionCard>
 
       {/* Accept dialog */}
       <Dialog open={!!acceptOpen} onOpenChange={(v) => { if (!v) { setAcceptOpen(null); setSelectedRole(""); } }}>
@@ -166,7 +174,7 @@ const JoinRequestsCard = ({ businessUserId }: { businessUserId: string }) => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAcceptOpen(null)}>Cancel</Button>
-            <Button onClick={accept} disabled={!selectedRole || busy} className="bg-green-600 hover:bg-green-700 text-white">
+            <Button onClick={accept} disabled={!selectedRole || busy} className="bg-success text-success-foreground hover:bg-success/90">
               {busy ? "Accepting…" : "Confirm Accept"}
             </Button>
           </DialogFooter>
@@ -178,7 +186,7 @@ const JoinRequestsCard = ({ businessUserId }: { businessUserId: string }) => {
         <DialogContent className="bg-card border-border">
           <DialogHeader>
             <DialogTitle>Decline {declineOpen?.requester_name}</DialogTitle>
-            <DialogDescription>Tell them why. They'll see this on their pending page (and in their email once email is wired up).</DialogDescription>
+            <DialogDescription>Tell them why. They'll see this on their pending page and in their email.</DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
             <Label>Reason</Label>
