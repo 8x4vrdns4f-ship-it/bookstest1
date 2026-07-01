@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { CreditCard, ExternalLink, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { getConnectAuthHeaders, getConnectErrorMessage, getStripeEnvironment } from "@/lib/connectPayments";
+import SectionCard from "@/components/app/SectionCard";
 
 type Status = {
   connected: boolean;
@@ -78,44 +77,38 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
 
   const ready = status?.connected && status?.charges_enabled;
 
+  const statusBadge = loading ? (
+    <Loader2 className="animate-spin text-muted-foreground" size={18} />
+  ) : ready ? (
+    <Badge className="bg-success/20 text-success border-success/40 gap-1">
+      <CheckCircle2 size={12} /> Active
+    </Badge>
+  ) : status?.connected ? (
+    <Badge variant="outline" className="border-warning/40 text-warning gap-1">
+      <AlertCircle size={12} /> Onboarding incomplete
+    </Badge>
+  ) : (
+    <Badge variant="outline" className="border-border text-muted-foreground">Not connected</Badge>
+  );
+
   return (
-    <Card className="bg-card border-border mb-6">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-accent/10">
-            <CreditCard className="text-accent" size={20} />
-          </div>
-          <div>
-            <CardTitle className="text-foreground">Payments</CardTitle>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Collect deposits at booking time and route money to your bank.
-            </p>
-          </div>
-        </div>
-        {loading ? (
-          <Loader2 className="animate-spin text-muted-foreground" size={18} />
-        ) : ready ? (
-          <Badge className="bg-green-500/20 text-green-400 border-green-500/40 gap-1">
-            <CheckCircle2 size={12} /> Active
-          </Badge>
-        ) : status?.connected ? (
-          <Badge variant="outline" className="border-yellow-500/40 text-yellow-400 gap-1">
-            <AlertCircle size={12} /> Onboarding incomplete
-          </Badge>
-        ) : (
-          <Badge variant="outline" className="border-border text-muted-foreground">Not connected</Badge>
-        )}
-      </CardHeader>
-      <CardContent className="flex flex-wrap gap-3">
+    <SectionCard
+      className="mb-6"
+      icon={<CreditCard size={20} />}
+      title="Payments"
+      description="Collect deposits at booking time and route money to your bank."
+      actions={statusBadge}
+    >
+      <div className="flex flex-wrap items-center gap-3">
         {!status?.connected && (
-          <Button onClick={startOnboarding} disabled={actionLoading} className="bg-accent text-accent-foreground hover:bg-accent/90">
-            {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+          <Button onClick={startOnboarding} disabled={actionLoading} variant="premium">
+            {actionLoading ? <Loader2 className="animate-spin" size={16} /> : null}
             Connect Stripe
           </Button>
         )}
         {status?.connected && !ready && (
           <Button onClick={startOnboarding} disabled={actionLoading} variant="outline">
-            {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+            {actionLoading ? <Loader2 className="animate-spin" size={16} /> : null}
             Finish onboarding
           </Button>
         )}
@@ -139,8 +132,8 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
             Until you connect Stripe, customers cannot book through your widget.
           </p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </SectionCard>
   );
 };
 

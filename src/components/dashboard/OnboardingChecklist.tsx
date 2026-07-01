@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Circle, X } from "lucide-react";
+import { CheckCircle2, Circle, X, Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getConnectAuthHeaders, getStripeEnvironment } from "@/lib/connectPayments";
+import SectionCard from "@/components/app/SectionCard";
 
 type Props = { userId: string };
 
@@ -64,28 +64,33 @@ const OnboardingChecklist = ({ userId }: Props) => {
   };
 
   return (
-    <Card className="bg-card border-border mb-8">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="text-base">
-          Get set up ({done}/{total})
-        </CardTitle>
+    <SectionCard
+      className="mb-8"
+      icon={<Rocket size={18} />}
+      title={`Get set up`}
+      description={`${done} of ${total} steps complete`}
+      actions={
         <Button variant="ghost" size="icon" onClick={dismiss} aria-label="Dismiss checklist">
           <X size={16} />
         </Button>
-      </CardHeader>
-      <CardContent className="space-y-3">
+      }
+    >
+      <div className="space-y-4">
         <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
           <div
-            className="h-full bg-primary transition-all"
+            className="h-full bg-[image:var(--gradient-primary)] transition-all"
             style={{ width: `${(done / total) * 100}%` }}
           />
         </div>
         <ul className="space-y-2">
           {steps.map((s) => (
-            <li key={s.key} className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm">
+            <li
+              key={s.key}
+              className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 hover:bg-secondary/40 transition-colors"
+            >
+              <div className="flex items-center gap-3 text-sm">
                 {s.done ? (
-                  <CheckCircle2 size={18} className="text-primary" />
+                  <CheckCircle2 size={18} className="text-success" />
                 ) : (
                   <Circle size={18} className="text-muted-foreground" />
                 )}
@@ -101,8 +106,8 @@ const OnboardingChecklist = ({ userId }: Props) => {
             </li>
           ))}
         </ul>
-      </CardContent>
-    </Card>
+      </div>
+    </SectionCard>
   );
 };
 

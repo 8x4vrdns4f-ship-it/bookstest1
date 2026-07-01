@@ -1,56 +1,45 @@
 ## Goal
-Make every logged-in surface feel like one polished, elegant product — consistent shell, refined components, tighter spacing, better hierarchy — starting from 3 rendered design directions you pick from.
+Finish Acts 4–6 of the dashboard polish plan: unify every card, dialog, table, chart, and page under the Professional Dark system, then add motion, empty states, skeletons, and a proper mobile pass. No business logic changes.
 
-## Approach
+## Act 4 — Component pass (one batch at a time)
 
-### Act 1 — Pick the direction (before any code)
-1. Capture the current Dashboard shell as reference (needs you signed in on the preview so I can screenshot the real thing — I'll prompt you if the session isn't there).
-2. Generate **3 rendered design directions** for the dashboard shell + a stat card + a primary button, all sharing the locked BookSuite palette (dark base, light-blue accent, Plus Jakarta Sans).
-   Each direction varies composition, density, and motion register — not the brand.
-3. You pick one. That direction becomes the design system for everything else.
+**Batch 1 — Cards & primitives**
+- Add a `StatCard`, `SectionCard`, and `EmptyState` wrapper in `src/components/app/` so every card shares padding, header, icon slot, and hover elevation.
+- Add a `premium` gradient variant to `button.tsx` for headline CTAs.
+- Restyle: `OnboardingChecklist`, `SubscriptionWidget`, `UsageBanner`, `PaymentsCard`, `GiftCodesCard`, `JoinRequestsCard` on the new primitives.
 
-### Act 2 — Build the shell
-Once you've picked:
-- New `AppLayout` with **collapsible shadcn Sidebar** (icon-collapse variant, always-visible trigger in the header).
-- Sidebar sections: Overview, Bookings, Calendar, Clients, Staff, Shifts, Payments, Settings. Active route highlighting via `NavLink`.
-- Top header keeps: sidebar trigger, page title/breadcrumb, language/currency switcher, notifications, user menu.
-- Move the current top button bar into the sidebar; keep the "Try Now / Login" logic intact on public routes.
+**Batch 2 — Lists & tables**
+- Shared row component: 56px height, hover ring, status pill, chevron affordance.
+- Apply to `BookingsList`, `ClientList`, `StaffList`.
+- Empty states with illustration + primary action.
 
-### Act 3 — Refresh the design tokens
-Update `index.css` + `tailwind.config.ts` with the chosen direction's tokens:
-- Refined surface layers (`--surface`, `--surface-elevated`, `--surface-sunken`)
-- Softer semantic borders + focus rings
-- Elevation scale (`--shadow-sm/md/lg/glow`)
-- Gradient primitives for hero cards and CTAs
-- Motion tokens (durations, easings) used by Framer Motion
+**Batch 3 — Dialogs**
+- Shared header (title + subtitle + close), footer (secondary/primary), consistent widths (`sm` 440, `md` 560, `lg` 720).
+- Refit: `AddEmployeeDialog`, `BookingDetailDialog`, `ManageShiftsDialog`, `PlanShiftsDialog`, `StaffMembersDialog`, `EmployeeProfileDialog`, `EmployeeActionsDialog`, `DateOverrideDialog`, `DayScheduleDialog`, `EmbedWidgetDialog`, `CancelSubscriptionDialog`.
 
-### Act 4 — Systematic component pass
-Rebuild these to the new system (one PR-sized batch at a time):
-- **Cards**: stat cards, `OnboardingChecklist`, `SubscriptionWidget`, `UsageBanner`, `PaymentsCard`, `GiftCodesCard`, `JoinRequestsCard`
-- **Buttons**: primary/secondary/ghost/destructive + new `premium` gradient variant for headline CTAs
-- **Tables/lists**: `BookingsList`, `ClientList`, `StaffList` — consistent row density, hover, empty states
-- **Dialogs**: `AddEmployeeDialog`, `BookingDetailDialog`, `ManageShiftsDialog`, `PlanShiftsDialog`, `StaffMembersDialog`, `EmployeeProfileDialog`, `EmployeeActionsDialog`, `DateOverrideDialog`, `DayScheduleDialog`, `EmbedWidgetDialog`, `CancelSubscriptionDialog` — shared header/footer pattern, consistent widths, better close affordance
-- **Calendar & Shifts views**: `CalendarView`, `ShiftsView`, `ReceptionistView` — cleaner grid lines, better time labels, drag/hover states
-- **Charts**: `DashboardCharts` — restyled tooltips, gridlines, legend to match tokens
+**Batch 4 — Calendar, Shifts, Charts**
+- `CalendarView`, `ShiftsView`, `ReceptionistView`: cleaner grid lines, tokenised time labels, hover/drag states, today marker.
+- `DashboardCharts`: restyled tooltip, gridlines, axis, legend to match tokens.
 
-### Act 5 — Page-level pass
-Apply the shell + refreshed components to:
-`Dashboard`, `EmployeeDashboard`, `Payments`, `Settings`, `Pricing`, `PendingApproval`, `VerifyEmail`, `ResetPassword`, `Auth`, `BookingSuccess`, `BookingCancelled`, `PaymentsReturn`, `PaymentsRefresh`, `EmbedWidget`, `Kiosk`.
+## Act 5 — Page-level pass
+- `PageHeader` (already scaffolded) applied to every dashboard route with title + description + action slot + breadcrumb.
+- Loading skeletons on `Dashboard`, `BookingsPage`, `CalendarPage`, `ClientsPage`, `StaffPage`, `ShiftsPage`, `Payments`, `Settings`.
+- Refit standalone pages to the new tokens: `EmployeeDashboard`, `Pricing`, `PendingApproval`, `VerifyEmail`, `ResetPassword`, `Auth`, `BookingSuccess`, `BookingCancelled`, `PaymentsReturn`, `PaymentsRefresh`, `EmbedWidget`, `Kiosk`.
 
-Add empty states, loading skeletons, and consistent page headers (title + description + primary action slot) to each.
+## Act 6 — Polish
+- Framer Motion: page transitions (fade+slide 200ms) via a `PageTransition` wrapper in `AppLayout`, card mount stagger.
+- Toast (sonner) styled to token surfaces.
+- Global focus-visible ring using `--ring`.
+- Mobile: sidebar off-canvas trigger in header, tables collapse to stacked cards under `md`, dialogs full-screen under `sm`.
+- Contrast audit on the dark palette.
 
-### Act 6 — Polish details
-- Framer Motion page transitions + card mount animations (subtle, one register)
-- Toast styling to match tokens
-- Focus-visible rings across all interactive elements
-- Mobile pass: sidebar becomes off-canvas, tables become stacked cards, dialogs full-screen
-- Dark-mode contrast audit on the new tokens
+## Order of execution
+Batch 1 → Batch 2 → Batch 3 → Batch 4 → Act 5 → Act 6. Each batch is self-contained so you can stop and review after any of them.
 
 ## Out of scope
-- No business logic changes (Stripe, bookings, RLS, edge functions untouched).
-- No new features — pure UI/UX refinement.
-- Public landing page stays as-is (you liked the current header).
+Stripe, bookings logic, RLS, edge functions, translations, landing page.
 
-## What I need from you
-1. Sign in on the preview so I can screenshot the real dashboard for the directions step.
-2. Approve this plan → I'll generate the 3 directions immediately.
+## Technical notes
+- New primitives live in `src/components/app/` to avoid clashing with shadcn `ui/`.
+- All colors/shadows/radii come from `index.css` tokens — no hex in components.
+- Motion uses existing `framer-motion` install; one duration/easing pair defined as CSS vars.

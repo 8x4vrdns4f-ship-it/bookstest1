@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -10,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Gift, Copy, Plus } from "lucide-react";
 import { toast } from "sonner";
+import SectionCard from "@/components/app/SectionCard";
+import EmptyState from "@/components/app/EmptyState";
 
 type GiftCodeRow = {
   id: string;
@@ -79,15 +79,15 @@ const GiftCodesCard = () => {
   };
 
   return (
-    <Card className="bg-card border-border mb-8">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2 text-foreground">
-          <Gift className="text-primary" size={18} />
-          Gift Codes
-        </CardTitle>
+    <SectionCard
+      className="mb-8"
+      icon={<Gift size={18} />}
+      title="Gift Codes"
+      description="Give someone 30 days of full access."
+      actions={
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button size="sm" variant="premium" className="gap-2">
               <Plus size={16} /> Generate code
             </Button>
           </DialogTrigger>
@@ -119,43 +119,44 @@ const GiftCodesCard = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleCreate} disabled={creating} className="bg-primary text-primary-foreground">
+              <Button onClick={handleCreate} disabled={creating} variant="premium">
                 {creating ? "Creating…" : "Create code"}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
-        ) : codes.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No codes yet. Generate one to give someone 30 days of full access.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {codes.map((c) => (
-              <div key={c.id} className="flex items-center justify-between gap-3 p-3 rounded-md bg-secondary/40 border border-border">
-                <div className="flex items-center gap-3 min-w-0">
-                  <code className="font-mono text-sm text-foreground">{c.code}</code>
-                  <Badge variant="outline" className="capitalize">{c.tier}</Badge>
-                  {c.redeemed_at ? (
-                    <Badge className="bg-muted text-muted-foreground">Redeemed</Badge>
-                  ) : (
-                    <Badge className="bg-primary/20 text-primary">Active</Badge>
-                  )}
-                  {c.note && <span className="text-xs text-muted-foreground truncate">{c.note}</span>}
-                </div>
-                <Button size="sm" variant="ghost" onClick={() => copyCode(c.code)} className="gap-1">
-                  <Copy size={14} />
-                </Button>
+      }
+    >
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      ) : codes.length === 0 ? (
+        <EmptyState
+          icon={<Gift size={20} />}
+          title="No gift codes yet"
+          description="Generate one to give someone 30 days of full BookSuite access."
+        />
+      ) : (
+        <div className="space-y-2">
+          {codes.map((c) => (
+            <div key={c.id} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-secondary/40 border border-border hover:border-primary/30 transition-colors">
+              <div className="flex items-center gap-3 min-w-0">
+                <code className="font-mono text-sm text-foreground">{c.code}</code>
+                <Badge variant="outline" className="capitalize">{c.tier}</Badge>
+                {c.redeemed_at ? (
+                  <Badge className="bg-muted text-muted-foreground">Redeemed</Badge>
+                ) : (
+                  <Badge className="bg-primary/20 text-primary">Active</Badge>
+                )}
+                {c.note && <span className="text-xs text-muted-foreground truncate">{c.note}</span>}
               </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              <Button size="sm" variant="ghost" onClick={() => copyCode(c.code)} className="gap-1">
+                <Copy size={14} />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </SectionCard>
   );
 };
 
