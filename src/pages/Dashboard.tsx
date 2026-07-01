@@ -1,247 +1,181 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, Users, Clock, LogOut, Code2, Settings as SettingsIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, Users, Clock, Code2, Plus, ArrowUpRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
+import { TIER_LIMITS } from "@/lib/tierLimits";
+import { useDashboardContext } from "@/hooks/useDashboardContext";
+
 import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
 import EmbedWidgetDialog from "@/components/dashboard/EmbedWidgetDialog";
 import PaymentsCard from "@/components/dashboard/PaymentsCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import SEO from "@/components/SEO";
 import BookingsList from "@/components/dashboard/BookingsList";
-import CalendarView from "@/components/dashboard/CalendarView";
-import ClientList from "@/components/dashboard/ClientList";
-import StaffList from "@/components/dashboard/StaffList";
-import ShiftsView from "@/components/dashboard/ShiftsView";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
-
 import UsageBanner from "@/components/dashboard/UsageBanner";
 import SubscriptionWidget from "@/components/dashboard/SubscriptionWidget";
 import LockedFeature from "@/components/LockedFeature";
-import { useSubscription } from "@/hooks/useSubscription";
-import { TIER_LIMITS } from "@/lib/tierLimits";
-
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import GiftCodesCard from "@/components/dashboard/GiftCodesCard";
 import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
-import { getDashboardRoute } from "@/lib/routeAfterAuth";
-import type { User } from "@supabase/supabase-js";
+import PageHeader from "@/components/app/PageHeader";
+import SEO from "@/components/SEO";
 
-type RoleInfo = { name: string; canApprove: boolean };
+type StatCard = {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  hint?: string;
+};
 
-const Dashboard = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [businessUserId, setBusinessUserId] = useState<string | null>(null);
-  const [role, setRole] = useState<RoleInfo>({ name: "owner", canApprove: true });
-  const [displayName, setDisplayName] = useState("");
-  const [stats, setStats] = useState({ todayBookings: 0, totalClients: 0, upcoming: 0 });
-  const { toast } = useToast();
+export default function Dashboard() {
+  const ctx = useDashboardContext();
   const navigate = useNavigate();
   const { tier } = useSubscription();
   const canSeeAdvanced = tier ? TIER_LIMITS[tier].advancedAnalytics : false;
+  const [stats, setStats] = useState({ todayBookings: 0, totalClients: 0, upcoming: 0 });
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) { navigate("/auth"); return; }
-      setUser(session.user);
-      setDisplayName(session.user.user_metadata?.display_name || session.user.email || "");
-    });
-
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) { navigate("/auth"); return; }
-      const target = await getDashboardRoute();
-      if (target !== "/dashboard") { navigate(target); return; }
-      setUser(session.user);
-      setDisplayName(session.user.user_metadata?.display_name || session.user.email || "");
-
-      // Determine business + role context
-      const { data: emp } = await supabase
-        .from("employees")
-        .select("user_id, company_roles:role_id(name, can_approve_requests)")
-        .eq("auth_user_id", session.user.id)
-        .maybeSingle();
-      if (emp) {
-        setBusinessUserId(emp.user_id);
-        const cr = (emp as any).company_roles;
-        setRole({ name: cr?.name ?? "employee", canApprove: !!cr?.can_approve_requests });
-      } else {
-        // Business owner
-        setBusinessUserId(session.user.id);
-        setRole({ name: "owner", canApprove: true });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  useEffect(() => {
-    if (!user) return;
-    const fetchStats = async () => {
-      const today = new Date().toISOString().split("T")[0];
-      const [todayRes, clientsRes, upcomingRes] = await Promise.all([
-        supabase.from("bookings").select("id", { count: "exact", head: true }).eq("booking_date", today),
-        supabase.from("clients").select("id", { count: "exact", head: true }),
-        supabase.from("bookings").select("id", { count: "exact", head: true }).gte("booking_date", today).in("status", ["pending", "confirmed"]),
-      ]);
+    if (!ctx) return;
+    const today = new Date().toISOString().split("T")[0];
+    Promise.all([
+      supabase.from("bookings").select("id", { count: "exact", head: true }).eq("booking_date", today),
+      supabase.from("clients").select("id", { count: "exact", head: true }),
+      supabase.from("bookings").select("id", { count: "exact", head: true }).gte("booking_date", today).in("status", ["pending", "confirmed"]),
+    ]).then(([t, c, u]) => {
       setStats({
-        todayBookings: todayRes.count || 0,
-        totalClients: clientsRes.count || 0,
-        upcoming: upcomingRes.count || 0,
+        todayBookings: t.count || 0,
+        totalClients: c.count || 0,
+        upcoming: u.count || 0,
       });
-    };
-    fetchStats();
-  }, [user]);
+    });
+  }, [ctx]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
+  if (!ctx) return null;
 
-
-  if (!user || !businessUserId) return null;
-
-  const isOwner = role.name === "owner";
+  const { user, businessUserId, displayName, role, isOwner } = ctx;
   const isReceptionist = role.name === "receptionist";
 
-  const statCards = [
-    { label: "Bookings Today", value: String(stats.todayBookings), icon: CalendarDays },
-    { label: "Total Clients", value: String(stats.totalClients), icon: Users },
-    { label: "Upcoming", value: String(stats.upcoming), icon: Clock },
+  const statCards: StatCard[] = [
+    { label: "Bookings today", value: String(stats.todayBookings), icon: CalendarDays, hint: "Confirmed & pending" },
+    { label: "Total clients", value: String(stats.totalClients), icon: Users, hint: "Lifetime" },
+    { label: "Upcoming", value: String(stats.upcoming), icon: Clock, hint: "From today onwards" },
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
       <SEO
         title="Dashboard — BookSuite"
         description="Your BookSuite dashboard: today's bookings, upcoming appointments, clients, and staff at a glance."
         path="/dashboard"
         noIndex
       />
-      <Navbar />
-      <main className="flex-1 px-8 md:px-16 py-10">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Hey, {displayName} 👋</h1>
-            <p className="text-muted-foreground mt-1 capitalize">{role.name} view</p>
-          </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            {isOwner && (
-              <Button asChild variant="outline" className="gap-2 border-border text-muted-foreground hover:text-foreground hover:bg-secondary">
-                <Link to="/settings"><SettingsIcon size={16} /> Settings</Link>
-              </Button>
-            )}
-            {isOwner && <AddEmployeeDialog userId={user.id} />}
-            {isOwner && (
+
+      <PageHeader
+        title={`Welcome back, ${displayName.split(" ")[0] || "there"}`}
+        description={isOwner ? "Here's what's happening with your business today." : `Signed in as ${role.name}.`}
+        actions={
+          isOwner ? (
+            <>
               <EmbedWidgetDialog
                 userId={user.id}
                 trigger={
-                  <Button className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm">
-                    <Code2 size={16} />
-                    Embed Widget
+                  <Button variant="outline" className="gap-2">
+                    <Code2 className="h-4 w-4" /> Embed widget
                   </Button>
                 }
               />
-            )}
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="border-border text-muted-foreground hover:text-foreground hover:bg-secondary gap-2"
-            >
-              <LogOut size={16} />
-              Log Out
-            </Button>
+              <Button
+                className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-[var(--shadow-glow)]"
+                onClick={() => navigate("/dashboard/bookings")}
+              >
+                <Plus className="h-4 w-4" /> New booking
+              </Button>
+            </>
+          ) : null
+        }
+      />
+
+      {isReceptionist ? (
+        <ReceptionistView businessUserId={businessUserId} />
+      ) : (
+        <div className="space-y-8">
+          {isOwner && <SubscriptionWidget />}
+          {isOwner && <OnboardingChecklist userId={user.id} />}
+          {isOwner && <PaymentsCard userId={user.id} />}
+          {isOwner && <UsageBanner userId={businessUserId} />}
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {statCards.map((stat) => (
+              <Card
+                key={stat.label}
+                className="surface-card hover:border-primary/30 transition-colors group"
+              >
+                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                  <CardTitle className="stat-label">{stat.label}</CardTitle>
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary grid place-items-center group-hover:bg-primary/20 transition-colors">
+                    <stat.icon className="h-4 w-4" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-baseline justify-between">
+                    <p className="stat-value">{stat.value}</p>
+                    {stat.hint && <span className="text-xs text-muted-foreground">{stat.hint}</span>}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </div>
 
-        {isReceptionist ? (
-          <ReceptionistView businessUserId={businessUserId} />
-        ) : (
-          <>
-            {isOwner && <SubscriptionWidget />}
-            {isOwner && <OnboardingChecklist userId={user.id} />}
-            {isOwner && <PaymentsCard userId={user.id} />}
-            {isOwner && <UsageBanner userId={businessUserId} />}
-            {isOwner && <GiftCodesCard />}
+          {isOwner && <GiftCodesCard />}
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {statCards.map((stat) => (
-                <Card key={stat.label} className="bg-card border-border">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
-                    <stat.icon size={18} className="text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          {role.canApprove && <JoinRequestsCard businessUserId={businessUserId} />}
 
-            {/* Join requests — owners + roles with approve permission */}
-            {role.canApprove && (
-              <div className="mb-8">
-                <JoinRequestsCard businessUserId={businessUserId} />
+          {/* Charts */}
+          <div>
+            {canSeeAdvanced ? (
+              <DashboardCharts userId={businessUserId} />
+            ) : (
+              <div className="relative min-h-[260px]">
+                <LockedFeature
+                  requiredTier="gold"
+                  title="Advanced Analytics"
+                  description="Charts, trends and revenue insights are available on Gold and Platinum."
+                >
+                  <DashboardCharts userId={businessUserId} />
+                </LockedFeature>
               </div>
             )}
+          </div>
 
-            {/* Charts row — Gold/Platinum only */}
-            <div className="mb-8">
-              {canSeeAdvanced ? (
-                <DashboardCharts userId={businessUserId} />
-              ) : (
-                <div className="relative min-h-[260px]">
-                  <LockedFeature
-                    requiredTier="gold"
-                    title="Advanced Analytics"
-                    description="Charts, trends and revenue insights are available on Gold and Platinum."
-                  >
-                    <DashboardCharts userId={businessUserId} />
-                  </LockedFeature>
-                </div>
-              )}
+          {/* Recent bookings */}
+          <Card className="surface-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-base font-semibold">Recent bookings</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/dashboard/bookings")}
+                className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
+              >
+                View all <ArrowUpRight className="h-3.5 w-3.5" />
+              </Button>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <BookingsList userId={businessUserId} />
+            </CardContent>
+          </Card>
+
+          {isOwner && (
+            <div className="flex justify-end">
+              <AddEmployeeDialog userId={user.id} />
             </div>
-
-
-            {/* Tabs */}
-            <Tabs defaultValue="bookings" className="space-y-6">
-              <TabsList className="bg-secondary border border-border">
-                <TabsTrigger value="bookings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Bookings</TabsTrigger>
-                <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Calendar</TabsTrigger>
-                <TabsTrigger value="clients" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Clients</TabsTrigger>
-                <TabsTrigger value="staff" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Staff</TabsTrigger>
-                <TabsTrigger value="shifts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Shifts</TabsTrigger>
-              </TabsList>
-              <TabsContent value="bookings">
-                <BookingsList userId={businessUserId} />
-              </TabsContent>
-              <TabsContent value="calendar">
-                <CalendarView userId={businessUserId} />
-              </TabsContent>
-              <TabsContent value="clients">
-                <ClientList userId={businessUserId} />
-              </TabsContent>
-              <TabsContent value="staff">
-                <StaffList userId={businessUserId} />
-              </TabsContent>
-              <TabsContent value="shifts">
-                <ShiftsView userId={businessUserId} />
-              </TabsContent>
-            </Tabs>
-
-          </>
-        )}
-      </main>
-      <Footer />
-    </div>
+          )}
+        </div>
+      )}
+    </>
   );
-};
-
-export default Dashboard;
+}
