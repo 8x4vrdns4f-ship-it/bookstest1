@@ -25,6 +25,17 @@ Deno.serve(async (req) => {
     const { data: userData } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
     if (!userData?.user) throw new Error("Unauthorized");
 
+    // Platform owner allowlist. Only these emails may (re)register the platform's Stripe webhook.
+    const PLATFORM_OWNER_EMAILS = (Deno.env.get("PLATFORM_OWNER_EMAILS") ?? "help@booksuite.online")
+      .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+    const callerEmail = (userData.user.email ?? "").toLowerCase();
+    if (!callerEmail || !PLATFORM_OWNER_EMAILS.includes(callerEmail)) {
+      return new Response(JSON.stringify({ error: "Forbidden: platform owner only" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json().catch(() => ({}));
     const env = (body.env || "sandbox") as StripeEnv;
     if (env !== "sandbox" && env !== "live") throw new Error("env must be sandbox or live");
