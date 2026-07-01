@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const origin = body.origin || req.headers.get("origin") || "https://booksuite.online";
+    const origin = sanitizeOrigin(body.origin || req.headers.get("origin"), "https://booksuite.online");
 
     const link = await stripe.accountLinks.create({
       account: accountId,
