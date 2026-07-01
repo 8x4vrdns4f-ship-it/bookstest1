@@ -67,8 +67,8 @@ const Terms = () => (
           <h2 className="text-xl font-semibold mb-2 text-foreground">Contact</h2>
           <p>
             Questions? Email{" "}
-            <a href="mailto:support@booksuite.online" className="text-primary underline">
-              support@booksuite.online
+            <a href="mailto:help@booksuite.online" className="text-primary underline">
+              help@booksuite.online
             </a>
             .
           </p>

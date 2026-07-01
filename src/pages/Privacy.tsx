@@ -19,8 +19,8 @@ const Privacy = () => (
           This page is maintained by BookSuite to explain how we handle information
           when you use booksuite.online (the "Service"). It is not a legal
           certification — reach out at{" "}
-          <a href="mailto:support@booksuite.online" className="text-primary underline">
-            support@booksuite.online
+          <a href="mailto:help@booksuite.online" className="text-primary underline">
+            help@booksuite.online
           </a>{" "}
           with any questions.
         </p>
@@ -56,7 +56,7 @@ const Privacy = () => (
           <h2 className="text-xl font-semibold mb-2">Your rights</h2>
           <p className="text-muted-foreground">
             You can request access to, correction of, or deletion of your data by
-            emailing support@booksuite.online. Account owners can delete their
+            emailing help@booksuite.online. Account owners can delete their
             workspace from Settings at any time.
           </p>
         </div>
