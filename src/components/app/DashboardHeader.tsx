@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Bell, LogOut, ChevronRight } from "lucide-react";
+import {
+  Bell,
+  LogOut,
+  ChevronRight,
+  Calendar,
+  CreditCard,
+  UserPlus,
+  Users,
+  RefreshCcw,
+  XCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNotifications, type NotificationKind } from "@/context/NotificationsContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +27,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+const KIND_ICON: Record<NotificationKind, React.ComponentType<{ className?: string }>> = {
+  booking_new: Calendar,
+  booking_paid: CreditCard,
+  booking_refunded: RefreshCcw,
+  booking_cancelled: XCircle,
+  join_request: UserPlus,
+  employee_new: Users,
+};
+
+function timeAgo(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const s = Math.round(diff / 1000);
+  if (s < 60) return `${s}s ago`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(h / 24);
+  return `${d}d ago`;
+}
 
 const CRUMB_LABEL: Record<string, string> = {
   dashboard: "Dashboard",
