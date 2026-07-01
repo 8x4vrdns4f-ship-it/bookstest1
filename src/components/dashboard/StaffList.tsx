@@ -223,17 +223,17 @@ const StaffList = ({ userId }: { userId: string }) => {
       {loading ? (
         <p className="text-muted-foreground">Loading…</p>
       ) : employees.length === 0 ? (
-        <Card className="bg-card border-border">
-          <CardContent className="py-12 text-center text-muted-foreground">
-            No staff yet. Add your first team member to get started.
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<User size={20} />}
+          title="No staff yet"
+          description="Add your first team member to start scheduling shifts and assigning bookings."
+        />
       ) : shifts.length === 0 ? (
-        <Card className="bg-card border-border">
-          <CardContent className="py-12 text-center text-muted-foreground">
-            No staff scheduled for this day. Click <strong className="text-foreground">Manage Shifts</strong> to add some.
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Clock size={20} />}
+          title="No shifts scheduled"
+          description="Click Manage Shifts to add staff to this day."
+        />
       ) : (
         <>
           {/* On shift now (today only) */}

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Mail, Phone } from "lucide-react";
+import { Plus, Trash2, Mail, Phone, Users } from "lucide-react";
+import SectionCard from "@/components/app/SectionCard";
+import EmptyState from "@/components/app/EmptyState";
 
 type Client = {
   id: string;
@@ -59,12 +60,14 @@ const ClientList = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <Card className="bg-card border-border">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-foreground">Clients</CardTitle>
+    <SectionCard
+      icon={<Users size={18} />}
+      title="Clients"
+      description="Your customer contact list."
+      actions={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1 bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button size="sm" variant="premium" className="gap-1">
               <Plus size={14} /> Add Client
             </Button>
           </DialogTrigger>
@@ -91,45 +94,48 @@ const ClientList = ({ userId }: { userId: string }) => {
                 <Label>Notes</Label>
                 <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="bg-secondary border-border" rows={2} />
               </div>
-              <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground">
+              <Button type="submit" disabled={loading} variant="premium" className="w-full">
                 {loading ? "Adding..." : "Add Client"}
               </Button>
             </form>
           </DialogContent>
         </Dialog>
-      </CardHeader>
-      <CardContent>
-        {clients.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No clients yet. Add your first client!</p>
-        ) : (
-          <div className="space-y-2">
-            {clients.map((c) => (
-              <div key={c.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border">
-                <div>
-                  <p className="font-semibold text-foreground text-sm">{c.name}</p>
-                  <div className="flex items-center gap-3 mt-1">
-                    {c.email && (
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Mail size={10} /> {c.email}
-                      </span>
-                    )}
-                    {c.phone && (
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Phone size={10} /> {c.phone}
-                      </span>
-                    )}
-                  </div>
-                  {c.notes && <p className="text-xs text-muted-foreground mt-1">{c.notes}</p>}
+      }
+    >
+      {clients.length === 0 ? (
+        <EmptyState
+          icon={<Users size={20} />}
+          title="No clients yet"
+          description="Add clients manually or they'll appear here automatically when they book."
+        />
+      ) : (
+        <div className="space-y-2">
+          {clients.map((c) => (
+            <div key={c.id} className="flex items-center justify-between p-3.5 rounded-lg bg-secondary/40 border border-border hover:border-primary/30 transition-colors">
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground text-sm">{c.name}</p>
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                  {c.email && (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Mail size={10} /> {c.email}
+                    </span>
+                  )}
+                  {c.phone && (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Phone size={10} /> {c.phone}
+                    </span>
+                  )}
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(c.id)}>
-                  <Trash2 size={14} />
-                </Button>
+                {c.notes && <p className="text-xs text-muted-foreground mt-1">{c.notes}</p>}
               </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(c.id)}>
+                <Trash2 size={14} />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </SectionCard>
   );
 };
 
