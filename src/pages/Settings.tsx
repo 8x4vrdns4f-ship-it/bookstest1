@@ -394,10 +394,10 @@ const Settings = () => {
             <DangerRow icon={<Trash2 size={16} />} title="Delete Account" hint="Permanently delete your account. (Coming soon.)" action={<Button variant="destructive" disabled>Delete Account</Button>} />
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </>
   );
+
 };
 
 const Field = ({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) => (
