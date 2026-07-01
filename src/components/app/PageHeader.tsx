@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 
 type Props = {
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   actions?: ReactNode;
 };
+
 
 export default function PageHeader({ title, description, actions }: Props) {
   return (

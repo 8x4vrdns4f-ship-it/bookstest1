@@ -31,10 +31,11 @@ const Payments = () => {
                 <CreditCard className="h-5 w-5" />
               </span>
               Payments
-            </span> as any
+            </span>
           }
           description="Connect your Stripe account to start collecting booking deposits."
         />
+
 
         <PaymentsCard userId={userId} />
 
