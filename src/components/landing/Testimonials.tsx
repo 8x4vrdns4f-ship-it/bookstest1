@@ -8,7 +8,7 @@ const Testimonials = () => {
     { quote: t("test.3.q"), name: "Priya K.",  role: t("test.3.r") },
   ];
   return (
-    <section className="px-8 md:px-16 py-20 border-t border-border">
+    <section className="px-8 md:px-16 py-20 border-t border-border bg-card/30">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold mb-3">{t("test.title")}</h2>
         <p className="text-muted-foreground mb-12 max-w-2xl">{t("test.sub")}</p>

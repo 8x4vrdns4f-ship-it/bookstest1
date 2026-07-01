@@ -9,6 +9,8 @@ import ExpandedFeatures from "@/components/landing/ExpandedFeatures";
 import Testimonials from "@/components/landing/Testimonials";
 import FAQ from "@/components/landing/FAQ";
 import FinalCTA from "@/components/landing/FinalCTA";
+import SocialProofStrip from "@/components/landing/SocialProofStrip";
+import StickyMobileCTA from "@/components/StickyMobileCTA";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -22,6 +24,7 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <SocialProofStrip />
         <InfoCards />
         <HowItWorks />
         <FeaturesStrip />
@@ -31,9 +34,11 @@ const Index = () => {
         <FAQ />
         <FinalCTA />
       </main>
+      <StickyMobileCTA />
       <Footer />
     </div>
   );
 };
 
 export default Index;
+
