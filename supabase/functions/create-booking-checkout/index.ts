@@ -1,6 +1,6 @@
 // PUBLIC endpoint — called by the embed widget. No JWT required.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
+import { createStripeClient, resolveEnv, sanitizeOrigin } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     if (pErr || !pending) throw new Error(pErr?.message || "Failed to reserve booking");
 
     const stripe = createStripeClient(env);
-    const baseOrigin = origin || req.headers.get("origin") || "https://booksuite.online";
+    const baseOrigin = sanitizeOrigin(origin || req.headers.get("origin"), "https://booksuite.online");
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
