@@ -46,3 +46,35 @@ export async function resolvePriceIdByLookupKey(stripe: Stripe, lookupKey: strin
   if (!prices.data.length) throw new Error(`Price not found for lookup_key: ${lookupKey}`);
   return prices.data[0].id;
 }
+
+/**
+ * Validate a caller-supplied `origin` string against an allowlist of trusted
+ * hosts (BookSuite production, previews, sandbox) and Lovable preview domains.
+ * Returns the sanitized origin if allowed, otherwise the provided fallback.
+ * Prevents open-redirect abuse via Stripe success_url / cancel_url.
+ */
+export function sanitizeOrigin(
+  candidate: unknown,
+  fallback: string = "https://booksuite.online",
+): string {
+  const raw = typeof candidate === "string" ? candidate.trim() : "";
+  if (!raw) return fallback;
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return fallback;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return fallback;
+  const host = url.hostname.toLowerCase();
+  const allowed =
+    host === "booksuite.online" ||
+    host.endsWith(".booksuite.online") ||
+    host.endsWith(".lovable.app") ||
+    host.endsWith(".lovable.dev") ||
+    host === "localhost" ||
+    host === "127.0.0.1";
+  if (!allowed) return fallback;
+  return `${url.protocol}//${url.host}`;
+}
+
