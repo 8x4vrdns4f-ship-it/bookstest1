@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     if (pErr || !pending) throw new Error(pErr?.message || "Failed to reserve booking");
 
     const stripe = createStripeClient(env);
-    const baseOrigin = origin || req.headers.get("origin") || "https://booksuite.online";
+    const baseOrigin = sanitizeOrigin(origin || req.headers.get("origin"), "https://booksuite.online");
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
