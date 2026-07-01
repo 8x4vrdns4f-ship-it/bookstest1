@@ -54,8 +54,8 @@ const Security = () => (
           <h2 className="text-xl font-semibold mb-2 text-foreground">Reporting a vulnerability</h2>
           <p>
             Please email{" "}
-            <a href="mailto:security@booksuite.online" className="text-primary underline">
-              security@booksuite.online
+            <a href="mailto:help@booksuite.online" className="text-primary underline">
+              help@booksuite.online
             </a>{" "}
             with details. We aim to acknowledge reports within 72 hours.
           </p>
