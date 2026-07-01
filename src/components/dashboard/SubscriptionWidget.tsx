@@ -29,7 +29,7 @@ const SubscriptionWidget = () => {
           </Button>
         }
       >
-        <div />
+  
       </SectionCard>
     );
   }
@@ -72,7 +72,7 @@ const SubscriptionWidget = () => {
         </>
       }
     >
-      <div />
+
     </SectionCard>
   );
 };
