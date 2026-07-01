@@ -80,9 +80,11 @@ export default function SectionCard({
           {actions && <div className="shrink-0 flex items-center gap-2">{actions}</div>}
         </div>
       )}
-      <div className={cn("p-5 md:p-6", hasHeader && "pt-2", bodyClassName)}>
-        {children}
-      </div>
+      {children !== undefined && children !== null && children !== false && (
+        <div className={cn("p-5 md:p-6", hasHeader && "pt-2", bodyClassName)}>
+          {children}
+        </div>
+      )}
     </div>
   );
 }
