@@ -2,25 +2,28 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Lock } from "lucide-react";
+import { AppDialog } from "@/components/app/AppDialog";
+import { Plus, Pencil, Trash2, Lock, Shield } from "lucide-react";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { roleSchema, type RoleForm } from "@/lib/formSchemas";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 type Role = {
   id: string;
   name: string;
   is_builtin: boolean;
-  can_approve_requests: boolean;
-  can_view_all_bookings: boolean;
-  can_check_in: boolean;
-  can_manage_settings: boolean;
-};
-
-type RoleForm = {
-  name: string;
   can_approve_requests: boolean;
   can_view_all_bookings: boolean;
   can_check_in: boolean;
@@ -38,10 +41,14 @@ const empty: RoleForm = {
 const RolesManager = ({ userId }: { userId: string }) => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [editing, setEditing] = useState<Role | null>(null);
-  const [form, setForm] = useState<RoleForm>(empty);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const { toast } = useToast();
+
+  const form = useForm<RoleForm>({
+    resolver: zodResolver(roleSchema),
+    defaultValues: empty,
+  });
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -55,10 +62,10 @@ const RolesManager = ({ userId }: { userId: string }) => {
 
   useEffect(() => { load(); }, [load]);
 
-  const startNew = () => { setEditing(null); setForm(empty); setOpen(true); };
+  const startNew = () => { setEditing(null); form.reset(empty); setOpen(true); };
   const startEdit = (r: Role) => {
     setEditing(r);
-    setForm({
+    form.reset({
       name: r.name,
       can_approve_requests: r.can_approve_requests,
       can_view_all_bookings: r.can_view_all_bookings,
@@ -68,23 +75,21 @@ const RolesManager = ({ userId }: { userId: string }) => {
     setOpen(true);
   };
 
-  const save = async () => {
-    if (!form.name.trim()) { toast({ title: "Name required", variant: "destructive" }); return; }
+  const onSubmit = async (values: RoleForm) => {
     setBusy(true);
     if (editing) {
       const payload = editing.is_builtin
         ? {
-            // built-ins: only permissions editable (name locked)
-            can_approve_requests: form.can_approve_requests,
-            can_view_all_bookings: form.can_view_all_bookings,
-            can_check_in: form.can_check_in,
-            can_manage_settings: form.can_manage_settings,
+            can_approve_requests: values.can_approve_requests,
+            can_view_all_bookings: values.can_view_all_bookings,
+            can_check_in: values.can_check_in,
+            can_manage_settings: values.can_manage_settings,
           }
-        : { ...form };
+        : { ...values };
       const { error } = await supabase.from("company_roles").update(payload).eq("id", editing.id);
       if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); setBusy(false); return; }
     } else {
-      const { error } = await supabase.from("company_roles").insert({ ...form, user_id: userId, is_builtin: false });
+      const { error } = await supabase.from("company_roles").insert({ ...values, user_id: userId, is_builtin: false } as any);
       if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); setBusy(false); return; }
     }
     setBusy(false); setOpen(false); load();
@@ -144,39 +149,56 @@ const RolesManager = ({ userId }: { userId: string }) => {
         ))}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-card border-border">
-          <DialogHeader>
-            <DialogTitle>{editing ? `Edit ${editing.name}` : "New Role"}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <Label>Role Name</Label>
-              <Input
-                value={form.name}
-                disabled={editing?.is_builtin}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. supervisor"
-                className="bg-secondary border-border"
-              />
-            </div>
-            <PermRow label="Approve join requests" hint="Accept or decline employee join requests."
-              checked={form.can_approve_requests} onChange={(v) => setForm({ ...form, can_approve_requests: v })} />
-            <PermRow label="View all company bookings" hint="See every booking, not only their own."
-              checked={form.can_view_all_bookings} onChange={(v) => setForm({ ...form, can_view_all_bookings: v })} />
-            <PermRow label="Check-in customers" hint="Use the receptionist scanner and check-in tools."
-              checked={form.can_check_in} onChange={(v) => setForm({ ...form, can_check_in: v })} />
-            <PermRow label="Manage business settings" hint="Edit hours, branding, integrations."
-              checked={form.can_manage_settings} onChange={(v) => setForm({ ...form, can_manage_settings: v })} />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={save} disabled={busy} className="bg-primary text-primary-foreground hover:bg-primary/90">
+      <AppDialog
+        open={open}
+        onOpenChange={(v) => { setOpen(v); if (!v) form.reset(empty); }}
+        title={editing ? `Edit ${editing.name}` : "New Role"}
+        icon={Shield}
+        size="md"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button>
+            <Button onClick={form.handleSubmit(onSubmit)} disabled={busy} className="bg-primary text-primary-foreground hover:bg-primary/90">
               {busy ? "Saving…" : "Save Role"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </>
+        }
+      >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={editing?.is_builtin}
+                      placeholder="e.g. supervisor"
+                      className="bg-secondary border-border"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <PermRow label="Approve join requests" hint="Accept or decline employee join requests."
+              checked={form.watch("can_approve_requests")}
+              onChange={(v) => form.setValue("can_approve_requests", v)} />
+            <PermRow label="View all company bookings" hint="See every booking, not only their own."
+              checked={form.watch("can_view_all_bookings")}
+              onChange={(v) => form.setValue("can_view_all_bookings", v)} />
+            <PermRow label="Check-in customers" hint="Use the receptionist scanner and check-in tools."
+              checked={form.watch("can_check_in")}
+              onChange={(v) => form.setValue("can_check_in", v)} />
+            <PermRow label="Manage business settings" hint="Edit hours, branding, integrations."
+              checked={form.watch("can_manage_settings")}
+              onChange={(v) => form.setValue("can_manage_settings", v)} />
+          </form>
+        </Form>
+      </AppDialog>
     </div>
   );
 };
