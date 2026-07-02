@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
         service,
         booking_date,
         booking_time,
-        duration_minutes: duration_minutes || 60,
+        duration_minutes: dur,
         notes: notes || null,
         deposit_amount: deposit,
         platform_fee_amount: (deposit * feePct) / 100,
