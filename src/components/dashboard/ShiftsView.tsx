@@ -282,11 +282,12 @@ const ShiftsView = ({ userId }: { userId: string }) => {
       </div>
 
       {employees.length === 0 ? (
-        <Card className="bg-card border-border">
-          <CardContent className="py-12 text-center text-muted-foreground">
-            No staff yet. Add your first team member to start scheduling shifts.
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<CalendarDays size={24} />}
+          title="No staff yet"
+          description="Add your first team member to start scheduling shifts."
+          action={<AddEmployeeDialog userId={userId} onEmployeeAdded={reloadEmployees} />}
+        />
       ) : loading ? (
         <p className="text-muted-foreground text-sm">Loading…</p>
       ) : (
