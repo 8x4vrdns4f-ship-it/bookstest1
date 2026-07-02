@@ -1,6 +1,6 @@
 // Generates the standalone HTML widget that businesses embed on their site.
-// Reads business_settings + busy slots from Supabase via anon key.
-// The same parts are reused by the React /embed/:userId and /book/:userId pages.
+// Card details are captured inline via Stripe Elements (SetupIntent, no charge).
+// The deposit is only charged if/when the business accepts the request.
 
 export const WIDGET_STYLES = `
   *,*::before,*::after{box-sizing:border-box}
@@ -32,6 +32,8 @@ export const WIDGET_STYLES = `
   .bw input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2d3548;background:#263040;color:#fff;font-size:14px;outline:none}
   .bw input:focus{border-color:#5bade8}
   .bw .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .bw #bw-payel{background:#263040;border:1px solid #2d3548;border-radius:8px;padding:10px;min-height:44px}
+  .bw .paynote{font-size:11px;color:#9ca3af;margin-top:6px;line-height:1.4}
   .bw button.submit{width:100%;padding:12px;border:none;border-radius:8px;background:#5bade8;color:#0f1420;font-weight:700;font-size:14px;cursor:pointer;margin-top:14px;transition:.15s}
   .bw button.submit:hover{background:#4a9ad8}
   .bw button.submit:disabled{opacity:.5;cursor:not-allowed}
@@ -63,6 +65,10 @@ export const WIDGET_MARKUP = `
     <input id="bw-email" type="email" placeholder="Email" required>
   </div>
 
+  <div class="label">Card details</div>
+  <div id="bw-payel"></div>
+  <div class="paynote" id="bw-paynote">Your card is only charged if the business accepts your request.</div>
+
   <div id="bw-err"></div>
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
 </div>
@@ -71,7 +77,7 @@ export const WIDGET_MARKUP = `
   <div class="ok">
     <div class="ic">✓</div>
     <h3>Booking requested!</h3>
-    <p>You'll receive an email when the business confirms or declines.</p>
+    <p>Your card is saved but has not been charged. You'll receive an email when the business accepts or declines.</p>
   </div>
 </div>
 `;
@@ -81,12 +87,14 @@ export const buildWidgetScript = (opts: {
   supabaseKey: string;
   userId: string;
   paymentEnvironment?: "sandbox" | "live";
+  stripePublishableKey: string;
 }) => `
 (function(){
   var URL_ = ${JSON.stringify(opts.supabaseUrl)};
   var KEY = ${JSON.stringify(opts.supabaseKey)};
   var UID = ${JSON.stringify(opts.userId)};
   var PAYMENT_ENV = ${JSON.stringify(opts.paymentEnvironment || "live")};
+  var STRIPE_PK = ${JSON.stringify(opts.stripePublishableKey)};
 
   var settings = {
     working_hours: {
@@ -103,12 +111,14 @@ export const buildWidgetScript = (opts: {
     welcome_message: '',
     allow_same_day: true,
     max_advance_days: 14,
-    buffer_minutes: 0
+    buffer_minutes: 0,
+    currency: 'GBP'
   };
   var busy = [];
   var overrides = {};
   var selDate = null, selSlot = null, selDur = null;
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
+  var stripe = null, elements = null, paymentEl = null, elementsReady = false;
 
   function api(path, opts){
     opts = opts || {};
@@ -123,6 +133,14 @@ export const buildWidgetScript = (opts: {
   function fmtDate(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
   function toMin(t){ var p = t.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); }
   function fmtMin(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
+  function showErr(msg){
+    var errEl = document.getElementById('bw-err');
+    errEl.innerHTML = '';
+    var ed = document.createElement('div');
+    ed.className = 'err';
+    ed.textContent = msg || 'Something went wrong';
+    errEl.appendChild(ed);
+  }
 
   function dayHoursFor(dateStr){
     var ov = overrides[dateStr];
@@ -212,42 +230,107 @@ export const buildWidgetScript = (opts: {
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
-    btn.disabled = !(selDate && selSlot !== null && selDur && name && email);
+    btn.disabled = !(selDate && selSlot !== null && selDur && name && email && elementsReady);
   }
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
+
+  function mountStripeElements(){
+    if (!window.Stripe || !STRIPE_PK) {
+      document.getElementById('bw-payel').textContent = 'Payments unavailable — please contact the business.';
+      return;
+    }
+    stripe = Stripe(STRIPE_PK);
+    var depAmt = Math.round(Number(settings.deposit_amount || 10) * 100);
+    var ccy = String(settings.currency || 'GBP').toLowerCase();
+    elements = stripe.elements({
+      mode: 'setup',
+      currency: ccy,
+      paymentMethodTypes: ['card'],
+      appearance: {
+        theme: 'night',
+        variables: { colorPrimary: '#5bade8', colorBackground: '#263040', colorText: '#fff', borderRadius: '6px', fontSizeBase: '13px' }
+      }
+    });
+    paymentEl = elements.create('payment', { layout: 'tabs' });
+    paymentEl.mount('#bw-payel');
+    paymentEl.on('ready', function(){ elementsReady = true; renderAll(); });
+    paymentEl.on('change', renderAll);
+  }
+
   document.getElementById('bw-submit').addEventListener('click', async function(){
-    var btn = this; btn.disabled = true; btn.textContent = 'Continuing to payment...';
-    var errEl = document.getElementById('bw-err'); errEl.innerHTML = '';
+    var btn = this;
+    btn.disabled = true; btn.textContent = 'Saving card...';
+    document.getElementById('bw-err').innerHTML = '';
     try {
-      var res = await fetch(URL_ + '/functions/v1/create-booking-checkout', {
+      // 1) validate card form
+      var subm = await elements.submit();
+      if (subm.error) throw new Error(subm.error.message || 'Card details invalid');
+
+      // 2) create SetupIntent server-side
+      var email = document.getElementById('bw-email').value.trim();
+      var name = document.getElementById('bw-name').value.trim();
+      var intentRes = await fetch(URL_ + '/functions/v1/create-booking-intent', {
+        method: 'POST',
+        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: UID, client_email: email, environment: PAYMENT_ENV })
+      });
+      var intentData = await intentRes.json();
+      if (!intentRes.ok || !intentData.client_secret) {
+        throw new Error(intentData.error || 'Could not initialise payment.');
+      }
+
+      // 3) confirm setup (saves the card, no charge)
+      btn.textContent = 'Confirming...';
+      var confirmRes = await stripe.confirmSetup({
+        elements: elements,
+        clientSecret: intentData.client_secret,
+        confirmParams: { payment_method_data: { billing_details: { name: name, email: email } } },
+        redirect: 'if_required'
+      });
+      if (confirmRes.error) throw new Error(confirmRes.error.message || 'Could not save card');
+      var pmId = confirmRes.setupIntent && confirmRes.setupIntent.payment_method;
+      if (!pmId) throw new Error('Card not saved. Please try again.');
+
+      // 4) persist the pending booking
+      btn.textContent = 'Sending request...';
+      var saveRes = await fetch(URL_ + '/functions/v1/save-pending-booking', {
         method: 'POST',
         headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: UID,
-          client_name: document.getElementById('bw-name').value.trim(),
-          client_email: document.getElementById('bw-email').value.trim(),
+          client_name: name,
+          client_email: email,
           service: 'Booking',
           booking_date: selDate,
           booking_time: fmtMin(selSlot) + ':00',
           duration_minutes: selDur,
           environment: PAYMENT_ENV,
-          origin: window.location.origin
+          stripe_customer_id: intentData.customer_id,
+          stripe_payment_method_id: pmId,
+          stripe_setup_intent_id: intentData.setup_intent_id
         })
       });
-      var data = await res.json();
-      if (!res.ok || !data.url) throw new Error(data.error || 'Could not start checkout. Please try again.');
-      // Redirect top window (escape iframe if embedded)
-      try { window.top.location.href = data.url; } catch(_){ window.location.href = data.url; }
+      var saveData = await saveRes.json();
+      if (!saveRes.ok || !saveData.ok) throw new Error(saveData.error || 'Could not save booking');
+
+      document.getElementById('bw').style.display = 'none';
+      document.getElementById('bw-done').style.display = 'block';
     } catch(e){
-      var ed = document.createElement('div');
-      ed.className = 'err';
-      ed.textContent = (e && e.message) ? String(e.message) : 'Something went wrong';
-      errEl.textContent = '';
-      errEl.appendChild(ed);
+      showErr((e && e.message) ? String(e.message) : 'Something went wrong');
       btn.disabled = false; btn.textContent = 'Request Booking';
     }
   });
+
+  function loadStripeJs(cb){
+    if (window.Stripe) return cb();
+    var s = document.createElement('script');
+    s.src = 'https://js.stripe.com/v3/';
+    s.onload = cb;
+    s.onerror = function(){ document.getElementById('bw-payel').textContent = 'Could not load payment form.'; };
+    document.head.appendChild(s);
+  }
+
   var endRange = (function(){ var d = new Date(); d.setDate(d.getDate()+60); return fmtDate(d); })();
   Promise.all([
     api('/rest/v1/rpc/get_widget_settings', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); }),
@@ -265,24 +348,7 @@ export const buildWidgetScript = (opts: {
       var depAmt = Number(settings.deposit_amount);
       var ccy = (settings.currency || 'GBP').toUpperCase();
       var sym = ccy === 'USD' ? '$' : ccy === 'EUR' ? '€' : ccy === 'JPY' ? '¥' : ccy === 'AUD' ? 'A$' : ccy === 'CAD' ? 'C$' : '£';
-      document.getElementById('bw-deposit').textContent = 'Deposit: ' + sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' (paid securely at checkout)';
-      // FX hint for international visitors
-      try {
-        var navLang = (navigator.language || 'en-GB');
-        var visitorCcy = navLang.startsWith('en-US') ? 'USD' : (navLang.startsWith('ja') ? 'JPY' : (navLang.startsWith('en-GB') ? 'GBP' : (navLang.startsWith('en-AU') ? 'AUD' : (navLang.startsWith('en-CA') ? 'CAD' : 'EUR'))));
-        if (visitorCcy !== ccy) {
-          fetch('https://open.er-api.com/v6/latest/' + ccy).then(function(r){ return r.json(); }).then(function(fx){
-            if (fx && fx.result === 'success' && fx.rates && fx.rates[visitorCcy]) {
-              var conv = depAmt * fx.rates[visitorCcy];
-              var vsym = visitorCcy === 'USD' ? '$' : visitorCcy === 'EUR' ? '€' : visitorCcy === 'JPY' ? '¥' : visitorCcy === 'AUD' ? 'A$' : visitorCcy === 'CAD' ? 'C$' : '£';
-              var hint = document.createElement('div');
-              hint.style.fontSize = '10px'; hint.style.opacity = '.7'; hint.style.marginTop = '4px';
-              hint.textContent = '≈ ' + vsym + (visitorCcy === 'JPY' ? Math.round(conv) : conv.toFixed(2)) + ' ' + visitorCcy + ' (charged in ' + ccy + ')';
-              document.getElementById('bw-deposit').appendChild(hint);
-            }
-          }).catch(function(){});
-        }
-      } catch(_){}
+      document.getElementById('bw-deposit').textContent = 'Deposit: ' + sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' — only charged if accepted';
     } else {
       document.getElementById('bw-deposit').textContent = 'Booking system';
     }
@@ -293,6 +359,7 @@ export const buildWidgetScript = (opts: {
     var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
     selDate = fmtDate(d0);
     renderAll();
+    loadStripeJs(mountStripeElements);
   }).catch(function(e){
     document.getElementById('bw-deposit').textContent = 'Could not load. Refresh to try again.';
   });
@@ -304,6 +371,7 @@ export const buildWidgetHtml = (opts: {
   supabaseKey: string;
   userId: string;
   paymentEnvironment?: "sandbox" | "live";
+  stripePublishableKey: string;
 }) => `<!DOCTYPE html>
 <html lang="en">
 <head>
