@@ -1,45 +1,61 @@
-## Act 4, Batch 4 — Calendar & Pages
+## Act 4, Batch 5 — Forms Redesign
 
-Polish the calendar and shift-management surfaces so they feel as refined as the rest of the dashboard.
+Standardize every form in the app so they share one layout language, one validation pattern, and one dialog shell.
 
 ### What changes
 
-1. **CalendarView polish** (`src/components/dashboard/CalendarView.tsx`)
-   - Replace raw `Card` with `SectionCard` wrapper for consistent surface/border
-   - Day-cell grid: tighter spacing, clearer booking-density dots (replace text-list overflow with coloured dot indicators)
-   - Today highlight uses primary ring instead of solid fill
-   - "Closed" / "Custom" chips use semantic badge tokens
-   - Empty month state via `EmptyState`
-   - Responsive: scrollable on very small viewports
+1. **Validation layer — zod schemas for every major form**
+   - `AddEmployeeDialog`: name (min 2 chars), email (valid format), phone (optional, E.164-ish), position (optional)
+   - `RolesManager` dialog: role name (required, trimmed)
+   - `Auth` page: email + password (min 6) for login; add display-name (min 2) for signup
+   - `ResetPassword`: password (min 6) + confirm-password match
+   - `JoinCompanyDialog`: company code (required)
+   - `Settings` page sub-sections: numeric bounds (deposit >= 10, buffer 0-120, etc.), email format where applicable
+   - No business logic changes; schemas only replace the ad-hoc inline checks.
 
-2. **Calendar dialogs refactored to `AppDialog`**
-   - `DayScheduleDialog` → `AppDialog` shell with icon (`Calendar`), title (date), size `lg`
-   - `DateOverrideDialog` → `AppDialog` shell, size `sm`
-   - Time-slot rows kept as-is (custom content), but header/footer spacing unified
+2. **Form primitives — adopt `FormField` / `FormItem` / `FormLabel` / `FormControl` / `FormMessage`**
+   - Every form field wraps in `<FormItem>` so error messages, helper text, and focus rings are consistent.
+   - Labels use `text-foreground font-medium text-sm`.
+   - Inputs sit on `bg-secondary border-border` surfaces.
+   - Error state: `text-destructive` message below the input, ring tint on the field.
 
-3. **BookingDetailDialog refactor**
-   - Wrap in `AppDialog` with `User` icon, size `md`
-   - Footer actions (Close, Refund) moved to `DialogFooter` using consistent button placement
-   - Status/assignment selects stay in body, but section dividers use `border-border`
+3. **Dialog forms → `AppDialog` shell**
+   - `AddEmployeeDialog`: wrap in `AppDialog` with `UserPlus` icon, size `md`
+   - `RolesManager` dialog: wrap in `AppDialog` with `Shield` icon, size `md`
+   - `JoinCompanyDialog`: wrap in `AppDialog` with `Building2` icon, size `sm`
+   - All dialog footers use `DialogFooter` with `Cancel` (outline) + primary action (`premium` or `destructive`)
 
-4. **ShiftsView polish** (`src/components/dashboard/ShiftsView.tsx`)
-   - `SectionCard` wrapper for the shift rows table
-   - Empty-state when no employees (`EmptyState` with `CalendarDays` icon)
-   - Row hover highlight, tighter time-input grouping
-   - Save button moved to sticky footer inside card or pinned below
-   - Preset/date-range controls use consistent `secondary` input surfaces
+4. **Settings page — `SectionCard` per accordion section**
+   - Replace raw `AccordionItem` card styling (`bg-card border border-border rounded-lg px-4`) with `SectionCard` wrappers.
+   - Each accordion section becomes a `SectionCard` with a matching icon chip:
+     - Company Info → `Building2`
+     - Working Hours → `Clock`
+     - Booking Preferences → `CalendarCheck`
+     - Notifications → `Bell`
+     - Roles & Permissions → `Shield`
+     - Check-In → `QrCode`
+     - Branding → `Palette` (locked if no custom-branding tier)
+   - The accordion stays inside the card body so collapse/expand still works.
+   - Save button moves to a sticky bottom bar across all sections, or stays per-section if that’s the current UX — evaluated during implementation.
 
-5. **Page-level consistency**
-   - `CalendarPage`, `ShiftsPage` wrappers verified: `PageHeader` + content, no extra wrapping divs
-   - Ensure all calendar/shift surfaces respect the `--card` / `--border` token system
+5. **Auth page polish**
+   - Keep the centered `Card` shell (it’s a public page, not dashboard).
+   - Refactor fields to use `FormItem` primitives for consistent label/input spacing and error display.
+   - Password field keeps the eye toggle; error messages appear below instead of toast-only.
 
-### Out of scope for Batch 4
-- Forms redesign (Batch 5)
+6. **ResetPassword page polish**
+   - Same `Card` shell, same `FormItem` field pattern.
+   - Add confirm-password field with zod match validation.
+
+### Out of scope for Batch 5
 - Mobile motion pass (Batch 6)
-- Refactoring non-calendar dialogs (Gift codes, Clients, etc.) — those follow in later batches
+- Refactoring non-form dialogs that are already using `AppDialog` correctly
+- Widget/iframe forms (those live in `widgetTemplate.ts`, a different surface)
+- Payment/checkout forms (those are Stripe-hosted)
 
 ### Technical notes
-- No business logic changes; presentation and layout only.
-- All colours via semantic tokens (`--card`, `--border`, `--primary`).
-- `AppDialog` sizes used: `sm` for overrides, `md` for booking details, `lg` for day schedule.
-- `EmptyState` and `SectionCard` already exist from Batch 1/2.
+- `react-hook-form` and `@hookform/resolvers` are already available in the project (used by `src/components/ui/form.tsx`).
+- `zod` is already in `package.json`.
+- All colours stay on semantic tokens (`--card`, `--border`, `--primary`, `--destructive`, `--secondary`).
+- No backend or RLS changes.
+- No route changes.

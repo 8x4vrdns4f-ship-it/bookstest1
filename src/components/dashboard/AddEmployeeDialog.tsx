@@ -2,19 +2,22 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { handleTierError } from "@/lib/tierError";
+import { AppDialog } from "@/components/app/AppDialog";
+import { UserPlus } from "lucide-react";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { employeeSchema, type EmployeeForm } from "@/lib/formSchemas";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface AddEmployeeDialogProps {
   userId: string;
@@ -24,39 +27,40 @@ interface AddEmployeeDialogProps {
 const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [position, setPosition] = useState("");
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<EmployeeForm>({
+    resolver: zodResolver(employeeSchema),
+    defaultValues: { name: "", email: "", phone: "", position: "" },
+  });
+
+  const onSubmit = async (values: EmployeeForm) => {
     setLoading(true);
     const { data: emp, error } = await supabase.from("employees").insert({
       user_id: userId,
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim() || null,
-      position: position.trim() || null,
+      name: values.name.trim(),
+      email: values.email.trim(),
+      phone: values.phone?.trim() || null,
+      position: values.position?.trim() || null,
     }).select("id").single();
     setLoading(false);
+
     if (error) {
-      if (!handleTierError(error)) toast({ title: "Error", description: "Failed to add employee.", variant: "destructive" });
+      if (!handleTierError(error))
+        toast({ title: "Error", description: "Failed to add employee.", variant: "destructive" });
       return;
     }
 
-    // Send invite email (best-effort)
     try {
       const { data: bs } = await supabase
         .from("business_settings")
         .select("business_name, company_code")
         .eq("user_id", userId)
         .maybeSingle();
-      if (bs?.company_code && email.trim()) {
+      if (bs?.company_code && values.email.trim()) {
         const { sendEmail } = await import("@/lib/sendEmail");
-        sendEmail("employee-invited", email.trim(), `emp-invite-${emp?.id ?? email.trim()}`, {
-          inviteeName: name.trim(),
+        sendEmail("employee-invited", values.email.trim(), `emp-invite-${emp?.id ?? values.email.trim()}`, {
+          inviteeName: values.name.trim(),
           businessName: bs.business_name || "the team",
           companyCode: bs.company_code,
           joinUrl: `${window.location.origin}/auth?mode=signup`,
@@ -66,54 +70,102 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
 
     toast({
       title: "Employee added!",
-      description: `${name} has been invited via email and can join with your company code.`,
+      description: `${values.name} has been invited via email and can join with your company code.`,
     });
-    setName("");
-    setEmail("");
-    setPhone("");
-    setPosition("");
+    form.reset();
     setOpen(false);
     onEmployeeAdded?.();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm">
-          <UserPlus size={16} />
-          Add Employee
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="bg-card border-border">
-        <DialogHeader>
-          <DialogTitle className="text-foreground">Add Team Member</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Add an employee to your team so they can help manage bookings.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <div className="space-y-2">
-            <Label className="text-muted-foreground">Full Name *</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Jane Smith" className="bg-secondary border-border" />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-muted-foreground">Email *</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="jane@company.com" className="bg-secondary border-border" />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-muted-foreground">Phone</Label>
-            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 234 567 8900" className="bg-secondary border-border" />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-muted-foreground">Position / Role</Label>
-            <Input value={position} onChange={(e) => setPosition(e.target.value)} placeholder="e.g. Stylist, Receptionist" className="bg-secondary border-border" />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
-            {loading ? "Adding..." : "Add Employee"}
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Button
+        onClick={() => setOpen(true)}
+        className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm"
+      >
+        <UserPlus size={16} />
+        Add Employee
+      </Button>
+      <AppDialog
+        open={open}
+        onOpenChange={(v) => { setOpen(v); if (!v) form.reset(); }}
+        title="Add Team Member"
+        description="Add an employee to your team so they can help manage bookings."
+        icon={UserPlus}
+        size="md"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+              Cancel
+            </Button>
+            <Button
+              onClick={form.handleSubmit(onSubmit)}
+              disabled={loading}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
+            >
+              {loading ? "Adding..." : "Add Employee"}
+            </Button>
+          </>
+        }
+      >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Jane Smith" {...field} className="bg-secondary border-border" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email *</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="jane@company.com" {...field} className="bg-secondary border-border" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input type="tel" placeholder="+1 234 567 8900" {...field} className="bg-secondary border-border" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="position"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Position / Role</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Stylist, Receptionist" {...field} className="bg-secondary border-border" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+      </AppDialog>
+    </>
   );
 };
 

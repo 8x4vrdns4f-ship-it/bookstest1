@@ -10,16 +10,18 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Copy, Check, LogOut, KeyRound, Trash2, XCircle } from "lucide-react";
+import {
+  Copy, Check, LogOut, KeyRound, Trash2, XCircle,
+  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock,
+} from "lucide-react";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
-
+import SectionCard from "@/components/app/SectionCard";
 
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS } from "@/lib/tierLimits";
-import { Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type DayHours = { open: string; close: string; closed: boolean };
@@ -191,10 +193,16 @@ const Settings = () => {
 
         <Accordion type="multiple" defaultValue={["company", "hours"]} className="space-y-3">
           {/* Company Info */}
-          <AccordionItem value="company" className="bg-card border border-border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <span className="text-foreground font-semibold">Company Info</span>
-            </AccordionTrigger>
+          <SectionCard>
+            <AccordionItem value="company" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <Building2 size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Company Info</span>
+                </span>
+              </AccordionTrigger>
             <AccordionContent className="space-y-5 pb-5">
               <div className="space-y-2">
                 <Label className="text-foreground">Company Code</Label>
@@ -243,12 +251,19 @@ const Settings = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Working Hours */}
-          <AccordionItem value="hours" className="bg-card border border-border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <span className="text-foreground font-semibold">Working Hours</span>
-            </AccordionTrigger>
+          <SectionCard>
+            <AccordionItem value="hours" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <Clock size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Working Hours</span>
+                </span>
+              </AccordionTrigger>
             <AccordionContent className="pb-5">
               <p className="text-xs text-muted-foreground mb-4">Clients can only book during open hours. Uncheck a day to mark it as closed.</p>
               <div className="space-y-2">
@@ -272,12 +287,19 @@ const Settings = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Booking Preferences */}
-          <AccordionItem value="booking" className="bg-card border border-border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <span className="text-foreground font-semibold">Booking Preferences</span>
-            </AccordionTrigger>
+          <SectionCard>
+            <AccordionItem value="booking" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <CalendarCheck size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Booking Preferences</span>
+                </span>
+              </AccordionTrigger>
             <AccordionContent className="space-y-4 pb-5">
               <Field label={`Deposit per booking (${form.currency}) — min £10`} hint="Charged only when you accept a booking.">
                 <Input type="number" min={10} step="0.50" value={form.deposit_amount} onChange={(e) => setForm({ ...form, deposit_amount: Number(e.target.value) })} className="bg-secondary border-border" />
@@ -295,12 +317,19 @@ const Settings = () => {
               </Field>
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Notifications */}
-          <AccordionItem value="notif" className="bg-card border border-border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <span className="text-foreground font-semibold">Notifications</span>
-            </AccordionTrigger>
+          <SectionCard>
+            <AccordionItem value="notif" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <Bell size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Notifications</span>
+                </span>
+              </AccordionTrigger>
             <AccordionContent className="space-y-3 pb-5">
               <ToggleRow label="Email Notifications" hint="Get an email on every new booking." checked={form.notify_new_booking} onChange={(v) => setForm({ ...form, notify_new_booking: v })} />
               <ToggleRow label="Daily Summary Email" hint="Recap of tomorrow's appointments." checked={form.notify_daily_summary} onChange={(v) => setForm({ ...form, notify_daily_summary: v })} />
@@ -308,22 +337,36 @@ const Settings = () => {
               <ToggleRow label="Reminder Before Appointment" hint="Send a reminder before the appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Roles & Permissions */}
-          <AccordionItem value="roles" className="bg-card border border-border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <span className="text-foreground font-semibold">Roles &amp; Permissions</span>
-            </AccordionTrigger>
+          <SectionCard>
+            <AccordionItem value="roles" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <Shield size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Roles &amp; Permissions</span>
+                </span>
+              </AccordionTrigger>
             <AccordionContent className="pb-5">
               {userId && <RolesManager userId={userId} />}
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Check-In */}
-          <AccordionItem value="checkin" className="bg-card border border-border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <span className="text-foreground font-semibold">Check-In</span>
-            </AccordionTrigger>
+          <SectionCard>
+            <AccordionItem value="checkin" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <QrCode size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Check-In</span>
+                </span>
+              </AccordionTrigger>
             <AccordionContent className="space-y-3 pb-5">
               <ToggleRow
                 label="Self check-in kiosk"
@@ -339,12 +382,19 @@ const Settings = () => {
               />
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Booking Page */}
-          <AccordionItem value="page" className="bg-card border border-border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline">
-              <span className="text-foreground font-semibold">Booking Page</span>
-            </AccordionTrigger>
+          <SectionCard>
+            <AccordionItem value="page" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <Palette size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Booking Page</span>
+                </span>
+              </AccordionTrigger>
             <AccordionContent className="space-y-4 pb-5">
               {!canBrand && (
                 <div className="flex items-center justify-between gap-3 bg-secondary/60 border border-border rounded-lg px-4 py-3">
@@ -375,6 +425,7 @@ const Settings = () => {
             </AccordionContent>
 
           </AccordionItem>
+          </SectionCard>
         </Accordion>
 
         <Button onClick={handleSave} disabled={saving} className="w-full mt-6 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
