@@ -30,10 +30,15 @@ export const getDashboardRoute = async (): Promise<string> => {
   // Business owner?
   const { data: biz } = await supabase
     .from("business_settings")
-    .select("user_id")
+    .select("user_id, onboarding_completed_at")
     .eq("user_id", uid)
     .maybeSingle();
-  if (biz) return "/dashboard";
+  if (biz) {
+    if (!(biz as { onboarding_completed_at: string | null }).onboarding_completed_at) {
+      return "/onboarding";
+    }
+    return "/dashboard";
+  }
 
   // Otherwise check for pending/declined join request
   const { data: req } = await supabase

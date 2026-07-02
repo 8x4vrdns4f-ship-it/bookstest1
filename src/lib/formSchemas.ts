@@ -50,3 +50,10 @@ export type LoginForm = z.infer<typeof loginSchema>;
 export type SignupForm = z.infer<typeof signupSchema>;
 export type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 export type JoinCompanyForm = z.infer<typeof joinCompanySchema>;
+
+export const onboardingBusinessSchema = z.object({
+  business_name: z.string().trim().min(2, "Business name must be at least 2 characters").max(100),
+  business_category: z.string().trim().max(80).optional().or(z.literal("")),
+  business_phone: z.string().trim().max(50).optional().or(z.literal("")),
+});
+export type OnboardingBusinessForm = z.infer<typeof onboardingBusinessSchema>;
