@@ -31,6 +31,7 @@ import NotFound from "./pages/NotFound.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
+import Onboarding from "./pages/Onboarding.tsx";
 import AppLayout from "./components/app/AppLayout.tsx";
 import { LocaleProvider } from "./contexts/LocaleContext.tsx";
 
@@ -66,6 +67,7 @@ const App = () => (
           <Route path="/book/:userId/success" element={<BookingSuccess />} />
           <Route path="/book/:userId/cancelled" element={<BookingCancelled />} />
           <Route path="/employee-dashboard" element={<RequireVerifiedEmail><EmployeeDashboard /></RequireVerifiedEmail>} />
+          <Route path="/onboarding" element={<RequireVerifiedEmail><Onboarding /></RequireVerifiedEmail>} />
 
           {/* Authenticated app shell */}
           <Route element={<Guarded><AppLayout /></Guarded>}>
