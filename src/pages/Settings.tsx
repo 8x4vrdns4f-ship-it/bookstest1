@@ -287,6 +287,7 @@ const Settings = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Booking Preferences */}
           <SectionCard>
@@ -316,6 +317,7 @@ const Settings = () => {
               </Field>
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Notifications */}
           <SectionCard>
@@ -335,6 +337,7 @@ const Settings = () => {
               <ToggleRow label="Reminder Before Appointment" hint="Send a reminder before the appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Roles & Permissions */}
           <SectionCard>
@@ -351,6 +354,7 @@ const Settings = () => {
               {userId && <RolesManager userId={userId} />}
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Check-In */}
           <SectionCard>
@@ -378,6 +382,7 @@ const Settings = () => {
               />
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
 
           {/* Booking Page */}
           <SectionCard>
@@ -420,6 +425,7 @@ const Settings = () => {
             </AccordionContent>
 
           </AccordionItem>
+          </SectionCard>
         </Accordion>
 
         <Button onClick={handleSave} disabled={saving} className="w-full mt-6 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
