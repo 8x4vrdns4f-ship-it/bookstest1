@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import SectionCard from "@/components/app/SectionCard";
 import DayScheduleDialog from "./DayScheduleDialog";
 import DateOverrideDialog from "./DateOverrideDialog";
 import BookingDetailDialog from "./BookingDetailDialog";
