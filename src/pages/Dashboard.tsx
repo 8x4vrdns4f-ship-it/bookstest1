@@ -12,6 +12,7 @@ import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
 import EmbedWidgetDialog from "@/components/dashboard/EmbedWidgetDialog";
 import PaymentsCard from "@/components/dashboard/PaymentsCard";
 import BookingsList from "@/components/dashboard/BookingsList";
+import BookingRequestsCard from "@/components/dashboard/BookingRequestsCard";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import UsageBanner from "@/components/dashboard/UsageBanner";
 import SubscriptionWidget from "@/components/dashboard/SubscriptionWidget";
@@ -164,7 +165,8 @@ export default function Dashboard() {
                 View all <ArrowUpRight className="h-3.5 w-3.5" />
               </Button>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 space-y-4">
+              <BookingRequestsCard userId={businessUserId} />
               <BookingsList userId={businessUserId} />
             </CardContent>
           </Card>
