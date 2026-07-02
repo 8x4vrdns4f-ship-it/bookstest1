@@ -292,25 +292,25 @@ const ShiftsView = ({ userId }: { userId: string }) => {
         <p className="text-muted-foreground text-sm">Loading…</p>
       ) : (
         <>
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 space-y-2">
-              {rows.map((r, i) => (
-                <div
-                  key={r.date}
-                  className="flex items-center gap-3 p-3 rounded border border-border bg-secondary/30"
-                >
-                  <Checkbox
-                    checked={r.on}
-                    onCheckedChange={(v) => update(i, { on: !!v })}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {format(parseISO(r.date), "EEE d MMM")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {r.on ? "Working" : "Off"}
-                    </p>
-                  </div>
+          <SectionCard bodyClassName="p-4 space-y-2">
+            {rows.map((r, i) => (
+              <div
+                key={r.date}
+                className="flex items-center gap-3 p-3 rounded border border-border bg-secondary/30 transition-colors hover:bg-secondary/50"
+              >
+                <Checkbox
+                  checked={r.on}
+                  onCheckedChange={(v) => update(i, { on: !!v })}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {format(parseISO(r.date), "EEE d MMM")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {r.on ? "Working" : "Off"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
                   <Input
                     type="time"
                     value={r.start_time}
@@ -327,14 +327,14 @@ const ShiftsView = ({ userId }: { userId: string }) => {
                     className="w-28 bg-secondary border-border"
                   />
                 </div>
-              ))}
-              {rows.length === 0 && (
-                <p className="text-muted-foreground text-sm text-center py-6">
-                  Select a valid date range.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            ))}
+            {rows.length === 0 && (
+              <p className="text-muted-foreground text-sm text-center py-6">
+                Select a valid date range.
+              </p>
+            )}
+          </SectionCard>
           <div className="flex justify-end">
             <Button
               onClick={save}
