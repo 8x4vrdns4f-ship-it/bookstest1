@@ -1,61 +1,78 @@
-## Act 4, Batch 5 — Forms Redesign
+Two focused batches. We ship A first, then B in a follow-up.
 
-Standardize every form in the app so they share one layout language, one validation pattern, and one dialog shell.
+## Batch A — Branded public booking page (`/book/:userId`)
 
-### What changes
+Today the page is a bare iframe centered on a blank background. We wrap it in a trust-building, on-brand shell so customers know who they're booking with.
 
-1. **Validation layer — zod schemas for every major form**
-   - `AddEmployeeDialog`: name (min 2 chars), email (valid format), phone (optional, E.164-ish), position (optional)
-   - `RolesManager` dialog: role name (required, trimmed)
-   - `Auth` page: email + password (min 6) for login; add display-name (min 2) for signup
-   - `ResetPassword`: password (min 6) + confirm-password match
-   - `JoinCompanyDialog`: company code (required)
-   - `Settings` page sub-sections: numeric bounds (deposit >= 10, buffer 0-120, etc.), email format where applicable
-   - No business logic changes; schemas only replace the ad-hoc inline checks.
+**What the customer sees**
+- Hero band with the business name, category tagline, and (if set) address + phone.
+- The existing booking widget iframe, unchanged, in a card with soft shadow.
+- Reassurance strip below the widget: "Secure booking", "Instant confirmation", "Cancel free up to X hours" (X pulled from `cancellation_hours`).
+- Footer line: "Powered by BookSuite" linking to the marketing site.
+- Loading skeleton while business info is fetching; graceful fallback if the profile has no `business_name` (shows "Book an appointment").
 
-2. **Form primitives — adopt `FormField` / `FormItem` / `FormLabel` / `FormControl` / `FormMessage`**
-   - Every form field wraps in `<FormItem>` so error messages, helper text, and focus rings are consistent.
-   - Labels use `text-foreground font-medium text-sm`.
-   - Inputs sit on `bg-secondary border-border` surfaces.
-   - Error state: `text-destructive` message below the input, ring tint on the field.
+**Data**
+- One public `select` against `company_settings` by `user_id` for: `business_name`, `business_category`, `business_address`, `business_phone`, `accent_color`, `welcome_message`, `cancellation_hours`. Requires a public-read RLS policy on those columns (row filtered by `user_id` param) — confirm/add if missing.
+- No auth. No mutations. Widget iframe keeps handling the actual booking flow.
 
-3. **Dialog forms → `AppDialog` shell**
-   - `AddEmployeeDialog`: wrap in `AppDialog` with `UserPlus` icon, size `md`
-   - `RolesManager` dialog: wrap in `AppDialog` with `Shield` icon, size `md`
-   - `JoinCompanyDialog`: wrap in `AppDialog` with `Building2` icon, size `sm`
-   - All dialog footers use `DialogFooter` with `Cancel` (outline) + primary action (`premium` or `destructive`)
+**SEO**
+- `<SEO>` title becomes `Book with {business_name} — BookSuite`.
+- Description uses `welcome_message` when present, else a generic line.
+- Add `LocalBusiness` JSON-LD when address/phone are set.
 
-4. **Settings page — `SectionCard` per accordion section**
-   - Replace raw `AccordionItem` card styling (`bg-card border border-border rounded-lg px-4`) with `SectionCard` wrappers.
-   - Each accordion section becomes a `SectionCard` with a matching icon chip:
-     - Company Info → `Building2`
-     - Working Hours → `Clock`
-     - Booking Preferences → `CalendarCheck`
-     - Notifications → `Bell`
-     - Roles & Permissions → `Shield`
-     - Check-In → `QrCode`
-     - Branding → `Palette` (locked if no custom-branding tier)
-   - The accordion stays inside the card body so collapse/expand still works.
-   - Save button moves to a sticky bottom bar across all sections, or stays per-section if that’s the current UX — evaluated during implementation.
+**Design**
+- Reuse dark theme tokens and `SectionCard`. Accent header uses `--primary` (fall back to the profile's `accent_color` only as a subtle top border, not a full recolor — keeps design system intact).
+- Mobile: hero stacks, widget goes full width with 16px padding.
 
-5. **Auth page polish**
-   - Keep the centered `Card` shell (it’s a public page, not dashboard).
-   - Refactor fields to use `FormItem` primitives for consistent label/input spacing and error display.
-   - Password field keeps the eye toggle; error messages appear below instead of toast-only.
+**Files touched**
+- `src/pages/PublicBooking.tsx` — replace layout, add data fetch.
+- new `src/components/booking/PublicBookingHeader.tsx`, `PublicBookingTrustStrip.tsx`.
+- possibly one migration to add a public-read policy on `company_settings` if not already permitted.
 
-6. **ResetPassword page polish**
-   - Same `Card` shell, same `FormItem` field pattern.
-   - Add confirm-password field with zod match validation.
+**Out of scope for A**
+- Business logo upload (no field exists yet — would need storage bucket + settings UI; flag for later).
+- Reviews/testimonials (no data model).
+- Changing the widget itself.
 
-### Out of scope for Batch 5
-- Mobile motion pass (Batch 6)
-- Refactoring non-form dialogs that are already using `AppDialog` correctly
-- Widget/iframe forms (those live in `widgetTemplate.ts`, a different surface)
-- Payment/checkout forms (those are Stripe-hosted)
+---
 
-### Technical notes
-- `react-hook-form` and `@hookform/resolvers` are already available in the project (used by `src/components/ui/form.tsx`).
-- `zod` is already in `package.json`.
-- All colours stay on semantic tokens (`--card`, `--border`, `--primary`, `--destructive`, `--secondary`).
-- No backend or RLS changes.
-- No route changes.
+## Batch B — First-run onboarding wizard
+
+Right after signup, drop the user into a 4-step wizard before the dashboard. Skippable, resumable, and never shown again once completed.
+
+**Steps**
+1. **Business basics** — `business_name`, `business_category`, `business_phone`.
+2. **Hours** — quick preset (Mon–Fri 9–5, Tue–Sat 10–6, custom) writing to `working_hours`.
+3. **First service** — name, duration, price. Creates one row so the booking widget isn't empty.
+4. **Share your link** — shows the `/book/:userId` URL with copy button and a "Connect payments later" nudge linking to Settings → Payments.
+
+**Behavior**
+- Route: `/onboarding`. Guarded — redirects to `/dashboard` if `company_settings.onboarding_completed_at` is set.
+- After Auth signup success, redirect new users to `/onboarding` instead of `/dashboard`. Existing users skip it.
+- Each step saves on Next; back navigation preserves entered data.
+- "Skip for now" on every step; final step also has "Finish". Both mark `onboarding_completed_at = now()`.
+- Progress bar + step indicator at top; uses `AppDialog`-style shell but as a full page.
+
+**Data**
+- Add nullable `onboarding_completed_at timestamptz` to `company_settings` (migration).
+- Reuses existing zod schemas from `formSchemas.ts`; adds `onboardingBusinessBasicsSchema`, `onboardingServiceSchema`.
+
+**Design**
+- Centered card, max-w-2xl, dark surface, one icon chip per step (`Store`, `Clock`, `Sparkles`, `Link2`).
+- Framer-motion slide between steps.
+
+**Files touched**
+- new `src/pages/Onboarding.tsx`, `src/components/onboarding/{Stepper,StepBusiness,StepHours,StepService,StepShare}.tsx`.
+- `src/App.tsx` — add route.
+- `src/pages/Auth.tsx` — post-signup redirect.
+- `src/lib/formSchemas.ts` — new schemas.
+- one migration for `onboarding_completed_at`.
+
+**Out of scope for B**
+- Stripe Connect setup inside the wizard (kept as a Settings nudge — one less thing to fail on first-run).
+- Multi-employee setup (single-owner default; team invites stay in dashboard).
+- Tutorial tooltips on the dashboard.
+
+---
+
+Approve and I'll build **Batch A** first, then check in before starting **B**.
