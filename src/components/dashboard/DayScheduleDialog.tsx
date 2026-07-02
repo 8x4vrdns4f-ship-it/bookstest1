@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AppDialog } from "@/components/app/AppDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
+import { Calendar, Settings } from "lucide-react";
 
 type Booking = {
   id: string;
