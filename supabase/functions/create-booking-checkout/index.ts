@@ -34,6 +34,36 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Server-side validation
+    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+    const timeRe = /^\d{2}:\d{2}(:\d{2})?$/;
+    const bad = (msg: string) =>
+      new Response(JSON.stringify({ error: msg }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+
+    if (typeof userId !== "string" || !uuidRe.test(userId)) return bad("Invalid business id");
+    if (typeof client_email !== "string" || client_email.length > 254 || !emailRe.test(client_email))
+      return bad("Invalid email");
+    if (typeof client_name !== "string" || client_name.trim().length === 0 || client_name.length > 200)
+      return bad("Invalid name");
+    if (typeof service !== "string" || service.trim().length === 0 || service.length > 200)
+      return bad("Invalid service");
+    if (typeof booking_date !== "string" || !dateRe.test(booking_date)) return bad("Invalid date");
+    const bd = new Date(`${booking_date}T00:00:00Z`);
+    if (isNaN(bd.getTime())) return bad("Invalid date");
+    const todayUtc = new Date();
+    todayUtc.setUTCHours(0, 0, 0, 0);
+    if (bd < todayUtc) return bad("Booking date must be today or later");
+    if (typeof booking_time !== "string" || !timeRe.test(booking_time)) return bad("Invalid time");
+    const dur = Number(duration_minutes ?? 60);
+    if (!Number.isInteger(dur) || dur < 15 || dur > 480) return bad("Invalid duration");
+    if (notes != null && (typeof notes !== "string" || notes.length > 2000))
+      return bad("Notes too long");
+
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -77,7 +107,7 @@ Deno.serve(async (req) => {
         service,
         booking_date,
         booking_time,
-        duration_minutes: duration_minutes || 60,
+        duration_minutes: dur,
         notes: notes || null,
         deposit_amount: deposit,
         platform_fee_amount: (deposit * feePct) / 100,
