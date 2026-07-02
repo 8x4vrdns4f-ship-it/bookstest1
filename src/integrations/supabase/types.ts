@@ -886,6 +886,18 @@ export type Database = {
         }[]
       }
       get_owner_email: { Args: { _user_id: string }; Returns: string }
+      get_public_business_info: {
+        Args: { _user_id: string }
+        Returns: {
+          accent_color: string
+          business_address: string
+          business_category: string
+          business_name: string
+          business_phone: string
+          cancellation_hours: number
+          welcome_message: string
+        }[]
+      }
       get_widget_date_overrides: {
         Args: { p_from: string; p_to: string; p_user_id: string }
         Returns: {
