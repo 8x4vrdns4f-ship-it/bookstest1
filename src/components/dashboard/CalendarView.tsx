@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import SectionCard from "@/components/app/SectionCard";
 import DayScheduleDialog from "./DayScheduleDialog";
 import DateOverrideDialog from "./DateOverrideDialog";
 import BookingDetailDialog from "./BookingDetailDialog";
@@ -101,62 +102,68 @@ const CalendarView = ({ userId }: { userId: string }) => {
   })();
 
   return (
-    <Card className="bg-card border-border">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-foreground">Calendar</CardTitle>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(new Date(year, month - 1))}>
-            <ChevronLeft size={16} />
-          </Button>
-          <span className="text-sm font-medium text-foreground min-w-[140px] text-center">{monthName}</span>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(new Date(year, month + 1))}>
-            <ChevronRight size={16} />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-7 gap-1 mb-2">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-            <div key={d} className="text-xs text-muted-foreground text-center py-1 font-medium">{d}</div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {days.map((day, idx) => {
-            if (!day) return <div key={`e-${idx}`} />;
-            const dayBookings = getBookingsForDay(day);
-            const ov = getOverrideForDay(day);
-            return (
-              <button
-                key={day}
-                onClick={() => handleDayClick(day)}
-                className={`min-h-[60px] p-1 rounded-md border text-xs text-left transition-colors hover:bg-primary/20 hover:border-primary/50 ${
-                  isToday(day) ? "border-primary bg-primary/10" : "border-border bg-secondary/30"
-                } ${ov?.closed ? "opacity-50" : ""}`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className={`font-medium ${isToday(day) ? "text-primary" : "text-foreground"}`}>{day}</span>
-                  {ov && (
-                    <span className="text-[8px] uppercase tracking-wide text-accent font-bold">
-                      {ov.closed ? "Closed" : "Custom"}
-                    </span>
-                  )}
-                </div>
-                {dayBookings.slice(0, 2).map((b, i) => (
-                  <div key={i} className="mt-0.5 truncate text-[10px] text-muted-foreground bg-primary/10 rounded px-1">
-                    {b.booking_time.slice(0, 5)} {b.client_name}
+    <>
+      <SectionCard
+        title="Calendar"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(new Date(year, month - 1))}>
+              <ChevronLeft size={16} />
+            </Button>
+            <span className="text-sm font-medium text-foreground min-w-[140px] text-center">{monthName}</span>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(new Date(year, month + 1))}>
+              <ChevronRight size={16} />
+            </Button>
+          </div>
+        }
+      >
+        <div className="overflow-x-auto">
+          <div className="grid grid-cols-7 gap-1 mb-2 min-w-[560px]">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+              <div key={d} className="text-xs text-muted-foreground text-center py-1 font-medium">{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1 min-w-[560px]">
+            {days.map((day, idx) => {
+              if (!day) return <div key={`e-${idx}`} />;
+              const dayBookings = getBookingsForDay(day);
+              const ov = getOverrideForDay(day);
+              const todayCls = isToday(day)
+                ? "ring-1 ring-primary border-primary/60 bg-primary/5"
+                : "border-border bg-secondary/30";
+              return (
+                <button
+                  key={day}
+                  onClick={() => handleDayClick(day)}
+                  className={`min-h-[60px] p-1.5 rounded-md border text-xs text-left transition-colors hover:bg-primary/10 hover:border-primary/40 ${todayCls} ${ov?.closed ? "opacity-50" : ""}`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className={`font-medium ${isToday(day) ? "text-primary" : "text-foreground"}`}>{day}</span>
+                    {ov && (
+                      <Badge variant="outline" className="text-[8px] px-1 py-0 h-auto capitalize border-current">
+                        {ov.closed ? "Closed" : "Custom"}
+                      </Badge>
+                    )}
                   </div>
-                ))}
-                {dayBookings.length > 2 && (
-                  <div className="text-[10px] text-primary">+{dayBookings.length - 2} more</div>
-                )}
-              </button>
-            );
-          })}
+                  {dayBookings.length > 0 && (
+                    <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                      {dayBookings.slice(0, 3).map((_, i) => (
+                        <span key={i} className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      ))}
+                      {dayBookings.length > 3 && (
+                        <span className="text-[9px] text-primary font-medium">+{dayBookings.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <p className="text-xs text-muted-foreground mt-3">
           Tip: click a day to view its schedule, set custom hours, or open bookings.
         </p>
-      </CardContent>
+      </SectionCard>
 
       <DayScheduleDialog
         open={dialogOpen}
@@ -187,7 +194,7 @@ const CalendarView = ({ userId }: { userId: string }) => {
         onOpenChange={(o) => !o && setBookingDetail(null)}
         ownerId={userId}
       />
-    </Card>
+    </>
   );
 };
 

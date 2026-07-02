@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AppDialog } from "@/components/app/AppDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Props = {
@@ -87,47 +88,44 @@ const DateOverrideDialog = ({ open, onOpenChange, date, userId, onSaved }: Props
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border max-w-sm">
-        <DialogHeader>
-          <DialogTitle className="text-foreground">
-            Hours for {date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            One-off override for this date only. Your weekly defaults stay the same.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="flex items-center justify-between rounded-md border border-border bg-secondary/40 px-3 py-2">
-          <Label className="text-foreground">Closed this day</Label>
-          <Switch checked={closed} onCheckedChange={setClosed} />
-        </div>
-
-        {!closed && (
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-muted-foreground text-xs">Open</Label>
-              <Input type="time" value={openTime} onChange={(e) => setOpenTime(e.target.value)} className="bg-secondary border-border" />
-            </div>
-            <div>
-              <Label className="text-muted-foreground text-xs">Close</Label>
-              <Input type="time" value={closeTime} onChange={(e) => setCloseTime(e.target.value)} className="bg-secondary border-border" />
-            </div>
-          </div>
-        )}
-
-        <div className="flex gap-2 pt-2">
+    <AppDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={`Hours for ${date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}`}
+      description="One-off override for this date only. Your weekly defaults stay the same."
+      icon={Clock}
+      size="sm"
+      footer={
+        <>
           {existingId && (
             <Button variant="outline" onClick={remove} disabled={loading} className="border-border text-muted-foreground">
               Remove override
             </Button>
           )}
-          <Button onClick={save} disabled={loading} className="flex-1 bg-primary text-primary-foreground">
+          <Button onClick={save} disabled={loading} className="bg-primary text-primary-foreground hover:bg-primary/90">
             {loading ? "Saving…" : "Save"}
           </Button>
+        </>
+      }
+    >
+      <div className="flex items-center justify-between rounded-md border border-border bg-secondary/40 px-3 py-2">
+        <Label className="text-foreground">Closed this day</Label>
+        <Switch checked={closed} onCheckedChange={setClosed} />
+      </div>
+
+      {!closed && (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-muted-foreground text-xs">Open</Label>
+            <Input type="time" value={openTime} onChange={(e) => setOpenTime(e.target.value)} className="bg-secondary border-border" />
+          </div>
+          <div>
+            <Label className="text-muted-foreground text-xs">Close</Label>
+            <Input type="time" value={closeTime} onChange={(e) => setCloseTime(e.target.value)} className="bg-secondary border-border" />
+          </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+    </AppDialog>
   );
 };
 
