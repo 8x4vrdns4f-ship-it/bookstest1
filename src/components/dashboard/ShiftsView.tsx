@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,6 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import SectionCard from "@/components/app/SectionCard";
+import EmptyState from "@/components/app/EmptyState";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarDays, ChevronLeft, ChevronRight, Save } from "lucide-react";
 import { addDays, eachDayOfInterval, format, parseISO } from "date-fns";
