@@ -1,43 +1,45 @@
-## Act 4, Batch 3 — Dialogs & Modals
+## Act 4, Batch 4 — Calendar & Pages
 
-Unify every dialog/sheet/drawer across the dashboard so they match the new Professional Dark aesthetic and feel like one product.
+Polish the calendar and shift-management surfaces so they feel as refined as the rest of the dashboard.
 
 ### What changes
 
-1. **Dialog primitive polish** (`src/components/ui/dialog.tsx`)
-   - Darker overlay with subtle blur
-   - Rounded-xl surface, refined border, layered shadow
-   - Tighter header/footer spacing, sticky footer on tall dialogs
-   - Consistent close-button hit area
+1. **CalendarView polish** (`src/components/dashboard/CalendarView.tsx`)
+   - Replace raw `Card` with `SectionCard` wrapper for consistent surface/border
+   - Day-cell grid: tighter spacing, clearer booking-density dots (replace text-list overflow with coloured dot indicators)
+   - Today highlight uses primary ring instead of solid fill
+   - "Closed" / "Custom" chips use semantic badge tokens
+   - Empty month state via `EmptyState`
+   - Responsive: scrollable on very small viewports
 
-2. **Standardised dialog shell** — new `src/components/app/AppDialog.tsx`
-   - Wraps `Dialog` with title, description, icon slot, and footer actions
-   - Enforces consistent padding, typography, and `premium` primary CTA
-   - Replaces one-off styling in existing dialogs
+2. **Calendar dialogs refactored to `AppDialog`**
+   - `DayScheduleDialog` → `AppDialog` shell with icon (`Calendar`), title (date), size `lg`
+   - `DateOverrideDialog` → `AppDialog` shell, size `sm`
+   - Time-slot rows kept as-is (custom content), but header/footer spacing unified
 
-3. **Refactor key dialogs to use `AppDialog`**
-   - `StaffMembersDialog` (staff stat popup)
-   - `AddEmployeeDialog` / invite flow
-   - `BookingDetailsDialog` + edit/cancel confirmations
-   - `ClientDetailsDialog`
-   - `GiftCodeRedeemDialog` and admin create dialog
-   - Shift editor modal inside `ShiftsView`
-   - Confirm/destructive dialogs (cancel booking, remove employee, delete gift code) → unified `ConfirmDialog` variant with warning token
+3. **BookingDetailDialog refactor**
+   - Wrap in `AppDialog` with `User` icon, size `md`
+   - Footer actions (Close, Refund) moved to `DialogFooter` using consistent button placement
+   - Status/assignment selects stay in body, but section dividers use `border-border`
 
-4. **Sheets & Drawers**
-   - Align mobile sheet styling (side padding, header) with the new dialog look
-   - Notification popover spacing tightened to match
+4. **ShiftsView polish** (`src/components/dashboard/ShiftsView.tsx`)
+   - `SectionCard` wrapper for the shift rows table
+   - Empty-state when no employees (`EmptyState` with `CalendarDays` icon)
+   - Row hover highlight, tighter time-input grouping
+   - Save button moved to sticky footer inside card or pinned below
+   - Preset/date-range controls use consistent `secondary` input surfaces
 
-5. **Micro-interactions**
-   - Framer-motion fade+scale on open (respects `prefers-reduced-motion`)
-   - Focus ring uses accent token
+5. **Page-level consistency**
+   - `CalendarPage`, `ShiftsPage` wrappers verified: `PageHeader` + content, no extra wrapping divs
+   - Ensure all calendar/shift surfaces respect the `--card` / `--border` token system
 
-### Out of scope for Batch 3
-- Calendar view, forms redesign, and mobile pass — those are Batches 4–6.
+### Out of scope for Batch 4
+- Forms redesign (Batch 5)
+- Mobile motion pass (Batch 6)
+- Refactoring non-calendar dialogs (Gift codes, Clients, etc.) — those follow in later batches
 
 ### Technical notes
-- No business logic changes; only presentation and shared primitives.
-- All colours via semantic tokens (`--card`, `--border`, `--primary`, `--warning`).
-- `AppDialog` accepts `size: sm | md | lg` and `tone: default | destructive`.
-
-Say "go" and I'll build it.
+- No business logic changes; presentation and layout only.
+- All colours via semantic tokens (`--card`, `--border`, `--primary`).
+- `AppDialog` sizes used: `sm` for overrides, `md` for booking details, `lg` for day schedule.
+- `EmptyState` and `SectionCard` already exist from Batch 1/2.
