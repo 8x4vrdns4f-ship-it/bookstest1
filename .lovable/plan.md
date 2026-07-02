@@ -1,78 +1,86 @@
-Two focused batches. We ship A first, then B in a follow-up.
 
-## Batch A — Branded public booking page (`/book/:userId`)
+## Goal
 
-Today the page is a bare iframe centered on a blank background. We wrap it in a trust-building, on-brand shell so customers know who they're booking with.
+Change the booking widget so the customer enters their card **inside the widget** at request time, but the deposit is only **charged if the business accepts** the booking. If the business declines (or the charge later fails), the customer is never charged.
 
-**What the customer sees**
-- Hero band with the business name, category tagline, and (if set) address + phone.
-- The existing booking widget iframe, unchanged, in a card with soft shadow.
-- Reassurance strip below the widget: "Secure booking", "Instant confirmation", "Cancel free up to X hours" (X pulled from `cancellation_hours`).
-- Footer line: "Powered by BookSuite" linking to the marketing site.
-- Loading skeleton while business info is fetching; graceful fallback if the profile has no `business_name` (shows "Book an appointment").
+## New end-to-end flow
 
-**Data**
-- One public `select` against `company_settings` by `user_id` for: `business_name`, `business_category`, `business_address`, `business_phone`, `accent_color`, `welcome_message`, `cancellation_hours`. Requires a public-read RLS policy on those columns (row filtered by `user_id` param) — confirm/add if missing.
-- No auth. No mutations. Widget iframe keeps handling the actual booking flow.
+```text
+Customer                Widget / Elements        Edge functions              Business dashboard
+--------                -----------------        ----------------            -------------------
+Fill details      -->   Card entered inline
+                        (Stripe Payment Element)
+Press "Request"   -->   create-booking-intent  --> creates Stripe Customer
+                                                   + SetupIntent (off_session)
+                                                   returns client_secret
+                        stripe.confirmSetup()  --> card saved as PaymentMethod
+                                                   (no charge)
+                        create pending_bookings row with:
+                        stripe_customer_id, payment_method_id, setup_intent_id
+                        status = 'awaiting_owner'
+Success screen    <--                                                        New request appears
+                                                                             in "Pending requests"
 
-**SEO**
-- `<SEO>` title becomes `Book with {business_name} — BookSuite`.
-- Description uses `welcome_message` when present, else a generic line.
-- Add `LocalBusiness` JSON-LD when address/phone are set.
+                                                 Owner clicks Accept   -->  charge-booking-deposit
+                                                 Off-session PaymentIntent
+                                                 (Connect: transfer_data +
+                                                 application_fee_amount)
+                                                 - success -> promote to bookings, email both sides
+                                                 - requires_action / fail ->
+                                                   keep pending, email customer
+                                                   a one-click checkout fallback link
 
-**Design**
-- Reuse dark theme tokens and `SectionCard`. Accent header uses `--primary` (fall back to the profile's `accent_color` only as a subtle top border, not a full recolor — keeps design system intact).
-- Mobile: hero stacks, widget goes full width with 16px padding.
+                                                 Owner clicks Decline  -->  detach PaymentMethod,
+                                                                            delete pending row,
+                                                                            email customer
+```
 
-**Files touched**
-- `src/pages/PublicBooking.tsx` — replace layout, add data fetch.
-- new `src/components/booking/PublicBookingHeader.tsx`, `PublicBookingTrustStrip.tsx`.
-- possibly one migration to add a public-read policy on `company_settings` if not already permitted.
+## Scope of changes
 
-**Out of scope for A**
-- Business logo upload (no field exists yet — would need storage bucket + settings UI; flag for later).
-- Reviews/testimonials (no data model).
-- Changing the widget itself.
+### 1. Widget (`src/lib/widgetTemplate.ts`)
+- Load `https://js.stripe.com/v3/` inside the iframe `srcDoc`.
+- After settings load, fetch the business's Stripe **publishable key + connected account id** from a small new public RPC (`get_widget_payment_config(user_id)`).
+- Mount Stripe **Payment Element in `mode: 'setup'`** below the "Your details" section (label: "Payment details — you'll only be charged if the booking is accepted").
+- On submit:
+  1. Call new edge function `create-booking-intent` -> returns `{ setup_client_secret, customer_id, publishable_key }`.
+  2. `stripe.confirmSetup({ elements, clientSecret, redirect: 'if_required' })`.
+  3. Post the returned `payment_method_id` + booking details to `save-pending-booking` -> creates the `pending_bookings` row.
+  4. Show the existing "Booking requested" success screen. No redirect off the host site.
 
----
+### 2. New / changed edge functions
+- **`create-booking-intent`** (new, public): validates fields (reuse validation from `create-booking-checkout`), resolves-or-creates a Stripe Customer on the platform account with `metadata.user_id/business_id`, creates a SetupIntent with `usage: 'off_session'`, `payment_method_types: ['card']`, and `on_behalf_of` = connected account so the card is usable through Connect.
+- **`save-pending-booking`** (new, public): after client-side confirmSetup, inserts a `pending_bookings` row with `stripe_customer_id`, `payment_method_id`, `setup_intent_id`, `status = 'awaiting_owner'`. Emails the owner "new request received".
+- **`charge-booking-deposit`** (new, owner-authed): called from the dashboard Accept action. Creates a PaymentIntent with `confirm: true`, `off_session: true`, `customer`, `payment_method`, `application_fee_amount`, `transfer_data.destination`, then on success promotes `pending_bookings` -> `bookings` (status `confirmed`), stores `payment_intent_id`/`charge_id`, and sends confirmation emails. On `requires_action` or card failure it keeps the row pending and triggers a fallback email with a hosted Checkout link (reuses current `create-booking-checkout`).
+- **`decline-pending-booking`** (new, owner-authed): detaches the PaymentMethod, deletes the pending row, sends the decline email.
+- **Delete/deprecate**: `create-booking-checkout` stays only as the fallback-link generator for the SCA-retry case; `verify-booking-payment` stays for that same path. `refund-booking-deposit` is no longer part of the accept/decline path (kept for post-confirmation refunds).
 
-## Batch B — First-run onboarding wizard
+### 3. Database (`pending_bookings` and `bookings`)
+Migration adds:
+- `pending_bookings.stripe_customer_id text`
+- `pending_bookings.payment_method_id text`
+- `pending_bookings.setup_intent_id text`
+- `pending_bookings.status text default 'awaiting_owner'` (values: `awaiting_owner`, `charging`, `failed`, `declined`)
+- Index on `(user_id, status)` for the dashboard queue.
 
-Right after signup, drop the user into a 4-step wizard before the dashboard. Skippable, resumable, and never shown again once completed.
+No changes to `bookings`; it still receives `stripe_payment_intent_id`/`stripe_charge_id` on accept.
 
-**Steps**
-1. **Business basics** — `business_name`, `business_category`, `business_phone`.
-2. **Hours** — quick preset (Mon–Fri 9–5, Tue–Sat 10–6, custom) writing to `working_hours`.
-3. **First service** — name, duration, price. Creates one row so the booking widget isn't empty.
-4. **Share your link** — shows the `/book/:userId` URL with copy button and a "Connect payments later" nudge linking to Settings → Payments.
+### 4. Dashboard
+- Existing pending-bookings UI keeps its Accept / Decline buttons; they now call `charge-booking-deposit` / `decline-pending-booking` instead of just flipping a status.
+- Accept button shows a spinner while the off-session charge runs and surfaces "Card needs verification — customer emailed a payment link" if the PI comes back `requires_action`.
 
-**Behavior**
-- Route: `/onboarding`. Guarded — redirects to `/dashboard` if `company_settings.onboarding_completed_at` is set.
-- After Auth signup success, redirect new users to `/onboarding` instead of `/dashboard`. Existing users skip it.
-- Each step saves on Next; back navigation preserves entered data.
-- "Skip for now" on every step; final step also has "Finish". Both mark `onboarding_completed_at = now()`.
-- Progress bar + step indicator at top; uses `AppDialog`-style shell but as a full page.
+### 5. Public booking success/cancel pages
+- `/book/:userId/success` is repurposed for the SCA fallback path only. The primary path now shows the success state inline in the widget without navigation.
 
-**Data**
-- Add nullable `onboarding_completed_at timestamptz` to `company_settings` (migration).
-- Reuses existing zod schemas from `formSchemas.ts`; adds `onboardingBusinessBasicsSchema`, `onboardingServiceSchema`.
+## Technical notes / risks
 
-**Design**
-- Centered card, max-w-2xl, dark surface, one icon chip per step (`Store`, `Clock`, `Sparkles`, `Link2`).
-- Framer-motion slide between steps.
+- **Off-session charge failures**: cards can decline or require SCA when charged later. The fallback (email the customer a hosted Checkout link that reuses the existing `create-booking-checkout`) covers both.
+- **Connect authorization**: SetupIntents created on the platform account with `on_behalf_of` + the resulting PaymentIntent using `transfer_data.destination` is the Stripe-supported path for saving a card once and charging later on behalf of a connected account.
+- **Publishable key exposure**: safe to return from the widget config RPC (it's publishable).
+- **Currency / deposit amount**: read from `business_settings` at accept time (not save time), so owners changing the deposit before accepting is honored. If we'd rather lock the amount at request time, we store `deposit_amount` on `pending_bookings` (already the case) and use that instead.
 
-**Files touched**
-- new `src/pages/Onboarding.tsx`, `src/components/onboarding/{Stepper,StepBusiness,StepHours,StepService,StepShare}.tsx`.
-- `src/App.tsx` — add route.
-- `src/pages/Auth.tsx` — post-signup redirect.
-- `src/lib/formSchemas.ts` — new schemas.
-- one migration for `onboarding_completed_at`.
+## Open decisions
 
-**Out of scope for B**
-- Stripe Connect setup inside the wizard (kept as a Settings nudge — one less thing to fail on first-run).
-- Multi-employee setup (single-owner default; team invites stay in dashboard).
-- Tutorial tooltips on the dashboard.
+1. Deposit amount: lock at **request time** (what the customer saw) or use the **current** setting at accept time? Recommendation: lock at request time.
+2. Auto-expire pending requests after N hours (e.g. 48h) with an automatic decline + email? Recommendation: yes, 48h.
 
----
-
-Approve and I'll build **Batch A** first, then check in before starting **B**.
+I'll assume "lock at request time" and "auto-expire at 48h" unless you say otherwise when approving.

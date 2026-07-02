@@ -22,6 +22,7 @@ const EmbedWidget = () => {
     supabaseKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     userId,
     paymentEnvironment: getStripeEnvironment(),
+    stripePublishableKey: String(import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN || ""),
   });
 
   return (

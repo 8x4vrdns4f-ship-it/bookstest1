@@ -649,10 +649,12 @@ export type Database = {
         Row: {
           booking_date: string
           booking_time: string
+          charge_error: string | null
           client_email: string
           client_name: string
           created_at: string
           currency: string
+          decline_reason: string | null
           deposit_amount: number
           duration_minutes: number
           expires_at: string
@@ -664,15 +666,20 @@ export type Database = {
           status: string
           stripe_account_id: string
           stripe_checkout_session_id: string | null
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
+          stripe_setup_intent_id: string | null
           user_id: string
         }
         Insert: {
           booking_date: string
           booking_time: string
+          charge_error?: string | null
           client_email: string
           client_name: string
           created_at?: string
           currency?: string
+          decline_reason?: string | null
           deposit_amount: number
           duration_minutes?: number
           expires_at?: string
@@ -684,15 +691,20 @@ export type Database = {
           status?: string
           stripe_account_id: string
           stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          stripe_setup_intent_id?: string | null
           user_id: string
         }
         Update: {
           booking_date?: string
           booking_time?: string
+          charge_error?: string | null
           client_email?: string
           client_name?: string
           created_at?: string
           currency?: string
+          decline_reason?: string | null
           deposit_amount?: number
           duration_minutes?: number
           expires_at?: string
@@ -704,6 +716,9 @@ export type Database = {
           status?: string
           stripe_account_id?: string
           stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          stripe_setup_intent_id?: string | null
           user_id?: string
         }
         Relationships: []
