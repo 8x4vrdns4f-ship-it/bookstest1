@@ -143,6 +143,9 @@ Deno.serve(async (req) => {
     const checkInUrl = settings?.company_code && booking.confirmation_code
       ? `https://booksuite.online/kiosk/${settings.company_code}?code=${booking.confirmation_code}`
       : undefined;
+    const manageUrl = booking.client_access_token
+      ? `https://booksuite.online/booking/manage/${booking.client_access_token}`
+      : undefined;
     try {
       if (booking.client_email) {
         await admin.functions.invoke("send-transactional-email", {
@@ -154,6 +157,7 @@ Deno.serve(async (req) => {
               businessName, clientName: booking.client_name, service: booking.service,
               date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
               confirmationCode: booking.confirmation_code, checkInUrl, depositAmount: depositLabel,
+              manageUrl,
             },
           },
         });
