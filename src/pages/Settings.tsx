@@ -117,6 +117,7 @@ const Settings = () => {
             buffer_minutes: data.buffer_minutes,
             max_advance_days: data.max_advance_days,
             cancellation_hours: data.cancellation_hours,
+            pending_request_ttl_hours: (data as any).pending_request_ttl_hours ?? 48,
             notify_new_booking: data.notify_new_booking,
             notify_daily_summary: data.notify_daily_summary,
             notify_client_confirmation: data.notify_client_confirmation,
