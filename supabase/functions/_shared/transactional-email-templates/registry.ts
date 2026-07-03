@@ -11,6 +11,7 @@ export interface TemplateEntry {
 
 import { template as bookingConfirmed } from './booking-confirmed.tsx'
 import { template as bookingDeclined } from './booking-declined.tsx'
+import { template as bookingRequestExpired } from './booking-request-expired.tsx'
 import { template as bookingFollowup } from './booking-followup.tsx'
 import { template as bookingPaidOwner } from './booking-paid-owner.tsx'
 import { template as bookingRefunded } from './booking-refunded.tsx'
@@ -26,6 +27,7 @@ import { template as welcome } from './welcome.tsx'
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-confirmed': bookingConfirmed,
   'booking-declined': bookingDeclined,
+  'booking-request-expired': bookingRequestExpired,
   'booking-followup': bookingFollowup,
   'booking-paid-owner': bookingPaidOwner,
   'booking-refunded': bookingRefunded,
