@@ -41,4 +41,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'subscription-activated': subscriptionActivated,
   'employee-invited': employeeInvited,
   'welcome': welcome,
+  'booking-request-expired-owner': bookingRequestExpiredOwner,
+  'booking-request-reminder-owner': bookingRequestReminderOwner,
 }
