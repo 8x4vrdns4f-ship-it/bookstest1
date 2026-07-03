@@ -24,6 +24,8 @@ import EmbedWidget from "./pages/EmbedWidget.tsx";
 import PublicBooking from "./pages/PublicBooking.tsx";
 import BookingSuccess from "./pages/BookingSuccess.tsx";
 import BookingCancelled from "./pages/BookingCancelled.tsx";
+import ManageBooking from "./pages/ManageBooking.tsx";
+import SubmitReview from "./pages/SubmitReview.tsx";
 import Payments from "./pages/Payments.tsx";
 import PaymentsReturn from "./pages/PaymentsReturn.tsx";
 import PaymentsRefresh from "./pages/PaymentsRefresh.tsx";
