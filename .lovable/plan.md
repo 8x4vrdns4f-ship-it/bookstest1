@@ -1,66 +1,100 @@
 ## Goal
 
-Notify business owners when pending widget booking requests expire, and nudge them with a reminder partway through the TTL so fewer requests slip through the cracks.
+Deliver three client-facing features that reduce no-shows, cut admin workload, and build social proof:
+
+1. **Client booking reminders** — automated email 24 hours before a confirmed appointment.
+2. **Client self-service portal** — secure link in confirmation emails lets clients reschedule or cancel within the business's cancellation window.
+3. **Reviews & ratings** — after a confirmed appointment passes, email the client a one-click star rating; aggregate rating displays on the public booking page.
 
 ---
 
-## 1. Owner expiry notification
+## 1. Client booking reminders
 
-When `expire-pending-bookings` marks a request as `expired`, also email the owner (today only the customer is notified).
+### Database changes
+- Add `client_reminder_sent_at timestamptz` to `public.bookings` (nullable, default null).
 
-### Changes
+### Email template
+- New template `booking-reminder-client.tsx` registered in `registry.ts`.
+- Content: appointment details (business name, service, date, time, location) plus a CTA to the self-service portal.
 
-- **New email template** `supabase/functions/_shared/transactional-email-templates/booking-request-expired-owner.tsx`
-  - Same brand style as existing templates (`#ffffff` body, dark headings, light card).
-  - Content: "A booking request expired", client name, service, date/time, and a note that the card was not charged.
-- **Register template** in `registry.ts` under the key `booking-request-expired-owner`.
-- **Update `expire-pending-bookings`** edge function:
-  - After successfully updating the row to `status='expired'` and emailing the client, call `admin.rpc('get_owner_email', { _user_id: pending.user_id })` to get the owner's address.
-  - Invoke `send-transactional-email` with the new owner template and an idempotency key like `pending-expired-owner-${pending.id}`.
+### Edge function
+- New edge function `send-booking-reminders`:
+  - Query `bookings` where `status = 'confirmed'`, `booking_date` is tomorrow, and `client_reminder_sent_at IS NULL`.
+  - For each match, invoke `send-transactional-email` with idempotency key `booking-remind-${id}`.
+  - Update `client_reminder_sent_at = now()`.
+  - Returns `{ ok: true, reminded: N }`.
 
----
+### Cron schedule
+- Hourly `pg_cron` job calling `send-booking-reminders`.
 
-## 2. Reminder nudge before expiry
-
-Send owners a single reminder when a request is about halfway through its configured TTL and still unanswered.
-
-### Changes
-
-- **Database migration**
-  - Add `reminder_sent_at timestamptz` to `public.pending_bookings` (nullable, default null).
-  - Update the existing `pending_bookings` RLS policies if needed so the owner can still read/write their own rows.
-
-- **New email template** `supabase/functions/_shared/transactional-email-templates/booking-request-reminder-owner.tsx`
-  - Content: "You have a pending booking request about to expire", client details, requested slot, deposit amount, and a CTA to open the dashboard.
-- **Register template** in `registry.ts` under the key `booking-request-reminder-owner`.
-
-- **New edge function** `supabase/functions/remind-pending-bookings/index.ts`
-  - Uses the admin/service-role Supabase client.
-  - Query `pending_bookings` where `status = 'awaiting_owner'` and `reminder_sent_at IS NULL`.
-  - Fetch each owner's `pending_request_ttl_hours` from `business_settings` (fallback 48h).
-  - Select rows where `now() - created_at >= (ttl_hours / 2) * 3600 * 1000` (i.e. at least 50% through the TTL).
-  - For each due row:
-    1. Look up owner email via `get_owner_email` RPC.
-    2. Invoke `send-transactional-email` with the reminder template and idempotency key `pending-remind-owner-${pending.id}`.
-    3. Update the row's `reminder_sent_at` to prevent duplicate sends.
-  - Returns JSON `{ ok: true, reminded: N }`.
-
-- **Cron schedule** (SQL executed via `supabase--insert`):
-  - Hourly `pg_cron` job calling `remind-pending-bookings` via `net.http_post` with the `apikey` header.
+### Settings toggle
+- Add `notify_client_reminder boolean` to `business_settings` (already partially present; wire it up in the Settings UI).
+- Only send reminders when this toggle is true.
 
 ---
 
-## Technical notes
+## 2. Client self-service portal
 
-- Both email sends go through the existing `send-transactional-email` queue infrastructure (`notify.booksuite.online` domain is already verified).
-- The `send-transactional-email` ownership guard allows `service_role` callers, so edge functions invoking it with the service-role client will succeed.
-- The `get_owner_email` RPC already exists and queries `auth.users` securely.
+### Secure tokens
+- Add `client_access_token uuid` to `public.bookings` (nullable, default `gen_random_uuid()`).
+- Add `client_token_expires_at timestamptz` (default to booking end time + 7 days).
+
+### New page
+- Route `/booking/manage/:token` (page `ManageBooking.tsx`):
+  - Validates token by looking up `bookings` where `client_access_token` matches and `client_token_expires_at > now()`.
+  - Shows appointment details and two actions: **Reschedule** and **Cancel**.
+  - **Reschedule**: open a mini widget/calendar view limited to the same service and business; pre-fill client details. On submit, update the existing booking row (new date/time) and send a confirmation email.
+  - **Cancel**: confirm dialog, then set `status = 'cancelled_by_client'`, trigger deposit refund if within policy, and send cancellation confirmation.
+
+### Email wiring
+- Update `booking-confirmed` template to include a "Manage your booking" button with the self-service URL.
+
+---
+
+## 3. Reviews & ratings
+
+### Database changes
+- New table `public.reviews`:
+  - `booking_id uuid` (unique, references bookings)
+  - `user_id uuid` (business owner)
+  - `rating integer` (1–5)
+  - `comment text` (nullable)
+  - `created_at timestamptz`
+- Grant `authenticated` SELECT/INSERT, `service_role` ALL.
+- Enable RLS; policy: reviewers can insert via a secure token path; owners can read their own reviews.
+
+### Review token
+- Add `review_token uuid` to `public.bookings` (default `gen_random_uuid()`, nullable).
+- Add `review_sent_at timestamptz` and `review_submitted_at timestamptz`.
+
+### Post-appointment review flow
+- New edge function `send-review-requests`:
+  - Runs daily/hourly via cron.
+  - Finds confirmed bookings where `booking_date + duration` is in the past, `review_sent_at IS NULL`, and `review_submitted_at IS NULL`.
+  - Sends `review-request-client` email with a one-click link to `/review/:token`.
+  - Updates `review_sent_at`.
+
+### Review page
+- New route `/review/:token` (page `SubmitReview.tsx`):
+  - Validates `review_token`.
+  - Star rating input (1–5) and optional comment textarea.
+  - On submit, insert into `reviews`, update `booking.review_submitted_at`, show thank-you.
+
+### Public display
+- Update `get_public_business_info` or create a new RPC to return `average_rating` and `review_count` for a business.
+- Display average stars and count on `PublicBooking.tsx` below the business name.
 
 ---
 
 ## Out of scope
+- SMS reminders (email only for now).
+- Marketing/re-engagement emails.
+- Photo attachments on reviews.
+- Owner reply to reviews.
+- Waitlist (explicitly excluded by user).
 
-- Configurable reminder threshold per business (fixed at 50% of TTL for now).
-- Digest/summary emails (one email per request).
-- In-app notification bell or push notifications.
-- SMS reminders.
+## Technical notes
+- All email sends go through existing `send-transactional-email` infrastructure with idempotency keys.
+- Self-service and review tokens are opaque UUIDs; no auth required from the client.
+- Reschedule logic reuses existing widget slot logic where possible (RPCs `get_busy_slots`, `get_widget_settings`, etc.).
+- Database migration uses standard GRANT + RLS pattern for any new tables.
