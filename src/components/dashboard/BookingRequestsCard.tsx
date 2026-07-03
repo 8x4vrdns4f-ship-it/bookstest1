@@ -40,6 +40,8 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
 
   useEffect(() => {
     load();
+    supabase.from("business_settings").select("pending_request_ttl_hours").eq("user_id", userId).maybeSingle()
+      .then(({ data }) => { if (data) setTtlHours(Number((data as any).pending_request_ttl_hours) || 48); });
     const ch = supabase
       .channel(`pending-bookings-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "pending_bookings", filter: `user_id=eq.${userId}` }, load)
