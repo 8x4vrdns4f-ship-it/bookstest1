@@ -666,6 +666,7 @@ export type Database = {
           notes: string | null
           payment_environment: string
           platform_fee_amount: number
+          reminder_sent_at: string | null
           service: string
           status: string
           stripe_account_id: string
@@ -692,6 +693,7 @@ export type Database = {
           notes?: string | null
           payment_environment?: string
           platform_fee_amount: number
+          reminder_sent_at?: string | null
           service: string
           status?: string
           stripe_account_id: string
@@ -718,6 +720,7 @@ export type Database = {
           notes?: string | null
           payment_environment?: string
           platform_fee_amount?: number
+          reminder_sent_at?: string | null
           service?: string
           status?: string
           stripe_account_id?: string
