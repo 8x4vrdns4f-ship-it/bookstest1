@@ -9,7 +9,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const TTL_HOURS = 48;
+const DEFAULT_TTL_HOURS = 48;
 
 function formatDate(d: string): string {
   try { return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); }
@@ -26,18 +26,50 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const cutoff = new Date(Date.now() - TTL_HOURS * 3600 * 1000).toISOString();
+    // Fetch candidate pending rows (recent enough that even a 1h TTL might apply)
+    // then filter each against its owner's configured TTL.
+    const maxLookbackHours = 24 * 8; // covers the 168h max plus buffer
+    const lookbackCutoff = new Date(Date.now() - maxLookbackHours * 3600 * 1000).toISOString();
 
-    const { data: rows, error } = await admin
+    const { data: candidates, error } = await admin
       .from("pending_bookings")
       .select("*")
       .eq("status", "awaiting_owner")
-      .lt("created_at", cutoff)
-      .limit(100);
+      .gte("created_at", lookbackCutoff)
+      .limit(500);
     if (error) throw error;
 
+    // Also grab anything older than the max window — those are always expired.
+    const { data: ancient } = await admin
+      .from("pending_bookings")
+      .select("*")
+      .eq("status", "awaiting_owner")
+      .lt("created_at", lookbackCutoff)
+      .limit(100);
+
+    const ownerIds = Array.from(new Set((candidates || []).map((r: any) => r.user_id)));
+    const ttlMap = new Map<string, number>();
+    if (ownerIds.length) {
+      const { data: settings } = await admin
+        .from("business_settings")
+        .select("user_id, pending_request_ttl_hours")
+        .in("user_id", ownerIds);
+      for (const s of settings || []) {
+        ttlMap.set(s.user_id, (s as any).pending_request_ttl_hours ?? DEFAULT_TTL_HOURS);
+      }
+    }
+
+    const now = Date.now();
+    const dueRows = [
+      ...(ancient || []),
+      ...(candidates || []).filter((r: any) => {
+        const ttl = ttlMap.get(r.user_id) ?? DEFAULT_TTL_HOURS;
+        return now - new Date(r.created_at).getTime() >= ttl * 3600 * 1000;
+      }),
+    ].slice(0, 100);
+
     let expired = 0;
-    for (const pending of rows || []) {
+    for (const pending of dueRows) {
       // Detach the saved PaymentMethod (best-effort).
       if (pending.stripe_payment_method_id) {
         try {
