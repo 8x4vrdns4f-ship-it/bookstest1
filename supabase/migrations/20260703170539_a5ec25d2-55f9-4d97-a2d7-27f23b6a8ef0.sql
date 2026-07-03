@@ -1,0 +1,1 @@
+ALTER TABLE public.pending_bookings ADD COLUMN IF NOT EXISTS reminder_sent_at timestamp with time zone;
