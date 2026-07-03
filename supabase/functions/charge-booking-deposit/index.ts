@@ -106,6 +106,10 @@ Deno.serve(async (req) => {
     const chargeId = (intent as any).latest_charge as string | null;
     const { data: codeRow } = await admin.rpc("generate_booking_code");
 
+    // Compute token expiry: 7 days after appointment ends
+    const bookingDateTime = new Date(`${pending.booking_date}T${pending.booking_time}`);
+    const tokenExpires = new Date(bookingDateTime.getTime() + pending.duration_minutes * 60000 + 7 * 24 * 3600 * 1000);
+
     const { data: booking, error: bErr } = await admin
       .from("bookings")
       .insert({
@@ -125,6 +129,7 @@ Deno.serve(async (req) => {
         platform_fee_amount: pending.platform_fee_amount,
         payment_environment: env,
         payment_status: "paid",
+        client_token_expires_at: tokenExpires.toISOString(),
       })
       .select()
       .single();
