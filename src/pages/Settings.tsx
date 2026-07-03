@@ -317,6 +317,9 @@ const Settings = () => {
               <Field label="Cancellation Policy (hours)" hint="Minimum notice required to cancel.">
                 <Input type="number" min={0} max={168} value={form.cancellation_hours} onChange={(e) => setForm({ ...form, cancellation_hours: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
+              <Field label="Pending request expiry (hours)" hint="How long a booking request stays open before it's auto-declined and the card released.">
+                <Input type="number" min={1} max={168} value={form.pending_request_ttl_hours} onChange={(e) => setForm({ ...form, pending_request_ttl_hours: Number(e.target.value) })} className="bg-secondary border-border" />
+              </Field>
             </AccordionContent>
           </AccordionItem>
           </SectionCard>
