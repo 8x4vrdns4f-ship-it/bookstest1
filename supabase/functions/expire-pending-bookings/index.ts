@@ -116,6 +116,28 @@ Deno.serve(async (req) => {
           });
         } catch (e) { console.error("expire email failed", e); }
       }
+
+      // Notify owner
+      try {
+        const { data: ownerEmailData } = await admin.rpc("get_owner_email", { _user_id: pending.user_id });
+        const ownerEmail = ownerEmailData as string | null;
+        if (ownerEmail) {
+          await admin.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "booking-request-expired-owner",
+              recipientEmail: ownerEmail,
+              idempotencyKey: `pending-expired-owner-${pending.id}`,
+              templateData: {
+                businessName: settings?.business_name || "the business",
+                clientName: pending.client_name,
+                service: pending.service,
+                date: formatDate(pending.booking_date),
+                time: formatTime(pending.booking_time),
+              },
+            },
+          });
+        }
+      } catch (e) { console.error("expire owner email failed", e); }
     }
 
     return new Response(JSON.stringify({ ok: true, expired }), {
