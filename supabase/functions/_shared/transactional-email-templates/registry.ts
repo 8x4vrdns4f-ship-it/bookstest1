@@ -25,6 +25,8 @@ import { template as employeeInvited } from './employee-invited.tsx'
 import { template as welcome } from './welcome.tsx'
 import { template as bookingRequestExpiredOwner } from './booking-request-expired-owner.tsx'
 import { template as bookingRequestReminderOwner } from './booking-request-reminder-owner.tsx'
+import { template as bookingReminderClient } from './booking-reminder-client.tsx'
+import { template as reviewRequestClient } from './review-request-client.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-confirmed': bookingConfirmed,
