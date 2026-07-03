@@ -57,6 +57,7 @@ type SettingsForm = {
   buffer_minutes: number;
   max_advance_days: number;
   cancellation_hours: number;
+  pending_request_ttl_hours: number;
   notify_new_booking: boolean;
   notify_daily_summary: boolean;
   notify_client_confirmation: boolean;
