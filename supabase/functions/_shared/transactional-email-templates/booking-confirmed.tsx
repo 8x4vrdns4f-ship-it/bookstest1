@@ -14,6 +14,7 @@ interface Props {
   confirmationCode?: string
   checkInUrl?: string
   depositAmount?: string
+  manageUrl?: string
 }
 
 const BookingConfirmedEmail = ({
@@ -25,6 +26,7 @@ const BookingConfirmedEmail = ({
   confirmationCode = '',
   checkInUrl = '',
   depositAmount,
+  manageUrl = '',
 }: Props) => {
   const qrSrc = checkInUrl
     ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(checkInUrl)}`
@@ -63,6 +65,11 @@ const BookingConfirmedEmail = ({
               <Button href={checkInUrl} style={btn}>Self check-in</Button>
             </Section>
           )}
+          {manageUrl && (
+            <Section style={{ textAlign: 'center', margin: '16px 0' }}>
+              <Button href={manageUrl} style={btnSecondary}>Manage your booking</Button>
+            </Section>
+          )}
           <Text style={footer}>See you soon — {businessName}</Text>
         </Container>
       </Body>
@@ -84,6 +91,7 @@ export const template = {
     confirmationCode: 'X7K2P9',
     checkInUrl: 'https://booksuite.online/kiosk/BS-ABCDEF?code=X7K2P9',
     depositAmount: '£10.00',
+    manageUrl: 'https://booksuite.online/booking/manage/abc123',
   },
 } satisfies TemplateEntry
 
@@ -103,5 +111,10 @@ const codeBox = {
 const btn = {
   backgroundColor: '#3B82F6', color: '#ffffff', padding: '12px 24px',
   borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px',
+}
+const btnSecondary = {
+  backgroundColor: '#F1F5F9', color: '#0F172A', padding: '12px 24px',
+  borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px',
+  border: '1px solid #CBD5E1',
 }
 const footer = { fontSize: '12px', color: '#94A3B8', margin: '24px 0 0' }

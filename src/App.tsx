@@ -24,6 +24,8 @@ import EmbedWidget from "./pages/EmbedWidget.tsx";
 import PublicBooking from "./pages/PublicBooking.tsx";
 import BookingSuccess from "./pages/BookingSuccess.tsx";
 import BookingCancelled from "./pages/BookingCancelled.tsx";
+import ManageBooking from "./pages/ManageBooking.tsx";
+import SubmitReview from "./pages/SubmitReview.tsx";
 import Payments from "./pages/Payments.tsx";
 import PaymentsReturn from "./pages/PaymentsReturn.tsx";
 import PaymentsRefresh from "./pages/PaymentsRefresh.tsx";
@@ -66,6 +68,8 @@ const App = () => (
           <Route path="/book/:userId" element={<PublicBooking />} />
           <Route path="/book/:userId/success" element={<BookingSuccess />} />
           <Route path="/book/:userId/cancelled" element={<BookingCancelled />} />
+          <Route path="/booking/manage/:token" element={<ManageBooking />} />
+          <Route path="/review/:token" element={<SubmitReview />} />
           <Route path="/employee-dashboard" element={<RequireVerifiedEmail><EmployeeDashboard /></RequireVerifiedEmail>} />
           <Route path="/onboarding" element={<RequireVerifiedEmail><Onboarding /></RequireVerifiedEmail>} />
 

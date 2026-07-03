@@ -106,6 +106,10 @@ Deno.serve(async (req) => {
     const chargeId = (intent as any).latest_charge as string | null;
     const { data: codeRow } = await admin.rpc("generate_booking_code");
 
+    // Compute token expiry: 7 days after appointment ends
+    const bookingDateTime = new Date(`${pending.booking_date}T${pending.booking_time}`);
+    const tokenExpires = new Date(bookingDateTime.getTime() + pending.duration_minutes * 60000 + 7 * 24 * 3600 * 1000);
+
     const { data: booking, error: bErr } = await admin
       .from("bookings")
       .insert({
@@ -125,6 +129,7 @@ Deno.serve(async (req) => {
         platform_fee_amount: pending.platform_fee_amount,
         payment_environment: env,
         payment_status: "paid",
+        client_token_expires_at: tokenExpires.toISOString(),
       })
       .select()
       .single();
@@ -138,6 +143,9 @@ Deno.serve(async (req) => {
     const checkInUrl = settings?.company_code && booking.confirmation_code
       ? `https://booksuite.online/kiosk/${settings.company_code}?code=${booking.confirmation_code}`
       : undefined;
+    const manageUrl = booking.client_access_token
+      ? `https://booksuite.online/booking/manage/${booking.client_access_token}`
+      : undefined;
     try {
       if (booking.client_email) {
         await admin.functions.invoke("send-transactional-email", {
@@ -149,6 +157,7 @@ Deno.serve(async (req) => {
               businessName, clientName: booking.client_name, service: booking.service,
               date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
               confirmationCode: booking.confirmation_code, checkInUrl, depositAmount: depositLabel,
+              manageUrl,
             },
           },
         });
