@@ -105,6 +105,12 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
             const dep = Number(r.deposit_amount || 0);
             const failed = r.status === "charge_failed";
             const charging = r.status === "charging";
+            const createdMs = new Date(r.created_at).getTime();
+            const hoursLeft = Math.max(0, 48 - (Date.now() - createdMs) / 3_600_000);
+            const expiresLabel = hoursLeft < 1
+              ? `Expires in ${Math.max(1, Math.round(hoursLeft * 60))}m`
+              : `Expires in ${Math.round(hoursLeft)}h`;
+            const urgent = hoursLeft < 6;
             return (
               <div key={r.id} className="rounded-lg border border-border bg-card/50 p-3">
                 <div className="flex items-start justify-between gap-3">
@@ -117,6 +123,9 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
                       </Badge>
                       {failed && <Badge variant="destructive" className="text-[10px]">Charge failed</Badge>}
                       {charging && <Badge className="text-[10px]">Charging…</Badge>}
+                      <Badge variant={urgent ? "destructive" : "secondary"} className="text-[10px]">
+                        {expiresLabel}
+                      </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground truncate">{r.client_email} · {r.service}</p>
                     <p className="text-xs text-muted-foreground mt-1">
