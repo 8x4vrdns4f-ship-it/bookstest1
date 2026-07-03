@@ -24,6 +24,7 @@ type PendingRow = {
 
 const BookingRequestsCard = ({ userId }: { userId: string }) => {
   const [rows, setRows] = useState<PendingRow[]>([]);
+  const [ttlHours, setTtlHours] = useState<number>(48);
   const [busy, setBusy] = useState<string | null>(null);
   const { toast } = useToast();
 
