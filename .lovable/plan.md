@@ -1,76 +1,36 @@
 ## Goal
 
-Automatically decline any pending booking request that hasn't been accepted or declined within 48 hours: detach the saved card in Stripe, clear the pending row, and email the customer so they aren't left waiting on a card that will never be charged.
-
-## How it works
-
-```text
-Customer requests booking
-        │
-        ▼
-pending_bookings row created
-status = 'awaiting_owner'
-created_at = now()
-        │
-        ├── Owner accepts within 48h ─► charge-booking-deposit (existing)
-        ├── Owner declines within 48h ─► decline-pending-booking (existing)
-        └── No action after 48h
-                │
-                ▼
-        pg_cron runs every 15 min
-                │
-                ▼
-        expire-pending-bookings edge function
-                │
-                ├── Finds rows where status='awaiting_owner' AND created_at < now() - 48h
-                ├── For each: stripe.paymentMethods.detach(...)
-                ├── Marks pending row status='expired' (kept for audit)
-                └── Enqueues "your request expired" email to customer
-```
+Let each business owner choose how long a pending booking request stays open before it auto-expires, instead of the hardcoded 48 hours.
 
 ## Changes
 
-### 1. New edge function `expire-pending-bookings`
-- Service-role, no JWT required (called by cron).
-- Selects up to 100 `pending_bookings` where `status = 'awaiting_owner'` and `created_at < now() - interval '48 hours'`.
-- For each row: detaches `stripe_payment_method_id` (best-effort — swallow "already detached" errors), sets `status = 'expired'` and `expired_at = now()`, and enqueues a "booking-request-expired" transactional email to the client.
-- Also emails the business owner a short "a pending request expired" note so they know.
-- Returns `{ expired: <count> }`.
+### 1. Database
+Add a new column to `business_settings`:
+- `pending_request_ttl_hours integer NOT NULL DEFAULT 48`
 
-### 2. New email template `booking-request-expired.tsx`
-Under `supabase/functions/_shared/transactional-email-templates/`, registered in `registry.ts`. Message: "Your booking request with {business} wasn't confirmed in time. No charge was made. Feel free to request again."
+Update `validate_business_settings()` trigger to enforce a sensible range (min 1, max 168 = 7 days).
 
-### 3. Database migration
-- Add `pending_bookings.expired_at timestamptz null`.
-- Extend the allowed `status` values (via check constraint or comment) to include `'expired'`.
-- Add partial index `on pending_bookings (created_at) where status = 'awaiting_owner'` so the cron scan stays cheap.
+### 2. Expire edge function (`expire-pending-bookings`)
+Instead of a single global 48h cutoff, join each pending row against its owner's `pending_request_ttl_hours`:
 
-### 4. Schedule via pg_cron (using `supabase--insert`, not migration — it holds the project ref + anon key)
-```sql
-select cron.schedule(
-  'expire-pending-bookings',
-  '*/15 * * * *',
-  $$ select net.http_post(
-       url := 'https://<project-ref>.supabase.co/functions/v1/expire-pending-bookings',
-       headers := '{"Content-Type":"application/json","apikey":"<anon>"}'::jsonb,
-       body := '{}'::jsonb
-     ); $$
-);
+```text
+select pb.*, coalesce(bs.pending_request_ttl_hours, 48) as ttl_hours
+from pending_bookings pb
+left join business_settings bs on bs.user_id = pb.user_id
+where pb.status = 'awaiting_owner'
+  and pb.created_at < now() - make_interval(hours => coalesce(bs.pending_request_ttl_hours, 48))
 ```
-Ensures `pg_cron` and `pg_net` extensions are enabled first.
 
-### 5. Dashboard `BookingRequestsCard`
-- Show a small "expires in Xh" hint on each pending request so owners see the deadline.
-- Filter out `status = 'expired'` rows from the queue (they're kept for audit only).
+Simplest path: expose this via a new `SECURITY DEFINER` RPC `get_expired_pending_bookings(limit int)` the function calls, or do the filter in a raw supabase query. RPC keeps the function lean.
 
-## Notes / risks
+Cron cadence stays every 15 min.
 
-- **Idempotency**: the function uses `status='awaiting_owner'` as the filter, so a repeat run won't double-process.
-- **Race with accept**: if the owner clicks Accept exactly as the cron runs, one will win on the `status` update — the other will see the row already advanced and no-op.
-- **Stripe detach failure**: logged but non-fatal; the pending row is still marked expired to prevent stuck queue entries.
-- **48h window**: hardcoded for now. Could later be moved to `business_settings.pending_request_ttl_hours` if owners ask for it.
+### 3. Owner UI — `BusinessSettingsDialog`
+Add a "Pending request expiry" number input (hours, 1–168) alongside the existing deposit / hours fields. Help text: "How long a booking request stays open before it's auto-declined and the card released."
+
+### 4. Dashboard — `BookingRequestsCard`
+Read the owner's `pending_request_ttl_hours` once on mount (already fetches settings elsewhere — or add a small query) and use it in the "Expires in Xh" calculation instead of the hardcoded 48.
 
 ## Out of scope
-
-- Configurable per-business TTL.
-- Reminder email at 24h ("still waiting on the business"). Can be added later.
+- Per-service TTL.
+- Warning email to owner at 50% of TTL (separate feature).
