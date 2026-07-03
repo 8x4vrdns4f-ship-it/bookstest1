@@ -109,7 +109,7 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
             const failed = r.status === "charge_failed";
             const charging = r.status === "charging";
             const createdMs = new Date(r.created_at).getTime();
-            const hoursLeft = Math.max(0, 48 - (Date.now() - createdMs) / 3_600_000);
+            const hoursLeft = Math.max(0, ttlHours - (Date.now() - createdMs) / 3_600_000);
             const expiresLabel = hoursLeft < 1
               ? `Expires in ${Math.max(1, Math.round(hoursLeft * 60))}m`
               : `Expires in ${Math.round(hoursLeft)}h`;
