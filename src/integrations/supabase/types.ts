@@ -135,6 +135,7 @@ export type Database = {
           notify_daily_summary: boolean
           notify_new_booking: boolean
           onboarding_completed_at: string | null
+          pending_request_ttl_hours: number
           platform_fee_percent: number
           reception_checkin_enabled: boolean
           require_deposit: boolean
@@ -169,6 +170,7 @@ export type Database = {
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null
+          pending_request_ttl_hours?: number
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
           require_deposit?: boolean
@@ -203,6 +205,7 @@ export type Database = {
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null
+          pending_request_ttl_hours?: number
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
           require_deposit?: boolean

@@ -24,6 +24,7 @@ type PendingRow = {
 
 const BookingRequestsCard = ({ userId }: { userId: string }) => {
   const [rows, setRows] = useState<PendingRow[]>([]);
+  const [ttlHours, setTtlHours] = useState<number>(48);
   const [busy, setBusy] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -39,6 +40,8 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
 
   useEffect(() => {
     load();
+    supabase.from("business_settings").select("pending_request_ttl_hours").eq("user_id", userId).maybeSingle()
+      .then(({ data }) => { if (data) setTtlHours(Number((data as any).pending_request_ttl_hours) || 48); });
     const ch = supabase
       .channel(`pending-bookings-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "pending_bookings", filter: `user_id=eq.${userId}` }, load)
@@ -106,7 +109,7 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
             const failed = r.status === "charge_failed";
             const charging = r.status === "charging";
             const createdMs = new Date(r.created_at).getTime();
-            const hoursLeft = Math.max(0, 48 - (Date.now() - createdMs) / 3_600_000);
+            const hoursLeft = Math.max(0, ttlHours - (Date.now() - createdMs) / 3_600_000);
             const expiresLabel = hoursLeft < 1
               ? `Expires in ${Math.max(1, Math.round(hoursLeft * 60))}m`
               : `Expires in ${Math.round(hoursLeft)}h`;

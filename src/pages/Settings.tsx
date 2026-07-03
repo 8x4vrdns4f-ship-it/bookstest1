@@ -57,6 +57,7 @@ type SettingsForm = {
   buffer_minutes: number;
   max_advance_days: number;
   cancellation_hours: number;
+  pending_request_ttl_hours: number;
   notify_new_booking: boolean;
   notify_daily_summary: boolean;
   notify_client_confirmation: boolean;
@@ -81,7 +82,7 @@ const Settings = () => {
     business_name: "", business_phone: "", business_email: "", business_address: "",
     business_category: "", currency: "GBP", timezone: "Europe/London", deposit_amount: 10,
     working_hours: DEFAULT_HOURS, auto_confirm: false, allow_same_day: true,
-    buffer_minutes: 0, max_advance_days: 30, cancellation_hours: 24,
+    buffer_minutes: 0, max_advance_days: 30, cancellation_hours: 24, pending_request_ttl_hours: 48,
     notify_new_booking: true, notify_daily_summary: false,
     notify_client_confirmation: true, notify_client_reminder: true,
     welcome_message: "", accent_color: "#3B82F6",
@@ -116,6 +117,7 @@ const Settings = () => {
             buffer_minutes: data.buffer_minutes,
             max_advance_days: data.max_advance_days,
             cancellation_hours: data.cancellation_hours,
+            pending_request_ttl_hours: (data as any).pending_request_ttl_hours ?? 48,
             notify_new_booking: data.notify_new_booking,
             notify_daily_summary: data.notify_daily_summary,
             notify_client_confirmation: data.notify_client_confirmation,
@@ -314,6 +316,9 @@ const Settings = () => {
               </Field>
               <Field label="Cancellation Policy (hours)" hint="Minimum notice required to cancel.">
                 <Input type="number" min={0} max={168} value={form.cancellation_hours} onChange={(e) => setForm({ ...form, cancellation_hours: Number(e.target.value) })} className="bg-secondary border-border" />
+              </Field>
+              <Field label="Pending request expiry (hours)" hint="How long a booking request stays open before it's auto-declined and the card released.">
+                <Input type="number" min={1} max={168} value={form.pending_request_ttl_hours} onChange={(e) => setForm({ ...form, pending_request_ttl_hours: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
             </AccordionContent>
           </AccordionItem>
