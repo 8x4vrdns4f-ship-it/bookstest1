@@ -19,9 +19,12 @@ export type Database = {
           assigned_employee_id: string | null
           booking_date: string
           booking_time: string
+          client_access_token: string | null
           client_email: string | null
           client_id: string | null
           client_name: string
+          client_reminder_sent_at: string | null
+          client_token_expires_at: string | null
           confirmation_code: string | null
           created_at: string
           decline_reason: string | null
@@ -33,6 +36,9 @@ export type Database = {
           payment_status: string
           platform_fee_amount: number | null
           refund_id: string | null
+          review_sent_at: string | null
+          review_submitted_at: string | null
+          review_token: string | null
           service: string
           status: string
           stripe_charge_id: string | null
@@ -45,9 +51,12 @@ export type Database = {
           assigned_employee_id?: string | null
           booking_date: string
           booking_time: string
+          client_access_token?: string | null
           client_email?: string | null
           client_id?: string | null
           client_name: string
+          client_reminder_sent_at?: string | null
+          client_token_expires_at?: string | null
           confirmation_code?: string | null
           created_at?: string
           decline_reason?: string | null
@@ -59,6 +68,9 @@ export type Database = {
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
+          review_sent_at?: string | null
+          review_submitted_at?: string | null
+          review_token?: string | null
           service: string
           status?: string
           stripe_charge_id?: string | null
@@ -71,9 +83,12 @@ export type Database = {
           assigned_employee_id?: string | null
           booking_date?: string
           booking_time?: string
+          client_access_token?: string | null
           client_email?: string | null
           client_id?: string | null
           client_name?: string
+          client_reminder_sent_at?: string | null
+          client_token_expires_at?: string | null
           confirmation_code?: string | null
           created_at?: string
           decline_reason?: string | null
@@ -85,6 +100,9 @@ export type Database = {
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
+          review_sent_at?: string | null
+          review_submitted_at?: string | null
+          review_token?: string | null
           service?: string
           status?: string
           stripe_charge_id?: string | null
@@ -758,6 +776,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
