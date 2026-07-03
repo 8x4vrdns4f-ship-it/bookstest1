@@ -657,6 +657,7 @@ export type Database = {
           decline_reason: string | null
           deposit_amount: number
           duration_minutes: number
+          expired_at: string | null
           expires_at: string
           id: string
           notes: string | null
@@ -682,6 +683,7 @@ export type Database = {
           decline_reason?: string | null
           deposit_amount: number
           duration_minutes?: number
+          expired_at?: string | null
           expires_at?: string
           id?: string
           notes?: string | null
@@ -707,6 +709,7 @@ export type Database = {
           decline_reason?: string | null
           deposit_amount?: number
           duration_minutes?: number
+          expired_at?: string | null
           expires_at?: string
           id?: string
           notes?: string | null
