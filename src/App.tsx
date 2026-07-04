@@ -15,6 +15,7 @@ import CalendarPage from "./pages/dashboard/CalendarPage.tsx";
 import ClientsPage from "./pages/dashboard/ClientsPage.tsx";
 import StaffPage from "./pages/dashboard/StaffPage.tsx";
 import ShiftsPage from "./pages/dashboard/ShiftsPage.tsx";
+import ReviewsPage from "./pages/dashboard/ReviewsPage.tsx";
 import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
 import Settings from "./pages/Settings.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/dashboard/clients" element={<ClientsPage />} />
             <Route path="/dashboard/staff" element={<StaffPage />} />
             <Route path="/dashboard/shifts" element={<ShiftsPage />} />
+            <Route path="/dashboard/reviews" element={<ReviewsPage />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/payments/return" element={<PaymentsReturn />} />
