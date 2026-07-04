@@ -16,7 +16,12 @@ interface PublicInfo {
   accent_color: string | null;
   welcome_message: string | null;
   cancellation_hours: number | null;
+  average_rating: number | null;
+  review_count: number | null;
 }
+
+// leave-blank
+type _ = never;
 
 const PublicBooking = () => {
   const { userId } = useParams<{ userId: string }>();
