@@ -6,6 +6,7 @@ import {
   Users,
   UsersRound,
   Clock,
+  Star,
   CreditCard,
   Settings as SettingsIcon,
 } from "lucide-react";
