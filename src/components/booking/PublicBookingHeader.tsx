@@ -1,4 +1,4 @@
-import { MapPin, Phone } from "lucide-react";
+import { MapPin, Phone, Star } from "lucide-react";
 
 interface Props {
   businessName: string;
@@ -6,6 +6,8 @@ interface Props {
   address?: string | null;
   phone?: string | null;
   accentColor?: string | null;
+  averageRating?: number | null;
+  reviewCount?: number | null;
 }
 
 const PublicBookingHeader = ({ businessName, category, address, phone, accentColor }: Props) => {
