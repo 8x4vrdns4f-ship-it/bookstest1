@@ -16,7 +16,10 @@ interface PublicInfo {
   accent_color: string | null;
   welcome_message: string | null;
   cancellation_hours: number | null;
+  average_rating: number | null;
+  review_count: number | null;
 }
+
 
 const PublicBooking = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -94,6 +97,8 @@ const PublicBooking = () => {
             address={info?.business_address}
             phone={info?.business_phone}
             accentColor={info?.accent_color}
+            averageRating={info?.average_rating ? Number(info.average_rating) : null}
+            reviewCount={info?.review_count ?? null}
           />
         )}
 
