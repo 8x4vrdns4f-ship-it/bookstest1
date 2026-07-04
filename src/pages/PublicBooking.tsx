@@ -20,8 +20,6 @@ interface PublicInfo {
   review_count: number | null;
 }
 
-// leave-blank
-type _ = never;
 
 const PublicBooking = () => {
   const { userId } = useParams<{ userId: string }>();
