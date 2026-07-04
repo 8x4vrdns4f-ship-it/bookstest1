@@ -970,11 +970,13 @@ export type Database = {
         Args: { _user_id: string }
         Returns: {
           accent_color: string
+          average_rating: number
           business_address: string
           business_category: string
           business_name: string
           business_phone: string
           cancellation_hours: number
+          review_count: number
           welcome_message: string
         }[]
       }
