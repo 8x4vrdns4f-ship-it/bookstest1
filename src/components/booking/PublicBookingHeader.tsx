@@ -10,7 +10,8 @@ interface Props {
   reviewCount?: number | null;
 }
 
-const PublicBookingHeader = ({ businessName, category, address, phone, accentColor }: Props) => {
+const PublicBookingHeader = ({ businessName, category, address, phone, accentColor, averageRating, reviewCount }: Props) => {
+  const hasReviews = (reviewCount ?? 0) > 0 && (averageRating ?? 0) > 0;
   return (
     <header className="w-full max-w-2xl mx-auto text-center space-y-3">
       {accentColor && (
@@ -25,6 +26,13 @@ const PublicBookingHeader = ({ businessName, category, address, phone, accentCol
       </h1>
       {category && (
         <p className="text-sm uppercase tracking-widest text-muted-foreground">{category}</p>
+      )}
+      {hasReviews && (
+        <div className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden />
+          <span className="font-medium text-foreground">{Number(averageRating).toFixed(1)}</span>
+          <span>· {reviewCount} {reviewCount === 1 ? "review" : "reviews"}</span>
+        </div>
       )}
       {(address || phone) && (
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-muted-foreground">
