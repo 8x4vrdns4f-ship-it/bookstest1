@@ -150,6 +150,7 @@ export type Database = {
           max_advance_days: number
           notify_client_confirmation: boolean
           notify_client_reminder: boolean
+          notify_client_review_request: boolean
           notify_daily_summary: boolean
           notify_new_booking: boolean
           onboarding_completed_at: string | null
@@ -185,6 +186,7 @@ export type Database = {
           max_advance_days?: number
           notify_client_confirmation?: boolean
           notify_client_reminder?: boolean
+          notify_client_review_request?: boolean
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null
@@ -220,6 +222,7 @@ export type Database = {
           max_advance_days?: number
           notify_client_confirmation?: boolean
           notify_client_reminder?: boolean
+          notify_client_review_request?: boolean
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null

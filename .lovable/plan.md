@@ -1,33 +1,27 @@
-## Owner reviews dashboard
+## Reminders & reviews toggles in Settings
 
-Give business owners a place to see the ratings and comments clients leave after appointments.
+The reminder toggle already exists and is honored by the `send-booking-reminders` cron. This adds the missing **review request** toggle and keeps everything consistent.
 
-### New page & route
-- New page `src/pages/dashboard/ReviewsPage.tsx`, route `/dashboard/reviews`.
-- Add a "Reviews" entry in `DashboardSidebar` with a star icon.
+### Database
+- New column on `business_settings`: `notify_client_review_request boolean NOT NULL DEFAULT true`.
 
-### Data
-- Uses the existing `public.reviews` table (already has RLS letting owners read their own).
-- Query: `reviews` joined with `bookings` (service, client_name, booking_date) filtered by `user_id = auth.uid()`, ordered by `created_at desc`.
-- If per-employee breakdown is wanted, join `bookings.assigned_employee_id` → `employees.name`.
+### Cron function
+- `supabase/functions/send-review-requests/index.ts`
+  - Select `notify_client_review_request` alongside `business_name`.
+  - Skip bookings whose owner has the toggle set to `false`.
 
-### UI sections
-1. **Summary cards** (top row, using existing `StatCard`):
-   - Average rating (1 decimal, star icon).
-   - Total reviews.
-   - Reviews this month.
-   - 5-star share (%).
-2. **Rating distribution** — a compact bar for each of 5→1 stars showing count and % of total.
-3. **Per-staff breakdown** (only if the business has employees): table of employee name, avg rating, review count. Sorted best-first.
-4. **Recent reviews list** — cards showing stars, client first name, service, date, and comment. Paginated (20/page) or "Load more".
-5. **Empty state** when no reviews yet: friendly message plus a hint that reviews arrive automatically after appointments.
+### Settings UI
+- `src/pages/Settings.tsx`
+  - Add `notify_client_review_request` to the form state, load, and save payload.
+  - New `ToggleRow` under Notifications: "Client Review Request — Ask clients for a review after their appointment."
+  - Reorder for clarity: owner-focused toggles first (new booking, daily summary), then client-facing (confirmation, reminder, review request).
 
-### Small touches
-- Reuse `PageHeader`, `SectionCard`, and the shared dashboard shell for visual consistency.
-- Locked behind the same subscription/tier gate the rest of the dashboard uses (no new tier changes).
+### Small clarity touches (UI only)
+- Rename "Email Notifications" → "New Booking Email" (hint unchanged) so its purpose is obvious next to the others.
+- Group hint copy so each toggle clearly says who receives the email.
 
 ### Out of scope
-- Owner replies to reviews.
-- Editing/deleting reviews.
-- Public per-employee rating display.
-- Email digests of new reviews.
+- Per-employee or per-service overrides.
+- Custom reminder timing (stays at 24h before).
+- Editing the email templates themselves.
+- Owner digest of new reviews.
