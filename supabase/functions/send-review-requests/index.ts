@@ -35,11 +35,11 @@ Deno.serve(async (req) => {
     if (error) throw error;
 
     const ownerIds = Array.from(new Set((bookings || []).map((r: any) => r.user_id)));
-    const settingsMap = new Map<string, { business_name: string | null }>();
+    const settingsMap = new Map<string, { business_name: string | null; notify_client_review_request: boolean | null }>();
     if (ownerIds.length) {
       const { data: settings } = await admin
         .from("business_settings")
-        .select("user_id, business_name")
+        .select("user_id, business_name, notify_client_review_request")
         .in("user_id", ownerIds);
       for (const s of settings || []) {
         settingsMap.set(s.user_id, s as any);
@@ -51,6 +51,7 @@ Deno.serve(async (req) => {
       if (!booking.client_email || !booking.review_token) continue;
 
       const settings = settingsMap.get(booking.user_id);
+      if (settings?.notify_client_review_request === false) continue;
       const reviewUrl = `https://booksuite.online/review/${booking.review_token}`;
 
       try {
