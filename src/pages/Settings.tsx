@@ -123,6 +123,7 @@ const Settings = () => {
             notify_daily_summary: data.notify_daily_summary,
             notify_client_confirmation: data.notify_client_confirmation,
             notify_client_reminder: data.notify_client_reminder,
+            notify_client_review_request: (data as any).notify_client_review_request ?? true,
             welcome_message: data.welcome_message || "",
             accent_color: data.accent_color || "#3B82F6",
             self_checkin_enabled: !!data.self_checkin_enabled,
