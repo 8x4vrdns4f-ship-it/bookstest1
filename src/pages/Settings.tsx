@@ -62,6 +62,7 @@ type SettingsForm = {
   notify_daily_summary: boolean;
   notify_client_confirmation: boolean;
   notify_client_reminder: boolean;
+  notify_client_review_request: boolean;
   welcome_message: string;
   accent_color: string;
   self_checkin_enabled: boolean;
@@ -84,7 +85,7 @@ const Settings = () => {
     working_hours: DEFAULT_HOURS, auto_confirm: false, allow_same_day: true,
     buffer_minutes: 0, max_advance_days: 30, cancellation_hours: 24, pending_request_ttl_hours: 48,
     notify_new_booking: true, notify_daily_summary: false,
-    notify_client_confirmation: true, notify_client_reminder: true,
+    notify_client_confirmation: true, notify_client_reminder: true, notify_client_review_request: true,
     welcome_message: "", accent_color: "#3B82F6",
     self_checkin_enabled: false, reception_checkin_enabled: true,
   });
@@ -122,6 +123,7 @@ const Settings = () => {
             notify_daily_summary: data.notify_daily_summary,
             notify_client_confirmation: data.notify_client_confirmation,
             notify_client_reminder: data.notify_client_reminder,
+            notify_client_review_request: (data as any).notify_client_review_request ?? true,
             welcome_message: data.welcome_message || "",
             accent_color: data.accent_color || "#3B82F6",
             self_checkin_enabled: !!data.self_checkin_enabled,
@@ -336,10 +338,11 @@ const Settings = () => {
                 </span>
               </AccordionTrigger>
             <AccordionContent className="space-y-3 pb-5">
-              <ToggleRow label="Email Notifications" hint="Get an email on every new booking." checked={form.notify_new_booking} onChange={(v) => setForm({ ...form, notify_new_booking: v })} />
+              <ToggleRow label="New Booking Email" hint="Get an email on every new booking." checked={form.notify_new_booking} onChange={(v) => setForm({ ...form, notify_new_booking: v })} />
               <ToggleRow label="Daily Summary Email" hint="Recap of tomorrow's appointments." checked={form.notify_daily_summary} onChange={(v) => setForm({ ...form, notify_daily_summary: v })} />
               <ToggleRow label="Client Booking Confirmation" hint="Email clients when their booking is confirmed." checked={form.notify_client_confirmation} onChange={(v) => setForm({ ...form, notify_client_confirmation: v })} />
-              <ToggleRow label="Reminder Before Appointment" hint="Send a reminder before the appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
+              <ToggleRow label="Client Reminder" hint="Send clients a reminder 24 hours before their appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
+              <ToggleRow label="Client Review Request" hint="Ask clients for a review after their appointment." checked={form.notify_client_review_request} onChange={(v) => setForm({ ...form, notify_client_review_request: v })} />
             </AccordionContent>
           </AccordionItem>
           </SectionCard>

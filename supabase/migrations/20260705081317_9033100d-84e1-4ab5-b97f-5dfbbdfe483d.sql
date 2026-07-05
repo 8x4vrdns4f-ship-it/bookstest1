@@ -1,0 +1,1 @@
+ALTER TABLE public.business_settings ADD COLUMN IF NOT EXISTS notify_client_review_request boolean NOT NULL DEFAULT true;
