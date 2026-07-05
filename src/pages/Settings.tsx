@@ -62,6 +62,7 @@ type SettingsForm = {
   notify_daily_summary: boolean;
   notify_client_confirmation: boolean;
   notify_client_reminder: boolean;
+  notify_client_review_request: boolean;
   welcome_message: string;
   accent_color: string;
   self_checkin_enabled: boolean;
