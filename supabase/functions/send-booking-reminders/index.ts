@@ -16,6 +16,15 @@ function formatTime(t: string): string { return (t || "").slice(0, 5); }
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Cron auth guard: require Bearer <SERVICE_ROLE_KEY> or valid service_role JWT
+  const auth = req.headers.get("authorization") || "";
+  const expected = `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""}`;
+  if (auth !== expected) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
