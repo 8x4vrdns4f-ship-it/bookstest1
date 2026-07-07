@@ -94,7 +94,7 @@ const VerifyEmail = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <SEO title="Verify your email — BookSuite" description="Confirm your email to access your BookSuite dashboard." path="/verify-email" />
+      <SEO title="Verify your email — BookSuite" description="Confirm your email to access your BookSuite dashboard." path="/verify-email" noIndex />
       <Navbar />
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <Card className="w-full max-w-md bg-card border-border">

@@ -105,6 +105,7 @@ const Auth = () => {
         title={isLogin ? "Log In — BookSuite" : "Sign Up — BookSuite"}
         description={isLogin ? "Log in to BookSuite to manage your bookings, clients, and staff." : "Create a BookSuite account and start taking online bookings for your service business."}
         path="/auth"
+        noIndex
       />
       <Navbar />
       <main className="flex-1 flex items-center justify-center px-4 py-16">

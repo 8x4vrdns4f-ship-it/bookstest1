@@ -71,7 +71,7 @@ const PublicBooking = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title={seoTitle} description={seoDescription} path={`/book/${userId}`} />
+      <SEO title={seoTitle} description={seoDescription} path={`/book/${userId}`} noIndex />
       {jsonLd && (
         <script
           type="application/ld+json"
