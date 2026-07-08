@@ -11,6 +11,7 @@ import Testimonials from "@/components/landing/Testimonials";
 import FAQ from "@/components/landing/FAQ";
 import FinalCTA from "@/components/landing/FinalCTA";
 import SocialProofStrip from "@/components/landing/SocialProofStrip";
+import GuidesSection from "@/components/landing/GuidesSection";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import Footer from "@/components/Footer";
 
@@ -75,6 +76,7 @@ const Index = () => {
         <ExpandedFeatures />
         <TierComparison />
         <Testimonials />
+        <GuidesSection />
         <FAQ />
         <FinalCTA />
       </main>
