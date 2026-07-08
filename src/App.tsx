@@ -31,6 +31,7 @@ import Payments from "./pages/Payments.tsx";
 import PaymentsReturn from "./pages/PaymentsReturn.tsx";
 import PaymentsRefresh from "./pages/PaymentsRefresh.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import GuideDetail from "./pages/GuideDetail.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/guides/:slug" element={<GuideDetail />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/pending-approval" element={<RequireVerifiedEmail><PendingApproval /></RequireVerifiedEmail>} />

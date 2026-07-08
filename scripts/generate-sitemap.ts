@@ -17,6 +17,9 @@ const today = new Date().toISOString().split("T")[0];
 const entries: SitemapEntry[] = [
   { path: "/",         lastmod: today, changefreq: "weekly",  priority: "1.0" },
   { path: "/pricing",  lastmod: today, changefreq: "monthly", priority: "0.9" },
+  { path: "/guides/online-booking-system-for-small-business", lastmod: today, changefreq: "monthly", priority: "0.8" },
+  { path: "/guides/how-to-take-deposits-for-appointments",    lastmod: today, changefreq: "monthly", priority: "0.8" },
+  { path: "/guides/reduce-no-shows-appointment-reminders",    lastmod: today, changefreq: "monthly", priority: "0.8" },
   { path: "/security", lastmod: today, changefreq: "yearly",  priority: "0.4" },
   { path: "/privacy",  lastmod: today, changefreq: "yearly",  priority: "0.3" },
   { path: "/terms",    lastmod: today, changefreq: "yearly",  priority: "0.3" },
