@@ -62,25 +62,32 @@ Deno.serve(async (req) => {
   let callerRole: 'authenticated' | 'service_role' | null = null
   let callerUserId: string | null = null
   let callerEmail: string | null = null
-  try {
-    const token = authHeader.replace('Bearer ', '')
-    const authClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? supabaseServiceKey)
-    const { data: claimsData, error: claimsErr } = await authClient.auth.getClaims(token)
-    const role = claimsData?.claims?.role
-    if (claimsErr || (role !== 'authenticated' && role !== 'service_role')) {
+  const token = authHeader.replace('Bearer ', '')
+  // Fast-path: raw service_role key from trusted server-to-server callers
+  // (edge functions using SUPABASE_SERVICE_ROLE_KEY). getClaims can fail to
+  // verify legacy-signed service-role JWTs, so accept the exact key match too.
+  if (token === supabaseServiceKey) {
+    callerRole = 'service_role'
+  } else {
+    try {
+      const authClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? supabaseServiceKey)
+      const { data: claimsData, error: claimsErr } = await authClient.auth.getClaims(token)
+      const role = claimsData?.claims?.role
+      if (claimsErr || (role !== 'authenticated' && role !== 'service_role')) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      callerRole = role as 'authenticated' | 'service_role'
+      callerUserId = (claimsData?.claims?.sub as string) || null
+      callerEmail = ((claimsData?.claims?.email as string) || '').toLowerCase() || null
+    } catch {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-    callerRole = role as 'authenticated' | 'service_role'
-    callerUserId = (claimsData?.claims?.sub as string) || null
-    callerEmail = ((claimsData?.claims?.email as string) || '').toLowerCase() || null
-  } catch {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
   }
 
   // Parse request body
