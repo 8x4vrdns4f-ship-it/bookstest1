@@ -4,54 +4,77 @@
 
 export const WIDGET_STYLES = `
   *,*::before,*::after{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:transparent}
-  .bw{max-width:460px;margin:0 auto;background:#1a1f2e;border-radius:16px;padding:20px;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.3)}
-  .bw h2{font-size:18px;margin:0 0 4px;color:#5bade8;font-weight:700}
-  .bw .sub{font-size:12px;color:#9ca3af;margin:0 0 16px}
-  .bw .deposit{font-size:11px;color:#9ca3af;background:#0f1420;padding:6px 10px;border-radius:6px;margin-bottom:14px;text-align:center}
-  .bw .label{font-size:12px;color:#9ca3af;margin:14px 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-  .bw .dates{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+  body{margin:0;font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:transparent;-webkit-font-smoothing:antialiased}
+  .bw{max-width:460px;margin:0 auto;background:#0F1420;border:1px solid #1F2937;border-radius:20px;padding:22px;color:#F3F4F6;box-shadow:0 8px 32px -12px rgba(0,0,0,.55)}
+  .bw .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .bw .head .ht{flex:1;min-width:0}
+  .bw h2{font-size:20px;margin:0 0 4px;color:#F3F4F6;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+  .bw .sub{font-size:13px;color:#94A3B8;margin:0;line-height:1.4}
+  .bw .deposit-pill{flex:0 0 auto;font-size:11px;color:#5BADE8;background:rgba(91,173,232,.08);border:1px solid rgba(91,173,232,.25);padding:5px 10px;border-radius:999px;font-weight:600;white-space:nowrap;line-height:1.2}
+  .bw .label{font-size:11px;color:#94A3B8;margin:18px 0 8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .bw .dates-wrap{position:relative}
+  .bw .dates-wrap::before,.bw .dates-wrap::after{content:'';position:absolute;top:0;bottom:6px;width:18px;pointer-events:none;z-index:1}
+  .bw .dates-wrap::before{left:0;background:linear-gradient(90deg,#0F1420,rgba(15,20,32,0))}
+  .bw .dates-wrap::after{right:0;background:linear-gradient(-90deg,#0F1420,rgba(15,20,32,0))}
+  .bw .dates{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;scroll-behavior:smooth}
   .bw .dates::-webkit-scrollbar{height:4px}
-  .bw .dates::-webkit-scrollbar-thumb{background:#2d3548;border-radius:2px}
-  .bw .date{flex:0 0 auto;min-width:54px;padding:8px 6px;border-radius:8px;background:#263040;text-align:center;cursor:pointer;border:1px solid transparent;transition:.15s}
-  .bw .date:hover{background:#2d3548}
-  .bw .date.sel{background:#5bade8;color:#0f1420;border-color:#5bade8}
-  .bw .date .dn{font-size:10px;font-weight:600;text-transform:uppercase;opacity:.7}
-  .bw .date .dd{font-size:18px;font-weight:700;line-height:1.2}
-  .bw .date .dm{font-size:10px;opacity:.7}
-  .bw .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:220px;overflow-y:auto;padding:2px}
-  .bw .slot{padding:8px 4px;border-radius:6px;background:#263040;text-align:center;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:.15s}
-  .bw .slot:hover:not(:disabled):not(.busy){background:#2d3548}
-  .bw .slot.sel{background:#5bade8;color:#0f1420;border-color:#5bade8}
-  .bw .slot.busy{background:#3a1c1c;color:#7f3a3a;cursor:not-allowed;text-decoration:line-through}
-  .bw .durs{display:flex;gap:6px;flex-wrap:wrap}
-  .bw .dur{flex:1;min-width:64px;padding:8px;border-radius:6px;background:#263040;text-align:center;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:.15s}
-  .bw .dur:hover:not(:disabled){background:#2d3548}
-  .bw .dur.sel{background:#5bade8;color:#0f1420;border-color:#5bade8}
-  .bw .dur:disabled{opacity:.3;cursor:not-allowed}
-  .bw input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2d3548;background:#263040;color:#fff;font-size:14px;outline:none}
-  .bw input:focus{border-color:#5bade8}
+  .bw .dates::-webkit-scrollbar-thumb{background:#1F2937;border-radius:2px}
+  .bw .date{flex:0 0 auto;min-width:64px;padding:10px 8px;border-radius:12px;background:transparent;border:1px solid #1F2937;text-align:center;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+  .bw .date:hover{background:#141B2A;border-color:#2A3547}
+  .bw .date.sel{background:#5BADE8;color:#0A0F1A;border-color:#5BADE8}
+  .bw .date.closed{opacity:.35;cursor:not-allowed}
+  .bw .date.closed .dd{text-decoration:line-through}
+  .bw .date .dn{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.75}
+  .bw .date .dd{font-size:19px;font-weight:700;line-height:1.2;margin:2px 0}
+  .bw .date .dm{font-size:10px;opacity:.65;font-weight:500}
+  .bw .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:220px;overflow-y:auto;padding:2px}
+  @media (min-width:400px){.bw .slots{grid-template-columns:repeat(4,1fr)}}
+  .bw .slots::-webkit-scrollbar{width:4px}
+  .bw .slots::-webkit-scrollbar-thumb{background:#1F2937;border-radius:2px}
+  .bw .slot{height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:transparent;border:1px solid #1F2937;text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .bw .slot:hover:not(:disabled):not(.busy){background:#141B2A;border-color:#2A3547}
+  .bw .slot.sel{background:#5BADE8;color:#0A0F1A;border-color:#5BADE8}
+  .bw .slot.busy{color:#4B5563;cursor:not-allowed;text-decoration:line-through;opacity:.6}
+  .bw .empty{grid-column:1/-1;color:#64748B;font-size:12px;text-align:center;padding:20px 8px;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .bw .empty svg{opacity:.5}
+  .bw .durs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .bw .dur{height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:transparent;border:1px solid #1F2937;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;color:inherit;font-family:inherit}
+  .bw .dur:hover:not(:disabled){background:#141B2A;border-color:#2A3547}
+  .bw .dur.sel{background:#5BADE8;color:#0A0F1A;border-color:#5BADE8}
+  .bw .dur:disabled{opacity:.35;cursor:not-allowed}
+  .bw input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #1F2937;background:#0A0F1A;color:#F3F4F6;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+  .bw input::placeholder{color:#64748B}
+  .bw input:focus{border-color:#5BADE8;box-shadow:0 0 0 3px rgba(91,173,232,.15)}
   .bw .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .bw #bw-payel{background:#263040;border:1px solid #2d3548;border-radius:8px;padding:10px;min-height:44px}
-  .bw .paynote{font-size:11px;color:#9ca3af;margin-top:6px;line-height:1.4}
-  .bw button.submit{width:100%;padding:12px;border:none;border-radius:8px;background:#5bade8;color:#0f1420;font-weight:700;font-size:14px;cursor:pointer;margin-top:14px;transition:.15s}
-  .bw button.submit:hover{background:#4a9ad8}
-  .bw button.submit:disabled{opacity:.5;cursor:not-allowed}
-  .bw .ok{text-align:center;padding:24px 0}
-  .bw .ok .ic{font-size:42px;color:#4ade80;margin-bottom:8px}
-  .bw .ok h3{margin:0 0 6px;font-size:16px}
-  .bw .ok p{margin:0;font-size:13px;color:#9ca3af}
-  .bw .err{background:#3a1c1c;color:#fca5a5;padding:8px 10px;border-radius:6px;font-size:12px;margin-top:8px}
+  @media (max-width:380px){.bw .row{grid-template-columns:1fr}}
+  .bw #bw-payel{background:#0A0F1A;border:1px solid #1F2937;border-radius:10px;padding:12px;min-height:44px}
+  .bw .paynote{display:flex;align-items:center;gap:6px;font-size:11px;color:#94A3B8;margin-top:8px;line-height:1.4}
+  .bw .paynote svg{flex:0 0 auto;opacity:.7}
+  .bw button.submit{width:100%;height:48px;border:none;border-radius:12px;background:#5BADE8;color:#0A0F1A;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;margin-top:16px;transition:transform .1s,box-shadow .15s,background .15s;letter-spacing:.01em}
+  .bw button.submit:hover:not(:disabled){background:#6BB8EC;transform:translateY(-1px);box-shadow:0 6px 18px -6px rgba(91,173,232,.4)}
+  .bw button.submit:active:not(:disabled){transform:translateY(0)}
+  .bw button.submit:disabled{opacity:.4;cursor:not-allowed}
+  .bw .ok{text-align:center;padding:28px 8px}
+  .bw .ok .ic{width:56px;height:56px;border-radius:50%;background:rgba(91,173,232,.12);color:#5BADE8;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 14px}
+  .bw .ok h3{margin:0 0 8px;font-size:17px;font-weight:700}
+  .bw .ok p{margin:0 0 16px;font-size:13px;color:#94A3B8;line-height:1.5}
+  .bw .ok .again{background:transparent;border:1px solid #1F2937;color:#F3F4F6;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s}
+  .bw .ok .again:hover{background:#141B2A;border-color:#2A3547}
+  .bw .err{background:#2A1518;color:#FCA5A5;padding:10px 12px 10px 14px;border-radius:8px;border-left:3px solid #EF4444;font-size:12px;margin-top:10px;line-height:1.4}
 `;
 
 export const WIDGET_MARKUP = `
 <div class="bw" id="bw">
-  <h2 id="bw-title">Book an Appointment</h2>
-  <p class="sub">Pick a day, then tap a start time and duration.</p>
-  <div class="deposit" id="bw-deposit">Loading...</div>
+  <div class="head">
+    <div class="ht">
+      <h2 id="bw-title">Book an Appointment</h2>
+      <p class="sub">Pick a day, then tap a start time and duration.</p>
+    </div>
+    <div class="deposit-pill" id="bw-deposit">Loading…</div>
+  </div>
 
   <div class="label">Day</div>
-  <div class="dates" id="bw-dates"></div>
+  <div class="dates-wrap"><div class="dates" id="bw-dates"></div></div>
 
   <div class="label">Start time</div>
   <div class="slots" id="bw-slots"></div>
@@ -67,7 +90,10 @@ export const WIDGET_MARKUP = `
 
   <div class="label">Card details</div>
   <div id="bw-payel"></div>
-  <div class="paynote" id="bw-paynote">Your card is only charged if the business accepts your request.</div>
+  <div class="paynote" id="bw-paynote">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span>Your card is only charged if the business accepts your request.</span>
+  </div>
 
   <div id="bw-err"></div>
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
@@ -78,6 +104,7 @@ export const WIDGET_MARKUP = `
     <div class="ic">✓</div>
     <h3>Booking requested!</h3>
     <p>Your card is saved but has not been charged. You'll receive an email when the business accepts or declines.</p>
+    <button class="again" id="bw-again" type="button">Book another</button>
   </div>
 </div>
 `;
@@ -173,7 +200,7 @@ export const buildWidgetScript = (opts: {
       var ds = fmtDate(d);
       var hrs = dayHoursFor(ds);
       var el = document.createElement('div');
-      el.className = 'date' + (selDate === ds ? ' sel' : '') + (hrs.closed ? ' busy' : '');
+      el.className = 'date' + (selDate === ds ? ' sel' : '') + (hrs.closed ? ' closed' : '');
       el.innerHTML = '<div class="dn">'+d.toLocaleDateString(undefined,{weekday:'short'})+'</div>'+
                      '<div class="dd">'+d.getDate()+'</div>'+
                      '<div class="dm">'+(hrs.closed ? 'Closed' : d.toLocaleDateString(undefined,{month:'short'}))+'</div>';
@@ -183,12 +210,17 @@ export const buildWidgetScript = (opts: {
       wrap.appendChild(el);
     }
   }
+  function emptyMsg(text){
+    return '<div class="empty">'+
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>'+
+      '<span>'+text+'</span></div>';
+  }
   function renderSlots(){
     var wrap = document.getElementById('bw-slots');
     wrap.innerHTML = '';
-    if (!selDate){ wrap.innerHTML = '<div style="grid-column:1/-1;color:#9ca3af;font-size:12px;text-align:center;padding:8px">Pick a day first</div>'; return; }
+    if (!selDate){ wrap.innerHTML = emptyMsg('Pick a day first'); return; }
     var hrs = dayHoursFor(selDate);
-    if (hrs.closed){ wrap.innerHTML = '<div style="grid-column:1/-1;color:#9ca3af;font-size:12px;text-align:center;padding:8px">Closed this day</div>'; return; }
+    if (hrs.closed){ wrap.innerHTML = emptyMsg('Closed this day'); return; }
     var bset = busyMinutes(selDate);
     var startM = toMin(hrs.open), endM = toMin(hrs.close);
     for (var m = startM; m < endM; m += 30){
@@ -241,7 +273,6 @@ export const buildWidgetScript = (opts: {
       return;
     }
     stripe = Stripe(STRIPE_PK);
-    var depAmt = Math.round(Number(settings.deposit_amount || 10) * 100);
     var ccy = String(settings.currency || 'GBP').toLowerCase();
     elements = stripe.elements({
       mode: 'setup',
@@ -249,13 +280,42 @@ export const buildWidgetScript = (opts: {
       paymentMethodTypes: ['card'],
       appearance: {
         theme: 'night',
-        variables: { colorPrimary: '#5bade8', colorBackground: '#263040', colorText: '#fff', borderRadius: '6px', fontSizeBase: '13px' }
+        variables: {
+          colorPrimary: '#5BADE8',
+          colorBackground: '#0A0F1A',
+          colorText: '#F3F4F6',
+          colorTextPlaceholder: '#64748B',
+          borderRadius: '10px',
+          fontSizeBase: '14px',
+          fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+        },
+        rules: {
+          '.Input': { border: '1px solid #1F2937', boxShadow: 'none' },
+          '.Input:focus': { border: '1px solid #5BADE8', boxShadow: '0 0 0 3px rgba(91,173,232,.15)' },
+          '.Tab': { border: '1px solid #1F2937' }
+        }
       }
     });
     paymentEl = elements.create('payment', { layout: 'tabs' });
     paymentEl.mount('#bw-payel');
     paymentEl.on('ready', function(){ elementsReady = true; renderAll(); });
     paymentEl.on('change', renderAll);
+  }
+
+  var againBtn = document.getElementById('bw-again');
+  if (againBtn) {
+    againBtn.addEventListener('click', function(){
+      document.getElementById('bw-done').style.display = 'none';
+      document.getElementById('bw').style.display = '';
+      selSlot = null; selDur = null;
+      document.getElementById('bw-name').value = '';
+      document.getElementById('bw-email').value = '';
+      document.getElementById('bw-err').innerHTML = '';
+      var sb = document.getElementById('bw-submit');
+      sb.textContent = 'Request Booking';
+      if (paymentEl) { try { paymentEl.clear(); } catch(e){} }
+      renderAll();
+    });
   }
 
   document.getElementById('bw-submit').addEventListener('click', async function(){
@@ -348,9 +408,9 @@ export const buildWidgetScript = (opts: {
       var depAmt = Number(settings.deposit_amount);
       var ccy = (settings.currency || 'GBP').toUpperCase();
       var sym = ccy === 'USD' ? '$' : ccy === 'EUR' ? '€' : ccy === 'JPY' ? '¥' : ccy === 'AUD' ? 'A$' : ccy === 'CAD' ? 'C$' : '£';
-      document.getElementById('bw-deposit').textContent = 'Deposit: ' + sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' — only charged if accepted';
+      document.getElementById('bw-deposit').textContent = sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' deposit';
     } else {
-      document.getElementById('bw-deposit').textContent = 'Booking system';
+      document.getElementById('bw-deposit').textContent = 'Booking';
     }
     busy = Array.isArray(arr[1]) ? arr[1] : [];
     (Array.isArray(arr[2]) ? arr[2] : []).forEach(function(o){ overrides[o.override_date] = o; });
@@ -361,7 +421,7 @@ export const buildWidgetScript = (opts: {
     renderAll();
     loadStripeJs(mountStripeElements);
   }).catch(function(e){
-    document.getElementById('bw-deposit').textContent = 'Could not load. Refresh to try again.';
+    document.getElementById('bw-deposit').textContent = 'Could not load';
   });
 })();
 `;
@@ -378,6 +438,9 @@ export const buildWidgetHtml = (opts: {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Book an Appointment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 <style>${WIDGET_STYLES}</style>
 </head>
 <body>
