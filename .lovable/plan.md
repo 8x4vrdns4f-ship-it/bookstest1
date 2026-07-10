@@ -1,68 +1,69 @@
+Restyle the embeddable booking widget so it looks noticeably cleaner and more professional, while keeping the current single-screen structure (day chips → time slots → duration → details → card → submit). No flow changes, no dropdowns.
 
-# Ranking BookSuite higher on Google
+All changes live in `src/lib/widgetTemplate.ts` (the self-contained HTML/CSS/JS used by `/embed/:userId`, the script-tag embed, and the downloadable HTML). Zero backend changes.
 
-Honest framing first: Google ranking is earned over weeks/months through relevance, authority, and content — not a switch we flip. But there's a lot we can do in-app right now to give BookSuite the best possible foundation. Here's the plan.
+## Visual direction
 
-## 1. Verify & submit to Google Search Console
-- Add BookSuite to Google Search Console (via meta-tag verification in `index.html`).
-- Submit `sitemap.xml` so Google discovers every page.
-- Request indexing on the homepage and pricing page to speed up first crawl.
+Refined dark UI, aligned with the BookSuite app aesthetic:
+- Background: deep near-black card (`#0F1420`) with a subtle 1px border (`#1F2937`) and softer shadow — currently a mid-blue-grey card with a heavy shadow.
+- Accent: keep the BookSuite light blue (`#5BADE8`) but use it more sparingly — only on the selected state and the primary CTA.
+- Typography: switch the widget to Plus Jakarta Sans (loaded from Google Fonts inside the widget HTML so it works standalone), with a clear scale: 20px title, 11px uppercase section labels with more letter-spacing, 13px body.
+- Rounded corners bumped from 6–8px to 10–12px for pills/inputs, 20px for the outer card.
+- Consistent 16px internal padding rhythm; more breathing room between sections.
 
-This is the #1 missing piece — without it, we're guessing what Google sees.
+## Component-level changes
 
-## 2. Per-page SEO metadata (title, description, canonical, OG)
-Currently only Index uses `<SEO>`. Add it to every public route with unique, keyword-focused titles/descriptions:
-- `/pricing` — "BookSuite Pricing — Plans for Small Service Businesses"
-- `/auth` — noIndex (not useful in search)
-- `/privacy`, `/terms`, `/security` — proper titles, low priority
-- Public booking pages — noIndex (per-tenant, not for search)
+1. **Header block**
+   - Title left-aligned, subtitle in muted grey underneath.
+   - Deposit line becomes a small inline pill (rounded, subtle border, no full-width bar) sitting next to the subtitle instead of a separate boxed row.
 
-## 3. Structured data (JSON-LD)
-Add rich schema so Google can show enhanced results:
-- **SoftwareApplication** schema on homepage (name, category, pricing, rating placeholder)
-- **FAQPage** schema on the landing FAQ section (already have Q&A content — just needs markup)
-- **BreadcrumbList** on inner pages
-- **Product** schema on pricing tiers
+2. **Day chips**
+   - Larger tap targets (min 64px wide, 68px tall), 12px radius.
+   - Unselected: transparent background with a 1px border; hover fills subtly.
+   - Selected: solid accent with black text (current behavior, cleaner border).
+   - Closed days rendered muted/disabled with a diagonal-line feel via opacity + strikethrough on the day number, not the current red "busy" style.
+   - Scroll row gets fade-out gradients on left/right edges so it clearly indicates more days.
 
-FAQ rich results in particular can dramatically expand search real estate.
+3. **Time slots**
+   - 3 columns on mobile / 4 on wider widget (currently always 4).
+   - Pill style: taller (36px), 10px radius, monospaced-feeling tabular numbers so "09:30" and "10:00" line up.
+   - Busy slots: muted grey with a thin strike, no red — red reads as an error.
+   - Selected slot uses the accent fill.
+   - Empty state ("Pick a day first") gets a proper centered muted message with an icon glyph.
 
-## 4. Content & keyword targeting
-The current landing copy is generic. To rank for terms people actually search:
-- Target primary keywords: "booking software for small business", "appointment booking system", "salon booking software", etc.
-- Rework H1/H2s and hero copy to include these naturally
-- Add a `/features` page (deep, keyword-rich, ~800+ words)
-- Add a `/blog` or `/guides` section — this is the single biggest long-term ranking lever. Even 3–5 high-quality posts ("How to take deposits for appointments", "Best booking software for barbers", etc.) can pull real traffic.
+4. **Duration**
+   - Row of 4 equal pills matching the time-slot style for visual consistency.
+   - Disabled state uses reduced opacity + `cursor: not-allowed` without changing size.
 
-I can also run Semrush keyword research to pick the exact terms with best volume-vs-difficulty tradeoff for BookSuite's niche.
+5. **Your details**
+   - Inputs get a floating-label look: label sits inside the input, 12px placeholder, focus ring in accent.
+   - Two-column on wide, single-column under 380px.
 
-## 5. Technical SEO hygiene
-- Confirm `robots.txt` and `sitemap.xml` are correct (they are, but sitemap should auto-generate from routes so new pages get added).
-- Convert sitemap to a generated script (`scripts/generate-sitemap.ts`) that runs on build.
-- Add `lastmod` dates to sitemap entries.
-- Verify all images have descriptive `alt` text.
-- Verify single H1 per page, semantic heading hierarchy.
+6. **Card details**
+   - Stripe Elements appearance tuned to match: `borderRadius: 10`, `colorBackground: #0F1420`, `colorText: #F3F4F6`, matching input border color, slightly larger `fontSizeBase`.
+   - Payment note becomes a small lock-icon + text row so it reads as reassurance, not a disclaimer.
 
-## 6. Performance & Core Web Vitals
-Google factors page speed. Check:
-- Image sizes (hero, OG image)
-- Lazy-loading below-the-fold images
-- Font loading strategy
+7. **Submit button**
+   - Full-width, 48px tall, 12px radius, accent background, subtle hover lift (translateY -1px, stronger shadow).
+   - Disabled state: 40% opacity, no pointer.
 
-## 7. Off-page (what only you can do)
-- **Backlinks** are the biggest external ranking factor. List BookSuite on: Product Hunt, G2, Capterra, SaaSHub, AlternativeTo, small-business directories.
-- Get customers to link to their public booking page from their own sites — every one is a backlink.
-- Google Business Profile if there's a physical/regional angle.
+8. **Success state**
+   - Larger check in a circular accent-tinted background, tighter copy, primary "Book another" ghost button underneath (client-side reset — no backend call).
 
-## Suggested order of execution
-Fastest wins first:
-1. Search Console verification + sitemap submission (immediate, foundational)
-2. Per-page SEO metadata + FAQ/Software JSON-LD (1 build, big impact for rich results)
-3. Semrush keyword research → rewrite hero + add /features page
-4. Auto-generated sitemap with lastmod
-5. Blog/guides infrastructure (biggest long-term lever)
-6. Off-page work (your side, ongoing)
+9. **Error banner**
+   - Softer red (`#2A1518` bg, `#FCA5A5` text), left accent bar, no full block color.
 
-## What I need from you
-- **Confirm scope**: do you want all of the above, or should we start with steps 1–3 and see results before doing content work?
-- **Blog?**: are you willing to publish articles regularly? If yes, I'll scaffold the blog. If not, we'll skip it (biggest single miss, but only worth building if you'll use it).
-- **Keywords**: want me to run Semrush research to pick target terms, or do you already know which searches you want to rank for?
+## Technical notes
+
+- All work in `WIDGET_STYLES` and `WIDGET_MARKUP` constants, plus the Stripe `appearance` block inside `buildWidgetScript`.
+- Add a `<link rel="preconnect">` + Google Fonts `<link>` for Plus Jakarta Sans in `buildWidgetHtml`'s `<head>`, with `-apple-system` fallback so first paint is never blocked.
+- Keep the widget viewport-safe: max-width stays 460px, all sizing in `rem`/`px` (no viewport units) so it looks identical inside the 500px iframe on any host site.
+- Preserve every existing DOM id (`bw-dates`, `bw-slots`, `bw-durs`, `bw-name`, `bw-email`, `bw-payel`, `bw-err`, `bw-submit`, `bw`, `bw-done`) so the JS logic is untouched.
+- No changes to `src/pages/EmbedWidget.tsx`, `public/embed.js`, edge functions, or Stripe wiring.
+
+## Out of scope
+
+- No stepped/multi-screen flow.
+- No dropdowns.
+- No calendar month grid.
+- No copy changes to the landing page or dashboard preview surrounding the widget.
