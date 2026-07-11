@@ -53,31 +53,31 @@ export function AppDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn(sizeClass[size], className)}>
+      <DialogContent className={cn("rounded-[20px]", sizeClass[size], className)}>
         <DialogHeader>
           <div className="flex items-start gap-3">
             {DisplayIcon && (
               <div
                 className={cn(
-                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border",
+                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
                   isDestructive
-                    ? "border-destructive/40 bg-destructive/10 text-destructive"
-                    : "border-primary/30 bg-primary/10 text-primary",
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-primary/[0.08] text-primary",
                 )}
               >
                 <DisplayIcon className="h-5 w-5" />
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <DialogTitle className="text-lg font-semibold tracking-tight">{title}</DialogTitle>
+              <DialogTitle className="text-[17px] font-semibold tracking-tight">{title}</DialogTitle>
               {description && (
-                <DialogDescription className="mt-1">{description}</DialogDescription>
+                <DialogDescription className="mt-1 text-[13px] leading-relaxed">{description}</DialogDescription>
               )}
             </div>
           </div>
         </DialogHeader>
         {children && <div className={cn("space-y-4", contentClassName)}>{children}</div>}
-        {footer && <DialogFooter>{footer}</DialogFooter>}
+        {footer && <DialogFooter className="gap-2">{footer}</DialogFooter>}
       </DialogContent>
     </Dialog>
   );

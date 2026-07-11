@@ -26,8 +26,8 @@ export default function StatCard({
       type={onClick ? "button" : undefined}
       onClick={onClick}
       className={cn(
-        "text-left w-full rounded-2xl bg-card border border-border p-5 md:p-6 shadow-[var(--shadow-sm)]",
-        "transition-all hover:border-primary/40 hover:shadow-[var(--shadow-md)]",
+        "text-left w-full rounded-[20px] bg-card border border-border p-5",
+        "transition-colors hover:border-primary/40",
         onClick && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
@@ -35,14 +35,14 @@ export default function StatCard({
       <div className="flex items-start justify-between gap-3">
         <span className="stat-label">{label}</span>
         {icon && (
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 text-primary">
+          <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-primary/[0.08] text-primary">
             {icon}
           </span>
         )}
       </div>
-      <div className="stat-value mt-3">{value}</div>
+      <div className="stat-value mt-4">{value}</div>
       {(hint || trend) && (
-        <div className="mt-2 flex items-center gap-2 text-xs">
+        <div className="mt-2.5 flex items-center gap-2 text-[12px]">
           {trend && (
             <span
               className={cn(
