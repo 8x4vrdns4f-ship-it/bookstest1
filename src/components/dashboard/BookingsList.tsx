@@ -30,12 +30,12 @@ type Booking = {
   assigned_employee_id: string | null;
 };
 
-const statusColors: Record<string, string> = {
-  pending: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  confirmed: "bg-green-500/20 text-green-400 border-green-500/30",
-  in_progress: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  cancelled: "bg-destructive/20 text-destructive border-destructive/30",
-  completed: "bg-primary/20 text-primary border-primary/30",
+const statusStyle: Record<string, { pill: string; dot: string; label: string }> = {
+  pending:    { pill: "text-warning bg-warning/10 border-warning/25",           dot: "bg-warning",     label: "Pending" },
+  confirmed:  { pill: "text-success bg-success/10 border-success/25",           dot: "bg-success",     label: "Confirmed" },
+  in_progress:{ pill: "text-primary bg-primary/10 border-primary/25",           dot: "bg-primary",     label: "In progress" },
+  cancelled:  { pill: "text-destructive bg-destructive/10 border-destructive/25", dot: "bg-destructive", label: "Cancelled" },
+  completed:  { pill: "text-muted-foreground bg-secondary/60 border-border",    dot: "bg-muted-foreground", label: "Completed" },
 };
 
 const BookingsList = ({ userId }: { userId: string }) => {
@@ -263,29 +263,34 @@ const BookingsList = ({ userId }: { userId: string }) => {
           description={search ? "Try a different code, name, or email." : "Add one manually or share your calendar widget to start receiving bookings."}
         />
       ) : (
-        <div className="space-y-2">
-          {filtered.map((b) => (
+        <div className="space-y-1.5">
+          {filtered.map((b) => {
+            const st = statusStyle[b.status] || statusStyle.pending;
+            return (
             <div
               key={b.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-lg bg-secondary/40 border border-border hover:border-primary/40 hover:bg-secondary/60 transition-colors cursor-pointer"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-xl bg-secondary/30 border border-border/70 hover:border-primary/40 hover:bg-secondary/50 transition-colors cursor-pointer"
               onClick={() => setDetail(b)}
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="font-semibold text-foreground text-sm">{b.client_name}</span>
-                  <Badge variant="outline" className={statusColors[b.status]}>{b.status.replace("_", " ")}</Badge>
+                  <span className="font-semibold text-foreground text-[14px] tracking-tight">{b.client_name}</span>
+                  <span className={`status-pill ${st.pill}`}>
+                    <span className={`status-dot ${st.dot}`} />
+                    {st.label}
+                  </span>
                   {b.confirmation_code && (
-                    <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 font-mono">
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/25 font-mono text-[10px] tracking-wider">
                       {b.confirmation_code}
                     </Badge>
                   )}
                   {b.assigned_employee_id && employeesMap[b.assigned_employee_id] && (
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 gap-1">
+                    <Badge variant="outline" className="bg-secondary/60 text-muted-foreground border-border gap-1 text-[10px]">
                       <UserCheck size={10} /> {employeesMap[b.assigned_employee_id]}
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[12px] text-muted-foreground">
                   {b.service} · {b.booking_date} at {b.booking_time.slice(0, 5)} · {b.duration_minutes}min
                   {b.client_email && <> · {b.client_email}</>}
                 </p>
@@ -320,7 +325,8 @@ const BookingsList = ({ userId }: { userId: string }) => {
                 <ChevronRight size={14} className="text-muted-foreground hidden sm:block" />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Users, Clock, Code2, Plus, ArrowUpRight } from "lucide-react";
+import StatCard from "@/components/app/StatCard";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -109,27 +110,18 @@ export default function Dashboard() {
           {isOwner && <UsageBanner userId={businessUserId} />}
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             {statCards.map((stat) => (
-              <Card
+              <StatCard
                 key={stat.label}
-                className="surface-card hover:border-primary/30 transition-colors group"
-              >
-                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                  <CardTitle className="stat-label">{stat.label}</CardTitle>
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary grid place-items-center group-hover:bg-primary/20 transition-colors">
-                    <stat.icon className="h-4 w-4" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-baseline justify-between">
-                    <p className="stat-value">{stat.value}</p>
-                    {stat.hint && <span className="text-xs text-muted-foreground">{stat.hint}</span>}
-                  </div>
-                </CardContent>
-              </Card>
+                label={stat.label}
+                value={stat.value}
+                hint={stat.hint}
+                icon={<stat.icon className="h-[18px] w-[18px]" />}
+              />
             ))}
           </div>
+
 
           {isOwner && <GiftCodesCard />}
 
