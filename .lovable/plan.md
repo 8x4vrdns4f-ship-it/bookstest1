@@ -1,69 +1,36 @@
-Restyle the embeddable booking widget so it looks noticeably cleaner and more professional, while keeping the current single-screen structure (day chips → time slots → duration → details → card → submit). No flow changes, no dropdowns.
+Same treatment as the widget: keep the dark theme, blue accent, Plus Jakarta Sans and the current structure — no redesign, no new palette, no layout changes. Every page and every shared surface gets tuned so the app feels one grade sharper and more professional.
 
-All changes live in `src/lib/widgetTemplate.ts` (the self-contained HTML/CSS/JS used by `/embed/:userId`, the script-tag embed, and the downloadable HTML). Zero backend changes.
+## Shared surfaces (touch once, everything benefits)
 
-## Visual direction
+- **`SectionCard`** — tighten padding rhythm (20/24), header gap, remove `hover:shadow` lift (feels twitchy on static cards), stronger border contrast (`border`/`border-border/70`), 20px radius to match widget, refined title (15px/600) + description (13px/muted) hierarchy.
+- **`StatCard`** — bigger, more confident value (32px, tabular-nums, tighter tracking), label as 11px uppercase muted with wider letter-spacing, icon chip 36×36 with softer bg (`bg-primary/8`), 20px radius, remove hover lift, keep hover border tint only. Trend pill smaller and rounder.
+- **`PageHeader`** — tighter vertical rhythm, slightly larger title, description one tone lighter, action row spacing normalised, subtle divider under header on scroll (optional, sticky-safe).
+- **`DashboardSidebar`** — active item: solid subtle accent bg + accent text (matches widget selection). Nav item height 36px, icon 18px, tighter label letter-spacing. Group labels smaller (10px) and more muted. Slightly stronger border on the right edge.
+- **`DashboardHeader`** — align height with sidebar header (56px), refined trigger button, avatar/menu tightened.
+- **Dialogs (`AppDialog`)** — 20px radius, denser header, `max-w` normalised per size, softer overlay, consistent footer button row.
+- **Empty states (`EmptyState`)** — circular tinted icon (like widget success), 15px title, 13px muted body, single primary CTA.
+- **Buttons** — audit primary/secondary/ghost sizing across dashboard, ensure 40/44px heights, consistent 10–12px radius, subtle hover (bg shift, no translate).
+- **Tables/lists** — row height, divider colour, hover tint, header uppercase 11px muted — applied to `BookingsList`, `ClientList`, `StaffList`.
 
-Refined dark UI, aligned with the BookSuite app aesthetic:
-- Background: deep near-black card (`#0F1420`) with a subtle 1px border (`#1F2937`) and softer shadow — currently a mid-blue-grey card with a heavy shadow.
-- Accent: keep the BookSuite light blue (`#5BADE8`) but use it more sparingly — only on the selected state and the primary CTA.
-- Typography: switch the widget to Plus Jakarta Sans (loaded from Google Fonts inside the widget HTML so it works standalone), with a clear scale: 20px title, 11px uppercase section labels with more letter-spacing, 13px body.
-- Rounded corners bumped from 6–8px to 10–12px for pills/inputs, 20px for the outer card.
-- Consistent 16px internal padding rhythm; more breathing room between sections.
+## Per-page passes
 
-## Component-level changes
+- **Overview (`Dashboard.tsx`)** — restyled stat grid, tighter chart card, onboarding checklist as clean numbered rows (not chunky cards), booking requests + join requests + gift codes rendered through the polished `SectionCard`. `UsageBanner` softened, `SubscriptionWidget` compacted.
+- **Bookings page** — filter bar tightened, list rows given the shared row style, status pills restyled (dot + small caps), detail dialog refreshed via `AppDialog` polish.
+- **Calendar page** — day/time chips restyled to match widget (transparent bordered → solid accent when selected), today marker refined, `DayScheduleDialog` cleaned up.
+- **Clients / Staff / Shifts / Reviews** — inherit shared row + card + empty-state polish. Small per-page tweaks only where visibly off (spacing, badge colour, header alignment).
 
-1. **Header block**
-   - Title left-aligned, subtitle in muted grey underneath.
-   - Deposit line becomes a small inline pill (rounded, subtle border, no full-width bar) sitting next to the subtitle instead of a separate boxed row.
+## Design tokens (index.css)
 
-2. **Day chips**
-   - Larger tap targets (min 64px wide, 68px tall), 12px radius.
-   - Unselected: transparent background with a 1px border; hover fills subtly.
-   - Selected: solid accent with black text (current behavior, cleaner border).
-   - Closed days rendered muted/disabled with a diagonal-line feel via opacity + strikethrough on the day number, not the current red "busy" style.
-   - Scroll row gets fade-out gradients on left/right edges so it clearly indicates more days.
-
-3. **Time slots**
-   - 3 columns on mobile / 4 on wider widget (currently always 4).
-   - Pill style: taller (36px), 10px radius, monospaced-feeling tabular numbers so "09:30" and "10:00" line up.
-   - Busy slots: muted grey with a thin strike, no red — red reads as an error.
-   - Selected slot uses the accent fill.
-   - Empty state ("Pick a day first") gets a proper centered muted message with an icon glyph.
-
-4. **Duration**
-   - Row of 4 equal pills matching the time-slot style for visual consistency.
-   - Disabled state uses reduced opacity + `cursor: not-allowed` without changing size.
-
-5. **Your details**
-   - Inputs get a floating-label look: label sits inside the input, 12px placeholder, focus ring in accent.
-   - Two-column on wide, single-column under 380px.
-
-6. **Card details**
-   - Stripe Elements appearance tuned to match: `borderRadius: 10`, `colorBackground: #0F1420`, `colorText: #F3F4F6`, matching input border color, slightly larger `fontSizeBase`.
-   - Payment note becomes a small lock-icon + text row so it reads as reassurance, not a disclaimer.
-
-7. **Submit button**
-   - Full-width, 48px tall, 12px radius, accent background, subtle hover lift (translateY -1px, stronger shadow).
-   - Disabled state: 40% opacity, no pointer.
-
-8. **Success state**
-   - Larger check in a circular accent-tinted background, tighter copy, primary "Book another" ghost button underneath (client-side reset — no backend call).
-
-9. **Error banner**
-   - Softer red (`#2A1518` bg, `#FCA5A5` text), left accent bar, no full block color.
-
-## Technical notes
-
-- All work in `WIDGET_STYLES` and `WIDGET_MARKUP` constants, plus the Stripe `appearance` block inside `buildWidgetScript`.
-- Add a `<link rel="preconnect">` + Google Fonts `<link>` for Plus Jakarta Sans in `buildWidgetHtml`'s `<head>`, with `-apple-system` fallback so first paint is never blocked.
-- Keep the widget viewport-safe: max-width stays 460px, all sizing in `rem`/`px` (no viewport units) so it looks identical inside the 500px iframe on any host site.
-- Preserve every existing DOM id (`bw-dates`, `bw-slots`, `bw-durs`, `bw-name`, `bw-email`, `bw-payel`, `bw-err`, `bw-submit`, `bw`, `bw-done`) so the JS logic is untouched.
-- No changes to `src/pages/EmbedWidget.tsx`, `public/embed.js`, edge functions, or Stripe wiring.
+- Slight tune to `--shadow-sm` / `--shadow-md` so cards feel flatter and calmer (less generic glow).
+- Add helper `.stat-value` / `.stat-label` if not already there, matching the new sizing.
+- No colour, font, or radius scale changes beyond what tokens already expose. No new dependencies.
 
 ## Out of scope
 
-- No stepped/multi-screen flow.
-- No dropdowns.
-- No calendar month grid.
-- No copy changes to the landing page or dashboard preview surrounding the widget.
+- No logic changes, no data-fetching changes, no route changes.
+- No new features, no new sections, no landing-page work, no widget changes.
+- No dark→light or palette swap. No typography swap.
+
+## Verification
+
+After the pass: load `/dashboard`, `/dashboard/bookings`, `/dashboard/calendar`, `/dashboard/clients`, `/dashboard/staff`, `/dashboard/shifts`, `/dashboard/reviews`, plus a booking detail dialog and the embed widget dialog — visually confirm consistent spacing, card style, and typography with a Playwright screenshot per page.
