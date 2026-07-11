@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Circle, X, Rocket } from "lucide-react";
+import { CheckCircle2, X, Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getConnectAuthHeaders, getStripeEnvironment } from "@/lib/connectPayments";
 import SectionCard from "@/components/app/SectionCard";
