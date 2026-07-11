@@ -60,11 +60,11 @@ export default function DashboardSidebar() {
           asChild
           isActive={active}
           tooltip={item.title}
-          className="data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary data-[active=true]:font-semibold hover:bg-sidebar-accent/60 transition-colors"
+          className="h-9 rounded-lg data-[active=true]:bg-primary/[0.12] data-[active=true]:text-primary data-[active=true]:font-semibold hover:bg-sidebar-accent/70 transition-colors"
         >
           <NavLink to={item.url} end={item.end}>
             <item.icon className="h-[18px] w-[18px] shrink-0" />
-            <span>{item.title}</span>
+            <span className="tracking-[-0.01em]">{item.title}</span>
           </NavLink>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -73,8 +73,8 @@ export default function DashboardSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
-      <SidebarHeader className="p-4 border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-1 h-9">
+      <SidebarHeader className="h-14 px-4 border-b border-sidebar-border flex flex-row items-center">
+        <div className="flex items-center gap-2 px-1">
           {collapsed ? (
             <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground grid place-items-center font-bold text-sm">
               BS
