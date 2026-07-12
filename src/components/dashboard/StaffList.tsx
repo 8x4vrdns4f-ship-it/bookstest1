@@ -171,16 +171,14 @@ const StaffList = ({ userId }: { userId: string }) => {
         <span className="text-xs text-muted-foreground">({items.length})</span>
       </div>
       {items.length === 0 ? (
-        <Card className="bg-card border-border border-dashed">
-          <CardContent className="py-6 text-center text-xs text-muted-foreground">No one here</CardContent>
-        </Card>
+        <div className="rounded-xl border border-dashed border-border/70 bg-muted/10 py-6 text-center text-xs text-muted-foreground">No one here</div>
       ) : (
         items.map((m) => (
-          <Card
+          <div
             key={m.id}
-            className="bg-card border-border hover:border-primary/50 transition-colors"
+            className="rounded-xl bg-card border border-border/70 hover:border-border transition-colors"
           >
-            <CardContent className="p-4 flex items-center justify-between gap-2">
+            <div className="p-4 flex items-center justify-between gap-2">
               <button
                 onClick={() => setProfileId(m.id)}
                 className="text-left flex-1 min-w-0"
@@ -190,12 +188,12 @@ const StaffList = ({ userId }: { userId: string }) => {
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); setSelected(m); }}
-                className="text-xs text-primary hover:underline shrink-0"
+                className="text-xs font-semibold text-primary hover:underline shrink-0"
               >
                 Assign
               </button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))
       )}
     </div>
@@ -205,15 +203,15 @@ const StaffList = ({ userId }: { userId: string }) => {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">Staff on duty</h2>
-          <p className="text-sm text-muted-foreground">Click a name to view their profile, or use the columns below to assign bookings.</p>
+          <h2 className="text-[17px] font-semibold text-foreground tracking-tight">Staff on duty</h2>
+          <p className="text-[13px] text-muted-foreground mt-1">Click a name to view their profile, or use the columns below to assign bookings.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="bg-secondary border-border w-auto"
+            className="w-auto"
           />
           <ManageShiftsDialog userId={userId} date={date} onChanged={load} />
           <PlanShiftsDialog userId={userId} onChanged={load} />
@@ -239,44 +237,42 @@ const StaffList = ({ userId }: { userId: string }) => {
         <>
           {/* On shift now (today only) */}
           {date === todayStr() && (
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 space-y-2">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock size={16} className="text-primary" />
-                  <h3 className="font-semibold text-foreground">On shift now</h3>
-                  <span className="text-xs text-muted-foreground">({onShiftNow.length})</span>
+            <div className="rounded-[20px] bg-card border border-border p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <Clock size={16} className="text-primary" />
+                <h3 className="font-semibold text-foreground text-[15px] tracking-tight">On shift now</h3>
+                <span className="text-xs text-muted-foreground">({onShiftNow.length})</span>
+              </div>
+              {onShiftNow.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-2">Nobody is currently within their shift hours.</p>
+              ) : (
+                <div className="space-y-2">
+                  {onShiftNow.map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => setProfileId(m.id)}
+                      className="w-full flex items-center justify-between gap-3 p-3 rounded-xl border border-border/60 bg-muted/20 hover:border-border hover:bg-muted/30 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-full bg-primary/[0.12] text-primary flex items-center justify-center shrink-0">
+                          <User size={16} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{m.name}</p>
+                          {m.position && <p className="text-xs text-muted-foreground truncate">{m.position}</p>}
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-xs text-foreground tabular-nums">{m.shiftStart} – {m.shiftEnd}</p>
+                        <p className={`text-[10px] uppercase tracking-[0.08em] font-semibold ${m.status === "in_progress" ? "text-primary" : "text-emerald-400"}`}>
+                          {m.status === "in_progress" ? "In booking" : "Free"}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-                {onShiftNow.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-2">Nobody is currently within their shift hours.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {onShiftNow.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => setProfileId(m.id)}
-                        className="w-full flex items-center justify-between gap-3 p-3 rounded border border-border bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50 transition-colors text-left"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center shrink-0">
-                            <User size={16} />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{m.name}</p>
-                            {m.position && <p className="text-xs text-muted-foreground truncate">{m.position}</p>}
-                          </div>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-xs text-foreground">{m.shiftStart} – {m.shiftEnd}</p>
-                          <p className={`text-[10px] uppercase tracking-wide ${m.status === "in_progress" ? "text-primary" : "text-emerald-400"}`}>
-                            {m.status === "in_progress" ? "In booking" : "Free"}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              )}
+            </div>
           )}
 
           <div className="grid gap-5 md:grid-cols-3">

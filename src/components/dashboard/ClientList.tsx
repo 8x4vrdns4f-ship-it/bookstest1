@@ -111,22 +111,27 @@ const ClientList = ({ userId }: { userId: string }) => {
       ) : (
         <div className="space-y-2">
           {clients.map((c) => (
-            <div key={c.id} className="flex items-center justify-between p-3.5 rounded-lg bg-secondary/40 border border-border hover:border-primary/30 transition-colors">
-              <div className="min-w-0">
-                <p className="font-semibold text-foreground text-sm">{c.name}</p>
-                <div className="flex items-center gap-3 mt-1 flex-wrap">
-                  {c.email && (
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Mail size={10} /> {c.email}
-                    </span>
-                  )}
-                  {c.phone && (
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Phone size={10} /> {c.phone}
-                    </span>
-                  )}
+            <div key={c.id} className="flex items-center justify-between p-3.5 rounded-xl bg-muted/20 border border-border/60 hover:border-border hover:bg-muted/30 transition-colors">
+              <div className="min-w-0 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary/[0.08] text-primary flex items-center justify-center shrink-0 text-xs font-semibold uppercase">
+                  {c.name.trim().slice(0, 2)}
                 </div>
-                {c.notes && <p className="text-xs text-muted-foreground mt-1">{c.notes}</p>}
+                <div className="min-w-0">
+                  <p className="font-semibold text-foreground text-sm">{c.name}</p>
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    {c.email && (
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Mail size={10} /> {c.email}
+                      </span>
+                    )}
+                    {c.phone && (
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Phone size={10} /> {c.phone}
+                      </span>
+                    )}
+                  </div>
+                  {c.notes && <p className="text-xs text-muted-foreground mt-1">{c.notes}</p>}
+                </div>
               </div>
               <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(c.id)}>
                 <Trash2 size={14} />
