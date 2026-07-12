@@ -214,7 +214,7 @@ export default function ReviewsPage() {
           <SectionCard title="Recent reviews">
             <div className="space-y-3">
               {reviews.slice(0, visible).map((r) => (
-                <div key={r.id} className="rounded-xl border border-border p-4 space-y-2">
+                <div key={r.id} className="rounded-xl border border-border/70 bg-muted/10 p-4 space-y-2 hover:border-border transition-colors">
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <div className="flex items-center gap-2">
                       <Stars value={r.rating} size={16} />
