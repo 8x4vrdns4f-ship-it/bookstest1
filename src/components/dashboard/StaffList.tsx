@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import AddEmployeeDialog from "./AddEmployeeDialog";
 import ManageShiftsDialog from "./ManageShiftsDialog";
