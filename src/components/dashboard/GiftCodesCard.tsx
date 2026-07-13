@@ -63,12 +63,17 @@ const GiftCodesCard = () => {
       });
       if (insErr) throw insErr;
 
-      toast.success(`Code created: ${code}`);
+      try { await navigator.clipboard.writeText(code); } catch {}
+      toast.success(`Code ${code} created & copied`, {
+        description: "Share it — the recipient gets 30 days of the selected tier.",
+      });
       setNote("");
       setDialogOpen(false);
       await load();
     } catch (e: any) {
-      toast.error(e.message || "Could not create code");
+      if (!handleTierError(e)) {
+        toast.error(e.message || "Could not create code");
+      }
     } finally {
       setCreating(false);
     }
