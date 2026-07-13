@@ -100,6 +100,9 @@ const GiftCodesCard = () => {
           <DialogContent className="bg-card border-border">
             <DialogHeader>
               <DialogTitle>Generate a gift code</DialogTitle>
+              <DialogDescription>
+                Requires an active plan. You can create up to 5 codes per month. Each unlocks 30 days of the selected tier.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div>
