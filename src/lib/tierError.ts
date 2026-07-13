@@ -30,5 +30,13 @@ export function handleTierError(error: { message?: string } | null | undefined):
     });
     return true;
   }
+  if (msg.includes("TIER_LIMIT_GIFT_CODES")) {
+    toast({
+      title: "Monthly gift code limit reached",
+      description: "You can create up to 5 gift codes per month. Try again next month.",
+      variant: "destructive",
+    });
+    return true;
+  }
   return false;
 }

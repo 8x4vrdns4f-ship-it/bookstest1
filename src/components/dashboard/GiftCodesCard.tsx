@@ -3,13 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Gift, Copy, Plus } from "lucide-react";
 import { toast } from "sonner";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
+import { handleTierError } from "@/lib/tierError";
 
 type GiftCodeRow = {
   id: string;
@@ -62,12 +63,17 @@ const GiftCodesCard = () => {
       });
       if (insErr) throw insErr;
 
-      toast.success(`Code created: ${code}`);
+      try { await navigator.clipboard.writeText(code); } catch {}
+      toast.success(`Code ${code} created & copied`, {
+        description: "Share it — the recipient gets 30 days of the selected tier.",
+      });
       setNote("");
       setDialogOpen(false);
       await load();
     } catch (e: any) {
-      toast.error(e.message || "Could not create code");
+      if (!handleTierError(e)) {
+        toast.error(e.message || "Could not create code");
+      }
     } finally {
       setCreating(false);
     }
@@ -94,6 +100,9 @@ const GiftCodesCard = () => {
           <DialogContent className="bg-card border-border">
             <DialogHeader>
               <DialogTitle>Generate a gift code</DialogTitle>
+              <DialogDescription>
+                Requires an active plan. You can create up to 5 codes per month. Each unlocks 30 days of the selected tier.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div>
