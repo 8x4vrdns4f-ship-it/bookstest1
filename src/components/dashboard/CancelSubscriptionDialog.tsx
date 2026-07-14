@@ -66,7 +66,7 @@ const CancelSubscriptionDialog = () => {
         <Button variant="destructive" size="sm">Cancel Subscription</Button>
       </DialogTrigger>
       <DialogContent className="bg-card border-border">
-        {step === "retain" ? (
+        {step === "retain" && !isGift ? (
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-foreground">
@@ -103,29 +103,42 @@ const CancelSubscriptionDialog = () => {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle size={20} />
-                Cancel your subscription?
+                {isGift ? "End your gifted access?" : "Cancel your subscription?"}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                This is permanent. Cancelling will:
+                {isGift
+                  ? `This will end your gifted ${tier ?? ""} access immediately.`
+                  : "This is permanent. Cancelling will:"}
               </DialogDescription>
             </DialogHeader>
-            <ul className="text-sm text-foreground space-y-2 list-disc pl-5">
-              <li><strong>Immediately remove your access</strong> to BookSuite — no grace period.</li>
-              <li>Stop billing on your card.</li>
-              <li>Make you <strong>permanently ineligible</strong> for the 30-day free trial again.</li>
-              <li>You can re-subscribe later, but it'll be at the regular price.</li>
-            </ul>
-            <div className="rounded-lg border border-border bg-secondary/40 p-3 text-xs text-muted-foreground">
-              We'll email you a one-time <strong className="text-foreground">20% off for 3 months</strong> code
-              in case you change your mind.
-            </div>
+            {isGift ? (
+              <ul className="text-sm text-foreground space-y-2 list-disc pl-5">
+                <li><strong>Immediately remove your access</strong> to BookSuite.</li>
+                <li>You can redeem another gift code or subscribe on the Pricing page later.</li>
+              </ul>
+            ) : (
+              <>
+                <ul className="text-sm text-foreground space-y-2 list-disc pl-5">
+                  <li><strong>Immediately remove your access</strong> to BookSuite — no grace period.</li>
+                  <li>Stop billing on your card.</li>
+                  <li>Make you <strong>permanently ineligible</strong> for the 30-day free trial again.</li>
+                  <li>You can re-subscribe later, but it'll be at the regular price.</li>
+                </ul>
+                <div className="rounded-lg border border-border bg-secondary/40 p-3 text-xs text-muted-foreground">
+                  We'll email you a one-time <strong className="text-foreground">20% off for 3 months</strong> code
+                  in case you change your mind.
+                </div>
+              </>
+            )}
             <DialogFooter className="gap-2 sm:gap-2">
-              <Button variant="outline" onClick={() => setStep("retain")} disabled={busy}>
-                Go back
-              </Button>
+              {!isGift && (
+                <Button variant="outline" onClick={() => setStep("retain")} disabled={busy}>
+                  Go back
+                </Button>
+              )}
               <Button variant="destructive" onClick={handleConfirmCancel} disabled={busy}>
                 {busy ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
-                Yes, cancel & remove access
+                {isGift ? "Yes, end my access" : "Yes, cancel & remove access"}
               </Button>
             </DialogFooter>
           </>
