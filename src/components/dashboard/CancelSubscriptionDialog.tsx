@@ -61,7 +61,7 @@ const CancelSubscriptionDialog = () => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setStep("retain"); }}>
+    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setStep(isGift ? "confirm" : "retain"); }}>
       <DialogTrigger asChild>
         <Button variant="destructive" size="sm">Cancel Subscription</Button>
       </DialogTrigger>
