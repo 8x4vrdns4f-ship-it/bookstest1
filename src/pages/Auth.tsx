@@ -43,7 +43,7 @@ const Auth = () => {
     defaultValues: { displayName: "", email: "", password: "" },
   });
 
-  const activeForm = isLogin ? loginForm : signupForm;
+  
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
