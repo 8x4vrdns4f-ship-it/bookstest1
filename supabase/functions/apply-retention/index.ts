@@ -29,9 +29,17 @@ serve(async (req) => {
 
     // One-time retention offer per user.
     const { data: sub } = await admin
-      .from("subscriptions").select("retention_offer_used").eq("user_id", user.id).maybeSingle();
+      .from("subscriptions")
+      .select("retention_offer_used, stripe_subscription_id, price_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
     if (sub?.retention_offer_used) {
       throw new Error("Retention discount has already been applied to your account.");
+    }
+    const isGift = !sub?.stripe_subscription_id ||
+      (typeof sub?.price_id === "string" && sub.price_id.startsWith("gift_"));
+    if (isGift) {
+      throw new Error("Retention discount isn't available for gifted plans.");
     }
 
     let environment: unknown = undefined;
