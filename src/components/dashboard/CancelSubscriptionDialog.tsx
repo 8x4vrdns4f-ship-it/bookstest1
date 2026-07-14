@@ -12,9 +12,9 @@ import { useSubscription } from "@/hooks/useSubscription";
 const CancelSubscriptionDialog = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { refresh, isActive } = useSubscription();
+  const { refresh, isActive, isGift, tier } = useSubscription();
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<"retain" | "confirm">("retain");
+  const [step, setStep] = useState<"retain" | "confirm">(isGift ? "confirm" : "retain");
   const [busy, setBusy] = useState(false);
 
   if (!isActive) return null;
