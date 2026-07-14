@@ -43,7 +43,7 @@ const Auth = () => {
     defaultValues: { displayName: "", email: "", password: "" },
   });
 
-  const activeForm = isLogin ? loginForm : signupForm;
+  
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,30 +146,11 @@ const Auth = () => {
                   </button>
                 </p>
               </form>
-            ) : (
-              <Form {...activeForm}>
-                <form onSubmit={activeForm.handleSubmit(onSubmit)} className="space-y-4">
-                  {!isLogin && (
-                    <FormField
-                      control={signupForm.control}
-                      name="displayName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Display Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Your name"
-                              {...field}
-                              className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
+            ) : isLogin ? (
+              <Form {...loginForm} key="login-form">
+                <form onSubmit={loginForm.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
-                    control={activeForm.control}
+                    control={loginForm.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
@@ -177,6 +158,7 @@ const Auth = () => {
                         <FormControl>
                           <Input
                             type="email"
+                            autoComplete="email"
                             placeholder="you@example.com"
                             {...field}
                             className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
@@ -187,7 +169,7 @@ const Auth = () => {
                     )}
                   />
                   <FormField
-                    control={activeForm.control}
+                    control={loginForm.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
@@ -196,6 +178,7 @@ const Auth = () => {
                           <div className="relative">
                             <Input
                               type={showPassword ? "text" : "password"}
+                              autoComplete="current-password"
                               placeholder="••••••••"
                               {...field}
                               className="bg-secondary border-border text-foreground placeholder:text-muted-foreground pr-10"
@@ -214,17 +197,89 @@ const Auth = () => {
                       </FormItem>
                     )}
                   />
-                  {isLogin && (
-                    <button
-                      type="button"
-                      onClick={() => setIsForgot(true)}
-                      className="text-xs text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      Forgot password?
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsForgot(true)}
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Forgot password?
+                  </button>
                   <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
-                    {loading ? "Please wait..." : isLogin ? "Log In" : "Sign Up"}
+                    {loading ? "Please wait..." : "Log In"}
+                  </Button>
+                </form>
+              </Form>
+            ) : (
+              <Form {...signupForm} key="signup-form">
+                <form onSubmit={signupForm.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={signupForm.control}
+                    name="displayName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Display Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            autoComplete="name"
+                            placeholder="Your name"
+                            {...field}
+                            className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={signupForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            autoComplete="email"
+                            placeholder="you@example.com"
+                            {...field}
+                            className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={signupForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              autoComplete="new-password"
+                              placeholder="••••••••"
+                              {...field}
+                              className="bg-secondary border-border text-foreground placeholder:text-muted-foreground pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
+                    {loading ? "Please wait..." : "Sign Up"}
                   </Button>
                 </form>
               </Form>
