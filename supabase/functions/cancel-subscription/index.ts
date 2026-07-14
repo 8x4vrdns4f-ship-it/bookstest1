@@ -27,7 +27,6 @@ serve(async (req) => {
       const body = await req.json();
       environment = body?.environment;
     } catch (_) { /* no body */ }
-    const env = resolveEnv(environment);
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -35,9 +34,61 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Look up current subscription row
+    const { data: subRow } = await admin
+      .from("subscriptions")
+      .select("tier, price_id, stripe_subscription_id, stripe_customer_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const { data: biz } = await admin.from("business_settings")
+      .select("business_name").eq("user_id", user.id).maybeSingle();
+
+    // Gift/manual subscription path — no Stripe involvement.
+    const isGift = !subRow?.stripe_subscription_id ||
+      (typeof subRow?.price_id === "string" && subRow.price_id.startsWith("gift_"));
+
+    if (isGift) {
+      const tier = subRow?.tier ?? "your plan";
+      await admin.from("subscriptions").upsert({
+        user_id: user.id,
+        email: user.email,
+        subscribed: false,
+        status: "canceled",
+        tier,
+        canceled_at: new Date().toISOString(),
+        current_period_end: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "user_id" });
+
+      try {
+        await admin.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "subscription-canceled",
+            recipientEmail: user.email,
+            templateData: {
+              businessName: biz?.business_name || user.email,
+              tier: String(tier).charAt(0).toUpperCase() + String(tier).slice(1),
+              winbackCode: "",
+              resubscribeUrl: "https://booksuite.online/pricing",
+            },
+            idempotencyKey: `cancel-gift-${user.id}-${Date.now()}`,
+          },
+        });
+      } catch (mailErr) {
+        console.error("[cancel-subscription] gift email send failed", mailErr);
+      }
+
+      return new Response(JSON.stringify({ ok: true, giftCanceled: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Paid Stripe path
+    const env = resolveEnv(environment);
     const stripe = createStripeClient(env);
 
-    // Find the active/trialing Stripe subscription for this user.
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     const customerId = customers.data[0]?.id;
     if (!customerId) throw new Error("No Stripe customer found");
@@ -46,15 +97,9 @@ serve(async (req) => {
     const live = subs.data.find((s) => s.status === "active" || s.status === "trialing" || s.status === "past_due");
     if (!live) throw new Error("No active subscription to cancel");
 
-    // Look up business name for the email
-    const { data: biz } = await admin.from("business_settings")
-      .select("business_name").eq("user_id", user.id).maybeSingle();
-
-    // Instantly cancel — no grace period.
     const canceled = await stripe.subscriptions.cancel(live.id, { invoice_now: false, prorate: false });
-    const tier = (canceled.metadata?.tier as string) || "your plan";
+    const tier = (canceled.metadata?.tier as string) || subRow?.tier || "your plan";
 
-    // Persist: row stays so the user is permanently ineligible for a free trial.
     await admin.from("subscriptions").upsert({
       user_id: user.id,
       email: user.email,
@@ -68,7 +113,6 @@ serve(async (req) => {
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
 
-    // Fire the cancellation + winback email (best-effort, do not fail the cancel)
     try {
       await admin.functions.invoke("send-transactional-email", {
         body: {
