@@ -64,6 +64,11 @@ const VerifyEmail = () => {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         window.history.replaceState({}, document.title, window.location.pathname);
         if (error && !cancelled) {
+          const { data: { user: existingUser } } = await supabase.auth.getUser();
+          if (existingUser?.email_confirmed_at) {
+            finishVerification(existingUser);
+            return;
+          }
           setLinkError(error.message);
           setChecking(false);
           return;
