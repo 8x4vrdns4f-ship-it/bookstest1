@@ -70,10 +70,17 @@ const Auth = () => {
       const v = values as LoginForm;
       const { data, error } = await supabase.auth.signInWithPassword({ email: v.email, password: v.password });
       if (error) {
-        toast({ title: "Login failed", description: error.message, variant: "destructive" });
+        if (error.message.toLowerCase().includes("email not confirmed")) {
+          localStorage.setItem("booksuite.pendingVerificationEmail", v.email);
+          toast({ title: "Verify your email", description: "Please confirm your email to continue." });
+          navigate("/verify-email", { state: { email: v.email } });
+        } else {
+          toast({ title: "Login failed", description: error.message, variant: "destructive" });
+        }
       } else if (data.user && !data.user.email_confirmed_at) {
+        localStorage.setItem("booksuite.pendingVerificationEmail", v.email);
         toast({ title: "Verify your email", description: "Please confirm your email to continue." });
-        navigate("/verify-email");
+        navigate("/verify-email", { state: { email: v.email } });
       } else {
         toast({ title: "Welcome back!" });
         const route = await getDashboardRoute();
@@ -92,8 +99,9 @@ const Auth = () => {
       if (error) {
         toast({ title: "Signup failed", description: error.message, variant: "destructive" });
       } else {
+        localStorage.setItem("booksuite.pendingVerificationEmail", v.email);
         toast({ title: "Account created!", description: "Check your email to verify." });
-        navigate("/verify-email");
+        navigate("/verify-email", { state: { email: v.email } });
       }
     }
     setLoading(false);

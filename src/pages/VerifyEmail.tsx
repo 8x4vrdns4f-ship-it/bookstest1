@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -11,14 +12,34 @@ import { getDashboardRoute } from "@/lib/routeAfterAuth";
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [email, setEmail] = useState<string | null>(null);
+  const [manualEmail, setManualEmail] = useState("");
   const [cooldown, setCooldown] = useState(0);
   const [resending, setResending] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [linkError, setLinkError] = useState<string | null>(null);
+
+  const storedEmailKey = "booksuite.pendingVerificationEmail";
 
   useEffect(() => {
     let cancelled = false;
+
+    const initialParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const urlError = initialParams.get("error_description") || hashParams.get("error_description") || initialParams.get("error") || hashParams.get("error");
+    const pendingEmail = (location.state as { email?: string } | null)?.email || localStorage.getItem(storedEmailKey) || "";
+
+    if (urlError) {
+      setLinkError(decodeURIComponent(urlError.replace(/\+/g, " ")));
+      setManualEmail(pendingEmail);
+      setEmail(pendingEmail || null);
+      setChecking(false);
+      return () => {
+        cancelled = true;
+      };
+    }
 
     const fireWelcome = async (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
       if (!user.email) return;
@@ -30,30 +51,53 @@ const VerifyEmail = () => {
       });
     };
 
+    const finishVerification = async (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
+      fireWelcome(user);
+      localStorage.removeItem(storedEmailKey);
+      const route = await getDashboardRoute();
+      navigate(route, { replace: true });
+    };
+
     const check = async () => {
+      const code = new URLSearchParams(window.location.search).get("code");
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        if (error && !cancelled) {
+          const { data: { user: existingUser } } = await supabase.auth.getUser();
+          if (existingUser?.email_confirmed_at) {
+            finishVerification(existingUser);
+            return;
+          }
+          setLinkError(error.message);
+          setChecking(false);
+          return;
+        }
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (cancelled) return;
       if (!user) {
-        navigate("/auth");
+        const pendingEmail = (location.state as { email?: string } | null)?.email || localStorage.getItem(storedEmailKey) || "";
+        setManualEmail(pendingEmail);
+        setEmail(pendingEmail || null);
+        setChecking(false);
         return;
       }
       setEmail(user.email ?? null);
+      if (user.email) localStorage.setItem(storedEmailKey, user.email);
       setChecking(false);
       if (user.email_confirmed_at) {
-        fireWelcome(user);
-        const route = await getDashboardRoute();
-        navigate(route, { replace: true });
+        finishVerification(user);
       }
     };
 
     check();
     const interval = setInterval(check, 4000);
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user?.email_confirmed_at) {
-        fireWelcome(session.user);
-        const route = await getDashboardRoute();
-        navigate(route, { replace: true });
+        setTimeout(() => finishVerification(session.user), 0);
       }
     });
 
@@ -62,7 +106,7 @@ const VerifyEmail = () => {
       clearInterval(interval);
       sub.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [location.state, navigate]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -71,17 +115,25 @@ const VerifyEmail = () => {
   }, [cooldown]);
 
   const handleResend = async () => {
-    if (!email || cooldown > 0) return;
+    const targetEmail = (email || manualEmail).trim();
+    if (!targetEmail || cooldown > 0) {
+      toast({ title: "Email required", description: "Enter the email address you used to sign up.", variant: "destructive" });
+      return;
+    }
     setResending(true);
     const { error } = await supabase.auth.resend({
       type: "signup",
-      email,
+      email: targetEmail,
       options: { emailRedirectTo: `${window.location.origin}/verify-email` },
     });
     setResending(false);
     if (error) {
       toast({ title: "Couldn't resend", description: error.message, variant: "destructive" });
     } else {
+      localStorage.setItem(storedEmailKey, targetEmail);
+      setEmail(targetEmail);
+      setManualEmail(targetEmail);
+      setLinkError(null);
       toast({ title: "Email sent", description: "Check your inbox for the verification link." });
       setCooldown(60);
     }
@@ -101,15 +153,38 @@ const VerifyEmail = () => {
           <CardHeader className="text-center">
             <h1 className="text-2xl font-bold text-foreground">Check your email</h1>
             <CardDescription className="text-muted-foreground">
-              {checking ? "Loading…" : (
+              {checking ? "Loading…" : linkError ? (
+                <>That verification link is no longer valid. Send yourself a fresh one below.</>
+              ) : email ? (
                 <>We've sent a verification link to <span className="text-foreground font-medium">{email}</span>. Click it to activate your account — you'll be logged in automatically.</>
+              ) : (
+                <>Enter the email you used to sign up and we'll send a new verification link.</>
               )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {linkError && (
+              <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {linkError}
+              </p>
+            )}
+            {!email && !checking && (
+              <div className="space-y-2">
+                <label htmlFor="verification-email" className="text-sm font-medium text-foreground">Email</label>
+                <Input
+                  id="verification-email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={manualEmail}
+                  onChange={(event) => setManualEmail(event.target.value)}
+                  className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+            )}
             <Button
               onClick={handleResend}
-              disabled={resending || cooldown > 0 || !email}
+              disabled={resending || cooldown > 0 || checking}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
             >
               {resending ? "Sending…" : cooldown > 0 ? `Resend in ${cooldown}s` : "Resend verification email"}
