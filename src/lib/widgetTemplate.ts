@@ -82,6 +82,16 @@ export const WIDGET_MARKUP = `
   <div class="label">Duration</div>
   <div class="durs" id="bw-durs"></div>
 
+  <div id="bw-party-wrap" style="display:none">
+    <div class="label" id="bw-party-label">Party size</div>
+    <input id="bw-party" type="number" min="1" max="99" value="2">
+  </div>
+
+  <div id="bw-res-wrap" style="display:none">
+    <div class="label" id="bw-res-label">Resource</div>
+    <div class="slots" id="bw-resources" style="grid-template-columns:repeat(2,1fr)"></div>
+  </div>
+
   <div class="label">Your details</div>
   <div class="row">
     <input id="bw-name" placeholder="Full name" required>
