@@ -517,7 +517,8 @@ export const buildWidgetScript = (opts: {
   Promise.all([
     api('/rest/v1/rpc/get_widget_settings', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); }),
     api('/rest/v1/rpc/get_busy_slots', { method: 'POST', body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange }) }).then(function(r){ return r.json(); }),
-    api('/rest/v1/rpc/get_widget_date_overrides', { method: 'POST', body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange }) }).then(function(r){ return r.json(); })
+    api('/rest/v1/rpc/get_widget_date_overrides', { method: 'POST', body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange }) }).then(function(r){ return r.json(); }),
+    api('/rest/v1/rpc/get_widget_resources', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];
@@ -536,6 +537,7 @@ export const buildWidgetScript = (opts: {
     }
     busy = Array.isArray(arr[1]) ? arr[1] : [];
     (Array.isArray(arr[2]) ? arr[2] : []).forEach(function(o){ overrides[o.override_date] = o; });
+    resources = Array.isArray(arr[3]) ? arr[3] : [];
     var today = new Date();
     var startI = settings.allow_same_day ? 0 : 1;
     var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
