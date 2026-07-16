@@ -69,6 +69,10 @@ type SettingsForm = {
   accent_color: string;
   self_checkin_enabled: boolean;
   reception_checkin_enabled: boolean;
+  resources_enabled: boolean;
+  resource_label: string;
+  party_size_enabled: boolean;
+  assignment_mode: "client_pick" | "auto";
 };
 
 const Settings = () => {
