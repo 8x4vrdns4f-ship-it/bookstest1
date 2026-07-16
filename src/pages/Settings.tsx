@@ -94,6 +94,8 @@ const Settings = () => {
     notify_client_confirmation: true, notify_client_reminder: true, notify_client_review_request: true,
     welcome_message: "", accent_color: "#3B82F6",
     self_checkin_enabled: false, reception_checkin_enabled: true,
+    resources_enabled: false, resource_label: "Resource",
+    party_size_enabled: false, assignment_mode: "client_pick",
   });
 
   useEffect(() => {
