@@ -149,11 +149,16 @@ export const buildWidgetScript = (opts: {
     allow_same_day: true,
     max_advance_days: 14,
     buffer_minutes: 0,
-    currency: 'GBP'
+    currency: 'GBP',
+    resources_enabled: false,
+    resource_label: 'Resource',
+    party_size_enabled: false,
+    assignment_mode: 'client_pick'
   };
   var busy = [];
   var overrides = {};
-  var selDate = null, selSlot = null, selDur = null;
+  var resources = [];
+  var selDate = null, selSlot = null, selDur = null, selResource = null;
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
   var stripe = null, elements = null, paymentEl = null, elementsReady = false;
 
