@@ -275,7 +275,7 @@ export const buildWidgetScript = (opts: {
                      '<div class="dd">'+d.getDate()+'</div>'+
                      '<div class="dm">'+(hrs.closed ? 'Closed' : d.toLocaleDateString(undefined,{month:'short'}))+'</div>';
       if (!hrs.closed){
-        (function(ds_){ el.onclick = function(){ selDate = ds_; selSlot = null; selDur = null; renderAll(); }; })(ds);
+        (function(ds_){ el.onclick = function(){ selDate = ds_; selSlot = null; selDur = null; selResource = null; renderAll(); }; })(ds);
       }
       wrap.appendChild(el);
     }
@@ -299,7 +299,7 @@ export const buildWidgetScript = (opts: {
       el.className = 'slot' + (isBusy?' busy':'') + (selSlot === m?' sel':'');
       el.textContent = fmtMin(m);
       if (!isBusy){
-        (function(mm){ el.onclick = function(){ selSlot = mm; selDur = null; renderAll(); }; })(m);
+        (function(mm){ el.onclick = function(){ selSlot = mm; selDur = null; selResource = null; renderAll(); }; })(m);
       }
       wrap.appendChild(el);
     }
@@ -427,7 +427,7 @@ export const buildWidgetScript = (opts: {
     againBtn.addEventListener('click', function(){
       document.getElementById('bw-done').style.display = 'none';
       document.getElementById('bw').style.display = '';
-      selSlot = null; selDur = null;
+      selSlot = null; selDur = null; selResource = null;
       document.getElementById('bw-name').value = '';
       document.getElementById('bw-email').value = '';
       document.getElementById('bw-err').innerHTML = '';
