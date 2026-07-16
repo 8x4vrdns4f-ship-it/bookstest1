@@ -20,6 +20,7 @@ Two dashboards: owners → /dashboard, employees → /employee-dashboard. Route 
 - [External Calendar Widget](mem://features/external-calendar-widget) — Embeddable HTML/JS snippet for external booking synchronization
 - [Auth UI Preferences](mem://auth/ui-preferences) — Password visibility and distinct entry points for login/signup
 - [Employee Management](mem://features/employee-management) — Adding and managing staff via dashboard dialog
+- [Bookable Resources](mem://features/bookable-resources) — Per-business tables/rooms/chairs with capacity, party size, client-pick or auto-assign
 - [Staff Day View](mem://features/staff-day-view) — Staff tab: 3-column day view (In Progress/Free/Unavailable), shifts, assign bookings
 - [Booking Lifecycle](mem://features/booking-lifecycle) — Pending → confirmed/declined flow with 6-char codes
 - [Business Settings](mem://features/business-settings) — Per-business settings table (deposit, hours, name)
