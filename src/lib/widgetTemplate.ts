@@ -327,15 +327,65 @@ export const buildWidgetScript = (opts: {
       wrap.appendChild(el);
     });
   }
+  // Which resources are free for the currently-selected date/time/duration/party?
+  function resourceIsFree(resourceId){
+    if (!selDate || selSlot === null || !selDur) return true;
+    var buf = settings.buffer_minutes || 0;
+    var startWant = selSlot;
+    var endWant = selSlot + selDur;
+    var conflict = busy.some(function(b){
+      if (b.booking_date !== selDate) return false;
+      if (b.resource_id !== resourceId) return false;
+      var s = toMin(b.booking_time) - buf;
+      var e = toMin(b.booking_time) + (b.duration_minutes || 30) + buf;
+      return s < endWant && e > startWant;
+    });
+    return !conflict;
+  }
+  function renderResources(){
+    var wrap = document.getElementById('bw-res-wrap');
+    if (!settings.resources_enabled || settings.assignment_mode === 'auto') {
+      wrap.style.display = 'none';
+      return;
+    }
+    wrap.style.display = '';
+    document.getElementById('bw-res-label').textContent = settings.resource_label || 'Resource';
+    var list = document.getElementById('bw-resources');
+    list.innerHTML = '';
+    var fits = fittingResources();
+    if (fits.length === 0){
+      list.innerHTML = emptyMsg('No ' + (settings.resource_label || 'resource').toLowerCase() + 's available for that party size');
+      return;
+    }
+    fits.forEach(function(r){
+      var free = resourceIsFree(r.id);
+      var el = document.createElement('div');
+      el.className = 'slot' + (!free ? ' busy' : '') + (selResource === r.id ? ' sel' : '');
+      el.textContent = r.name + ' · ' + r.capacity;
+      if (free){
+        (function(rid){ el.onclick = function(){ selResource = selResource === rid ? null : rid; renderAll(); }; })(r.id);
+      }
+      list.appendChild(el);
+    });
+  }
+  function renderParty(){
+    var wrap = document.getElementById('bw-party-wrap');
+    if (!settings.party_size_enabled) { wrap.style.display = 'none'; return; }
+    wrap.style.display = '';
+    document.getElementById('bw-party-label').textContent = 'Party size';
+  }
   function renderAll(){
-    renderDates(); renderSlots(); renderDurs();
+    renderDates(); renderSlots(); renderDurs(); renderParty(); renderResources();
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
-    btn.disabled = !(selDate && selSlot !== null && selDur && name && email && elementsReady);
+    var needResource = settings.resources_enabled && settings.assignment_mode === 'client_pick';
+    var resourceOk = !needResource || !!selResource;
+    btn.disabled = !(selDate && selSlot !== null && selDur && name && email && elementsReady && resourceOk);
   }
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
+  document.getElementById('bw-party').addEventListener('input', function(){ selResource = null; renderAll(); });
 
   function mountStripeElements(){
     if (!window.Stripe || !STRIPE_PK) {
