@@ -488,7 +488,9 @@ export const buildWidgetScript = (opts: {
           environment: PAYMENT_ENV,
           stripe_customer_id: intentData.customer_id,
           stripe_payment_method_id: pmId,
-          stripe_setup_intent_id: intentData.setup_intent_id
+          stripe_setup_intent_id: intentData.setup_intent_id,
+          resource_id: settings.resources_enabled ? selResource : null,
+          party_size: settings.party_size_enabled ? partySize() : null
         })
       });
       var saveData = await saveRes.json();
