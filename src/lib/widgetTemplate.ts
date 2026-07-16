@@ -323,7 +323,7 @@ export const buildWidgetScript = (opts: {
       el.disabled = disabled;
       el.className = 'dur' + (selDur === d ? ' sel' : '');
       el.textContent = d + ' min';
-      (function(dd){ el.onclick = function(){ if (!el.disabled){ selDur = dd; renderAll(); } }; })(d);
+      (function(dd){ el.onclick = function(){ if (!el.disabled){ selDur = dd; selResource = null; renderAll(); } }; })(d);
       wrap.appendChild(el);
     });
   }
