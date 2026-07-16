@@ -136,6 +136,10 @@ const Settings = () => {
             accent_color: data.accent_color || "#3B82F6",
             self_checkin_enabled: !!data.self_checkin_enabled,
             reception_checkin_enabled: data.reception_checkin_enabled ?? true,
+            resources_enabled: (data as any).resources_enabled ?? false,
+            resource_label: (data as any).resource_label ?? "Resource",
+            party_size_enabled: (data as any).party_size_enabled ?? false,
+            assignment_mode: ((data as any).assignment_mode as "client_pick" | "auto") ?? "client_pick",
           });
         }
         setLoading(false);
