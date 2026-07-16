@@ -32,6 +32,8 @@ Deno.serve(async (req) => {
       stripe_customer_id,
       stripe_payment_method_id,
       stripe_setup_intent_id,
+      resource_id,
+      party_size,
     } = body;
 
     const env = resolveEnv(environment);
@@ -56,6 +58,9 @@ Deno.serve(async (req) => {
     if (typeof stripe_customer_id !== "string" || !stripe_customer_id.startsWith("cus_")) return bad("Invalid customer");
     if (typeof stripe_payment_method_id !== "string" || !stripe_payment_method_id.startsWith("pm_")) return bad("Invalid payment method");
     if (typeof stripe_setup_intent_id !== "string" || !stripe_setup_intent_id.startsWith("seti_")) return bad("Invalid setup intent");
+    if (resource_id != null && (typeof resource_id !== "string" || !uuidRe.test(resource_id))) return bad("Invalid resource");
+    const ps = party_size == null ? null : Number(party_size);
+    if (ps != null && (!Number.isInteger(ps) || ps < 1 || ps > 999)) return bad("Invalid party size");
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
