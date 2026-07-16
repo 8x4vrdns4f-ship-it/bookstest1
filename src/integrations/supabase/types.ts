@@ -32,10 +32,12 @@ export type Database = {
           duration_minutes: number
           id: string
           notes: string | null
+          party_size: number | null
           payment_environment: string
           payment_status: string
           platform_fee_amount: number | null
           refund_id: string | null
+          resource_id: string | null
           review_sent_at: string | null
           review_submitted_at: string | null
           review_token: string | null
@@ -64,10 +66,12 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          party_size?: number | null
           payment_environment?: string
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
+          resource_id?: string | null
           review_sent_at?: string | null
           review_submitted_at?: string | null
           review_token?: string | null
@@ -96,10 +100,12 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          party_size?: number | null
           payment_environment?: string
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
+          resource_id?: string | null
           review_sent_at?: string | null
           review_submitted_at?: string | null
           review_token?: string | null
@@ -126,12 +132,20 @@ export type Database = {
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "bookings_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
         ]
       }
       business_settings: {
         Row: {
           accent_color: string
           allow_same_day: boolean
+          assignment_mode: string
           auto_confirm: boolean
           buffer_minutes: number
           business_address: string | null
@@ -154,10 +168,13 @@ export type Database = {
           notify_daily_summary: boolean
           notify_new_booking: boolean
           onboarding_completed_at: string | null
+          party_size_enabled: boolean
           pending_request_ttl_hours: number
           platform_fee_percent: number
           reception_checkin_enabled: boolean
           require_deposit: boolean
+          resource_label: string
+          resources_enabled: boolean
           self_checkin_enabled: boolean
           timezone: string
           updated_at: string
@@ -168,6 +185,7 @@ export type Database = {
         Insert: {
           accent_color?: string
           allow_same_day?: boolean
+          assignment_mode?: string
           auto_confirm?: boolean
           buffer_minutes?: number
           business_address?: string | null
@@ -190,10 +208,13 @@ export type Database = {
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null
+          party_size_enabled?: boolean
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
           require_deposit?: boolean
+          resource_label?: string
+          resources_enabled?: boolean
           self_checkin_enabled?: boolean
           timezone?: string
           updated_at?: string
@@ -204,6 +225,7 @@ export type Database = {
         Update: {
           accent_color?: string
           allow_same_day?: boolean
+          assignment_mode?: string
           auto_confirm?: boolean
           buffer_minutes?: number
           business_address?: string | null
@@ -226,10 +248,13 @@ export type Database = {
           notify_daily_summary?: boolean
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null
+          party_size_enabled?: boolean
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
           require_deposit?: boolean
+          resource_label?: string
+          resources_enabled?: boolean
           self_checkin_enabled?: boolean
           timezone?: string
           updated_at?: string
@@ -685,9 +710,11 @@ export type Database = {
           expires_at: string
           id: string
           notes: string | null
+          party_size: number | null
           payment_environment: string
           platform_fee_amount: number
           reminder_sent_at: string | null
+          resource_id: string | null
           service: string
           status: string
           stripe_account_id: string
@@ -712,9 +739,11 @@ export type Database = {
           expires_at?: string
           id?: string
           notes?: string | null
+          party_size?: number | null
           payment_environment?: string
           platform_fee_amount: number
           reminder_sent_at?: string | null
+          resource_id?: string | null
           service: string
           status?: string
           stripe_account_id: string
@@ -739,9 +768,11 @@ export type Database = {
           expires_at?: string
           id?: string
           notes?: string | null
+          party_size?: number | null
           payment_environment?: string
           platform_fee_amount?: number
           reminder_sent_at?: string | null
+          resource_id?: string | null
           service?: string
           status?: string
           stripe_account_id?: string
@@ -751,7 +782,15 @@ export type Database = {
           stripe_setup_intent_id?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pending_bookings_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -775,6 +814,39 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          active: boolean
+          capacity: number
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          capacity?: number
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          capacity?: number
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
           updated_at?: string
           user_id?: string
         }
@@ -965,6 +1037,7 @@ export type Database = {
           booking_date: string
           booking_time: string
           duration_minutes: number
+          resource_id: string
           status: string
         }[]
       }
@@ -992,16 +1065,29 @@ export type Database = {
           override_date: string
         }[]
       }
+      get_widget_resources: {
+        Args: { p_user_id: string }
+        Returns: {
+          capacity: number
+          id: string
+          name: string
+          sort_order: number
+        }[]
+      }
       get_widget_settings: {
         Args: { p_user_id: string }
         Returns: {
           accent_color: string
           allow_same_day: boolean
+          assignment_mode: string
           buffer_minutes: number
           business_name: string
           currency: string
           deposit_amount: number
           max_advance_days: number
+          party_size_enabled: boolean
+          resource_label: string
+          resources_enabled: boolean
           timezone: string
           user_id: string
           welcome_message: string

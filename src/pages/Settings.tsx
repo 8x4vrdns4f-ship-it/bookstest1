@@ -12,8 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Copy, Check, LogOut, KeyRound, Trash2, XCircle,
-  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock,
+  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock, LayoutGrid,
 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import ResourcesManager from "@/components/dashboard/ResourcesManager";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
@@ -67,6 +69,10 @@ type SettingsForm = {
   accent_color: string;
   self_checkin_enabled: boolean;
   reception_checkin_enabled: boolean;
+  resources_enabled: boolean;
+  resource_label: string;
+  party_size_enabled: boolean;
+  assignment_mode: "client_pick" | "auto";
 };
 
 const Settings = () => {
@@ -88,6 +94,8 @@ const Settings = () => {
     notify_client_confirmation: true, notify_client_reminder: true, notify_client_review_request: true,
     welcome_message: "", accent_color: "#3B82F6",
     self_checkin_enabled: false, reception_checkin_enabled: true,
+    resources_enabled: false, resource_label: "Resource",
+    party_size_enabled: false, assignment_mode: "client_pick",
   });
 
   useEffect(() => {
@@ -128,6 +136,10 @@ const Settings = () => {
             accent_color: data.accent_color || "#3B82F6",
             self_checkin_enabled: !!data.self_checkin_enabled,
             reception_checkin_enabled: data.reception_checkin_enabled ?? true,
+            resources_enabled: (data as any).resources_enabled ?? false,
+            resource_label: (data as any).resource_label ?? "Resource",
+            party_size_enabled: (data as any).party_size_enabled ?? false,
+            assignment_mode: ((data as any).assignment_mode as "client_pick" | "auto") ?? "client_pick",
           });
         }
         setLoading(false);
@@ -325,6 +337,78 @@ const Settings = () => {
             </AccordionContent>
           </AccordionItem>
           </SectionCard>
+
+          {/* Bookable Resources */}
+          <SectionCard>
+            <AccordionItem value="resources" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <LayoutGrid size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Bookable Resources</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-5">
+                <p className="text-xs text-muted-foreground">
+                  Turn this on if clients should pick a specific table, room, chair, court, etc. when booking.
+                </p>
+                <ToggleRow
+                  label="Enable resource selection"
+                  hint="Adds a resource picker to your booking widget."
+                  checked={form.resources_enabled}
+                  onChange={(v) => setForm({ ...form, resources_enabled: v })}
+                />
+                {form.resources_enabled && (
+                  <>
+                    <Field label="Resource label" hint="Shown on the widget, e.g. Table, Room, Chair, Court.">
+                      <Input
+                        value={form.resource_label}
+                        onChange={(e) => setForm({ ...form, resource_label: e.target.value })}
+                        className="bg-secondary border-border max-w-[220px]"
+                        maxLength={40}
+                      />
+                    </Field>
+                    <ToggleRow
+                      label="Ask for party size"
+                      hint="Client enters number of guests; only resources big enough are offered."
+                      checked={form.party_size_enabled}
+                      onChange={(v) => setForm({ ...form, party_size_enabled: v })}
+                    />
+                    <div className="space-y-2">
+                      <Label className="text-foreground">Assignment</Label>
+                      <p className="text-xs text-muted-foreground">Who chooses which resource the booking goes to.</p>
+                      <RadioGroup
+                        value={form.assignment_mode}
+                        onValueChange={(v) => setForm({ ...form, assignment_mode: v as "client_pick" | "auto" })}
+                        className="space-y-2"
+                      >
+                        <label className="flex items-start gap-3 p-3 rounded-md bg-secondary/40 border border-border cursor-pointer">
+                          <RadioGroupItem value="client_pick" id="am-client" className="mt-0.5" />
+                          <div>
+                            <p className="text-sm text-foreground font-medium">Client picks</p>
+                            <p className="text-xs text-muted-foreground">Client selects a specific {form.resource_label.toLowerCase() || "resource"} from the ones available.</p>
+                          </div>
+                        </label>
+                        <label className="flex items-start gap-3 p-3 rounded-md bg-secondary/40 border border-border cursor-pointer">
+                          <RadioGroupItem value="auto" id="am-auto" className="mt-0.5" />
+                          <div>
+                            <p className="text-sm text-foreground font-medium">Auto-assign</p>
+                            <p className="text-xs text-muted-foreground">We pick the first free {form.resource_label.toLowerCase() || "resource"} that fits. You can reassign later.</p>
+                          </div>
+                        </label>
+                      </RadioGroup>
+                    </div>
+                    <div className="pt-2 border-t border-border">
+                      <Label className="text-foreground">Your {form.resource_label.toLowerCase() || "resource"}s</Label>
+                      {userId && <div className="mt-3"><ResourcesManager userId={userId} label={form.resource_label || "Resource"} /></div>}
+                    </div>
+                  </>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          </SectionCard>
+
 
           {/* Notifications */}
           <SectionCard>

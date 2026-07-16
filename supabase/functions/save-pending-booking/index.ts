@@ -32,6 +32,8 @@ Deno.serve(async (req) => {
       stripe_customer_id,
       stripe_payment_method_id,
       stripe_setup_intent_id,
+      resource_id,
+      party_size,
     } = body;
 
     const env = resolveEnv(environment);
@@ -56,6 +58,9 @@ Deno.serve(async (req) => {
     if (typeof stripe_customer_id !== "string" || !stripe_customer_id.startsWith("cus_")) return bad("Invalid customer");
     if (typeof stripe_payment_method_id !== "string" || !stripe_payment_method_id.startsWith("pm_")) return bad("Invalid payment method");
     if (typeof stripe_setup_intent_id !== "string" || !stripe_setup_intent_id.startsWith("seti_")) return bad("Invalid setup intent");
+    if (resource_id != null && (typeof resource_id !== "string" || !uuidRe.test(resource_id))) return bad("Invalid resource");
+    const ps = party_size == null ? null : Number(party_size);
+    if (ps != null && (!Number.isInteger(ps) || ps < 1 || ps > 999)) return bad("Invalid party size");
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -64,7 +69,7 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking")
+      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes")
       .eq("user_id", userId)
       .maybeSingle();
     if (!settings) return bad("Business not found");
@@ -76,6 +81,58 @@ Deno.serve(async (req) => {
       .eq("environment", env)
       .maybeSingle();
     if (!connect || !connect.charges_enabled) return bad("Business is not accepting payments");
+
+    // --- Resource resolution ---
+    let finalResourceId: string | null = null;
+    if ((settings as any).resources_enabled) {
+      const buf = Number((settings as any).buffer_minutes || 0);
+      const startMin = ((): number => { const p = booking_time.split(":"); return parseInt(p[0]) * 60 + parseInt(p[1]); })();
+      const endMin = startMin + dur;
+
+      const overlaps = async (resId: string): Promise<boolean> => {
+        const { data: rows } = await admin
+          .from("bookings")
+          .select("booking_time, duration_minutes")
+          .eq("user_id", userId)
+          .eq("booking_date", booking_date)
+          .eq("resource_id", resId)
+          .in("status", ["pending", "confirmed"]);
+        return (rows || []).some((b: any) => {
+          const p = String(b.booking_time).split(":");
+          const s = parseInt(p[0]) * 60 + parseInt(p[1]) - buf;
+          const e = s + Number(b.duration_minutes || 30) + buf * 2;
+          return s < endMin && e > startMin;
+        });
+      };
+
+      if ((settings as any).assignment_mode === "auto" || !resource_id) {
+        // Auto-pick first fitting resource
+        const { data: candidates } = await admin
+          .from("resources")
+          .select("id, capacity")
+          .eq("user_id", userId)
+          .eq("active", true)
+          .gte("capacity", ps || 1)
+          .order("sort_order", { ascending: true })
+          .order("name", { ascending: true });
+        if (!candidates || candidates.length === 0) return bad("No resources available for that party size");
+        for (const c of candidates) {
+          if (!(await overlaps(c.id))) { finalResourceId = c.id; break; }
+        }
+        if (!finalResourceId) return bad("No resources available at that time");
+      } else {
+        // Client-picked: validate belongs to business, capacity, and no conflict
+        const { data: res } = await admin
+          .from("resources")
+          .select("id, capacity, active, user_id")
+          .eq("id", resource_id)
+          .maybeSingle();
+        if (!res || res.user_id !== userId || !res.active) return bad("Invalid resource selection");
+        if ((ps || 1) > Number(res.capacity)) return bad("Resource too small for that party size");
+        if (await overlaps(res.id)) return bad("That resource just got booked — please pick another time");
+        finalResourceId = res.id;
+      }
+    }
 
     const deposit = Number(settings.deposit_amount);
     const feePct = Number(settings.platform_fee_percent);
@@ -100,6 +157,8 @@ Deno.serve(async (req) => {
         stripe_customer_id,
         stripe_payment_method_id,
         stripe_setup_intent_id,
+        resource_id: finalResourceId,
+        party_size: ps,
       })
       .select()
       .single();

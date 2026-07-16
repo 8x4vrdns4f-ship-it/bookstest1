@@ -130,6 +130,8 @@ Deno.serve(async (req) => {
         payment_environment: env,
         payment_status: "paid",
         client_token_expires_at: tokenExpires.toISOString(),
+        resource_id: (pending as any).resource_id ?? null,
+        party_size: (pending as any).party_size ?? null,
       })
       .select()
       .single();
