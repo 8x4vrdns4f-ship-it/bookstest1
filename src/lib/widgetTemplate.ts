@@ -194,14 +194,69 @@ export const buildWidgetScript = (opts: {
     var key = DAY_KEYS[d.getDay()];
     return settings.working_hours[key] || { closed: true, open:'09:00', close:'18:00' };
   }
+  // Party size (returns 1 if disabled or empty)
+  function partySize(){
+    if (!settings.party_size_enabled) return 1;
+    var v = parseInt(document.getElementById('bw-party').value, 10);
+    return (isNaN(v) || v < 1) ? 1 : v;
+  }
+  // Which resources can host the current party size?
+  function fittingResources(){
+    if (!settings.resources_enabled) return [];
+    var ps = partySize();
+    return resources.filter(function(r){ return (r.capacity || 1) >= ps; });
+  }
+  // A slot is "busy" only if ALL fitting resources are occupied (or, when a specific resource is picked, only that resource).
+  // When resources are disabled, fall back to the flat busy set.
   function busyMinutes(dateStr){
     var set = {};
     var buf = settings.buffer_minutes || 0;
-    busy.filter(function(b){ return b.booking_date === dateStr; }).forEach(function(b){
+    var todays = busy.filter(function(b){ return b.booking_date === dateStr; });
+
+    if (!settings.resources_enabled) {
+      todays.forEach(function(b){
+        var s = toMin(b.booking_time) - buf;
+        var e = toMin(b.booking_time) + (b.duration_minutes || 30) + buf;
+        for (var m = Math.max(0, Math.floor(s/30)*30); m < e; m += 30) set[m] = true;
+      });
+      return set;
+    }
+
+    var fits = fittingResources();
+    if (fits.length === 0) return set; // no resources = nothing bookable, but keep slots pickable so we can show a message
+
+    // Which resource are we counting against?
+    var scoped = selResource ? [selResource] : fits.map(function(r){ return r.id; });
+    var scopedSet = {}; scoped.forEach(function(id){ scopedSet[id] = true; });
+
+    // Count overlapping bookings per resource per slot
+    var perSlot = {};
+    todays.forEach(function(b){
+      if (b.resource_id && !scopedSet[b.resource_id]) return;
       var s = toMin(b.booking_time) - buf;
       var e = toMin(b.booking_time) + (b.duration_minutes || 30) + buf;
-      for (var m = Math.max(0, Math.floor(s/30)*30); m < e; m += 30) set[m] = true;
+      for (var m = Math.max(0, Math.floor(s/30)*30); m < e; m += 30) {
+        var key = m + '|' + (b.resource_id || '_');
+        perSlot[key] = true;
+      }
     });
+
+    if (selResource) {
+      // Busy if this resource has any overlap at that slot
+      Object.keys(perSlot).forEach(function(k){
+        var parts = k.split('|'); if (parts[1] === selResource) set[Number(parts[0])] = true;
+      });
+    } else {
+      // Busy only if EVERY fitting resource is booked at that slot
+      var slotCounts = {};
+      Object.keys(perSlot).forEach(function(k){
+        var parts = k.split('|'); var m = Number(parts[0]);
+        slotCounts[m] = (slotCounts[m] || 0) + 1;
+      });
+      Object.keys(slotCounts).forEach(function(m){
+        if (slotCounts[m] >= scoped.length) set[Number(m)] = true;
+      });
+    }
     return set;
   }
   function renderDates(){
