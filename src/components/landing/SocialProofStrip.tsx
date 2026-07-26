@@ -3,7 +3,7 @@ import { Users, CreditCard, Globe, Zap } from "lucide-react";
 const items = [
   { Icon: Users, label: "Built for every service business" },
   { Icon: CreditCard, label: "Instant deposits via Stripe" },
-  { Icon: Globe, label: "6 languages, auto currency" },
+  { Icon: Globe, label: "38 languages, auto currency" },
   { Icon: Zap, label: "Live in under 5 minutes" },
 ];
 
