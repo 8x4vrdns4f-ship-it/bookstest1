@@ -22,7 +22,7 @@ const LanguageSwitcher = () => {
         <span className="sm:hidden">{current?.flag}</span>
         <span className="text-xs opacity-70 hidden md:inline">· {currency}</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 bg-popover">
+      <DropdownMenuContent align="end" className="w-64 bg-popover max-h-[70vh] overflow-y-auto">
         <DropdownMenuLabel className="text-xs uppercase tracking-wide opacity-60">{t("nav.language")}</DropdownMenuLabel>
         {LANGUAGES.map(l => (
           <DropdownMenuItem key={l.code} onClick={() => setLanguage(l.code)} className="cursor-pointer">
