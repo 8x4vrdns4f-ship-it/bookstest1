@@ -91,7 +91,7 @@ const TierComparison = () => {
                     className={`relative py-4 px-3 md:px-6 text-center min-w-[110px] ${tier.popular ? "bg-primary/10" : ""}`}
                   >
                     {tier.popular && (
-                      <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary text-primary-foreground whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full bg-primary text-primary-foreground whitespace-nowrap">
                         <Sparkles size={10} /> Most popular
                       </span>
                     )}
