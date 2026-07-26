@@ -1,19 +1,28 @@
+import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import SEO from "@/components/SEO";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import InfoCards from "@/components/InfoCards";
-import FeaturesStrip from "@/components/FeaturesStrip";
-import TierComparison from "@/components/TierComparison";
-import HowItWorks from "@/components/landing/HowItWorks";
-import ExpandedFeatures from "@/components/landing/ExpandedFeatures";
-import Testimonials from "@/components/landing/Testimonials";
-import FAQ from "@/components/landing/FAQ";
-import FinalCTA from "@/components/landing/FinalCTA";
 import SocialProofStrip from "@/components/landing/SocialProofStrip";
-import GuidesSection from "@/components/landing/GuidesSection";
+import InfoCards from "@/components/InfoCards";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import Footer from "@/components/Footer";
+
+// Below-the-fold: lazy-load to shrink the initial JS payload for better LCP/TTI.
+const ProductShowcase = lazy(() => import("@/components/landing/ProductShowcase"));
+const HowItWorks = lazy(() => import("@/components/landing/HowItWorks"));
+const FeaturesStrip = lazy(() => import("@/components/FeaturesStrip"));
+const ExpandedFeatures = lazy(() => import("@/components/landing/ExpandedFeatures"));
+const TierComparison = lazy(() => import("@/components/TierComparison"));
+const IndustrySections = lazy(() => import("@/components/landing/IndustrySections"));
+const CompetitorComparison = lazy(() => import("@/components/landing/CompetitorComparison"));
+const Testimonials = lazy(() => import("@/components/landing/Testimonials"));
+const GuidesSection = lazy(() => import("@/components/landing/GuidesSection"));
+const FAQ = lazy(() => import("@/components/landing/FAQ"));
+const FinalCTA = lazy(() => import("@/components/landing/FinalCTA"));
+
+const Fallback = () => <div className="h-40" aria-hidden />;
+
 
 const FAQS: { q: string; a: string }[] = [
   { q: "How much does BookSuite cost?", a: "We offer a free tier to get started and paid tiers as you grow. Check the pricing page for the full breakdown of features per tier." },
@@ -71,14 +80,19 @@ const Index = () => {
         <HeroSection />
         <SocialProofStrip />
         <InfoCards />
-        <HowItWorks />
-        <FeaturesStrip />
-        <ExpandedFeatures />
-        <TierComparison />
-        <Testimonials />
-        <GuidesSection />
-        <FAQ />
-        <FinalCTA />
+        <Suspense fallback={<Fallback />}>
+          <ProductShowcase />
+          <HowItWorks />
+          <FeaturesStrip />
+          <ExpandedFeatures />
+          <TierComparison />
+          <IndustrySections />
+          <CompetitorComparison />
+          <Testimonials />
+          <GuidesSection />
+          <FAQ />
+          <FinalCTA />
+        </Suspense>
       </main>
       <StickyMobileCTA />
       <Footer />
