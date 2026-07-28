@@ -81,15 +81,24 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, onChanged }
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
     }
-    if (status === "cancelled" && prevStatus !== "cancelled" && booking.client_email) {
-      const { sendEmail, formatDate, formatTime } = await import("@/lib/sendEmail");
-      const { data: bs } = await supabase.from("business_settings").select("business_name").eq("user_id", ownerId).maybeSingle();
-      sendEmail("booking-cancelled-client", booking.client_email, `booking-cancel-${booking.id}`, {
-        businessName: bs?.business_name || "the business",
-        clientName: booking.client_name, service: booking.service,
-        date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
-      });
+    if (status === "cancelled" && prevStatus !== "cancelled") {
+      if (booking.client_email) {
+        const { sendEmail, formatDate, formatTime } = await import("@/lib/sendEmail");
+        const { data: bs } = await supabase.from("business_settings").select("business_name").eq("user_id", ownerId).maybeSingle();
+        sendEmail("booking-cancelled-client", booking.client_email, `booking-cancel-${booking.id}`, {
+          businessName: bs?.business_name || "the business",
+          clientName: booking.client_name, service: booking.service,
+          date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
+        });
+      }
+      // Notify waitlist for that date (non-fatal).
+      try {
+        await supabase.functions.invoke("notify-waitlist", {
+          body: { user_id: ownerId, date: booking.booking_date },
+        });
+      } catch { /* ignore */ }
     }
+
     onChanged?.();
   };
 

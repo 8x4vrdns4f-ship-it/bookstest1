@@ -84,7 +84,15 @@ Deno.serve(async (req) => {
       } catch (e) { console.error("decline email failed", e); }
     }
 
+    // Notify waitlist for that date (non-fatal).
+    try {
+      await admin.functions.invoke("notify-waitlist", {
+        body: { user_id: pending.user_id, date: pending.booking_date },
+      });
+    } catch (e) { console.error("waitlist notify failed", e); }
+
     await admin.from("pending_bookings").delete().eq("id", pending.id);
+
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

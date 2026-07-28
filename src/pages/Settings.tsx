@@ -73,6 +73,8 @@ type SettingsForm = {
   resource_label: string;
   party_size_enabled: boolean;
   assignment_mode: "client_pick" | "auto";
+  waitlist_enabled: boolean;
+
 };
 
 const Settings = () => {
@@ -95,7 +97,8 @@ const Settings = () => {
     welcome_message: "", accent_color: "#3B82F6",
     self_checkin_enabled: false, reception_checkin_enabled: true,
     resources_enabled: false, resource_label: "Resource",
-    party_size_enabled: false, assignment_mode: "client_pick",
+    party_size_enabled: false, assignment_mode: "client_pick", waitlist_enabled: false,
+
   });
 
   useEffect(() => {
@@ -140,6 +143,8 @@ const Settings = () => {
             resource_label: (data as any).resource_label ?? "Resource",
             party_size_enabled: (data as any).party_size_enabled ?? false,
             assignment_mode: ((data as any).assignment_mode as "client_pick" | "auto") ?? "client_pick",
+            waitlist_enabled: (data as any).waitlist_enabled ?? false,
+
           });
         }
         setLoading(false);
@@ -427,7 +432,9 @@ const Settings = () => {
               <ToggleRow label="Client Booking Confirmation" hint="Email clients when their booking is confirmed." checked={form.notify_client_confirmation} onChange={(v) => setForm({ ...form, notify_client_confirmation: v })} />
               <ToggleRow label="Client Reminder" hint="Send clients a reminder 24 hours before their appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
               <ToggleRow label="Client Review Request" hint="Ask clients for a review after their appointment." checked={form.notify_client_review_request} onChange={(v) => setForm({ ...form, notify_client_review_request: v })} />
+              <ToggleRow label="Waitlist" hint="Let clients join a waitlist for fully-booked dates, and auto-email them when a slot opens." checked={form.waitlist_enabled} onChange={(v) => setForm({ ...form, waitlist_enabled: v })} />
             </AccordionContent>
+
           </AccordionItem>
           </SectionCard>
 
