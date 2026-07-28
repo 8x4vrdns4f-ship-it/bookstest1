@@ -6,7 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import PublicBookingHeader from "@/components/booking/PublicBookingHeader";
 import PublicBookingTrustStrip from "@/components/booking/PublicBookingTrustStrip";
+import WaitlistDialog from "@/components/booking/WaitlistDialog";
 import { Skeleton } from "@/components/ui/skeleton";
+
 
 interface PublicInfo {
   business_name: string | null;
@@ -24,19 +26,25 @@ interface PublicInfo {
 const PublicBooking = () => {
   const { userId } = useParams<{ userId: string }>();
   const [info, setInfo] = useState<PublicInfo | null>(null);
+  const [waitlistEnabled, setWaitlistEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!userId) return;
     let active = true;
     (async () => {
-      const { data } = await supabase.rpc("get_public_business_info", { _user_id: userId });
+      const [{ data: pub }, { data: ws }] = await Promise.all([
+        supabase.rpc("get_public_business_info", { _user_id: userId }),
+        supabase.rpc("get_widget_settings", { p_user_id: userId }),
+      ]);
       if (!active) return;
-      setInfo((data as PublicInfo[] | null)?.[0] ?? null);
+      setInfo((pub as PublicInfo[] | null)?.[0] ?? null);
+      setWaitlistEnabled(!!(ws as any[] | null)?.[0]?.waitlist_enabled);
       setLoading(false);
     })();
     return () => { active = false; };
   }, [userId]);
+
 
   if (!userId) return null;
 
@@ -116,7 +124,14 @@ const PublicBooking = () => {
           />
         </div>
 
+        {waitlistEnabled && !loading && (
+          <div className="flex justify-center">
+            <WaitlistDialog userId={userId} businessName={businessName} />
+          </div>
+        )}
+
         <PublicBookingTrustStrip cancellationHours={info?.cancellation_hours} />
+
 
         <footer className="text-center text-xs text-muted-foreground pt-4">
           Powered by{" "}
