@@ -27,6 +27,10 @@ import { template as bookingRequestExpiredOwner } from './booking-request-expire
 import { template as bookingRequestReminderOwner } from './booking-request-reminder-owner.tsx'
 import { template as bookingReminderClient } from './booking-reminder-client.tsx'
 import { template as reviewRequestClient } from './review-request-client.tsx'
+import { template as waitlistAdded } from './waitlist-added.tsx'
+import { template as waitlistSlotOpen } from './waitlist-slot-open.tsx'
+
+
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-confirmed': bookingConfirmed,
@@ -47,4 +51,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-request-reminder-owner': bookingRequestReminderOwner,
   'booking-reminder-client': bookingReminderClient,
   'review-request-client': reviewRequestClient,
+  'waitlist-added': waitlistAdded,
+  'waitlist-slot-open': waitlistSlotOpen,
 }
+

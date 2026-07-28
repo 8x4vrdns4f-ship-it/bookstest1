@@ -126,6 +126,15 @@ Deno.serve(async (req) => {
       } catch (e) { console.error("cancel email failed", e); }
     }
 
+    // Notify waitlist for that date (non-fatal).
+    try {
+      await admin.functions.invoke("notify-waitlist", {
+        body: { user_id: booking.user_id, date: booking.booking_date },
+      });
+    } catch (e) { console.error("waitlist notify failed", e); }
+
+
+
     return new Response(JSON.stringify({ ok: true, refunded: !!refundId }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

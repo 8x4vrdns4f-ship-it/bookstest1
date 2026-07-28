@@ -179,6 +179,7 @@ export type Database = {
           timezone: string
           updated_at: string
           user_id: string
+          waitlist_enabled: boolean
           welcome_message: string | null
           working_hours: Json
         }
@@ -219,6 +220,7 @@ export type Database = {
           timezone?: string
           updated_at?: string
           user_id: string
+          waitlist_enabled?: boolean
           welcome_message?: string | null
           working_hours?: Json
         }
@@ -259,6 +261,7 @@ export type Database = {
           timezone?: string
           updated_at?: string
           user_id?: string
+          waitlist_enabled?: boolean
           welcome_message?: string | null
           working_hours?: Json
         }
@@ -986,6 +989,60 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist_entries: {
+        Row: {
+          client_email: string
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          notified_at: string | null
+          party_size: number | null
+          preferred_date: string
+          preferred_time_end: string | null
+          preferred_time_start: string | null
+          service: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_email: string
+          client_name: string
+          client_phone?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          notified_at?: string | null
+          party_size?: number | null
+          preferred_date: string
+          preferred_time_end?: string | null
+          preferred_time_start?: string | null
+          service?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_email?: string
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          notified_at?: string | null
+          party_size?: number | null
+          preferred_date?: string
+          preferred_time_end?: string | null
+          preferred_time_start?: string | null
+          service?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1090,6 +1147,7 @@ export type Database = {
           resources_enabled: boolean
           timezone: string
           user_id: string
+          waitlist_enabled: boolean
           welcome_message: string
           working_hours: Json
         }[]
@@ -1104,6 +1162,21 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      join_waitlist: {
+        Args: {
+          p_client_email: string
+          p_client_name: string
+          p_client_phone: string
+          p_notes: string
+          p_party_size: number
+          p_preferred_date: string
+          p_preferred_time_end: string
+          p_preferred_time_start: string
+          p_service: string
+          p_user_id: string
+        }
+        Returns: string
       }
       lookup_business_by_code: {
         Args: { p_code: string }

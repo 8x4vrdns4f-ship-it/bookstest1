@@ -1,6 +1,7 @@
 import { useDashboardContext } from "@/hooks/useDashboardContext";
 import BookingsList from "@/components/dashboard/BookingsList";
 import BookingRequestsCard from "@/components/dashboard/BookingRequestsCard";
+import WaitlistCard from "@/components/dashboard/WaitlistCard";
 import PageHeader from "@/components/app/PageHeader";
 import SEO from "@/components/SEO";
 
@@ -13,8 +14,10 @@ export default function BookingsPage() {
       <PageHeader title="Bookings" description="Every appointment, past and upcoming." />
       <div className="space-y-4">
         <BookingRequestsCard userId={ctx.businessUserId} />
+        <WaitlistCard userId={ctx.businessUserId} />
         <BookingsList userId={ctx.businessUserId} />
       </div>
     </>
   );
 }
+
