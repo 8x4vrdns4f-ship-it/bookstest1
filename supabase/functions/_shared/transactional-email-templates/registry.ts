@@ -51,4 +51,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-request-reminder-owner': bookingRequestReminderOwner,
   'booking-reminder-client': bookingReminderClient,
   'review-request-client': reviewRequestClient,
+  'waitlist-added': waitlistAdded,
+  'waitlist-slot-open': waitlistSlotOpen,
 }
+
