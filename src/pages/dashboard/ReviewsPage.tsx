@@ -19,6 +19,8 @@ type ReviewRow = {
   comment: string | null;
   created_at: string;
   booking_id: string;
+  owner_reply: string | null;
+  owner_reply_at: string | null;
   bookings: {
     service: string | null;
     client_name: string | null;
