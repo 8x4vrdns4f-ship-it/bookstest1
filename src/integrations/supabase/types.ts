@@ -861,6 +861,8 @@ export type Database = {
           comment: string | null
           created_at: string
           id: string
+          owner_reply: string | null
+          owner_reply_at: string | null
           rating: number
           user_id: string
         }
@@ -869,6 +871,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          owner_reply?: string | null
+          owner_reply_at?: string | null
           rating: number
           user_id: string
         }
@@ -877,6 +881,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          owner_reply?: string | null
+          owner_reply_at?: string | null
           rating?: number
           user_id?: string
         }
@@ -1111,6 +1117,17 @@ export type Database = {
           cancellation_hours: number
           review_count: number
           welcome_message: string
+        }[]
+      }
+      get_public_reviews: {
+        Args: { _limit?: number; _user_id: string }
+        Returns: {
+          client_first_name: string
+          comment: string
+          created_at: string
+          owner_reply: string
+          owner_reply_at: string
+          rating: number
         }[]
       }
       get_widget_date_overrides: {

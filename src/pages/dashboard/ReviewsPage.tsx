@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Star, MessageSquare, Calendar, TrendingUp } from "lucide-react";
+import { Star, MessageSquare, Calendar, TrendingUp, Reply, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboardContext } from "@/hooks/useDashboardContext";
 import PageHeader from "@/components/app/PageHeader";
@@ -9,6 +9,8 @@ import EmptyState from "@/components/app/EmptyState";
 import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type ReviewRow = {
@@ -17,6 +19,8 @@ type ReviewRow = {
   comment: string | null;
   created_at: string;
   booking_id: string;
+  owner_reply: string | null;
+  owner_reply_at: string | null;
   bookings: {
     service: string | null;
     client_name: string | null;
@@ -52,10 +56,14 @@ function Stars({ value, size = 14 }: { value: number; size?: number }) {
 
 export default function ReviewsPage() {
   const ctx = useDashboardContext();
+  const { toast } = useToast();
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [employees, setEmployees] = useState<EmployeeRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!ctx) return;
@@ -65,7 +73,7 @@ export default function ReviewsPage() {
       const [rev, emp] = await Promise.all([
         supabase
           .from("reviews")
-          .select("id, rating, comment, created_at, booking_id, bookings(service, client_name, booking_date, assigned_employee_id)")
+          .select("id, rating, comment, created_at, booking_id, owner_reply, owner_reply_at, bookings(service, client_name, booking_date, assigned_employee_id)")
           .eq("user_id", ctx.businessUserId)
           .order("created_at", { ascending: false }),
         supabase
@@ -116,7 +124,47 @@ export default function ReviewsPage() {
       .sort((a, b) => b.avg - a.avg || b.count - a.count);
   }, [reviews, employees]);
 
+  const startEdit = (r: ReviewRow) => {
+    setEditingId(r.id);
+    setDraft(r.owner_reply ?? "");
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setDraft("");
+  };
+  const saveReply = async (id: string) => {
+    const text = draft.trim();
+    if (!text) {
+      toast({ title: "Reply is empty", variant: "destructive" });
+      return;
+    }
+    if (text.length > 1000) {
+      toast({ title: "Reply too long", description: "Max 1000 characters.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("reviews").update({ owner_reply: text }).eq("id", id);
+    setSaving(false);
+    if (error) {
+      toast({ title: "Failed to save reply", description: error.message, variant: "destructive" });
+      return;
+    }
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, owner_reply: text, owner_reply_at: new Date().toISOString() } : r));
+    cancelEdit();
+    toast({ title: "Reply posted" });
+  };
+  const deleteReply = async (id: string) => {
+    const { error } = await supabase.from("reviews").update({ owner_reply: null }).eq("id", id);
+    if (error) {
+      toast({ title: "Failed to delete reply", description: error.message, variant: "destructive" });
+      return;
+    }
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, owner_reply: null, owner_reply_at: null } : r));
+    toast({ title: "Reply removed" });
+  };
+
   if (!ctx) return null;
+
 
   return (
     <>
@@ -231,6 +279,51 @@ export default function ReviewsPage() {
                     </p>
                   )}
                   {r.comment && <p className="text-sm text-foreground/90 leading-relaxed">{r.comment}</p>}
+
+                  {editingId === r.id ? (
+                    <div className="space-y-2 pt-2">
+                      <Textarea
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value.slice(0, 1000))}
+                        placeholder="Write a public reply to this review…"
+                        rows={3}
+                        maxLength={1000}
+                      />
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground tabular-nums">{draft.length}/1000</span>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={saving}>Cancel</Button>
+                          <Button size="sm" onClick={() => saveReply(r.id)} disabled={saving}>
+                            {saving ? "Saving…" : "Post reply"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : r.owner_reply ? (
+                    <div className="mt-2 rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs font-semibold text-primary uppercase tracking-wide">Your reply</span>
+                        <span className="text-xs text-muted-foreground">
+                          {r.owner_reply_at && new Date(r.owner_reply_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{r.owner_reply}</p>
+                      <div className="flex gap-1 pt-1">
+                        <Button variant="ghost" size="sm" onClick={() => startEdit(r)}>
+                          <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => deleteReply(r.id)}>
+                          <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="pt-1">
+                      <Button variant="outline" size="sm" onClick={() => startEdit(r)}>
+                        <Reply className="h-3.5 w-3.5 mr-1" /> Reply
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
               {reviews.length > visible && (
