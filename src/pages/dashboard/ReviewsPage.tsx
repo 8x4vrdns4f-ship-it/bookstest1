@@ -124,7 +124,47 @@ export default function ReviewsPage() {
       .sort((a, b) => b.avg - a.avg || b.count - a.count);
   }, [reviews, employees]);
 
+  const startEdit = (r: ReviewRow) => {
+    setEditingId(r.id);
+    setDraft(r.owner_reply ?? "");
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setDraft("");
+  };
+  const saveReply = async (id: string) => {
+    const text = draft.trim();
+    if (!text) {
+      toast({ title: "Reply is empty", variant: "destructive" });
+      return;
+    }
+    if (text.length > 1000) {
+      toast({ title: "Reply too long", description: "Max 1000 characters.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("reviews").update({ owner_reply: text }).eq("id", id);
+    setSaving(false);
+    if (error) {
+      toast({ title: "Failed to save reply", description: error.message, variant: "destructive" });
+      return;
+    }
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, owner_reply: text, owner_reply_at: new Date().toISOString() } : r));
+    cancelEdit();
+    toast({ title: "Reply posted" });
+  };
+  const deleteReply = async (id: string) => {
+    const { error } = await supabase.from("reviews").update({ owner_reply: null }).eq("id", id);
+    if (error) {
+      toast({ title: "Failed to delete reply", description: error.message, variant: "destructive" });
+      return;
+    }
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, owner_reply: null, owner_reply_at: null } : r));
+    toast({ title: "Reply removed" });
+  };
+
   if (!ctx) return null;
+
 
   return (
     <>
