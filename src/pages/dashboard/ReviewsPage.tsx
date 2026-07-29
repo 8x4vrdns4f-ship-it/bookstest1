@@ -279,6 +279,51 @@ export default function ReviewsPage() {
                     </p>
                   )}
                   {r.comment && <p className="text-sm text-foreground/90 leading-relaxed">{r.comment}</p>}
+
+                  {editingId === r.id ? (
+                    <div className="space-y-2 pt-2">
+                      <Textarea
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value.slice(0, 1000))}
+                        placeholder="Write a public reply to this review…"
+                        rows={3}
+                        maxLength={1000}
+                      />
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground tabular-nums">{draft.length}/1000</span>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={saving}>Cancel</Button>
+                          <Button size="sm" onClick={() => saveReply(r.id)} disabled={saving}>
+                            {saving ? "Saving…" : "Post reply"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : r.owner_reply ? (
+                    <div className="mt-2 rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs font-semibold text-primary uppercase tracking-wide">Your reply</span>
+                        <span className="text-xs text-muted-foreground">
+                          {r.owner_reply_at && new Date(r.owner_reply_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">{r.owner_reply}</p>
+                      <div className="flex gap-1 pt-1">
+                        <Button variant="ghost" size="sm" onClick={() => startEdit(r)}>
+                          <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => deleteReply(r.id)}>
+                          <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="pt-1">
+                      <Button variant="outline" size="sm" onClick={() => startEdit(r)}>
+                        <Reply className="h-3.5 w-3.5 mr-1" /> Reply
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
               {reviews.length > visible && (
