@@ -73,7 +73,7 @@ export default function ReviewsPage() {
       const [rev, emp] = await Promise.all([
         supabase
           .from("reviews")
-          .select("id, rating, comment, created_at, booking_id, bookings(service, client_name, booking_date, assigned_employee_id)")
+          .select("id, rating, comment, created_at, booking_id, owner_reply, owner_reply_at, bookings(service, client_name, booking_date, assigned_employee_id)")
           .eq("user_id", ctx.businessUserId)
           .order("created_at", { ascending: false }),
         supabase
