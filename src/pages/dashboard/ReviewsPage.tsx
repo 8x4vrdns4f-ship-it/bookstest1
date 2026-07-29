@@ -56,10 +56,14 @@ function Stars({ value, size = 14 }: { value: number; size?: number }) {
 
 export default function ReviewsPage() {
   const ctx = useDashboardContext();
+  const { toast } = useToast();
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [employees, setEmployees] = useState<EmployeeRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!ctx) return;
