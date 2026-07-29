@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Star, MessageSquare, Calendar, TrendingUp } from "lucide-react";
+import { Star, MessageSquare, Calendar, TrendingUp, Reply, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDashboardContext } from "@/hooks/useDashboardContext";
 import PageHeader from "@/components/app/PageHeader";
@@ -9,6 +9,8 @@ import EmptyState from "@/components/app/EmptyState";
 import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type ReviewRow = {
