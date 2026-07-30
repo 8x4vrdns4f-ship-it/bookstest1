@@ -45,10 +45,18 @@ const HeroSection = () => {
         </div>
 
         <div className="flex-1 w-full">
-          <div className="aspect-video rounded-xl bg-secondary border border-border flex items-center justify-center">
-            <span className="text-muted-foreground text-sm">{t("hero.video")}</span>
+          <div className="rounded-xl overflow-hidden border border-border bg-secondary shadow-2xl shadow-primary/5">
+            <img
+              src={dashboardShot}
+              alt="BookSuite dashboard showing today's bookings, revenue and staff availability"
+              width={1280}
+              height={800}
+              loading="eager"
+              className="w-full h-auto block"
+            />
           </div>
         </div>
+
       </div>
     </section>
   );
