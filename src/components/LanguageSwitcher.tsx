@@ -27,7 +27,7 @@ const LanguageSwitcher = () => {
         <DropdownMenuLabel className="text-xs uppercase tracking-wide opacity-60">{t("nav.language")}</DropdownMenuLabel>
         {LANGUAGES.map(l => (
           <DropdownMenuItem key={l.code} onClick={() => setLanguage(l.code)} className="cursor-pointer">
-            <span className="mr-2">{l.flag}</span>
+            <span className="mr-2 text-[10px] font-semibold tracking-wide text-muted-foreground w-9 shrink-0">{l.code.toUpperCase()}</span>
             <span className="flex-1">{l.label}</span>
             {language === l.code && <Check size={14} className="text-primary" />}
           </DropdownMenuItem>
