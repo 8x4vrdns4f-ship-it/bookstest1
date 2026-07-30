@@ -20,7 +20,9 @@ const Footer = () => {
           <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
           <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
           <Link to="/security" className="hover:text-primary transition-colors">Security</Link>
+          <a href="mailto:help@booksuite.online" className="hover:text-primary transition-colors">Support</a>
         </nav>
+
         <div className="flex items-center gap-5">
           {socials.map(({ Icon, href, label }) => (
             <a
