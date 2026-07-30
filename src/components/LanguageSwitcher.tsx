@@ -18,8 +18,9 @@ const LanguageSwitcher = () => {
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground border border-border rounded-lg px-2.5 py-1.5 transition-colors">
         <Globe size={14} />
-        <span className="hidden sm:inline">{current?.flag} {current?.code.split("-")[0].toUpperCase()}</span>
-        <span className="sm:hidden">{current?.flag}</span>
+        <span className="hidden sm:inline">{current?.code.split("-")[0].toUpperCase()}</span>
+        <span className="sm:hidden">{current?.code.split("-")[0].toUpperCase()}</span>
+
         <span className="text-xs opacity-70 hidden md:inline">· {currency}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 bg-popover max-h-[70vh] overflow-y-auto">
