@@ -6,6 +6,8 @@ import JoinCompanyDialog from "./JoinCompanyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
 import { Check } from "lucide-react";
+import dashboardShot from "@/assets/shot-dashboard.jpg";
+
 
 const HeroSection = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
