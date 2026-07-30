@@ -119,9 +119,11 @@ const Auth = () => {
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <Card className="w-full max-w-md bg-card border-border">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">
               {isForgot ? "Reset your password" : isLogin ? "Sign in to BookSuite" : "Create your BookSuite account"}
-            </CardTitle>
+            </h1>
+
+
             <CardDescription className="text-muted-foreground">
               {isForgot ? "Enter your email to receive a reset link" : isLogin ? "Log in to access your dashboard" : "Sign up to get started"}
             </CardDescription>
