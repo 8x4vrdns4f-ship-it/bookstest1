@@ -8,6 +8,7 @@ import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./E
 import EmployeeProfileDialog from "./EmployeeProfileDialog";
 import { CheckCircle2, AlertCircle, Activity, Clock, User } from "lucide-react";
 import EmptyState from "@/components/app/EmptyState";
+import ListSkeleton from "@/components/app/ListSkeleton";
 
 interface Employee {
   id: string;
@@ -219,7 +220,7 @@ const StaffList = ({ userId }: { userId: string }) => {
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground">Loading…</p>
+        <ListSkeleton rows={3} />
       ) : employees.length === 0 ? (
         <EmptyState
           icon={<User size={20} />}
