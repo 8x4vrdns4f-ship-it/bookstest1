@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import JoinCompanyDialog from "./JoinCompanyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
-import { Check } from "lucide-react";
-import dashboardShot from "@/assets/shot-dashboard.jpg";
+import { Check, Play } from "lucide-react";
+
 
 
 const HeroSection = () => {
@@ -47,17 +47,14 @@ const HeroSection = () => {
         </div>
 
         <div className="flex-1 w-full">
-          <div className="rounded-xl overflow-hidden border border-border bg-secondary shadow-2xl shadow-primary/5">
-            <img
-              src={dashboardShot}
-              alt="BookSuite dashboard showing today's bookings, revenue and staff availability"
-              width={1280}
-              height={800}
-              loading="eager"
-              className="w-full h-auto block"
-            />
+          <div className="aspect-video rounded-xl overflow-hidden border border-border bg-secondary shadow-2xl shadow-primary/5 flex flex-col items-center justify-center gap-3">
+            <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+              <Play size={22} className="text-primary ml-0.5" />
+            </div>
+            <p className="text-sm text-muted-foreground">Product walkthrough video coming soon</p>
           </div>
         </div>
+
 
       </div>
     </section>
