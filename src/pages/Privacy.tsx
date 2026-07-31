@@ -15,6 +15,17 @@ const Privacy = () => (
       <p className="text-muted-foreground mb-8">Last updated: {new Date().toLocaleDateString()}</p>
 
       <section className="space-y-6 text-sm leading-relaxed">
+        <div className="rounded-lg border border-dashed border-border bg-secondary/40 p-4 text-muted-foreground">
+          <p className="font-medium text-foreground mb-1">Company details — to be completed before launch</p>
+          <ul className="space-y-0.5">
+            <li>Registered company name: [TO BE ADDED]</li>
+            <li>Company registration number: [TO BE ADDED]</li>
+            <li>Registered address: [TO BE ADDED]</li>
+            <li>ICO registration number: [TO BE ADDED]</li>
+            <li>Data protection contact: help@booksuite.online</li>
+          </ul>
+        </div>
+
         <p>
           This page is maintained by BookSuite to explain how we handle information
           when you use booksuite.online (the "Service"). It is not a legal
@@ -24,6 +35,7 @@ const Privacy = () => (
           </a>{" "}
           with any questions.
         </p>
+
 
         <div>
           <h2 className="text-xl font-semibold mb-2">Information we collect</h2>
