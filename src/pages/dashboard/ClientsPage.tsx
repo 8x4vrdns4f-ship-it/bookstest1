@@ -9,7 +9,10 @@ export default function ClientsPage() {
   return (
     <>
       <SEO title="Clients — BookSuite" description="Your client database." path="/dashboard/clients" noIndex />
-      <PageHeader title="Clients" description="Everyone who has booked with you." />
+      <PageHeader
+        title="Clients"
+        description="Everyone who has booked with you. Clients are added automatically the first time someone books — there's nothing to import."
+      />
       <ClientList userId={ctx.businessUserId} />
     </>
   );
