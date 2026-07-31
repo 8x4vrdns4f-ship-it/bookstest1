@@ -177,8 +177,13 @@ const Onboarding = () => {
     setFinishing(true);
     await markComplete();
     setFinishing(false);
+    toast({
+      title: "No problem — you can finish later",
+      description: "The 'Get set up' checklist on your dashboard has everything that's left.",
+    });
     navigate("/dashboard", { replace: true });
   };
+
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(bookingUrl);
