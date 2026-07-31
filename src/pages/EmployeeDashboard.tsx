@@ -122,10 +122,15 @@ const EmployeeDashboard = () => {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-muted-foreground text-sm">Loading…</p>
+              <ListSkeleton rows={3} />
             ) : bookings.length === 0 ? (
-              <p className="text-muted-foreground text-sm">No bookings assigned to you yet.</p>
+              <EmptyState
+                icon={<CalendarDays size={20} />}
+                title="No bookings assigned yet"
+                description="When your manager assigns you an appointment, it will show up right here."
+              />
             ) : (
+
               <div className="space-y-2">
                 {bookings.map((b) => (
                   <div key={b.id} className="flex items-center justify-between p-3 rounded-md bg-secondary/40 border border-border">
