@@ -9,6 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/app/EmptyState";
+import ListSkeleton from "@/components/app/ListSkeleton";
+
 
 type Booking = {
   id: string;
