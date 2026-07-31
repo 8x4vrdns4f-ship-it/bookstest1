@@ -15,10 +15,22 @@ const Terms = () => (
       <p className="text-muted-foreground mb-8">Last updated: {new Date().toLocaleDateString()}</p>
 
       <section className="space-y-6 text-sm leading-relaxed text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border bg-secondary/40 p-4">
+          <p className="font-medium text-foreground mb-1">Company details — to be completed before launch</p>
+          <ul className="space-y-0.5">
+            <li>Registered company name: [TO BE ADDED]</li>
+            <li>Company registration number: [TO BE ADDED]</li>
+            <li>Registered address: [TO BE ADDED]</li>
+            <li>Governing law / jurisdiction: [TO BE ADDED]</li>
+            <li>Refund policy: [TO BE ADDED]</li>
+          </ul>
+        </div>
+
         <p>
           By creating a BookSuite account you agree to these terms. If you do not agree,
           do not use the Service.
         </p>
+
 
         <div>
           <h2 className="text-xl font-semibold mb-2 text-foreground">Your account</h2>
