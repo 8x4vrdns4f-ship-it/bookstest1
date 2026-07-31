@@ -21,6 +21,9 @@ import LockedFeature from "@/components/LockedFeature";
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import GiftCodesCard from "@/components/dashboard/GiftCodesCard";
 import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
+import BookingLinkCard from "@/components/dashboard/BookingLinkCard";
+import { StatsSkeleton } from "@/components/app/ListSkeleton";
+
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
 import PageHeader from "@/components/app/PageHeader";
 import SEO from "@/components/SEO";
