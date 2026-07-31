@@ -65,7 +65,9 @@ const STEPS = [
   { id: 1, title: "Business basics", icon: Store },
   { id: 2, title: "Your hours", icon: Clock },
   { id: 3, title: "Share your link", icon: Link2 },
+  { id: 4, title: "You're all set", icon: Rocket },
 ] as const;
+
 
 const Onboarding = () => {
   const navigate = useNavigate();
