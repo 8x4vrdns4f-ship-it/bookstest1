@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
+import ListSkeleton from "@/components/app/ListSkeleton";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarDays, ChevronLeft, ChevronRight, Save } from "lucide-react";
 import { addDays, eachDayOfInterval, format, parseISO } from "date-fns";
@@ -289,7 +290,7 @@ const ShiftsView = ({ userId }: { userId: string }) => {
           action={<AddEmployeeDialog userId={userId} onEmployeeAdded={reloadEmployees} />}
         />
       ) : loading ? (
-        <p className="text-muted-foreground text-sm">Loading…</p>
+        <ListSkeleton rows={4} />
       ) : (
         <>
           <SectionCard bodyClassName="p-4 space-y-2">

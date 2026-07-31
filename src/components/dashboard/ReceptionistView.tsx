@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Search, ScanLine, UserCheck, Clock, Camera, X } from "lucide-react";
 import CameraScanner from "@/components/CameraScanner";
+import EmptyState from "@/components/app/EmptyState";
+
 
 type Booking = {
   id: string;
@@ -162,7 +164,16 @@ const ReceptionistView = ({ businessUserId }: { businessUserId: string }) => {
           </div>
 
           {filtered.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No bookings yet.</p>
+            <EmptyState
+              icon={<Clock size={20} />}
+              title={search ? "No bookings match your search" : "Nothing booked yet"}
+              description={
+                search
+                  ? "Try a different name or confirmation code."
+                  : "Today's and upcoming appointments will appear here as they come in."
+              }
+            />
+
           ) : (
             <div className="space-y-3">
               {filtered.map((b) => (

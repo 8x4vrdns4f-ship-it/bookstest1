@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Store, Clock, Link2, Check, Copy, ArrowLeft, ArrowRight } from "lucide-react";
+import { Store, Clock, Link2, Check, Copy, ArrowLeft, ArrowRight, Rocket, ExternalLink, CheckCircle2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
@@ -65,7 +65,9 @@ const STEPS = [
   { id: 1, title: "Business basics", icon: Store },
   { id: 2, title: "Your hours", icon: Clock },
   { id: 3, title: "Share your link", icon: Link2 },
+  { id: 4, title: "You're all set", icon: Rocket },
 ] as const;
+
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -177,8 +179,13 @@ const Onboarding = () => {
     setFinishing(true);
     await markComplete();
     setFinishing(false);
+    toast({
+      title: "No problem — you can finish later",
+      description: "The 'Get set up' checklist on your dashboard has everything that's left.",
+    });
     navigate("/dashboard", { replace: true });
   };
+
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(bookingUrl);
@@ -230,7 +237,9 @@ const Onboarding = () => {
                 {step === 1 && "Tell us a bit about your business."}
                 {step === 2 && "Pick a starting schedule — you can fine-tune it later."}
                 {step === 3 && "Share this link anywhere to take bookings."}
+                {step === 4 && "Here's where you're up to, and what's next."}
               </p>
+
             </div>
           </div>
 
@@ -343,15 +352,50 @@ const Onboarding = () => {
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-border/60 bg-card/40 p-4 text-sm">
-                    <p className="font-medium text-foreground mb-1">Next up: get paid</p>
+                  <Button asChild variant="outline" size="sm" className="gap-1.5">
+                    <a href={bookingUrl} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5" /> Preview your booking page
+                    </a>
+                  </Button>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <Button variant="ghost" onClick={() => setStep(2)}>
+                      <ArrowLeft className="mr-1.5 h-4 w-4" /> Back
+                    </Button>
+                    <Button onClick={() => setStep(4)}>
+                      Continue
+                      <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="space-y-5">
+                  <div className="rounded-xl border border-border/60 bg-card/40 p-4 space-y-2.5">
+                    <p className="text-sm font-medium text-foreground">Already done</p>
+                    {[
+                      "Business details saved",
+                      "Opening hours set",
+                      "Booking page live and ready to share",
+                    ].map((item) => (
+                      <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-xl border border-border/60 bg-card/40 p-4 text-sm space-y-1.5">
+                    <p className="font-medium text-foreground">What's left</p>
                     <p className="text-muted-foreground">
-                      Connect Stripe from Settings → Payments to start taking deposits.
+                      Connect Stripe to take deposits, add your team, and share your link. The
+                      "Get set up" checklist on your dashboard walks you through each one.
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    <Button variant="ghost" onClick={() => setStep(2)}>
+                    <Button variant="ghost" onClick={() => setStep(3)}>
                       <ArrowLeft className="mr-1.5 h-4 w-4" /> Back
                     </Button>
                     <Button onClick={finish} disabled={finishing}>
@@ -361,6 +405,7 @@ const Onboarding = () => {
                   </div>
                 </div>
               )}
+
             </motion.div>
           </AnimatePresence>
         </div>

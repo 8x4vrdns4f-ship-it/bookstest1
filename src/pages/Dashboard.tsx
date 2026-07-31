@@ -21,6 +21,9 @@ import LockedFeature from "@/components/LockedFeature";
 import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import GiftCodesCard from "@/components/dashboard/GiftCodesCard";
 import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
+import BookingLinkCard from "@/components/dashboard/BookingLinkCard";
+import { StatsSkeleton } from "@/components/app/ListSkeleton";
+
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
 import PageHeader from "@/components/app/PageHeader";
 import SEO from "@/components/SEO";
@@ -38,22 +41,29 @@ export default function Dashboard() {
   const { tier } = useSubscription();
   const canSeeAdvanced = tier ? TIER_LIMITS[tier].advancedAnalytics : false;
   const [stats, setStats] = useState({ todayBookings: 0, totalClients: 0, upcoming: 0 });
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [hasAnyActivity, setHasAnyActivity] = useState(true);
 
   useEffect(() => {
     if (!ctx) return;
     const today = new Date().toISOString().split("T")[0];
+    setStatsLoading(true);
     Promise.all([
       supabase.from("bookings").select("id", { count: "exact", head: true }).eq("booking_date", today),
       supabase.from("clients").select("id", { count: "exact", head: true }),
       supabase.from("bookings").select("id", { count: "exact", head: true }).gte("booking_date", today).in("status", ["pending", "confirmed"]),
-    ]).then(([t, c, u]) => {
+      supabase.from("bookings").select("id", { count: "exact", head: true }),
+    ]).then(([t, c, u, all]) => {
       setStats({
         todayBookings: t.count || 0,
         totalClients: c.count || 0,
         upcoming: u.count || 0,
       });
+      setHasAnyActivity((all.count || 0) > 0 || (c.count || 0) > 0);
+      setStatsLoading(false);
     });
   }, [ctx]);
+
 
   if (!ctx) return null;
 
@@ -109,18 +119,27 @@ export default function Dashboard() {
           {isOwner && <PaymentsCard userId={user.id} />}
           {isOwner && <UsageBanner userId={businessUserId} />}
 
+          {/* Zero state: no bookings and no clients at all */}
+          {isOwner && !statsLoading && !hasAnyActivity && (
+            <BookingLinkCard userId={user.id} />
+          )}
+
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-            {statCards.map((stat) => (
-              <StatCard
-                key={stat.label}
-                label={stat.label}
-                value={stat.value}
-                hint={stat.hint}
-                icon={<stat.icon className="h-[18px] w-[18px]" />}
-              />
-            ))}
-          </div>
+          {statsLoading ? (
+            <StatsSkeleton />
+          ) : hasAnyActivity ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+              {statCards.map((stat) => (
+                <StatCard
+                  key={stat.label}
+                  label={stat.label}
+                  value={stat.value}
+                  hint={stat.hint}
+                  icon={<stat.icon className="h-[18px] w-[18px]" />}
+                />
+              ))}
+            </div>
+          ) : null}
 
 
           {isOwner && <GiftCodesCard />}
@@ -128,21 +147,24 @@ export default function Dashboard() {
           {role.canApprove && <JoinRequestsCard businessUserId={businessUserId} />}
 
           {/* Charts */}
-          <div>
-            {canSeeAdvanced ? (
-              <DashboardCharts userId={businessUserId} />
-            ) : (
-              <div className="relative min-h-[260px]">
-                <LockedFeature
-                  requiredTier="gold"
-                  title="Advanced Analytics"
-                  description="Charts, trends and revenue insights are available on Gold and Platinum."
-                >
-                  <DashboardCharts userId={businessUserId} />
-                </LockedFeature>
-              </div>
-            )}
-          </div>
+          {hasAnyActivity && (
+            <div>
+              {canSeeAdvanced ? (
+                <DashboardCharts userId={businessUserId} />
+              ) : (
+                <div className="relative min-h-[260px]">
+                  <LockedFeature
+                    requiredTier="gold"
+                    title="Advanced Analytics"
+                    description="Charts, trends and revenue insights are available on Gold and Platinum."
+                  >
+                    <DashboardCharts userId={businessUserId} />
+                  </LockedFeature>
+                </div>
+              )}
+            </div>
+          )}
+
 
           {/* Recent bookings */}
           <Card className="surface-card">
