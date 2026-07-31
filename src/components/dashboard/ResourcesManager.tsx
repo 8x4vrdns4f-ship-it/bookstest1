@@ -73,11 +73,16 @@ export default function ResourcesManager({ userId, label }: { userId: string; la
       </p>
 
       {loading ? (
-        <div className="text-sm text-muted-foreground">Loading…</div>
+        <ListSkeleton rows={2} />
       ) : items.length === 0 ? (
-        <div className="text-sm text-muted-foreground p-3 rounded-md bg-secondary/40 border border-border">
-          No {label.toLowerCase()}s yet. Add your first below.
-        </div>
+        <EmptyState
+          icon={<LayoutGrid size={20} />}
+          title={`No ${label.toLowerCase()}s yet`}
+          description={`Add your first ${label.toLowerCase()} below so customers can pick one when they book.`}
+          className="py-8"
+        />
+      ) : (
+
       ) : (
         <div className="space-y-2">
           {items.map((r) => (
