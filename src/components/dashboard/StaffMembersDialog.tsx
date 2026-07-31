@@ -67,12 +67,21 @@ const StaffMembersDialog = ({ open, onOpenChange, userId, tierName, limit, count
       }
     >
       {loading ? (
-        <p className="text-muted-foreground text-sm py-2">Loading…</p>
+        <ListSkeleton rows={2} />
       ) : rows.length === 0 ? (
-        <p className="text-muted-foreground text-sm py-2">
-          No staff yet. Add your first team member from the Staff tab.
-        </p>
+        <EmptyState
+          icon={<Users size={20} />}
+          title="No team members yet"
+          description="Add your first team member from the Staff page to start assigning bookings and shifts."
+          action={
+            <Button asChild size="sm" variant="outline">
+              <Link to="/dashboard/staff">Go to Staff</Link>
+            </Button>
+          }
+          className="py-8"
+        />
       ) : (
+
         <div className="space-y-2">
           {rows.map((r) => (
             <div
