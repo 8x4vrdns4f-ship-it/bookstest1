@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Search, ScanLine, UserCheck, Clock, Camera, X } from "lucide-react";
 import CameraScanner from "@/components/CameraScanner";
+import EmptyState from "@/components/app/EmptyState";
+
 
 type Booking = {
   id: string;
