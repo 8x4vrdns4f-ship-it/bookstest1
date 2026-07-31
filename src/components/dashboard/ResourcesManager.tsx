@@ -83,7 +83,6 @@ export default function ResourcesManager({ userId, label }: { userId: string; la
         />
       ) : (
 
-      ) : (
         <div className="space-y-2">
           {items.map((r) => (
             <div key={r.id} className="flex items-center gap-2 p-2 rounded-md bg-secondary/40 border border-border">
