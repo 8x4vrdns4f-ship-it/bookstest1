@@ -38,22 +38,29 @@ export default function Dashboard() {
   const { tier } = useSubscription();
   const canSeeAdvanced = tier ? TIER_LIMITS[tier].advancedAnalytics : false;
   const [stats, setStats] = useState({ todayBookings: 0, totalClients: 0, upcoming: 0 });
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [hasAnyActivity, setHasAnyActivity] = useState(true);
 
   useEffect(() => {
     if (!ctx) return;
     const today = new Date().toISOString().split("T")[0];
+    setStatsLoading(true);
     Promise.all([
       supabase.from("bookings").select("id", { count: "exact", head: true }).eq("booking_date", today),
       supabase.from("clients").select("id", { count: "exact", head: true }),
       supabase.from("bookings").select("id", { count: "exact", head: true }).gte("booking_date", today).in("status", ["pending", "confirmed"]),
-    ]).then(([t, c, u]) => {
+      supabase.from("bookings").select("id", { count: "exact", head: true }),
+    ]).then(([t, c, u, all]) => {
       setStats({
         todayBookings: t.count || 0,
         totalClients: c.count || 0,
         upcoming: u.count || 0,
       });
+      setHasAnyActivity((all.count || 0) > 0 || (c.count || 0) > 0);
+      setStatsLoading(false);
     });
   }, [ctx]);
+
 
   if (!ctx) return null;
 
