@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppDialog } from "@/components/app/AppDialog";
 import { Button } from "@/components/ui/button";
 import { Users, Sparkles } from "lucide-react";
+import EmptyState from "@/components/app/EmptyState";
+import ListSkeleton from "@/components/app/ListSkeleton";
+
 
 interface Props {
   open: boolean;
