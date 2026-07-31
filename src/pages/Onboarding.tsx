@@ -237,7 +237,9 @@ const Onboarding = () => {
                 {step === 1 && "Tell us a bit about your business."}
                 {step === 2 && "Pick a starting schedule — you can fine-tune it later."}
                 {step === 3 && "Share this link anywhere to take bookings."}
+                {step === 4 && "Here's where you're up to, and what's next."}
               </p>
+
             </div>
           </div>
 
