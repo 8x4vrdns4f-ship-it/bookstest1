@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Store, Clock, Link2, Check, Copy, ArrowLeft, ArrowRight } from "lucide-react";
+import { Store, Clock, Link2, Check, Copy, ArrowLeft, ArrowRight, Rocket, ExternalLink, CheckCircle2 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
