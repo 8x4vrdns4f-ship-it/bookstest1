@@ -30,6 +30,14 @@
   iframe.style.background = 'transparent';
   iframe.setAttribute('loading', 'lazy');
 
+  window.addEventListener('message', function (event) {
+    if (event.source !== iframe.contentWindow) return;
+    var data = event.data;
+    if (!data || data.type !== 'booksuite:height') return;
+    var h = parseInt(data.height, 10);
+    if (h > 100 && h < 5000) iframe.style.height = h + 'px';
+  });
+
   var target = document.getElementById('booksuite-widget');
   if (target) {
     target.appendChild(iframe);

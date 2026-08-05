@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Cookie } from "lucide-react";
 
 const KEY = "booksuite:cookie-consent";
 
+/** Marketing/legal pages only — never over the signed-in app or a customer's booking flow. */
+const HIDDEN_PREFIXES = [
+  "/dashboard", "/settings", "/payments", "/employee-dashboard",
+  "/onboarding", "/kiosk", "/embed", "/book", "/booking", "/review",
+];
+
 const CookieBanner = () => {
+  const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -26,6 +33,7 @@ const CookieBanner = () => {
   };
 
   if (!visible) return null;
+  if (HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"))) return null;
 
   return (
     <div

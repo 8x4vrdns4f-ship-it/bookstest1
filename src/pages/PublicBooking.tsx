@@ -28,6 +28,18 @@ const PublicBooking = () => {
   const [info, setInfo] = useState<PublicInfo | null>(null);
   const [waitlistEnabled, setWaitlistEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [widgetHeight, setWidgetHeight] = useState(760);
+
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      const data = e.data as { type?: string; height?: number } | null;
+      if (!data || data.type !== "booksuite:height") return;
+      const h = Number(data.height);
+      if (h > 100 && h < 5000) setWidgetHeight(Math.ceil(h));
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -120,7 +132,7 @@ const PublicBooking = () => {
           <iframe
             title="Booking widget"
             srcDoc={html}
-            style={{ border: "none", width: "100%", height: 760, background: "transparent", borderRadius: 12 }}
+            style={{ border: "none", width: "100%", height: widgetHeight, background: "transparent", borderRadius: 12, transition: "height .2s ease" }}
           />
         </div>
 

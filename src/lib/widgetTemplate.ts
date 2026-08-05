@@ -550,6 +550,25 @@ export const buildWidgetScript = (opts: {
 })();
 `;
 
+
+const RESIZE_SCRIPT = `
+(function(){
+  if (window.parent === window) return;
+  var last = 0;
+  function send(){
+    var el = document.documentElement;
+    var h = Math.max(el.scrollHeight, document.body ? document.body.scrollHeight : 0);
+    if (!h || Math.abs(h - last) < 4) return;
+    last = h;
+    try { window.parent.postMessage({ type: 'booksuite:height', height: h }, '*'); } catch (e) {}
+  }
+  window.addEventListener('load', send);
+  setInterval(send, 400);
+  if (window.ResizeObserver) { new ResizeObserver(send).observe(document.documentElement); }
+  send();
+})();
+`;
+
 export const buildWidgetHtml = (opts: {
   supabaseUrl: string;
   supabaseKey: string;
@@ -570,5 +589,6 @@ export const buildWidgetHtml = (opts: {
 <body>
 ${WIDGET_MARKUP}
 <script>${buildWidgetScript(opts)}</script>
+<script>${RESIZE_SCRIPT}</script>
 </body>
 </html>`;
