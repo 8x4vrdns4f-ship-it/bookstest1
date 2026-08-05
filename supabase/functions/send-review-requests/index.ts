@@ -15,9 +15,11 @@ function formatDate(d: string): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const auth = req.headers.get("authorization") || "";
-  const expected = `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""}`;
-  if (auth !== expected) {
+  const token = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  const allowed = [Deno.env.get("INTERNAL_TASK_SECRET"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")]
+    .filter((v) => !!v) as string[];
+  const ok = allowed.some((v) => v === token);
+  if (!ok) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
