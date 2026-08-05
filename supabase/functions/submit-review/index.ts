@@ -1,5 +1,6 @@
 // PUBLIC endpoint — lets a client submit a review for their booking via the review token.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { checkRateLimits, getClientIp, rateLimited, RATE_RULES } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,11 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
+
+    const rlOk = await checkRateLimits([
+      { rule: RATE_RULES.review, identifier: `ip:${getClientIp(req)}` },
+    ]);
+    if (!rlOk) return rateLimited(corsHeaders, 3600);
     const { token, rating, comment } = body;
 
     if (!token || typeof token !== "string") {

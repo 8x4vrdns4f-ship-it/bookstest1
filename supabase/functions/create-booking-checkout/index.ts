@@ -1,6 +1,7 @@
 // PUBLIC endpoint — called by the embed widget. No JWT required.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv, sanitizeOrigin } from "../_shared/stripe.ts";
+import { checkRateLimits, getClientIp, rateLimited, RATE_RULES } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,6 +13,12 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
+
+    const rlOk = await checkRateLimits([
+      { rule: RATE_RULES.booking, identifier: `ip:${getClientIp(req)}` },
+      { rule: RATE_RULES.booking, identifier: `email:${body.client_email ?? ""}` },
+    ]);
+    if (!rlOk) return rateLimited(corsHeaders, 900);
     const {
       userId,
       service,
