@@ -31,6 +31,8 @@ import { template as waitlistAdded } from './waitlist-added.tsx'
 import { template as waitlistSlotOpen } from './waitlist-slot-open.tsx'
 import { template as contactConfirmation } from './contact-confirmation.tsx'
 import { template as contactReceivedOwner } from './contact-received-owner.tsx'
+import { template as platformAlert } from './platform-alert.tsx'
+import { template as platformDailySummary } from './platform-daily-summary.tsx'
 
 
 
@@ -57,5 +59,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'waitlist-slot-open': waitlistSlotOpen,
   'contact-confirmation': contactConfirmation,
   'contact-received-owner': contactReceivedOwner,
+  'platform-alert': platformAlert,
+  'platform-daily-summary': platformDailySummary,
 }
 
