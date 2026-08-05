@@ -17,8 +17,11 @@ const Footer = () => {
         <BrandLogo size="sm" />
         <nav className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
           <Link to="/pricing" className="hover:text-primary transition-colors">Pricing</Link>
+          <Link to="/about" className="hover:text-primary transition-colors">About</Link>
+          <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
           <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
           <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+          <Link to="/cookies" className="hover:text-primary transition-colors">Cookies</Link>
           <Link to="/security" className="hover:text-primary transition-colors">Security</Link>
           <a href="mailto:help@booksuite.online" className="hover:text-primary transition-colors">Support</a>
         </nav>

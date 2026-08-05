@@ -8,6 +8,9 @@ import Pricing from "./pages/Pricing.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import Terms from "./pages/Terms.tsx";
 import Security from "./pages/Security.tsx";
+import About from "./pages/About.tsx";
+import Contact from "./pages/Contact.tsx";
+import Cookies from "./pages/Cookies.tsx";
 import Auth from "./pages/Auth.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import BookingsPage from "./pages/dashboard/BookingsPage.tsx";
@@ -38,6 +41,7 @@ import VerifyEmail from "./pages/VerifyEmail.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import AppLayout from "./components/app/AppLayout.tsx";
 import { LocaleProvider } from "./contexts/LocaleContext.tsx";
+import CookieBanner from "./components/CookieBanner.tsx";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +65,9 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/cookies" element={<Cookies />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/guides/:slug" element={<GuideDetail />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
@@ -94,6 +101,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>
     </LocaleProvider>
