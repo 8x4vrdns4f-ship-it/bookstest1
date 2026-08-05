@@ -15,7 +15,6 @@ function formatDate(d: string): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const auth = req.headers.get("authorization") || "";
   const token = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
   const allowed = [Deno.env.get("INTERNAL_TASK_SECRET"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")]
     .filter((v) => !!v) as string[];
