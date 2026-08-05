@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
+import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -161,6 +162,18 @@ serve(async (req) => {
           },
         });
       } catch (e) { console.error("activation email failed", e); }
+
+      await notifyAdmin(admin, {
+        eventTitle: "Subscription started",
+        eventSummary: "A business activated a paid plan.",
+        businessName: (user.user_metadata as any)?.business_name || user.email || "",
+        rows: [
+          { label: "Account", value: user.email || user.id },
+          { label: "Plan", value: String(tier) },
+          { label: "Renews", value: periodEnd ? new Date(periodEnd).toLocaleDateString("en-GB") : "—" },
+        ],
+        idempotencyKey: `sub-active-${user.id}-${periodEnd ?? "none"}`,
+      });
     }
 
     return new Response(JSON.stringify({ subscribed, tier, current_period_end: periodEnd, status, trial_end: trialEnd }), {
