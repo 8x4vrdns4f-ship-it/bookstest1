@@ -41,6 +41,8 @@ Deno.serve(async (req) => {
       stripe_setup_intent_id,
       resource_id,
       party_size,
+      payment_option,
+      service_id,
     } = body;
 
     const env = resolveEnv(environment);
@@ -66,6 +68,8 @@ Deno.serve(async (req) => {
     if (typeof stripe_payment_method_id !== "string" || !stripe_payment_method_id.startsWith("pm_")) return bad("Invalid payment method");
     if (typeof stripe_setup_intent_id !== "string" || !stripe_setup_intent_id.startsWith("seti_")) return bad("Invalid setup intent");
     if (resource_id != null && (typeof resource_id !== "string" || !uuidRe.test(resource_id))) return bad("Invalid resource");
+    if (payment_option != null && payment_option !== "deposit" && payment_option !== "full") return bad("Invalid payment option");
+    if (service_id != null && (typeof service_id !== "string" || !uuidRe.test(service_id))) return bad("Invalid service selection");
     const ps = party_size == null ? null : Number(party_size);
     if (ps != null && (!Number.isInteger(ps) || ps < 1 || ps > 999)) return bad("Invalid party size");
 
@@ -76,7 +80,7 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes")
+      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes, services_enabled, payment_mode")
       .eq("user_id", userId)
       .maybeSingle();
     if (!settings) return bad("Business not found");
@@ -144,6 +148,26 @@ Deno.serve(async (req) => {
     const deposit = Number(settings.deposit_amount);
     const feePct = Number(settings.platform_fee_percent);
 
+    // --- Payment option resolution (never trust the browser for amounts) ---
+    const paymentMode = String((settings as any).payment_mode || "deposit");
+    let servicePrice: number | null = null;
+    if ((settings as any).services_enabled && service_id) {
+      const { data: svc } = await admin
+        .from("services")
+        .select("id, user_id, price, active")
+        .eq("id", service_id)
+        .maybeSingle();
+      if (!svc || svc.user_id !== userId || !svc.active) return bad("Invalid service selection");
+      servicePrice = svc.price == null ? null : Number(svc.price);
+    }
+
+    let finalOption: "deposit" | "full" = "deposit";
+    if (servicePrice != null && servicePrice > 0) {
+      if (paymentMode === "full") finalOption = "full";
+      else if (paymentMode === "client_choice" && payment_option === "full") finalOption = "full";
+    }
+    const chargeAmount = finalOption === "full" ? Math.max(deposit, servicePrice as number) : deposit;
+
     const { data: pending, error: pErr } = await admin
       .from("pending_bookings")
       .insert({
@@ -157,7 +181,10 @@ Deno.serve(async (req) => {
         duration_minutes: dur,
         notes: notes || null,
         deposit_amount: deposit,
-        platform_fee_amount: (deposit * feePct) / 100,
+        platform_fee_amount: (chargeAmount * feePct) / 100,
+        payment_option: finalOption,
+        service_price: servicePrice,
+        charge_amount: chargeAmount,
         currency: settings.currency || "GBP",
         payment_environment: env,
         status: "awaiting_owner",
@@ -194,7 +221,7 @@ Deno.serve(async (req) => {
               date: formatDate(booking_date),
               time: formatTime(booking_time),
               confirmationCode: "PENDING",
-              depositAmount: `${(settings.currency || "GBP").toUpperCase()} ${deposit.toFixed(2)}`,
+              depositAmount: `${(settings.currency || "GBP").toUpperCase()} ${chargeAmount.toFixed(2)}${finalOption === "full" ? " (full payment)" : ""}`,
             },
           },
         });

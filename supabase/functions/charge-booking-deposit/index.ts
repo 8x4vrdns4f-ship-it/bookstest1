@@ -56,7 +56,9 @@ Deno.serve(async (req) => {
     const env = resolveEnv((pending as any).payment_environment);
     const stripe = createStripeClient(env);
     const currency = String(pending.currency || "GBP").toLowerCase();
-    const depositMinor = Math.round(Number(pending.deposit_amount) * 100);
+    const chargeTotal = Number((pending as any).charge_amount ?? pending.deposit_amount);
+    const payOption = String((pending as any).payment_option || "deposit");
+    const depositMinor = Math.round(chargeTotal * 100);
     const feeMinor = Math.round(Number(pending.platform_fee_amount) * 100);
 
     const { data: settings } = await admin
@@ -76,7 +78,7 @@ Deno.serve(async (req) => {
         confirm: true,
         application_fee_amount: feeMinor,
         transfer_data: { destination: pending.stripe_account_id },
-        description: `Deposit — ${settings?.business_name || "Booking"} (${pending.service})`,
+        description: `${payOption === "full" ? "Payment" : "Deposit"} — ${settings?.business_name || "Booking"} (${pending.service})`,
         metadata: { pending_booking_id: pending.id, user_id: pending.user_id },
       });
     } catch (err: any) {
@@ -130,6 +132,9 @@ Deno.serve(async (req) => {
         payment_environment: env,
         payment_status: "paid",
         client_token_expires_at: tokenExpires.toISOString(),
+        payment_option: payOption,
+        service_price: (pending as any).service_price ?? null,
+        charge_amount: chargeTotal,
         resource_id: (pending as any).resource_id ?? null,
         party_size: (pending as any).party_size ?? null,
       })
@@ -141,7 +146,11 @@ Deno.serve(async (req) => {
 
     // Confirmation emails
     const businessName = settings?.business_name || "your business";
-    const depositLabel = `${String(pending.currency || "GBP").toUpperCase()} ${Number(pending.deposit_amount).toFixed(2)}`;
+    const ccyLabel = String(pending.currency || "GBP").toUpperCase();
+    const balanceDue = payOption === "full" ? 0 : Math.max(0, Number((pending as any).service_price ?? 0) - chargeTotal);
+    const depositLabel = payOption === "full"
+      ? `${ccyLabel} ${chargeTotal.toFixed(2)} (paid in full)`
+      : `${ccyLabel} ${chargeTotal.toFixed(2)}${balanceDue > 0 ? ` — ${ccyLabel} ${balanceDue.toFixed(2)} due on the day` : ""}`;
     const checkInUrl = settings?.company_code && booking.confirmation_code
       ? `https://booksuite.online/kiosk/${settings.company_code}?code=${booking.confirmation_code}`
       : undefined;
