@@ -99,6 +99,11 @@ export const WIDGET_MARKUP = `
     <div class="slots" id="bw-resources" style="grid-template-columns:repeat(2,1fr)"></div>
   </div>
 
+  <div id="bw-pay-wrap" style="display:none">
+    <div class="label">Payment</div>
+    <div class="slots" id="bw-payopts" style="grid-template-columns:repeat(2,1fr)"></div>
+  </div>
+
   <div class="label">Your details</div>
   <div class="row">
     <input id="bw-name" placeholder="Full name" required>
@@ -161,13 +166,14 @@ export const buildWidgetScript = (opts: {
     resource_label: 'Resource',
     party_size_enabled: false,
     assignment_mode: 'client_pick',
-    services_enabled: false
+    services_enabled: false,
+    payment_mode: 'deposit'
   };
   var busy = [];
   var overrides = {};
   var resources = [];
   var services = [];
-  var selDate = null, selSlot = null, selDur = null, selResource = null, selService = null;
+  var selDate = null, selSlot = null, selDur = null, selResource = null, selService = null, selPayOption = 'deposit';
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
   var stripe = null, elements = null, paymentEl = null, elementsReady = false;
 
@@ -409,6 +415,60 @@ export const buildWidgetScript = (opts: {
       list.appendChild(el);
     });
   }
+  function ccySym(){
+    var ccy = (settings.currency || 'GBP').toUpperCase();
+    return ccy === 'USD' ? '$' : ccy === 'EUR' ? '\u20AC' : ccy === 'JPY' ? '\u00A5' : ccy === 'AUD' ? 'A$' : ccy === 'CAD' ? 'C$' : '\u00A3';
+  }
+  function money(n){
+    var ccy = (settings.currency || 'GBP').toUpperCase();
+    return ccySym() + Number(n).toFixed(ccy === 'JPY' ? 0 : 2);
+  }
+  function servicePrice(){
+    if (!selService) return null;
+    var p = selService.price;
+    if (p === null || p === undefined) return null;
+    p = Number(p);
+    return (isNaN(p) || p <= 0) ? null : p;
+  }
+  function fullAmount(){
+    var p = servicePrice();
+    if (p === null) return null;
+    return Math.max(Number(settings.deposit_amount || 0), p);
+  }
+  function chargeNow(){
+    return (selPayOption === 'full' && fullAmount() !== null) ? fullAmount() : Number(settings.deposit_amount || 0);
+  }
+  function renderPayOptions(){
+    var wrap = document.getElementById('bw-pay-wrap');
+    var mode = settings.payment_mode || 'deposit';
+    var full = fullAmount();
+    if (full === null) { selPayOption = 'deposit'; }
+    else if (mode === 'full') { selPayOption = 'full'; }
+    else if (mode === 'deposit') { selPayOption = 'deposit'; }
+    if (mode !== 'client_choice' || full === null){ wrap.style.display = 'none'; renderDepositPill(); return; }
+    wrap.style.display = '';
+    var list = document.getElementById('bw-payopts');
+    list.innerHTML = '';
+    var dep = Number(settings.deposit_amount || 0);
+    var opts = [
+      { key: 'deposit', label: 'Deposit now ' + money(dep) + ' \u00B7 ' + money(Math.max(0, full - dep)) + ' on the day' },
+      { key: 'full', label: 'Pay in full ' + money(full) }
+    ];
+    opts.forEach(function(o){
+      var el = document.createElement('div');
+      el.className = 'slot' + (selPayOption === o.key ? ' sel' : '');
+      el.textContent = o.label;
+      (function(k){ el.onclick = function(){ selPayOption = k; renderAll(); }; })(o.key);
+      list.appendChild(el);
+    });
+    renderDepositPill();
+  }
+  function renderDepositPill(){
+    var pill = document.getElementById('bw-deposit');
+    if (!pill) return;
+    var amt = chargeNow();
+    pill.textContent = money(amt) + (selPayOption === 'full' ? ' total' : ' deposit');
+  }
   function renderParty(){
     var wrap = document.getElementById('bw-party-wrap');
     if (!settings.party_size_enabled) { wrap.style.display = 'none'; return; }
@@ -416,7 +476,7 @@ export const buildWidgetScript = (opts: {
     document.getElementById('bw-party-label').textContent = 'Party size';
   }
   function renderAll(){
-    renderDates(); renderSlots(); renderServices(); renderDurs(); renderParty(); renderResources();
+    renderDates(); renderSlots(); renderServices(); renderDurs(); renderParty(); renderResources(); renderPayOptions();
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
@@ -531,7 +591,9 @@ export const buildWidgetScript = (opts: {
           stripe_payment_method_id: pmId,
           stripe_setup_intent_id: intentData.setup_intent_id,
           resource_id: settings.resources_enabled ? selResource : null,
-          party_size: settings.party_size_enabled ? partySize() : null
+          party_size: settings.party_size_enabled ? partySize() : null,
+          service_id: selService ? selService.id : null,
+          payment_option: selPayOption
         })
       });
       var saveData = await saveRes.json();
