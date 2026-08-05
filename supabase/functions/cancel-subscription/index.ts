@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
+import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -79,6 +80,16 @@ serve(async (req) => {
         console.error("[cancel-subscription] gift email send failed", mailErr);
       }
 
+      await notifyAdmin(admin, {
+        eventTitle: "Subscription cancelled (gifted plan)",
+        businessName: biz?.business_name || user.email || "",
+        rows: [
+          { label: "Account", value: user.email || user.id },
+          { label: "Plan", value: String(tier) },
+        ],
+        idempotencyKey: `cancel-gift-${user.id}-${new Date().toISOString().slice(0, 10)}`,
+      });
+
       return new Response(JSON.stringify({ ok: true, giftCanceled: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -130,6 +141,16 @@ serve(async (req) => {
     } catch (mailErr) {
       console.error("[cancel-subscription] email send failed", mailErr);
     }
+
+    await notifyAdmin(admin, {
+      eventTitle: "Subscription cancelled",
+      businessName: biz?.business_name || user.email || "",
+      rows: [
+        { label: "Account", value: user.email || user.id },
+        { label: "Plan", value: String(tier) },
+      ],
+      idempotencyKey: `cancel-${live.id}`,
+    });
 
     return new Response(JSON.stringify({ ok: true, winbackCouponId: WINBACK_COUPON_ID }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

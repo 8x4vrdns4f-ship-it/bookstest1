@@ -3,6 +3,7 @@
 // pending_bookings -> bookings on success.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
+import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -174,6 +175,21 @@ Deno.serve(async (req) => {
         });
       }
     } catch (e) { console.error("accept email failed", e); }
+
+    await notifyAdmin(admin, {
+      eventTitle: payOption === "full" ? "Booking paid in full" : "Booking deposit taken",
+      eventSummary: "A business took a booking payment through BookSuite.",
+      businessName: businessName,
+      rows: [
+        { label: "Client", value: booking.client_name },
+        { label: "Service", value: booking.service },
+        { label: "Appointment", value: `${formatDate(booking.booking_date)} at ${formatTime(booking.booking_time)}` },
+        { label: "Amount charged", value: money(chargeTotal, pending.currency) },
+        { label: "Platform fee", value: money(Number(pending.platform_fee_amount), pending.currency) },
+        { label: "Environment", value: env },
+      ],
+      idempotencyKey: `booking-paid-${booking.id}`,
+    });
 
     return new Response(
       JSON.stringify({ ok: true, booking_id: booking.id, confirmation_code: booking.confirmation_code }),

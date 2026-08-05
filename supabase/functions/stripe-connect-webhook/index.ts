@@ -11,6 +11,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { notifyAdmin } from "../_shared/notify-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -313,6 +314,33 @@ async function handleAccountUpdated(
       updated_at: new Date().toISOString(),
     })
     .eq("stripe_account_id", stripeAccountId);
+
+  if (account.charges_enabled && account.details_submitted) {
+    const { data: row } = await admin
+      .from("connect_accounts")
+      .select("user_id")
+      .eq("stripe_account_id", stripeAccountId)
+      .maybeSingle();
+    let businessName = "";
+    if (row?.user_id) {
+      const { data: bs } = await admin
+        .from("business_settings")
+        .select("business_name")
+        .eq("user_id", (row as any).user_id)
+        .maybeSingle();
+      businessName = (bs as any)?.business_name || "";
+    }
+    await notifyAdmin(admin, {
+      eventTitle: "Payout account ready",
+      eventSummary: "A business completed payout onboarding and can now accept payments.",
+      businessName,
+      rows: [
+        { label: "Country", value: account.country || "—" },
+        { label: "Currency", value: String(account.default_currency || "—").toUpperCase() },
+      ],
+      idempotencyKey: `connect-ready-${stripeAccountId}`,
+    });
+  }
 }
 
 Deno.serve(async (req) => {

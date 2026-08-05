@@ -2,6 +2,7 @@
 // Also fires customer refund email (idempotent with the webhook via refund_id key).
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
+import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -93,6 +94,17 @@ Deno.serve(async (req) => {
           },
         });
       } catch (e) { console.error("refund email failed", e); }
+
+    await notifyAdmin(admin, {
+      eventTitle: "Booking refunded",
+      businessName: settings?.business_name || "",
+      rows: [
+        { label: "Client", value: booking.client_name },
+        { label: "Service", value: booking.service },
+        { label: "Refund amount", value: String(refundAmount) },
+      ],
+      idempotencyKey: `refund-${booking.id}-${refund.id}`,
+    });
     }
 
     return new Response(JSON.stringify({ ok: true, refund_id: refund.id }), {
