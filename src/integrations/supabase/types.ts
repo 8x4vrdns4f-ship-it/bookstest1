@@ -42,6 +42,7 @@ export type Database = {
           review_submitted_at: string | null
           review_token: string | null
           service: string
+          service_id: string | null
           status: string
           stripe_charge_id: string | null
           stripe_checkout_session_id: string | null
@@ -76,6 +77,7 @@ export type Database = {
           review_submitted_at?: string | null
           review_token?: string | null
           service: string
+          service_id?: string | null
           status?: string
           stripe_charge_id?: string | null
           stripe_checkout_session_id?: string | null
@@ -110,6 +112,7 @@ export type Database = {
           review_submitted_at?: string | null
           review_token?: string | null
           service?: string
+          service_id?: string | null
           status?: string
           stripe_charge_id?: string | null
           stripe_checkout_session_id?: string | null
@@ -137,6 +140,13 @@ export type Database = {
             columns: ["resource_id"]
             isOneToOne: false
             referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -176,6 +186,7 @@ export type Database = {
           resource_label: string
           resources_enabled: boolean
           self_checkin_enabled: boolean
+          services_enabled: boolean
           timezone: string
           updated_at: string
           user_id: string
@@ -217,6 +228,7 @@ export type Database = {
           resource_label?: string
           resources_enabled?: boolean
           self_checkin_enabled?: boolean
+          services_enabled?: boolean
           timezone?: string
           updated_at?: string
           user_id: string
@@ -258,6 +270,7 @@ export type Database = {
           resource_label?: string
           resources_enabled?: boolean
           self_checkin_enabled?: boolean
+          services_enabled?: boolean
           timezone?: string
           updated_at?: string
           user_id?: string
@@ -752,6 +765,7 @@ export type Database = {
           reminder_sent_at: string | null
           resource_id: string | null
           service: string
+          service_id: string | null
           status: string
           stripe_account_id: string
           stripe_checkout_session_id: string | null
@@ -781,6 +795,7 @@ export type Database = {
           reminder_sent_at?: string | null
           resource_id?: string | null
           service: string
+          service_id?: string | null
           status?: string
           stripe_account_id: string
           stripe_checkout_session_id?: string | null
@@ -810,6 +825,7 @@ export type Database = {
           reminder_sent_at?: string | null
           resource_id?: string | null
           service?: string
+          service_id?: string | null
           status?: string
           stripe_account_id?: string
           stripe_checkout_session_id?: string | null
@@ -824,6 +840,13 @@ export type Database = {
             columns: ["resource_id"]
             isOneToOne: false
             referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -958,6 +981,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      services: {
+        Row: {
+          active: boolean
+          created_at: string
+          duration_minutes: number
+          id: string
+          name: string
+          price: number | null
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          name: string
+          price?: number | null
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          name?: string
+          price?: number | null
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       subscriptions: {
         Row: {
@@ -1220,6 +1279,16 @@ export type Database = {
           sort_order: number
         }[]
       }
+      get_widget_services: {
+        Args: { p_user_id: string }
+        Returns: {
+          duration_minutes: number
+          id: string
+          name: string
+          price: number
+          sort_order: number
+        }[]
+      }
       get_widget_settings: {
         Args: { p_user_id: string }
         Returns: {
@@ -1234,6 +1303,7 @@ export type Database = {
           party_size_enabled: boolean
           resource_label: string
           resources_enabled: boolean
+          services_enabled: boolean
           timezone: string
           user_id: string
           waitlist_enabled: boolean
