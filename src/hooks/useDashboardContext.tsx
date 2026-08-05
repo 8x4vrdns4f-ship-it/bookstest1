@@ -31,7 +31,10 @@ export function useDashboardContext() {
       }
       const u: User = session.user;
       const displayName =
-        (u.user_metadata?.display_name as string) || u.email || "";
+        (u.user_metadata?.display_name as string) ||
+        (u.email ? u.email.split("@")[0] : "") ||
+        "";
+
 
       const { data: emp } = await supabase
         .from("employees")
