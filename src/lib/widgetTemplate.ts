@@ -567,7 +567,7 @@ const RESIZE_SCRIPT = `
   if (window.ResizeObserver) { new ResizeObserver(send).observe(document.documentElement); }
   send();
 })();
-\`;
+`;
 
 export const buildWidgetHtml = (opts: {
   supabaseUrl: string;
