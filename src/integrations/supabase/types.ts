@@ -19,6 +19,7 @@ export type Database = {
           assigned_employee_id: string | null
           booking_date: string
           booking_time: string
+          charge_amount: number | null
           client_access_token: string | null
           client_email: string | null
           client_id: string | null
@@ -34,6 +35,7 @@ export type Database = {
           notes: string | null
           party_size: number | null
           payment_environment: string
+          payment_option: string
           payment_status: string
           platform_fee_amount: number | null
           refund_id: string | null
@@ -43,6 +45,7 @@ export type Database = {
           review_token: string | null
           service: string
           service_id: string | null
+          service_price: number | null
           status: string
           stripe_charge_id: string | null
           stripe_checkout_session_id: string | null
@@ -54,6 +57,7 @@ export type Database = {
           assigned_employee_id?: string | null
           booking_date: string
           booking_time: string
+          charge_amount?: number | null
           client_access_token?: string | null
           client_email?: string | null
           client_id?: string | null
@@ -69,6 +73,7 @@ export type Database = {
           notes?: string | null
           party_size?: number | null
           payment_environment?: string
+          payment_option?: string
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
@@ -78,6 +83,7 @@ export type Database = {
           review_token?: string | null
           service: string
           service_id?: string | null
+          service_price?: number | null
           status?: string
           stripe_charge_id?: string | null
           stripe_checkout_session_id?: string | null
@@ -89,6 +95,7 @@ export type Database = {
           assigned_employee_id?: string | null
           booking_date?: string
           booking_time?: string
+          charge_amount?: number | null
           client_access_token?: string | null
           client_email?: string | null
           client_id?: string | null
@@ -104,6 +111,7 @@ export type Database = {
           notes?: string | null
           party_size?: number | null
           payment_environment?: string
+          payment_option?: string
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
@@ -113,6 +121,7 @@ export type Database = {
           review_token?: string | null
           service?: string
           service_id?: string | null
+          service_price?: number | null
           status?: string
           stripe_charge_id?: string | null
           stripe_checkout_session_id?: string | null
@@ -179,6 +188,7 @@ export type Database = {
           notify_new_booking: boolean
           onboarding_completed_at: string | null
           party_size_enabled: boolean
+          payment_mode: string
           pending_request_ttl_hours: number
           platform_fee_percent: number
           reception_checkin_enabled: boolean
@@ -221,6 +231,7 @@ export type Database = {
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null
           party_size_enabled?: boolean
+          payment_mode?: string
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
@@ -263,6 +274,7 @@ export type Database = {
           notify_new_booking?: boolean
           onboarding_completed_at?: string | null
           party_size_enabled?: boolean
+          payment_mode?: string
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
           reception_checkin_enabled?: boolean
@@ -747,6 +759,7 @@ export type Database = {
         Row: {
           booking_date: string
           booking_time: string
+          charge_amount: number | null
           charge_error: string | null
           client_email: string
           client_name: string
@@ -761,11 +774,13 @@ export type Database = {
           notes: string | null
           party_size: number | null
           payment_environment: string
+          payment_option: string
           platform_fee_amount: number
           reminder_sent_at: string | null
           resource_id: string | null
           service: string
           service_id: string | null
+          service_price: number | null
           status: string
           stripe_account_id: string
           stripe_checkout_session_id: string | null
@@ -777,6 +792,7 @@ export type Database = {
         Insert: {
           booking_date: string
           booking_time: string
+          charge_amount?: number | null
           charge_error?: string | null
           client_email: string
           client_name: string
@@ -791,11 +807,13 @@ export type Database = {
           notes?: string | null
           party_size?: number | null
           payment_environment?: string
+          payment_option?: string
           platform_fee_amount: number
           reminder_sent_at?: string | null
           resource_id?: string | null
           service: string
           service_id?: string | null
+          service_price?: number | null
           status?: string
           stripe_account_id: string
           stripe_checkout_session_id?: string | null
@@ -807,6 +825,7 @@ export type Database = {
         Update: {
           booking_date?: string
           booking_time?: string
+          charge_amount?: number | null
           charge_error?: string | null
           client_email?: string
           client_name?: string
@@ -821,11 +840,13 @@ export type Database = {
           notes?: string | null
           party_size?: number | null
           payment_environment?: string
+          payment_option?: string
           platform_fee_amount?: number
           reminder_sent_at?: string | null
           resource_id?: string | null
           service?: string
           service_id?: string | null
+          service_price?: number | null
           status?: string
           stripe_account_id?: string
           stripe_checkout_session_id?: string | null
@@ -1301,6 +1322,7 @@ export type Database = {
           deposit_amount: number
           max_advance_days: number
           party_size_enabled: boolean
+          payment_mode: string
           resource_label: string
           resources_enabled: boolean
           services_enabled: boolean
