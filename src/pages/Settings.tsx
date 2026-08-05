@@ -12,10 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Copy, Check, LogOut, KeyRound, Trash2, XCircle,
-  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock, LayoutGrid,
+  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock, LayoutGrid, ListChecks,
 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ResourcesManager from "@/components/dashboard/ResourcesManager";
+import ServicesManager from "@/components/dashboard/ServicesManager";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
@@ -74,6 +75,7 @@ type SettingsForm = {
   party_size_enabled: boolean;
   assignment_mode: "client_pick" | "auto";
   waitlist_enabled: boolean;
+  services_enabled: boolean;
 
 };
 
@@ -97,7 +99,7 @@ const Settings = () => {
     welcome_message: "", accent_color: "#3B82F6",
     self_checkin_enabled: false, reception_checkin_enabled: true,
     resources_enabled: false, resource_label: "Resource",
-    party_size_enabled: false, assignment_mode: "client_pick", waitlist_enabled: false,
+    party_size_enabled: false, assignment_mode: "client_pick", waitlist_enabled: false, services_enabled: false,
 
   });
 
@@ -144,6 +146,7 @@ const Settings = () => {
             party_size_enabled: (data as any).party_size_enabled ?? false,
             assignment_mode: ((data as any).assignment_mode as "client_pick" | "auto") ?? "client_pick",
             waitlist_enabled: (data as any).waitlist_enabled ?? false,
+            services_enabled: (data as any).services_enabled ?? false,
 
           });
         }
@@ -341,6 +344,37 @@ const Settings = () => {
               </Field>
             </AccordionContent>
           </AccordionItem>
+          </SectionCard>
+
+          {/* Services */}
+          <SectionCard>
+            <AccordionItem value="services" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <ListChecks size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Services</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-5">
+                <p className="text-xs text-muted-foreground">
+                  Turn this on to show a menu of services in your booking widget. Each service sets its own length, so clients never have to guess a duration.
+                </p>
+                <ToggleRow
+                  label="Enable service menu"
+                  hint="Clients pick a service; the duration is applied automatically."
+                  checked={form.services_enabled}
+                  onChange={(v) => setForm({ ...form, services_enabled: v })}
+                />
+                {form.services_enabled && userId && (
+                  <div className="pt-2 border-t border-border">
+                    <Label className="text-foreground">Your services</Label>
+                    <div className="mt-3"><ServicesManager userId={userId} currency={form.currency} /></div>
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
           </SectionCard>
 
           {/* Bookable Resources */}

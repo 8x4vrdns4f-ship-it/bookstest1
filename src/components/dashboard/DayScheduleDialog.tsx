@@ -12,6 +12,8 @@ type Booking = {
   client_name: string;
   service: string;
   status: string;
+  assigned_employee_id?: string | null;
+  resource_id?: string | null;
 };
 
 type Props = {
@@ -24,6 +26,8 @@ type Props = {
   closed?: boolean;
   onEditHours?: () => void;
   onBookingClick?: (b: Booking) => void;
+  employeeNames?: Record<string, string>;
+  resourceNames?: Record<string, string>;
 };
 
 const statusColors: Record<string, string> = {
@@ -37,7 +41,7 @@ const statusColors: Record<string, string> = {
 const toMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
 const fmt = (mins: number) => `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
 
-const DayScheduleDialog = ({ open, onOpenChange, date, bookings, startHour, endHour, closed, onEditHours, onBookingClick }: Props) => {
+const DayScheduleDialog = ({ open, onOpenChange, date, bookings, startHour, endHour, closed, onEditHours, onBookingClick, employeeNames = {}, resourceNames = {} }: Props) => {
   const slots = useMemo(() => {
     const out: number[] = [];
     for (let m = startHour * 60; m < endHour * 60; m += 30) out.push(m);
@@ -102,6 +106,8 @@ const DayScheduleDialog = ({ open, onOpenChange, date, bookings, startHour, endH
                         <div className="text-sm font-medium text-foreground truncate">{b.client_name}</div>
                         <div className="text-xs text-muted-foreground truncate">
                           {b.service} · {fmt(start)}–{fmt(end)}
+                          {b.resource_id && resourceNames[b.resource_id] && <> · {resourceNames[b.resource_id]}</>}
+                          {b.assigned_employee_id && employeeNames[b.assigned_employee_id] && <> · {employeeNames[b.assigned_employee_id]}</>}
                         </div>
                       </>
                     ) : (

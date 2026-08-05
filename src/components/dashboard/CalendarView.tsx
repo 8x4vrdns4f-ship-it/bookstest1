@@ -20,6 +20,7 @@ type Booking = {
   notes: string | null;
   confirmation_code: string | null;
   assigned_employee_id: string | null;
+  resource_id?: string | null;
 };
 
 type Override = { override_date: string; closed: boolean; open_time: string | null; close_time: string | null };
@@ -35,6 +36,8 @@ const CalendarView = ({ userId }: { userId: string }) => {
   const [bookingDetail, setBookingDetail] = useState<Booking | null>(null);
 
   const [defaultHours, setDefaultHours] = useState({ start: 9, end: 18 });
+  const [employeeNames, setEmployeeNames] = useState<Record<string, string>>({});
+  const [resourceNames, setResourceNames] = useState<Record<string, string>>({});
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -54,6 +57,18 @@ const CalendarView = ({ userId }: { userId: string }) => {
     if (ov.data) setOverrides(ov.data as Override[]);
     if (st.data) setDefaultHours({ start: st.data.day_start_hour ?? 9, end: st.data.day_end_hour ?? 18 });
   };
+
+  useEffect(() => {
+    (async () => {
+      const [emp, res] = await Promise.all([
+        supabase.from("employees").select("id, name").eq("user_id", userId),
+        supabase.from("resources").select("id, name").eq("user_id", userId),
+      ]);
+      const em: Record<string, string> = {}; (emp.data || []).forEach((e) => { em[e.id] = e.name; });
+      const rm: Record<string, string> = {}; (res.data || []).forEach((r) => { rm[r.id] = r.name; });
+      setEmployeeNames(em); setResourceNames(rm);
+    })();
+  }, [userId]);
 
   useEffect(() => {
     fetchAll();
@@ -166,6 +181,8 @@ const CalendarView = ({ userId }: { userId: string }) => {
       </SectionCard>
 
       <DayScheduleDialog
+          employeeNames={employeeNames}
+          resourceNames={resourceNames}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         date={selectedDate}

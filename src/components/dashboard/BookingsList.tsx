@@ -41,6 +41,7 @@ const statusStyle: Record<string, { pill: string; dot: string; label: string }> 
 const BookingsList = ({ userId }: { userId: string }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [employeesMap, setEmployeesMap] = useState<Record<string, string>>({});
+  const [employeesList, setEmployeesList] = useState<{ id: string; name: string }[]>([]);
   const [businessName, setBusinessName] = useState<string>("");
   const [companyCode, setCompanyCode] = useState<string>("");
   const [open, setOpen] = useState(false);
@@ -73,6 +74,7 @@ const BookingsList = ({ userId }: { userId: string }) => {
     const map: Record<string, string> = {};
     (data || []).forEach((e) => { map[e.id] = e.name; });
     setEmployeesMap(map);
+    setEmployeesList((data || []).map((e) => ({ id: e.id, name: e.name })));
   };
 
   useEffect(() => {
@@ -130,6 +132,13 @@ const BookingsList = ({ userId }: { userId: string }) => {
       fetchBookings();
     }
     setLoading(false);
+  };
+
+  const handleAssign = async (id: string, employeeId: string) => {
+    const value = employeeId === "none" ? null : employeeId;
+    const { error } = await supabase.from("bookings").update({ assigned_employee_id: value }).eq("id", id);
+    if (error) toast({ title: "Could not assign", description: error.message, variant: "destructive" });
+    else toast({ title: value ? "Staff assigned" : "Staff unassigned" });
   };
 
   const handleStatusChange = async (id: string, status: string) => {
@@ -316,6 +325,19 @@ const BookingsList = ({ userId }: { userId: string }) => {
                       <SelectItem value="in_progress">In Progress</SelectItem>
                       <SelectItem value="completed">Completed</SelectItem>
                       <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                {employeesList.length > 0 && (
+                  <Select value={b.assigned_employee_id || "none"} onValueChange={(val) => handleAssign(b.id, val)}>
+                    <SelectTrigger className="w-[130px] h-8 text-xs bg-secondary border-border">
+                      <SelectValue placeholder="Assign staff" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border">
+                      <SelectItem value="none">Unassigned</SelectItem>
+                      {employeesList.map((e) => (
+                        <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}
