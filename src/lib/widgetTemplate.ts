@@ -76,11 +76,18 @@ export const WIDGET_MARKUP = `
   <div class="label">Day</div>
   <div class="dates-wrap"><div class="dates" id="bw-dates"></div></div>
 
+  <div id="bw-svc-wrap" style="display:none">
+    <div class="label">Service</div>
+    <div class="slots" id="bw-services" style="grid-template-columns:repeat(2,1fr)"></div>
+  </div>
+
   <div class="label">Start time</div>
   <div class="slots" id="bw-slots"></div>
 
-  <div class="label">Duration</div>
-  <div class="durs" id="bw-durs"></div>
+  <div id="bw-dur-wrap">
+    <div class="label">Duration</div>
+    <div class="durs" id="bw-durs"></div>
+  </div>
 
   <div id="bw-party-wrap" style="display:none">
     <div class="label" id="bw-party-label">Party size</div>
@@ -153,12 +160,14 @@ export const buildWidgetScript = (opts: {
     resources_enabled: false,
     resource_label: 'Resource',
     party_size_enabled: false,
-    assignment_mode: 'client_pick'
+    assignment_mode: 'client_pick',
+    services_enabled: false
   };
   var busy = [];
   var overrides = {};
   var resources = [];
-  var selDate = null, selSlot = null, selDur = null, selResource = null;
+  var services = [];
+  var selDate = null, selSlot = null, selDur = null, selResource = null, selService = null;
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
   var stripe = null, elements = null, paymentEl = null, elementsReady = false;
 
@@ -299,12 +308,44 @@ export const buildWidgetScript = (opts: {
       el.className = 'slot' + (isBusy?' busy':'') + (selSlot === m?' sel':'');
       el.textContent = fmtMin(m);
       if (!isBusy){
-        (function(mm){ el.onclick = function(){ selSlot = mm; selDur = null; selResource = null; renderAll(); }; })(m);
+        (function(mm){ el.onclick = function(){ selSlot = mm; selDur = servicesOn() && selService ? (Number(selService.duration_minutes) || 30) : null; selResource = null; renderAll(); }; })(m);
       }
       wrap.appendChild(el);
     }
   }
+  function servicesOn(){ return !!settings.services_enabled && services.length > 0; }
+  function renderServices(){
+    var wrap = document.getElementById('bw-svc-wrap');
+    if (!servicesOn()){ wrap.style.display = 'none'; return; }
+    wrap.style.display = '';
+    var list = document.getElementById('bw-services');
+    list.innerHTML = '';
+    var bset = selDate ? busyMinutes(selDate) : {};
+    var hrs = selDate ? dayHoursFor(selDate) : null;
+    var endLimit = hrs ? toMin(hrs.close) : 0;
+    var ccy = (settings.currency || 'GBP').toUpperCase();
+    var sym = ccy === 'USD' ? '$' : ccy === 'EUR' ? '\u20AC' : ccy === 'JPY' ? '\u00A5' : ccy === 'AUD' ? 'A$' : ccy === 'CAD' ? 'C$' : '\u00A3';
+    services.forEach(function(sv){
+      var d = Number(sv.duration_minutes) || 30;
+      var disabled = false;
+      if (selSlot !== null && selSlot !== undefined){
+        if (selSlot + d > endLimit) disabled = true;
+        for (var mm = selSlot; mm < selSlot + d; mm += 30){ if (bset[mm]) { disabled = true; break; } }
+      }
+      var el = document.createElement('div');
+      el.className = 'slot' + (disabled ? ' busy' : '') + (selService && selService.id === sv.id ? ' sel' : '');
+      var price = (sv.price === null || sv.price === undefined || Number(sv.price) === 0) ? '' : ' \u00B7 ' + sym + Number(sv.price).toFixed(ccy === 'JPY' ? 0 : 2);
+      el.textContent = sv.name + ' \u00B7 ' + d + ' min' + price;
+      if (!disabled){
+        (function(svc){ el.onclick = function(){ selService = svc; selDur = Number(svc.duration_minutes) || 30; selResource = null; renderAll(); }; })(sv);
+      }
+      list.appendChild(el);
+    });
+  }
   function renderDurs(){
+    var durWrap = document.getElementById('bw-dur-wrap');
+    if (servicesOn()){ durWrap.style.display = 'none'; return; }
+    durWrap.style.display = '';
     var wrap = document.getElementById('bw-durs');
     wrap.innerHTML = '';
     var durs = [30,60,90,120];
@@ -375,7 +416,7 @@ export const buildWidgetScript = (opts: {
     document.getElementById('bw-party-label').textContent = 'Party size';
   }
   function renderAll(){
-    renderDates(); renderSlots(); renderDurs(); renderParty(); renderResources();
+    renderDates(); renderSlots(); renderServices(); renderDurs(); renderParty(); renderResources();
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
@@ -481,7 +522,7 @@ export const buildWidgetScript = (opts: {
           userId: UID,
           client_name: name,
           client_email: email,
-          service: 'Booking',
+          service: (selService && selService.name) ? selService.name : 'Booking',
           booking_date: selDate,
           booking_time: fmtMin(selSlot) + ':00',
           duration_minutes: selDur,
@@ -518,7 +559,8 @@ export const buildWidgetScript = (opts: {
     api('/rest/v1/rpc/get_widget_settings', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); }),
     api('/rest/v1/rpc/get_busy_slots', { method: 'POST', body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange }) }).then(function(r){ return r.json(); }),
     api('/rest/v1/rpc/get_widget_date_overrides', { method: 'POST', body: JSON.stringify({ p_user_id: UID, p_from: fmtDate(new Date()), p_to: endRange }) }).then(function(r){ return r.json(); }),
-    api('/rest/v1/rpc/get_widget_resources', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); })
+    api('/rest/v1/rpc/get_widget_resources', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); }),
+    api('/rest/v1/rpc/get_widget_services', { method: 'POST', body: JSON.stringify({ p_user_id: UID }) }).then(function(r){ return r.json(); }).catch(function(){ return []; })
   ]).then(function(arr){
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];
@@ -538,6 +580,7 @@ export const buildWidgetScript = (opts: {
     busy = Array.isArray(arr[1]) ? arr[1] : [];
     (Array.isArray(arr[2]) ? arr[2] : []).forEach(function(o){ overrides[o.override_date] = o; });
     resources = Array.isArray(arr[3]) ? arr[3] : [];
+    services = Array.isArray(arr[4]) ? arr[4] : [];
     var today = new Date();
     var startI = settings.allow_same_day ? 0 : 1;
     var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
