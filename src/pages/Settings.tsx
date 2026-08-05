@@ -54,6 +54,7 @@ type SettingsForm = {
   currency: string;
   timezone: string;
   deposit_amount: number;
+  payment_mode: string;
   working_hours: WorkingHours;
   auto_confirm: boolean;
   allow_same_day: boolean;
@@ -91,7 +92,7 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<SettingsForm>({
     business_name: "", business_phone: "", business_email: "", business_address: "",
-    business_category: "", currency: "GBP", timezone: "Europe/London", deposit_amount: 10,
+    business_category: "", currency: "GBP", timezone: "Europe/London", deposit_amount: 10, payment_mode: "deposit",
     working_hours: DEFAULT_HOURS, auto_confirm: false, allow_same_day: true,
     buffer_minutes: 0, max_advance_days: 30, cancellation_hours: 24, pending_request_ttl_hours: 48,
     notify_new_booking: true, notify_daily_summary: false,
@@ -125,6 +126,7 @@ const Settings = () => {
             currency: data.currency || "GBP",
             timezone: data.timezone || "Europe/London",
             deposit_amount: Number(data.deposit_amount),
+            payment_mode: (data as any).payment_mode || "deposit",
             working_hours: (data.working_hours as unknown as WorkingHours) || DEFAULT_HOURS,
             auto_confirm: data.auto_confirm,
             allow_same_day: data.allow_same_day,
@@ -328,6 +330,27 @@ const Settings = () => {
               <Field label={`Deposit per booking (${form.currency}) — min £10`} hint="Charged only when you accept a booking.">
                 <Input type="number" min={10} step="0.50" value={form.deposit_amount} onChange={(e) => setForm({ ...form, deposit_amount: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
+              <div className="rounded-2xl border border-border bg-secondary/40 p-4 space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Payment at booking</p>
+                  <p className="text-xs text-muted-foreground">Applies when a service has a price set. Without a price, only the deposit is taken.</p>
+                </div>
+                {[
+                  { key: "deposit", label: "Deposit only", hint: "Client pays the deposit; the rest is paid on the day." },
+                  { key: "full", label: "Pay in full", hint: "Client pays the full service price when you accept." },
+                  { key: "client_choice", label: "Let the client choose", hint: "Client picks deposit only or pay in full in the booking widget." },
+                ].map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setForm({ ...form, payment_mode: opt.key })}
+                    className={`w-full text-left rounded-xl border px-4 py-3 transition-colors ${form.payment_mode === opt.key ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-secondary"}`}
+                  >
+                    <span className="block text-sm font-medium text-foreground">{opt.label}</span>
+                    <span className="block text-xs text-muted-foreground">{opt.hint}</span>
+                  </button>
+                ))}
+              </div>
               <ToggleRow label="Auto-confirm Bookings" hint="Skip manual approval." checked={form.auto_confirm} onChange={(v) => setForm({ ...form, auto_confirm: v })} />
               <ToggleRow label="Allow Same-day Booking" hint="Let clients book today." checked={form.allow_same_day} onChange={(v) => setForm({ ...form, allow_same_day: v })} />
               <Field label="Booking Buffer (minutes)" hint="Gap between back-to-back appointments.">
