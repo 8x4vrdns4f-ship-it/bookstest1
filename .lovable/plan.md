@@ -8,9 +8,11 @@ Tables, chairs, rooms, booths are done.
 - The widget shows a party-size input, filters resources by capacity, greys out resources already taken for the chosen date/time/duration, and saves `resource_id` + `party_size` on the booking.
 - Currently every business has `resources_enabled = false`, so nobody sees it until they turn it on in Settings.
 
-## Not built yet: two things
-1. **Choosing a specific staff member (the barber).** Bookings have an `assigned_employee_id` column and staff/shifts exist in the dashboard, but the widget never offers a staff picker and never sets that field. A customer cannot say "I want Sam."
-2. **Choosing a service.** The widget hardcodes `service: 'Booking'` and only asks for a duration. There is no service/menu list (name, duration, price) a customer can pick from.
+## Already built: owner assigns staff to a booking
+Confirmed in the code — the booking detail dialog and the reception view both let the owner pick a staff member for a booking and save it to `assigned_employee_id`, and the assigned name already shows on the bookings list, calendar, and reviews.
+
+## Not built yet: one thing
+**Choosing a service.** The widget hardcodes `service: 'Booking'` and only asks for a duration. There is no service/menu list (name, duration, price) a customer can pick from.
 
 # Proposed work
 
@@ -19,16 +21,15 @@ Tables, chairs, rooms, booths are done.
 - Settings: add/edit/reorder services, with a toggle for businesses that don't need one.
 - Widget: when services exist, the customer picks a service first and the duration is set automatically from it (duration buttons stay as the fallback when no menu is defined).
 
-## Step 2 — Staff picker
-- Settings: a toggle for "let customers choose a staff member", plus per-staff visibility (only staff marked bookable appear).
-- Widget: after date and time, show available staff for that slot — filtered by their shifts and existing bookings — plus an "Any available" option.
-- Save `assigned_employee_id` on the booking so it lands on the right person's calendar.
+## Step 2 — Assignment polish (small)
+No customer-facing staff picker — a barbershop's chairs are just resources, which is already covered.
+- Add the same "assign staff" control to the bookings list row menu, so the owner doesn't have to open the detail dialog every time.
+- Show the assigned staff member alongside the resource on the calendar, so it's clear who is covering which chair or table.
 
 ## Step 3 — Combine the rules
-- Availability is checked across all three at once: service duration, staff working that slot, and resource free for the party size.
-- Optional link between services and staff (which barber does which service) — worth doing only if you want it.
+- Availability is checked across both at once: the service's duration and whether a resource is free for that party size at that time.
 
 ## Technical notes
 - New `services` table with the standard owner-scoped access rules, plus read access for the public booking widget through a security-definer function like the existing `get_widget_resources`.
-- New columns on `bookings`: `service_id`; on `business_settings`: `services_enabled`, `staff_pick_enabled`; on `employees`: `bookable`.
-- Widget changes live in `src/lib/widgetTemplate.ts`; availability logic extends the existing `get_busy_slots` path to also return `assigned_employee_id`.
+- New column on `bookings`: `service_id`; on `business_settings`: `services_enabled`.
+- Widget changes live in `src/lib/widgetTemplate.ts`; availability keeps using the existing `get_busy_slots` + resource capacity logic, with the selected service supplying the duration.
