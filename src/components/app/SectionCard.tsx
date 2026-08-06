@@ -95,4 +95,7 @@ const SectionCard = forwardRef<HTMLDivElement, Props>(function SectionCard(
       )}
     </div>
   );
-}
+});
+
+export default SectionCard;
+
