@@ -85,7 +85,8 @@ export const AppDialog = React.forwardRef<HTMLDivElement, AppDialogProps>(functi
       </DialogContent>
     </Dialog>
   );
-}
+});
+
 
 export interface ConfirmDialogProps {
   open: boolean;
