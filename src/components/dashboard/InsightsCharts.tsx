@@ -87,5 +87,3 @@ export function CountBarChart({
     </ResponsiveContainer>
   );
 }
-
-export default { TrendChart, CountBarChart };
