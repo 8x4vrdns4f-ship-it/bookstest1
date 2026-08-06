@@ -7,6 +7,8 @@ import {
   UsersRound,
   Clock,
   Star,
+  BarChart3,
+
   CreditCard,
   Settings as SettingsIcon,
 } from "lucide-react";
@@ -40,6 +42,8 @@ const mainItems: NavItem[] = [
   { title: "Staff", url: "/dashboard/staff", icon: UsersRound },
   { title: "Shifts", url: "/dashboard/shifts", icon: Clock },
   { title: "Reviews", url: "/dashboard/reviews", icon: Star },
+  { title: "Insights", url: "/dashboard/insights", icon: BarChart3 },
+
 ];
 
 const accountItems: NavItem[] = [
