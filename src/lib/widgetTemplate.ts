@@ -223,10 +223,19 @@ export const buildWidgetScript = (opts: {
   }
   // A slot is "busy" only if ALL fitting resources are occupied (or, when a specific resource is picked, only that resource).
   // When resources are disabled, fall back to the flat busy set.
+  // Minutes-of-day before which a slot is in the past (only relevant for today).
+  function pastCutoff(dateStr){
+    var now = new Date();
+    if (dateStr !== fmtDate(now)) return -1;
+    return now.getHours() * 60 + now.getMinutes();
+  }
   function busyMinutes(dateStr){
     var set = {};
     var buf = settings.buffer_minutes || 0;
+    var cut = pastCutoff(dateStr);
+    if (cut >= 0){ for (var pm = 0; pm < cut; pm += 30) set[pm] = true; }
     var todays = busy.filter(function(b){ return b.booking_date === dateStr; });
+
 
     if (!settings.resources_enabled) {
       todays.forEach(function(b){
