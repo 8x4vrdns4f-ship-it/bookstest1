@@ -35,25 +35,29 @@ export interface AppDialogProps {
   contentClassName?: string;
 }
 
-export function AppDialog({
-  open,
-  onOpenChange,
-  title,
-  description,
-  icon: Icon,
-  size = "md",
-  tone = "default",
-  children,
-  footer,
-  className,
-  contentClassName,
-}: AppDialogProps) {
+export const AppDialog = React.forwardRef<HTMLDivElement, AppDialogProps>(function AppDialog(
+  {
+    open,
+    onOpenChange,
+    title,
+    description,
+    icon: Icon,
+    size = "md",
+    tone = "default",
+    children,
+    footer,
+    className,
+    contentClassName,
+  },
+  ref,
+) {
   const isDestructive = tone === "destructive";
   const DisplayIcon = Icon ?? (isDestructive ? AlertTriangle : undefined);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("rounded-[20px]", sizeClass[size], className)}>
+      <DialogContent ref={ref} className={cn("rounded-[20px]", sizeClass[size], className)}>
+
         <DialogHeader>
           <div className="flex items-start gap-3">
             {DisplayIcon && (
@@ -81,7 +85,8 @@ export function AppDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});
+
 
 export interface ConfirmDialogProps {
   open: boolean;

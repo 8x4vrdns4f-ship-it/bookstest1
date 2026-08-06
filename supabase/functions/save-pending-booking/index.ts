@@ -80,10 +80,24 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes, services_enabled, payment_mode")
+      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes, services_enabled, payment_mode, timezone")
       .eq("user_id", userId)
       .maybeSingle();
     if (!settings) return bad("Business not found");
+
+    // Reject bookings in the past (evaluated in the business's own timezone)
+    try {
+      const tz = (settings as any).timezone || "Europe/London";
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", hour12: false,
+      }).formatToParts(new Date());
+      const g = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
+      const nowStamp = `${g("year")}-${g("month")}-${g("day")} ${g("hour")}:${g("minute")}`;
+      const reqStamp = `${booking_date} ${booking_time.slice(0, 5)}`;
+      if (reqStamp < nowStamp) return bad("That time has already passed — please pick another slot");
+    } catch (_e) { /* timezone parsing failure should not block bookings */ }
+
 
     const { data: connect } = await admin
       .from("connect_accounts")

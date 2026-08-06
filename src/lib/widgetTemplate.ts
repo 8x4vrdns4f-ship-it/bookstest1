@@ -223,10 +223,19 @@ export const buildWidgetScript = (opts: {
   }
   // A slot is "busy" only if ALL fitting resources are occupied (or, when a specific resource is picked, only that resource).
   // When resources are disabled, fall back to the flat busy set.
+  // Minutes-of-day before which a slot is in the past (only relevant for today).
+  function pastCutoff(dateStr){
+    var now = new Date();
+    if (dateStr !== fmtDate(now)) return -1;
+    return now.getHours() * 60 + now.getMinutes();
+  }
   function busyMinutes(dateStr){
     var set = {};
     var buf = settings.buffer_minutes || 0;
+    var cut = pastCutoff(dateStr);
+    if (cut >= 0){ for (var pm = 0; pm < cut; pm += 30) set[pm] = true; }
     var todays = busy.filter(function(b){ return b.booking_date === dateStr; });
+
 
     if (!settings.resources_enabled) {
       todays.forEach(function(b){
@@ -307,8 +316,12 @@ export const buildWidgetScript = (opts: {
     var hrs = dayHoursFor(selDate);
     if (hrs.closed){ wrap.innerHTML = emptyMsg('Closed this day'); return; }
     var bset = busyMinutes(selDate);
+    var cut = pastCutoff(selDate);
     var startM = toMin(hrs.open), endM = toMin(hrs.close);
+    var shown = 0;
     for (var m = startM; m < endM; m += 30){
+      if (cut >= 0 && m < cut) continue; // past times today
+      shown++;
       var el = document.createElement('div');
       var isBusy = !!bset[m];
       el.className = 'slot' + (isBusy?' busy':'') + (selSlot === m?' sel':'');
@@ -318,7 +331,9 @@ export const buildWidgetScript = (opts: {
       }
       wrap.appendChild(el);
     }
+    if (shown === 0) wrap.innerHTML = emptyMsg('No times left today — pick another day');
   }
+
   function servicesOn(){ return !!settings.services_enabled && services.length > 0; }
   function renderServices(){
     var wrap = document.getElementById('bw-svc-wrap');
@@ -645,8 +660,20 @@ export const buildWidgetScript = (opts: {
     services = Array.isArray(arr[4]) ? arr[4] : [];
     var today = new Date();
     var startI = settings.allow_same_day ? 0 : 1;
-    var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
-    selDate = fmtDate(d0);
+    var maxI = Math.min(settings.max_advance_days || 14, 60);
+    selDate = null;
+    for (var i = startI; i <= maxI; i++){
+      var dc = new Date(today); dc.setDate(dc.getDate()+i);
+      var dsc = fmtDate(dc);
+      var hc = dayHoursFor(dsc);
+      if (hc.closed) continue;
+      var cutc = pastCutoff(dsc);
+      var lastStart = toMin(hc.close) - 30;
+      if (cutc >= 0 && lastStart < cutc) continue; // today's slots all gone
+      selDate = dsc; break;
+    }
+    if (!selDate){ var d0 = new Date(today); d0.setDate(d0.getDate()+startI); selDate = fmtDate(d0); }
+
     renderAll();
     loadStripeJs(mountStripeElements);
   }).catch(function(e){
