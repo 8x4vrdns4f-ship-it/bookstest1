@@ -30,17 +30,21 @@ export function useDashboardContext() {
         return;
       }
       const u: User = session.user;
+      const [{ data: profile }, { data: emp }] = await Promise.all([
+        supabase.from("profiles").select("display_name").eq("user_id", u.id).maybeSingle(),
+        supabase
+          .from("employees")
+          .select("user_id, company_roles:role_id(name, can_approve_requests)")
+          .eq("auth_user_id", u.id)
+          .maybeSingle(),
+      ]);
+
       const displayName =
-        (u.user_metadata?.display_name as string) ||
+        (profile?.display_name || "").trim() ||
+        ((u.user_metadata?.display_name as string) || "").trim() ||
         (u.email ? u.email.split("@")[0] : "") ||
         "";
 
-
-      const { data: emp } = await supabase
-        .from("employees")
-        .select("user_id, company_roles:role_id(name, can_approve_requests)")
-        .eq("auth_user_id", u.id)
-        .maybeSingle();
 
       let businessUserId = u.id;
       let role: RoleInfo = { name: "owner", canApprove: true };
