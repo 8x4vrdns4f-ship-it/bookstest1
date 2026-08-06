@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import { forwardRef, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Props = {
+type Props = React.HTMLAttributes<HTMLDivElement> & {
+
   title?: ReactNode;
   description?: ReactNode;
   icon?: ReactNode;
