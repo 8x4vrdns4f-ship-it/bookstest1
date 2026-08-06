@@ -335,7 +335,7 @@ export default function InsightsPage() {
       <SEO
         title="Insights | BookSuite"
         description="Revenue, booking trends, top services and staff performance for your business."
-        noindex
+        noIndex
       />
       <PageHeader
         title="Insights"
