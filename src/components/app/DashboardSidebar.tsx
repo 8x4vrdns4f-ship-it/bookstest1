@@ -7,6 +7,8 @@ import {
   UsersRound,
   Clock,
   Star,
+  BarChart3,
+
   CreditCard,
   Settings as SettingsIcon,
 } from "lucide-react";
