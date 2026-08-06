@@ -316,8 +316,12 @@ export const buildWidgetScript = (opts: {
     var hrs = dayHoursFor(selDate);
     if (hrs.closed){ wrap.innerHTML = emptyMsg('Closed this day'); return; }
     var bset = busyMinutes(selDate);
+    var cut = pastCutoff(selDate);
     var startM = toMin(hrs.open), endM = toMin(hrs.close);
+    var shown = 0;
     for (var m = startM; m < endM; m += 30){
+      if (cut >= 0 && m < cut) continue; // past times today
+      shown++;
       var el = document.createElement('div');
       var isBusy = !!bset[m];
       el.className = 'slot' + (isBusy?' busy':'') + (selSlot === m?' sel':'');
@@ -327,7 +331,9 @@ export const buildWidgetScript = (opts: {
       }
       wrap.appendChild(el);
     }
+    if (shown === 0) wrap.innerHTML = emptyMsg('No times left today — pick another day');
   }
+
   function servicesOn(){ return !!settings.services_enabled && services.length > 0; }
   function renderServices(){
     var wrap = document.getElementById('bw-svc-wrap');
