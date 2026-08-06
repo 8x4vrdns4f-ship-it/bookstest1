@@ -32,25 +32,32 @@ const toneIconBg: Record<NonNullable<Props["tone"]>, string> = {
  * - Optional icon chip, title, description, and action slot in header
  * - Consistent padding across variants
  */
-export default function SectionCard({
-  title,
-  description,
-  icon,
-  actions,
-  children,
-  className,
-  bodyClassName,
-  tone = "default",
-}: Props) {
+const SectionCard = forwardRef<HTMLDivElement, Props>(function SectionCard(
+  {
+    title,
+    description,
+    icon,
+    actions,
+    children,
+    className,
+    bodyClassName,
+    tone = "default",
+    ...rest
+  },
+  ref,
+) {
   const hasHeader = title || description || icon || actions;
   return (
     <div
+      ref={ref}
+      {...rest}
       className={cn(
         "rounded-[20px] bg-card border",
         toneRing[tone],
         className,
       )}
     >
+
       {hasHeader && (
         <div className="flex items-start justify-between gap-4 px-5 md:px-6 pt-5 md:pt-6 pb-3">
           <div className="flex items-start gap-3 min-w-0">
