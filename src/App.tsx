@@ -19,6 +19,8 @@ import ClientsPage from "./pages/dashboard/ClientsPage.tsx";
 import StaffPage from "./pages/dashboard/StaffPage.tsx";
 import ShiftsPage from "./pages/dashboard/ShiftsPage.tsx";
 import ReviewsPage from "./pages/dashboard/ReviewsPage.tsx";
+import InsightsPage from "./pages/dashboard/InsightsPage.tsx";
+
 import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
 import Settings from "./pages/Settings.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
