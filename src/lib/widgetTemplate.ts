@@ -660,8 +660,20 @@ export const buildWidgetScript = (opts: {
     services = Array.isArray(arr[4]) ? arr[4] : [];
     var today = new Date();
     var startI = settings.allow_same_day ? 0 : 1;
-    var d0 = new Date(today); d0.setDate(d0.getDate()+startI);
-    selDate = fmtDate(d0);
+    var maxI = Math.min(settings.max_advance_days || 14, 60);
+    selDate = null;
+    for (var i = startI; i <= maxI; i++){
+      var dc = new Date(today); dc.setDate(dc.getDate()+i);
+      var dsc = fmtDate(dc);
+      var hc = dayHoursFor(dsc);
+      if (hc.closed) continue;
+      var cutc = pastCutoff(dsc);
+      var lastStart = toMin(hc.close) - 30;
+      if (cutc >= 0 && lastStart < cutc) continue; // today's slots all gone
+      selDate = dsc; break;
+    }
+    if (!selDate){ var d0 = new Date(today); d0.setDate(d0.getDate()+startI); selDate = fmtDate(d0); }
+
     renderAll();
     loadStripeJs(mountStripeElements);
   }).catch(function(e){
