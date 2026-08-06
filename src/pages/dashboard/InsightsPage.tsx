@@ -44,7 +44,7 @@ const CountBarChart = lazy(() =>
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const CANCELLED = new Set(["cancelled", "canceled", "declined", "no_show", "expired"]);
-const MIN_ROWS = 3;
+const MIN_ROWS = 0;
 
 function ChartFallback({ height = 240 }: { height?: number }) {
   return <Skeleton className="w-full rounded-xl" style={{ height }} />;
@@ -85,7 +85,7 @@ function BreakdownList({
 
 export default function InsightsPage() {
   const ctx = useDashboardContext();
-  const [range, setRange] = useState<RangeKey>("30d");
+  const [range, setRange] = useState<RangeKey>("ytd");
   const data = useInsights(ctx?.businessUserId, range);
   const {
     loading,
