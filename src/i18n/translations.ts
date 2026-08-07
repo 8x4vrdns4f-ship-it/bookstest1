@@ -103,9 +103,16 @@ const en: Dict = {
   "nav.currency": "Currency",
 
   // Hero
-  "hero.tagline": "BookSuite is the all-in-one platform for service businesses — take bookings and deposits, manage staff shifts, send automatic confirmations and reminders, and get paid through Stripe. Embed a booking widget on any site in minutes.",
-  "hero.try": "Try now",
-  "hero.pricing": "Explore Pricing",
+  "hero.headline": "Take bookings, deposits and payments — without the back-and-forth",
+  "hero.tagline": "The all-in-one booking platform for service businesses. Embed a booking widget on any site in minutes and let clients book and pay themselves.",
+  "hero.try": "Start 30-day free trial",
+  "hero.pricing": "Explore pricing",
+  "hero.join": "Staff member joining a company?",
+  "hero.support": "Plans from £1.99/mo after the trial. Cancel anytime.",
+  "hero.trust.1": "30-day free trial",
+  "hero.trust.2": "Card required, cancel before it ends",
+  "hero.trust.3": "No setup fees",
+  "hero.trust.4": "Payouts to your own Stripe account",
   "hero.video": "Video coming soon",
 
   // How it works
