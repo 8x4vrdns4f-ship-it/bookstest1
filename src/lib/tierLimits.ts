@@ -11,8 +11,8 @@ export const TIER_LIMITS: Record<Tier, {
 }> = {
   silver: {
     name: "Silver",
-    bookingsPerMonth: 50,
-    staff: 1,
+    bookingsPerMonth: 100,
+    staff: 2,
     customBranding: false,
     advancedAnalytics: false,
     apiAccess: false,
@@ -20,7 +20,7 @@ export const TIER_LIMITS: Record<Tier, {
   },
   gold: {
     name: "Gold",
-    bookingsPerMonth: 300,
+    bookingsPerMonth: 500,
     staff: 10,
     customBranding: true,
     advancedAnalytics: true,

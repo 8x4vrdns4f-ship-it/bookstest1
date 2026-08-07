@@ -1,5 +1,6 @@
 // PUBLIC endpoint — called by the embed widget. No JWT required.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { resolveFeePercent } from "../_shared/tier-fees.ts";
 import { createStripeClient, resolveEnv, sanitizeOrigin } from "../_shared/stripe.ts";
 import { checkRateLimits, getClientIp, rateLimited, RATE_RULES } from "../_shared/rate-limit.ts";
 
@@ -98,7 +99,7 @@ Deno.serve(async (req) => {
     }
 
     const deposit = Number(settings.deposit_amount);
-    const feePct = Number(settings.platform_fee_percent);
+    const feePct = await resolveFeePercent(admin, userId);
     const currency = (settings.currency || "GBP").toLowerCase();
     const depositMinor = Math.round(deposit * 100);
     const feeMinor = Math.round((deposit * feePct) / 100 * 100);

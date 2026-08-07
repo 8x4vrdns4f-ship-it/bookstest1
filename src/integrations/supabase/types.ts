@@ -1399,6 +1399,7 @@ export type Database = {
         }[]
       }
       tier_booking_limit: { Args: { _tier: string }; Returns: number }
+      tier_fee_percent: { Args: { _tier: string }; Returns: number }
       tier_staff_limit: { Args: { _tier: string }; Returns: number }
     }
     Enums: {

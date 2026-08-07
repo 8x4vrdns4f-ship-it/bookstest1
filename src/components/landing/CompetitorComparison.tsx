@@ -4,8 +4,8 @@ type Cell = boolean | string;
 type Row = { feature: string; booksuite: Cell; calendly: Cell; fresha: Cell; setmore: Cell };
 
 const ROWS: Row[] = [
-  { feature: "Starts from",            booksuite: "£1.99/mo", calendly: "Free / $12", fresha: "Free (fees on top)", setmore: "Free / $12" },
-  { feature: "Per-booking fee",        booksuite: "From 2.5%", calendly: "—",         fresha: "1.29% + £0.20",       setmore: "—" },
+  { feature: "Starts from",            booksuite: "£20/mo",   calendly: "Free / $12", fresha: "Free (fees on top)", setmore: "Free / $12" },
+  { feature: "Per-booking fee",        booksuite: "From 2%",  calendly: "—",         fresha: "1.29% + £0.20",       setmore: "—" },
   { feature: "Take deposits",          booksuite: true,        calendly: false,       fresha: true,                   setmore: true },
   { feature: "Embed widget on your site", booksuite: true,     calendly: true,        fresha: false,                  setmore: true },
   { feature: "Bookable resources (tables/rooms)", booksuite: true, calendly: false,   fresha: false,                  setmore: false },

@@ -19,18 +19,18 @@ const Pricing = () => {
 
   const tiers = [
     {
-      name: "Silver", tier: "silver" as const, gbp: 199,
+      name: "Silver", tier: "silver" as const, gbp: 20,
       features: [t("pricing.f.silver_bookings"), t("pricing.f.silver_staff"), t("pricing.f.email_support"), t("pricing.f.basic_analytics"), `12.5% ${t("pricing.fee")}`],
       badge: "bg-zinc-400/20 text-zinc-300",
     },
     {
-      name: "Gold", tier: "gold" as const, gbp: 549,
-      features: [t("pricing.f.gold_bookings"), t("pricing.f.gold_staff"), t("pricing.f.priority_support"), t("pricing.f.advanced_analytics"), t("pricing.f.custom_branding"), `7.5% ${t("pricing.fee")}`],
+      name: "Gold", tier: "gold" as const, gbp: 59,
+      features: [t("pricing.f.gold_bookings"), t("pricing.f.gold_staff"), t("pricing.f.priority_support"), t("pricing.f.advanced_analytics"), t("pricing.f.custom_branding"), `5% ${t("pricing.fee")}`],
       badge: "bg-yellow-500/20 text-yellow-300", popular: true,
     },
     {
-      name: "Platinum", tier: "platinum" as const, gbp: 1195,
-      features: [t("pricing.f.unlimited_bookings"), t("pricing.f.unlimited_staff"), t("pricing.f.dedicated_support"), t("pricing.f.full_analytics"), t("pricing.f.custom_branding"), t("pricing.f.api"), `2.5% ${t("pricing.fee")}`],
+      name: "Platinum", tier: "platinum" as const, gbp: 199,
+      features: [t("pricing.f.unlimited_bookings"), t("pricing.f.unlimited_staff"), t("pricing.f.dedicated_support"), t("pricing.f.full_analytics"), t("pricing.f.custom_branding"), t("pricing.f.api"), `2% ${t("pricing.fee")}`],
       badge: "bg-cyan-400/20 text-cyan-200",
     },
   ];
