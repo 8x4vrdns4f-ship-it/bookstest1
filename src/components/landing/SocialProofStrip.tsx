@@ -1,11 +1,12 @@
-import { Users, CreditCard, Globe, Zap, Scissors, Dumbbell, Stethoscope, UtensilsCrossed, GraduationCap, Wrench, Truck } from "lucide-react";
+import { Code2, CreditCard, Globe, MailCheck, Scissors, Dumbbell, Stethoscope, UtensilsCrossed, GraduationCap, Wrench, Truck } from "lucide-react";
 
 const metrics = [
-  { Icon: Users, label: "Built for every service business" },
-  { Icon: CreditCard, label: "Instant deposits via Stripe" },
+  { Icon: CreditCard, label: "Deposits and payouts via Stripe" },
   { Icon: Globe, label: "38 languages, auto currency" },
-  { Icon: Zap, label: "Live in under 5 minutes" },
+  { Icon: Code2, label: "Embeddable widget for any website" },
+  { Icon: MailCheck, label: "Automatic confirmations and reminders" },
 ];
+
 
 const industries = [
   { Icon: Scissors, label: "Salons" },
