@@ -13,9 +13,9 @@ interface Feature {
 }
 
 const features: Feature[] = [
-  { name: "Monthly Bookings", silver: "Up to 100", gold: "Up to 1,000", platinum: "Unlimited" },
-  { name: "Team Members", silver: "1", gold: "Up to 5", platinum: "Unlimited" },
-  { name: "Transaction Fee", silver: "12.5%", gold: "7.5%", platinum: "2.5%" },
+  { name: "Monthly Bookings", silver: "Up to 100", gold: "Up to 500", platinum: "Unlimited" },
+  { name: "Team Members", silver: "2", gold: "Up to 10", platinum: "Unlimited" },
+  { name: "Transaction Fee", silver: "12.5%", gold: "5%", platinum: "2%" },
   { name: "Automated Reminders", silver: "Email", gold: "Email & SMS", platinum: "Email & SMS" },
   { name: "Analytics & Reports", silver: false, gold: true, platinum: "Advanced" },
   { name: "Custom Branding", silver: false, gold: true, platinum: true },
@@ -24,9 +24,9 @@ const features: Feature[] = [
 
 // Monthly prices in GBP; annual = monthly * 12 * 0.8 (20% off).
 const tiers = [
-  { key: "silver",   name: "Silver",   monthly: 199,  popular: false },
-  { key: "gold",     name: "Gold",     monthly: 549,  popular: true  },
-  { key: "platinum", name: "Platinum", monthly: 1195, popular: false },
+  { key: "silver",   name: "Silver",   monthly: 20,  popular: false },
+  { key: "gold",     name: "Gold",     monthly: 59,  popular: true  },
+  { key: "platinum", name: "Platinum", monthly: 199, popular: false },
 ];
 
 const fmt = (n: number) => `£${Math.round(n).toLocaleString()}`;
