@@ -1,41 +1,57 @@
-# Repricing: Silver £20, Gold £150, Platinum £499
+# Repricing: Silver £20, Gold £59, Platinum £199
 
-## My take
+## The new ladder
 
-Good move. The current live prices are £199 / £549 / £1,195 a month, which is far above what Calendly, Fresha or Setmore charge — most small salons, barbers and restaurants would bounce off that before trying anything. £20 / £150 / £499 is a much more credible ladder for the market you're targeting.
+| | Silver | Gold | Platinum |
+|---|---|---|---|
+| Price | £20/mo | £59/mo | £199/mo |
+| Bookings | 100/mo | 500/mo | Unlimited |
+| Staff | 2 | 10 | Unlimited |
+| Transaction fee | 12.5% | 5% | 2% |
 
-Two things worth flagging:
-
-- **The gap between Silver (£20) and Gold (£150) is 7.5x.** Silver allows 50 bookings and 1 staff member; Gold allows 300 bookings and 10 staff. That's a steep cliff — a two-person barbershop that outgrows Silver has nowhere to go but a £150 plan. Consider either raising Silver's staff limit to 2-3, or pricing Gold nearer £79-99. Your call; I'll use your numbers unless you say otherwise.
-- **Transaction fees stay as they are** (12.5% / 7.5% / 2.5%). At the lower subscription prices those fees carry more of the revenue, which is fine — just worth being aware the mix has shifted.
+Roughly 3x between tiers, so each upgrade feels affordable and nobody hits a hard wall. Silver's 2 staff seats cover a solo operator plus one helper. Existing feature splits (custom branding, advanced analytics, API access, priority support) stay exactly as they are.
 
 ## What changes
 
-### 1. Stripe prices (the actual amounts customers get charged)
+### 1. Stripe — the amounts customers are actually charged
 
-Replace the amounts on the three existing recurring prices, keeping their IDs and lookup keys (`silver_monthly`, `gold_monthly`, `platinum_monthly`) so checkout keeps working with no code change:
+Replace the amounts on the three existing recurring prices, keeping their IDs and lookup keys (`silver_monthly`, `gold_monthly`, `platinum_monthly`) so checkout keeps working with no edge function change:
 
-| Plan | Now | New |
-|---|---|---|
-| Silver | £199/mo | £20/mo |
-| Gold | £549/mo | £150/mo |
-| Platinum | £1,195/mo | £499/mo |
+- `silver_monthly`: £199 → £20
+- `gold_monthly`: £549 → £59
+- `platinum_monthly`: £1,195 → £199
 
-Existing subscribers stay on their current price until they change plan — Stripe does not retroactively reprice active subscriptions. There are no active paying subscribers to migrate at the moment, so this is clean.
+After writing them I'll read the prices back from Stripe and confirm each lookup key resolves to the new amount in GBP, so what Stripe charges matches what the site shows.
 
-### 2. Site copy — fix the display bug at the same time
+Existing active subscriptions keep their old price until they change plan — Stripe never retroactively reprices. There are no live paying subscribers to migrate.
 
-Separately from the repricing, three places currently show the price 100x too small (they were written as if the stored numbers were pence). Both issues get corrected in one pass:
+### 2. Plan limits
 
-- `src/pages/Pricing.tsx` — tier amounts become 20 / 150 / 499.
-- `src/i18n/translations.ts` — the `hero.support` line in English, Spanish, French, German and Italian becomes "Plans from £20/mo after the trial. Cancel anytime."
-- `src/pages/Index.tsx` — the homepage structured data price range becomes `lowPrice: 20`, `highPrice: 499` so Google indexes the real figures.
-- `src/components/landing/CompetitorComparison.tsx` — the "Starts from" row becomes "£20/mo". At £20 this now reads competitively against "Free / $12" rather than embarrassingly.
+`src/lib/tierLimits.ts`:
+- Silver: 50 → 100 bookings, 1 → 2 staff
+- Gold: 300 → 500 bookings, staff stays 10
+- Platinum: unchanged (unlimited)
 
-### 3. Verify
+These limits are enforced server-side by the existing database tier-limit triggers, so I'll update those caps to match in the same pass — otherwise the site would advertise 100 bookings while the database still blocks at 50.
 
-Load `/pricing` and the homepage after the change and confirm all three tiers, the hero line and the comparison table show the new figures, and that a checkout session for Silver resolves to the £20 price.
+### 3. Transaction fees
+
+Gold drops 7.5% → 5% and Platinum 2.5% → 2%. This percentage is applied when a booking payment is taken, so it changes in both the fee constant used by the booking payment functions and the feature bullets on the pricing cards.
+
+### 4. Site copy — also fixes the 100x display bug
+
+Three places currently show prices 100x too small (written as if the stored figures were pence). Both problems get corrected together:
+
+- `src/pages/Pricing.tsx` — tier amounts become 20 / 59 / 199, fee bullets become 12.5% / 5% / 2%.
+- `src/components/TierComparison.tsx` — booking and staff limits updated to the new caps.
+- `src/i18n/translations.ts` — the hero line and any tier limit strings become "Plans from £20/mo after the trial", with the Spanish, French, German and Italian versions matched.
+- `src/pages/Index.tsx` — structured data becomes `lowPrice: 20`, `highPrice: 199` so Google indexes real figures.
+- `src/components/landing/CompetitorComparison.tsx` — "Starts from" becomes £20/mo and "Per-booking fee" becomes "From 2%". At £20 this now reads competitively against "Free / $12" instead of undercutting your own credibility.
+
+### 5. Verify
+
+Load `/pricing` and the homepage and confirm all three tiers, limits, fees, hero line and comparison table show the new figures — then confirm the Stripe prices read back at 2000 / 5900 / 19900 pence.
 
 ## Technical notes
 
-The Stripe prices are Lovable-managed (they carry `lovable_managed` metadata and lookup keys). Repricing is done by creating a new price against the same price ID, which replaces the old amount and takes over the lookup key — the checkout function resolves by lookup key, so no edge function changes are needed. `tierLimits.ts`, booking caps, staff caps and transaction fee percentages are untouched.
+Stripe prices are Lovable-managed with lookup keys; repricing writes a new price against the same price ID, which takes over the lookup key. `create-checkout` resolves by lookup key, so no edge function changes are needed. Database tier caps live in the `enforce_*_tier_limit` trigger functions and need a migration to match the new booking/staff numbers.
