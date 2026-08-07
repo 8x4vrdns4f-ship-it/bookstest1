@@ -40,26 +40,27 @@ const CookieBanner = () => {
       role="dialog"
       aria-live="polite"
       aria-label="Cookie consent"
-      className="fixed inset-x-3 bottom-3 z-50 md:inset-x-auto md:right-5 md:bottom-5 md:max-w-md"
+      className="fixed inset-x-2 bottom-2 z-50 md:inset-x-auto md:right-4 md:bottom-4 md:max-w-[340px]"
     >
-      <div className="rounded-[16px] border border-border bg-card/95 backdrop-blur p-5 shadow-lg">
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary grid place-items-center shrink-0">
-            <Cookie size={17} />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[15px] font-semibold text-foreground mb-1">We use cookies</p>
-            <p className="text-[13px] text-muted-foreground leading-relaxed">
-              Essential cookies keep you signed in and payments secure. Optional analytics
-              cookies help us improve BookSuite — your choice.{" "}
-              <Link to="/cookies" className="text-primary underline">Read more</Link>.
-            </p>
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Button size="sm" onClick={() => choose("accepted")}>Accept all</Button>
-              <Button size="sm" variant="outline" onClick={() => choose("rejected")}>
-                Essential only
-              </Button>
-            </div>
+      <div className="rounded-xl border border-border bg-card/95 backdrop-blur px-3 py-2.5 shadow-md">
+        <div className="flex items-center gap-2.5">
+          <Cookie size={15} className="shrink-0 text-primary" />
+          <p className="min-w-0 flex-1 text-[12px] leading-snug text-muted-foreground">
+            We use cookies to keep BookSuite working and improve it.{" "}
+            <Link to="/cookies" className="text-primary underline">Details</Link>
+          </p>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Button size="sm" className="h-7 px-2.5 text-[12px]" onClick={() => choose("accepted")}>
+              Accept
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2 text-[12px]"
+              onClick={() => choose("rejected")}
+            >
+              Essential
+            </Button>
           </div>
         </div>
       </div>
