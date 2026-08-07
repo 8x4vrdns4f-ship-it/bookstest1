@@ -152,7 +152,7 @@ const ProductShowcase = () => {
                   width={current.w}
                   height={current.h}
                   loading="lazy"
-                  className="block w-full h-auto animate-fade-in"
+                  className="block w-full h-auto"
                 />
               </BrowserFrame>
             </div>
