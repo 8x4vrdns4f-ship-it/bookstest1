@@ -1,32 +1,41 @@
-# Fix the "from £1.99/mo" pricing claim
+# Repricing: Silver £20, Gold £150, Platinum £499
 
-## What's wrong
+## My take
 
-Your real prices are **£199 / £549 / £1,195 per month** (confirmed against the live Stripe catalogue: `silver_monthly` = 19900p, `gold_monthly` = 54900p, `platinum_monthly` = 119500p). The pricing page renders these correctly.
+Good move. The current live prices are £199 / £549 / £1,195 a month, which is far above what Calendly, Fresha or Setmore charge — most small salons, barbers and restaurants would bounce off that before trying anything. £20 / £150 / £499 is a much more credible ladder for the market you're targeting.
 
-But a few pieces of marketing copy were written as if those numbers were pence, so they show **£1.99**, **£11.95** and similar — off by a factor of 100. This is a hard-coded copy mistake, not a settings issue, which is why nothing you changed in the dashboard affected it.
+Two things worth flagging:
 
-## Where the wrong figures appear
+- **The gap between Silver (£20) and Gold (£150) is 7.5x.** Silver allows 50 bookings and 1 staff member; Gold allows 300 bookings and 10 staff. That's a steep cliff — a two-person barbershop that outgrows Silver has nowhere to go but a £150 plan. Consider either raising Silver's staff limit to 2-3, or pricing Gold nearer £79-99. Your call; I'll use your numbers unless you say otherwise.
+- **Transaction fees stay as they are** (12.5% / 7.5% / 2.5%). At the lower subscription prices those fees carry more of the revenue, which is fine — just worth being aware the mix has shifted.
 
-| Location | Currently says | Should say |
+## What changes
+
+### 1. Stripe prices (the actual amounts customers get charged)
+
+Replace the amounts on the three existing recurring prices, keeping their IDs and lookup keys (`silver_monthly`, `gold_monthly`, `platinum_monthly`) so checkout keeps working with no code change:
+
+| Plan | Now | New |
 |---|---|---|
-| Hero subline (English + Spanish, French, German, Italian) | "Plans from £1.99/mo after the trial" | "Plans from £199/mo after the trial" |
-| Homepage structured data for Google | `lowPrice: 1.99`, `highPrice: 11.95` | `lowPrice: 199`, `highPrice: 1195` |
-| Competitor comparison table, "Starts from" row | "£1.99/mo" | "£199/mo" |
+| Silver | £199/mo | £20/mo |
+| Gold | £549/mo | £150/mo |
+| Platinum | £1,195/mo | £499/mo |
 
-## Changes
+Existing subscribers stay on their current price until they change plan — Stripe does not retroactively reprice active subscriptions. There are no active paying subscribers to migrate at the moment, so this is clean.
 
-1. **`src/i18n/translations.ts`** — update the `hero.support` string in all five translated languages to the correct £199 figure, keeping each language's existing phrasing and number formatting.
-2. **`src/pages/Index.tsx`** — correct `lowPrice` and `highPrice` in the AggregateOffer JSON-LD block so Google indexes the real price range.
-3. **`src/components/landing/CompetitorComparison.tsx`** — correct the "Starts from" value.
+### 2. Site copy — fix the display bug at the same time
 
-No pricing logic, Stripe products, or checkout code changes — only the displayed copy is wrong.
+Separately from the repricing, three places currently show the price 100x too small (they were written as if the stored numbers were pence). Both issues get corrected in one pass:
 
-## Worth deciding
+- `src/pages/Pricing.tsx` — tier amounts become 20 / 150 / 499.
+- `src/i18n/translations.ts` — the `hero.support` line in English, Spanish, French, German and Italian becomes "Plans from £20/mo after the trial. Cancel anytime."
+- `src/pages/Index.tsx` — the homepage structured data price range becomes `lowPrice: 20`, `highPrice: 499` so Google indexes the real figures.
+- `src/components/landing/CompetitorComparison.tsx` — the "Starts from" row becomes "£20/mo". At £20 this now reads competitively against "Free / $12" rather than embarrassingly.
 
-At £199/mo, "Plans from £199/mo" next to competitors listed as "Free / $12" makes BookSuite look expensive at a glance. Two options once the numbers are corrected:
+### 3. Verify
 
-- Keep the comparison row as-is (honest, but unflattering without context).
-- Add a short qualifier to that row, e.g. "£199/mo — includes payments, deposits and unlimited staff on higher tiers", so the price is read against what's included.
+Load `/pricing` and the homepage after the change and confirm all three tiers, the hero line and the comparison table show the new figures, and that a checkout session for Silver resolves to the £20 price.
 
-I'll apply the straight correction by default; tell me if you'd rather add the qualifier too.
+## Technical notes
+
+The Stripe prices are Lovable-managed (they carry `lovable_managed` metadata and lookup keys). Repricing is done by creating a new price against the same price ID, which replaces the old amount and takes over the lookup key — the checkout function resolves by lookup key, so no edge function changes are needed. `tierLimits.ts`, booking caps, staff caps and transaction fee percentages are untouched.
