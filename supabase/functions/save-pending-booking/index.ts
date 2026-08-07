@@ -1,6 +1,7 @@
 // PUBLIC endpoint — called by the widget after stripe.confirmSetup succeeds.
 // Persists a pending_bookings row with the saved PaymentMethod and notifies the owner.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { resolveFeePercent } from "../_shared/tier-fees.ts";
 import { resolveEnv } from "../_shared/stripe.ts";
 import { checkRateLimits, getClientIp, rateLimited, RATE_RULES } from "../_shared/rate-limit.ts";
 
@@ -160,7 +161,7 @@ Deno.serve(async (req) => {
     }
 
     const deposit = Number(settings.deposit_amount);
-    const feePct = Number(settings.platform_fee_percent);
+    const feePct = await resolveFeePercent(admin, userId);
 
     // --- Payment option resolution (never trust the browser for amounts) ---
     const paymentMode = String((settings as any).payment_mode || "deposit");
