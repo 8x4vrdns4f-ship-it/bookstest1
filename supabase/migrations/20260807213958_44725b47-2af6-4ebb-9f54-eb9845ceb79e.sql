@@ -1,0 +1,16 @@
+REVOKE ALL ON FUNCTION public.check_rate_limit(text, text, integer, integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.enforce_gift_code_monthly_limit() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.guard_reviews_owner_update() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_admin_new_signup() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.get_busy_slots(uuid, date, date) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.get_public_business_info(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.get_public_reviews(uuid, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.get_widget_resources(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.get_widget_services(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.join_waitlist(uuid, text, text, text, text, date, time without time zone, time without time zone, integer, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_busy_slots(uuid, date, date) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.get_public_business_info(uuid) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.get_public_reviews(uuid, integer) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.get_widget_resources(uuid) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.get_widget_services(uuid) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.join_waitlist(uuid, text, text, text, text, date, time without time zone, time without time zone, integer, text) TO anon, authenticated, service_role;
