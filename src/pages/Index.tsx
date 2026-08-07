@@ -46,8 +46,8 @@ const softwareApplicationLd = {
   offers: {
     "@type": "AggregateOffer",
     priceCurrency: "GBP",
-    lowPrice: "1.99",
-    highPrice: "11.95",
+    lowPrice: "20",
+    highPrice: "199",
     offerCount: 3,
     url: "https://booksuite.online/pricing",
   },
