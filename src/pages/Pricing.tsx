@@ -29,7 +29,7 @@ const Pricing = () => {
       badge: "bg-yellow-500/20 text-yellow-300", popular: true,
     },
     {
-      name: "Platinum", tier: "platinum" as const, gbp: 1195,
+      name: "Platinum", tier: "platinum" as const, gbp: 199,
       features: [t("pricing.f.unlimited_bookings"), t("pricing.f.unlimited_staff"), t("pricing.f.dedicated_support"), t("pricing.f.full_analytics"), t("pricing.f.custom_branding"), t("pricing.f.api"), `2% ${t("pricing.fee")}`],
       badge: "bg-cyan-400/20 text-cyan-200",
     },
