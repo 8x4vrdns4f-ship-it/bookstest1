@@ -55,8 +55,8 @@ const TABS: {
       "One snippet of code and your customers can book on your site 24/7 — with deposits, party size, and resource picking built in.",
     points: ["Embed on any website in one line", "Takes deposits or full payment", "Pick a service, staff member or table"],
     img: widgetShot,
-    w: 912,
-    h: 1200,
+    w: 905,
+    h: 1323,
     url: "yourbusiness.com/book",
   },
 ];
