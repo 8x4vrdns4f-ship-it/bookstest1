@@ -1224,6 +1224,15 @@ export type Database = {
           employee_id: string
         }[]
       }
+      claim_employee_seat_by_email: {
+        Args: never
+        Returns: {
+          business_name: string
+          business_user_id: string
+          employee_id: string
+          role_name: string
+        }[]
+      }
       decide_join_request: {
         Args: {
           p_decision: string
