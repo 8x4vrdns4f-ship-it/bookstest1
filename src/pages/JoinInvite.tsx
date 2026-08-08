@@ -27,6 +27,8 @@ const JoinInvite = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [needsVerify, setNeedsVerify] = useState(false);
+  const [alreadySignedIn, setAlreadySignedIn] = useState(false);
+
 
   useEffect(() => {
     (async () => {
