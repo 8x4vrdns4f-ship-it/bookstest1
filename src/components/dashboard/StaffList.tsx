@@ -290,6 +290,9 @@ const StaffList = ({ userId }: { userId: string }) => {
           </div>
         </>
       )}
+        </>
+      )}
+
 
       <EmployeeActionsDialog
         open={!!selected}
