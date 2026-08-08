@@ -6,6 +6,7 @@ import ManageShiftsDialog from "./ManageShiftsDialog";
 import PlanShiftsDialog from "./PlanShiftsDialog";
 import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./EmployeeActionsDialog";
 import EmployeeProfileDialog from "./EmployeeProfileDialog";
+import StaffRoster from "./StaffRoster";
 import { CheckCircle2, AlertCircle, Activity, Clock, User } from "lucide-react";
 import EmptyState from "@/components/app/EmptyState";
 import ListSkeleton from "@/components/app/ListSkeleton";
