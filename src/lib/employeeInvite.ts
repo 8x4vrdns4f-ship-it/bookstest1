@@ -1,7 +1,8 @@
 import { publicOrigin } from "@/lib/publicUrl";
+import { buildJoinPath } from "@/lib/inviteFlow";
 
 export const buildInviteUrl = (companyCode: string, email: string) =>
-  `${publicOrigin()}/join?code=${encodeURIComponent(companyCode)}&email=${encodeURIComponent(email)}`;
+  `${publicOrigin()}${buildJoinPath(companyCode, email)}`;
 
 export async function sendEmployeeInvite(opts: {
   employeeId?: string;

@@ -1,5 +1,5 @@
 import { publicOrigin } from "@/lib/publicUrl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,19 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import {
+  buildJoinPath,
+  getInviteCompanyCode,
+  PENDING_AUTH_DESTINATION_KEY,
+  PENDING_VERIFICATION_EMAIL_KEY,
+} from "@/lib/inviteFlow";
 
 const JoinInvite = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const code = (params.get("code") || "").toUpperCase();
+  const code = getInviteCompanyCode(params);
   const invitedEmail = params.get("email") || "";
 
   const [businessName, setBusinessName] = useState<string | null>(null);
@@ -29,14 +35,16 @@ const JoinInvite = () => {
   const [loading, setLoading] = useState(false);
   const [needsVerify, setNeedsVerify] = useState(false);
   const [alreadySignedIn, setAlreadySignedIn] = useState(false);
+  const [autoJoining, setAutoJoining] = useState(false);
+  const [autoJoinAttempted, setAutoJoinAttempted] = useState(false);
 
 
   useEffect(() => {
     (async () => {
       // If a different account is already signed in on this device (e.g. the owner),
       // sign it out so the invite is claimed by the invited person, not the current session.
-      const { data: sess } = await supabase.auth.getSession();
-      const current = (sess.session?.user.email || "").toLowerCase();
+      const { data: { user } } = await supabase.auth.getUser();
+      const current = (user?.email || "").toLowerCase();
       if (current && invitedEmail && current !== invitedEmail.toLowerCase()) {
         await supabase.auth.signOut();
       } else if (current && invitedEmail && current === invitedEmail.toLowerCase()) {
@@ -51,9 +59,18 @@ const JoinInvite = () => {
     })();
   }, [code, invitedEmail]);
 
-  const finish = async () => {
-    const { data: sess } = await supabase.auth.getSession();
-    const signedInEmail = sess.session?.user.email || email.trim();
+  const finish = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const signedInEmail = user?.email || email.trim();
+    if (!user) {
+      setMode("signin");
+      throw new Error("Your email is confirmed. Sign in once to finish joining the team.");
+    }
+    if (invitedEmail && signedInEmail.toLowerCase() !== invitedEmail.toLowerCase()) {
+      await supabase.auth.signOut();
+      setAlreadySignedIn(false);
+      throw new Error(`This invite is for ${invitedEmail}. Sign in with that email to continue.`);
+    }
 
     // Try code-based claim first, then email-based fallback
     const { error: claimErr } = await supabase.rpc("claim_employee_seat", { p_company_code: code });
@@ -61,9 +78,21 @@ const JoinInvite = () => {
       const { data: byEmail } = await supabase.rpc("claim_employee_seat_by_email");
       const row = Array.isArray(byEmail) ? byEmail[0] : byEmail;
       if (!row) {
+        const { data: existingEmployee } = await supabase
+          .from("employees")
+          .select("id")
+          .eq("auth_user_id", user.id)
+          .maybeSingle();
+        if (existingEmployee) {
+          const { getDashboardRoute } = await import("@/lib/routeAfterAuth");
+          navigate(await getDashboardRoute(), { replace: true });
+          return;
+        }
         toast({
           title: "Invite not found",
-          description: `No open invite matches ${signedInEmail}. Ask your manager to resend the invite to that exact address.`,
+          description: claimErr.message.includes("Company code not found")
+            ? "This invite link is no longer valid. Ask your manager to send a new one."
+            : `No open invite matches ${signedInEmail}. Ask your manager to check the invited address or resend the invite.`,
           variant: "destructive",
         });
         return;
@@ -72,7 +101,22 @@ const JoinInvite = () => {
     toast({ title: "Welcome to the team!" });
     const { getDashboardRoute } = await import("@/lib/routeAfterAuth");
     navigate(await getDashboardRoute(), { replace: true });
-  };
+  }, [code, email, invitedEmail, navigate, toast]);
+
+  useEffect(() => {
+    if (checking || !businessName || !alreadySignedIn || autoJoining || autoJoinAttempted) return;
+    setAutoJoinAttempted(true);
+    setAutoJoining(true);
+    finish()
+      .catch((err) => {
+        toast({
+          title: "Couldn't join",
+          description: err instanceof Error ? err.message : "Something went wrong.",
+          variant: "destructive",
+        });
+      })
+      .finally(() => setAutoJoining(false));
+  }, [alreadySignedIn, autoJoinAttempted, autoJoining, businessName, checking, finish, toast]);
 
   const joinAsCurrentUser = async () => {
     setLoading(true);
@@ -86,12 +130,15 @@ const JoinInvite = () => {
     setLoading(true);
     try {
       if (mode === "create") {
+        const joinPath = buildJoinPath(code, email);
+        localStorage.setItem(PENDING_AUTH_DESTINATION_KEY, joinPath);
+        localStorage.setItem(PENDING_VERIFICATION_EMAIL_KEY, email.trim());
         const { error: signErr } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
             data: { role: "employee" },
-            emailRedirectTo: `${publicOrigin()}/join?code=${encodeURIComponent(code)}&email=${encodeURIComponent(email.trim())}`,
+            emailRedirectTo: `${publicOrigin()}/verify-email?next=${encodeURIComponent(joinPath)}`,
           },
         });
         if (signErr) {
@@ -163,10 +210,10 @@ const JoinInvite = () => {
             ) : alreadySignedIn ? (
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground text-center">
-                  You're signed in as {email}. Accept the invite to join.
+                  {autoJoining ? "Your email is confirmed. We're joining you to the team…" : `You're signed in as ${email}.`}
                 </p>
                 <Button onClick={joinAsCurrentUser} disabled={loading} className="w-full font-semibold">
-                  {loading ? "Joining…" : "Accept invite"}
+                  {loading || autoJoining ? "Joining…" : "Accept invite"}
                 </Button>
               </div>
             ) : (
