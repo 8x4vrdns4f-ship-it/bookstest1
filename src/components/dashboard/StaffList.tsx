@@ -19,7 +19,9 @@ interface Employee {
   position: string | null;
   manual_status: string | null;
   manual_status_date: string | null;
+  auth_user_id: string | null;
 }
+
 
 interface Shift {
   employee_id: string;
