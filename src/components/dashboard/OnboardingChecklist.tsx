@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ const OnboardingChecklist = ({ userId }: Props) => {
     }
   });
 
-  const bookingUrl = `${window.location.origin}/book/${userId}`;
+  const bookingUrl = `${publicOrigin()}/book/${userId}`;
 
   const copyLink = async () => {
     try {

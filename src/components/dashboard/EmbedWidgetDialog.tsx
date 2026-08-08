@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -104,12 +105,7 @@ const EmbedWidgetDialog = ({ userId, trigger }: Props) => {
   const formatNext = (d: Date) =>
     d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 
-  const origin =
-    typeof window !== "undefined"
-      ? window.location.origin.includes("lovable.app") || window.location.origin.includes("localhost")
-        ? window.location.origin
-        : "https://booksuite.online"
-      : "https://booksuite.online";
+  const origin = publicOrigin();
 
   const scriptSnippet = `<div id="booksuite-widget"></div>\n<script src="${origin}/embed.js" data-user="${userId}"></script>`;
   const iframeSnippet = `<iframe src="${origin}/embed/${userId}" style="border:none;width:100%;max-width:500px;height:760px" title="Book an appointment"></iframe>`;

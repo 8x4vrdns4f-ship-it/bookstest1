@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -121,7 +122,7 @@ const Onboarding = () => {
   }, []);
 
   const bookingUrl = useMemo(
-    () => (userId ? `${window.location.origin}/book/${userId}` : ""),
+    () => (userId ? `${publicOrigin()}/book/${userId}` : ""),
     [userId]
   );
 

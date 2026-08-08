@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,7 +91,7 @@ const JoinInvite = () => {
           password,
           options: {
             data: { role: "employee" },
-            emailRedirectTo: `${window.location.origin}/join?code=${encodeURIComponent(code)}&email=${encodeURIComponent(email.trim())}`,
+            emailRedirectTo: `${publicOrigin()}/join?code=${encodeURIComponent(code)}&email=${encodeURIComponent(email.trim())}`,
           },
         });
         if (signErr) {

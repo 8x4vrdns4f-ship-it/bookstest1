@@ -1,5 +1,7 @@
+import { publicOrigin } from "@/lib/publicUrl";
+
 export const buildInviteUrl = (companyCode: string, email: string) =>
-  `${window.location.origin}/join?code=${encodeURIComponent(companyCode)}&email=${encodeURIComponent(email)}`;
+  `${publicOrigin()}/join?code=${encodeURIComponent(companyCode)}&email=${encodeURIComponent(email)}`;
 
 export async function sendEmployeeInvite(opts: {
   employeeId?: string;

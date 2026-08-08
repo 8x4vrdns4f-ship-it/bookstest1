@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +48,7 @@ const VerifyEmail = () => {
       const displayName = (user.user_metadata?.display_name as string | undefined) || undefined;
       sendEmail("welcome", user.email, `welcome-${user.id}`, {
         name: displayName,
-        dashboardUrl: `${window.location.origin}/dashboard`,
+        dashboardUrl: `${publicOrigin()}/dashboard`,
       });
     };
 
@@ -124,7 +125,7 @@ const VerifyEmail = () => {
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: targetEmail,
-      options: { emailRedirectTo: `${window.location.origin}/verify-email` },
+      options: { emailRedirectTo: `${publicOrigin()}/verify-email` },
     });
     setResending(false);
     if (error) {

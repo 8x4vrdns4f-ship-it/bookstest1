@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
         password: values.password,
         options: {
           data: { role: "employee", display_name: values.name },
-          emailRedirectTo: `${window.location.origin}/pending-approval`,
+          emailRedirectTo: `${publicOrigin()}/pending-approval`,
         },
       });
       let uid = signUp?.user?.id;
@@ -105,7 +106,7 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
                 applicantEmail: values.email.trim(),
                 applicantPhone: values.phone,
                 businessName: biz,
-                dashboardUrl: `${window.location.origin}/dashboard`,
+                dashboardUrl: `${publicOrigin()}/dashboard`,
               });
           }
         }

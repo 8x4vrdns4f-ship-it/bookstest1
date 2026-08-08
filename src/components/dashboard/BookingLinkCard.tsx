@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,7 @@ export default function BookingLinkCard({
   className,
 }: Props) {
   const [copied, setCopied] = useState(false);
-  const bookingUrl = `${window.location.origin}/book/${userId}`;
+  const bookingUrl = `${publicOrigin()}/book/${userId}`;
 
   const copy = async () => {
     try {

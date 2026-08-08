@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -161,7 +162,7 @@ const BookingsList = ({ userId }: { userId: string }) => {
     }
     if (b.client_email) {
       const checkInUrl = companyCode
-        ? `${window.location.origin}/kiosk/${companyCode}?code=${codeData}`
+        ? `${publicOrigin()}/kiosk/${companyCode}?code=${codeData}`
         : undefined;
       sendEmail("booking-confirmed", b.client_email, `booking-confirm-${b.id}`, {
         businessName, clientName: b.client_name, service: b.service,

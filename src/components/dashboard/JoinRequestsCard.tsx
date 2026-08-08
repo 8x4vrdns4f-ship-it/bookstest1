@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -80,7 +81,7 @@ const JoinRequestsCard = ({ businessUserId }: { businessUserId: string }) => {
       applicantName: acceptOpen.requester_name,
       businessName: bs?.business_name || "the team",
       role: roleName,
-      loginUrl: `${window.location.origin}/auth`,
+      loginUrl: `${publicOrigin()}/auth`,
     });
     toast({ title: `${acceptOpen.requester_name} accepted` });
     setAcceptOpen(null); setSelectedRole(""); load();
