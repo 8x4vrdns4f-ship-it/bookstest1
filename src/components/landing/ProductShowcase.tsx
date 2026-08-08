@@ -2,7 +2,9 @@ import { useState } from "react";
 import { LayoutDashboard, Calendar, Smartphone, Check } from "lucide-react";
 import dashboardShot from "@/assets/shot-dashboard.jpg";
 import calendarShot from "@/assets/shot-calendar.jpg";
-import widgetShot from "@/assets/shot-widget.jpg";
+import widgetShotAsset from "@/assets/shot-widget.jpg.asset.json";
+
+const widgetShot = widgetShotAsset.url;
 
 type Tab = "dashboard" | "calendar" | "widget";
 
@@ -53,8 +55,8 @@ const TABS: {
       "One snippet of code and your customers can book on your site 24/7 — with deposits, party size, and resource picking built in.",
     points: ["Embed on any website in one line", "Takes deposits or full payment", "Pick a service, staff member or table"],
     img: widgetShot,
-    w: 912,
-    h: 1200,
+    w: 905,
+    h: 1323,
     url: "yourbusiness.com/book",
   },
 ];
