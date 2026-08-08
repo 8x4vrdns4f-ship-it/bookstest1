@@ -1,65 +1,28 @@
-# Why the employee invite never arrived
+# Staff tab: add a full team roster list
 
-## What actually happened
+## Current behaviour
 
-The invite email *was* created and sent. It then bounced permanently.
+The Staff tab does **not** show all employees. It shows a day-based duty view:
 
-Email log for that invite:
+- Everything is filtered to the selected date's shifts. Only employees with a shift on that date appear in "On shift now" and the In Progress / Free / Unavailable columns.
+- If nobody has a shift that day, the page shows a "No shifts scheduled" empty state — even when you have 10 staff on file.
+- So a newly added employee with no shift yet is invisible on this page.
 
-```text
-21:12:53  employee-invited  wessexkinggdom@tmail.com  pending
-21:12:54  employee-invited  wessexkinggdom@tmail.com  sent
-21:12:57  system            wessexkinggdom@tmail.com  bounced
-          "Permanent bounce — email address is invalid or rejected"
-```
+## What to add
 
-The address used was `...@tmail.com`, not `gmail.com`. That domain rejected the
-message, so nobody received it.
+An "All team members" roster section on the Staff tab, always visible (independent of the date picker):
 
-Two knock-on effects:
+- Lists every employee for the business, sorted by name.
+- Each row: avatar initial, name, position, email/phone, and a status chip (On shift today / No shift today / Unavailable).
+- Search box to filter by name, email, or position.
+- Clicking a row opens the existing employee profile dialog.
+- Owner-only inline actions kept as they are today (Assign stays in the duty columns).
+- Collapsible: roster shown by default, duty columns below it.
 
-1. That address is now on the blocked (suppressed) list, so any future email to
-   it is silently dropped — even if it were valid.
-2. The dashboard still said "has been invited via email" because the app never
-   waits for or checks the send result. It shows a success message regardless of
-   whether the email went out, bounced, or was blocked.
-
-## The fix
-
-**1. Tell the truth in the confirmation message**
-Wait for the send result before showing the toast, and show one of:
-- "Employee added — invite sent to <email>"
-- "Employee added, but the invite email couldn't be sent" (with the reason, e.g.
-  the address is on the blocked list after an earlier bounce)
-
-**2. Catch obvious typo domains before sending**
-Warn on near-miss domains (`tmail.com`, `gmial.com`, `gmail.co`, `hotmial.com`,
-`outlok.com`, `yaho.com`, etc.) in the Add Team Member form: "Did you mean
-gmail.com?" with the option to correct it or send anyway.
-
-**3. Add a "Resend invite" action to the staff list**
-For staff who haven't joined yet, an action to resend the invite, plus an
-"Invite bounced / blocked" badge when the last send to that address failed, so a
-bad address is visible instead of silently doing nothing.
-
-**4. Show the company code as a fallback**
-Include the company code in the add-employee success message so the owner can
-pass it on directly if email fails.
-
-**5. Clean up the blocked entry (optional)**
-If `wessexkinggdom@tmail.com` was a typo, no action needed — just re-add the
-person with the correct address. If it is genuinely their address, the block
-entry needs removing before email can reach them again.
+The existing duty view (date picker, On shift now, three status columns) stays exactly as-is underneath.
 
 ## Technical notes
 
-- `src/components/dashboard/AddEmployeeDialog.tsx`: `sendEmail(...)` is
-  fire-and-forget (not awaited) and the toast is hardcoded to the success case.
-  Await it, read the response, branch the toast.
-- `src/lib/sendEmail.ts`: currently swallows the result. Return
-  `{ ok, reason }` so callers can react — the send function already returns
-  `{ success: false, reason: 'email_suppressed' }` for blocked addresses.
-- Typo check and resend action are frontend-only; the resend reuses the existing
-  `employee-invited` template with a fresh idempotency key.
-- Bounce/block state comes from the existing email log and suppression records;
-  read via a small query in the staff list, no schema changes.
+- `src/components/dashboard/StaffList.tsx` already fetches all employees for the business; the roster can reuse that `employees` state, so no new query is needed.
+- Move the "No staff yet" empty state to cover the whole page; the "No shifts scheduled" state applies only to the duty section.
+- New presentational component `src/components/dashboard/StaffRoster.tsx` to keep `StaffList` manageable; it receives employees, the shift map, and an `onSelect` callback.
