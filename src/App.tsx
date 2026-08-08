@@ -76,6 +76,7 @@ const App = () => (
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/pending-approval" element={<RequireVerifiedEmail><PendingApproval /></RequireVerifiedEmail>} />
+          <Route path="/join" element={<JoinInvite />} />
           <Route path="/kiosk/:companyCode" element={<Kiosk />} />
           <Route path="/embed/:userId" element={<EmbedWidget />} />
           <Route path="/book/:userId" element={<PublicBooking />} />
