@@ -73,9 +73,12 @@ const JoinInvite = () => {
     }
 
     // Try code-based claim first, then email-based fallback
-    const { error: claimErr } = await supabase.rpc("claim_employee_seat", { p_company_code: code });
+    const { data: claimedByCode, error: claimErr } = await supabase.rpc("claim_employee_seat", { p_company_code: code });
     if (claimErr) {
-      const { data: byEmail } = await supabase.rpc("claim_employee_seat_by_email");
+      const { data: byEmail, error: emailClaimErr } = await supabase.rpc("claim_employee_seat_by_email");
+      if (emailClaimErr) {
+        throw new Error(`We found your invite but couldn't link it: ${emailClaimErr.message}`);
+      }
       const row = Array.isArray(byEmail) ? byEmail[0] : byEmail;
       if (!row) {
         const { data: existingEmployee } = await supabase
@@ -97,6 +100,9 @@ const JoinInvite = () => {
         });
         return;
       }
+    } else {
+      const row = Array.isArray(claimedByCode) ? claimedByCode[0] : claimedByCode;
+      if (!row) throw new Error("The invite claim returned no employee record. Please try again.");
     }
     toast({ title: "Welcome to the team!" });
     const { getDashboardRoute } = await import("@/lib/routeAfterAuth");
