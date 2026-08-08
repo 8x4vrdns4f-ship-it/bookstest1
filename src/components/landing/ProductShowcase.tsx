@@ -2,7 +2,9 @@ import { useState } from "react";
 import { LayoutDashboard, Calendar, Smartphone, Check } from "lucide-react";
 import dashboardShot from "@/assets/shot-dashboard.jpg";
 import calendarShot from "@/assets/shot-calendar.jpg";
-import widgetShot from "@/assets/shot-widget.jpg";
+import widgetShotAsset from "@/assets/shot-widget.jpg.asset.json";
+
+const widgetShot = widgetShotAsset.url;
 
 type Tab = "dashboard" | "calendar" | "widget";
 
