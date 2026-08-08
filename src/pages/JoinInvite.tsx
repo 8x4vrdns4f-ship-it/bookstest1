@@ -36,6 +36,7 @@ const JoinInvite = () => {
   const [needsVerify, setNeedsVerify] = useState(false);
   const [alreadySignedIn, setAlreadySignedIn] = useState(false);
   const [autoJoining, setAutoJoining] = useState(false);
+  const [autoJoinAttempted, setAutoJoinAttempted] = useState(false);
 
 
   useEffect(() => {
@@ -103,7 +104,8 @@ const JoinInvite = () => {
   }, [code, email, invitedEmail, navigate, toast]);
 
   useEffect(() => {
-    if (checking || !businessName || !alreadySignedIn || autoJoining) return;
+    if (checking || !businessName || !alreadySignedIn || autoJoining || autoJoinAttempted) return;
+    setAutoJoinAttempted(true);
     setAutoJoining(true);
     finish()
       .catch((err) => {
@@ -114,7 +116,7 @@ const JoinInvite = () => {
         });
       })
       .finally(() => setAutoJoining(false));
-  }, [alreadySignedIn, autoJoining, businessName, checking, finish, toast]);
+  }, [alreadySignedIn, autoJoinAttempted, autoJoining, businessName, checking, finish, toast]);
 
   const joinAsCurrentUser = async () => {
     setLoading(true);
