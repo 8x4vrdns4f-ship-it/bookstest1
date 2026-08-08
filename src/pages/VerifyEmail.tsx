@@ -10,6 +10,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
+import {
+  getSafeRelativeDestination,
+  PENDING_AUTH_DESTINATION_KEY,
+  PENDING_VERIFICATION_EMAIL_KEY,
+} from "@/lib/inviteFlow";
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
@@ -22,15 +27,17 @@ const VerifyEmail = () => {
   const [checking, setChecking] = useState(true);
   const [linkError, setLinkError] = useState<string | null>(null);
 
-  const storedEmailKey = "booksuite.pendingVerificationEmail";
-
   useEffect(() => {
     let cancelled = false;
 
     const initialParams = new URLSearchParams(window.location.search);
     const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const urlError = initialParams.get("error_description") || hashParams.get("error_description") || initialParams.get("error") || hashParams.get("error");
-    const pendingEmail = (location.state as { email?: string } | null)?.email || localStorage.getItem(storedEmailKey) || "";
+    const pendingEmail = (location.state as { email?: string } | null)?.email || localStorage.getItem(PENDING_VERIFICATION_EMAIL_KEY) || "";
+    const requestedNext = getSafeRelativeDestination(initialParams.get("next"));
+    const storedNext = getSafeRelativeDestination(localStorage.getItem(PENDING_AUTH_DESTINATION_KEY));
+    const verificationDestination = requestedNext || storedNext;
+    if (verificationDestination) localStorage.setItem(PENDING_AUTH_DESTINATION_KEY, verificationDestination);
 
     if (urlError) {
       setLinkError(decodeURIComponent(urlError.replace(/\+/g, " ")));
@@ -54,10 +61,10 @@ const VerifyEmail = () => {
 
     const finishVerification = async (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
       fireWelcome(user);
-      localStorage.removeItem(storedEmailKey);
-      const rawNext = new URLSearchParams(window.location.search).get("next") ?? "";
-      if (/^\/(?!\/)/.test(rawNext)) {
-        window.location.href = rawNext;
+      localStorage.removeItem(PENDING_VERIFICATION_EMAIL_KEY);
+      if (verificationDestination) {
+        localStorage.removeItem(PENDING_AUTH_DESTINATION_KEY);
+        window.location.href = verificationDestination;
         return;
       }
       const route = await getDashboardRoute();
@@ -84,14 +91,14 @@ const VerifyEmail = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (cancelled) return;
       if (!user) {
-        const pendingEmail = (location.state as { email?: string } | null)?.email || localStorage.getItem(storedEmailKey) || "";
+        const pendingEmail = (location.state as { email?: string } | null)?.email || localStorage.getItem(PENDING_VERIFICATION_EMAIL_KEY) || "";
         setManualEmail(pendingEmail);
         setEmail(pendingEmail || null);
         setChecking(false);
         return;
       }
       setEmail(user.email ?? null);
-      if (user.email) localStorage.setItem(storedEmailKey, user.email);
+      if (user.email) localStorage.setItem(PENDING_VERIFICATION_EMAIL_KEY, user.email);
       setChecking(false);
       if (user.email_confirmed_at) {
         finishVerification(user);
@@ -127,16 +134,18 @@ const VerifyEmail = () => {
       return;
     }
     setResending(true);
+    const destination = getSafeRelativeDestination(localStorage.getItem(PENDING_AUTH_DESTINATION_KEY));
+    const verificationUrl = `${publicOrigin()}/verify-email${destination ? `?next=${encodeURIComponent(destination)}` : ""}`;
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: targetEmail,
-      options: { emailRedirectTo: `${publicOrigin()}/verify-email` },
+      options: { emailRedirectTo: verificationUrl },
     });
     setResending(false);
     if (error) {
       toast({ title: "Couldn't resend", description: error.message, variant: "destructive" });
     } else {
-      localStorage.setItem(storedEmailKey, targetEmail);
+      localStorage.setItem(PENDING_VERIFICATION_EMAIL_KEY, targetEmail);
       setEmail(targetEmail);
       setManualEmail(targetEmail);
       setLinkError(null);
