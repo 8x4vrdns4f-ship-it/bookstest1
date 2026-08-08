@@ -27,6 +27,18 @@ export const getDashboardRoute = async (): Promise<string> => {
     return "/employee-dashboard";
   }
 
+  // Invited but not yet linked? Claim the seat the owner created for this email.
+  const { data: claimed } = await supabase.rpc("claim_employee_seat_by_email");
+  const claimedRow = Array.isArray(claimed) ? claimed[0] : claimed;
+  if (claimedRow) {
+    const roleName = (claimedRow as { role_name?: string }).role_name ?? "employee";
+    if (roleName === "owner" || roleName === "manager" || roleName === "receptionist") {
+      return "/dashboard";
+    }
+    return "/employee-dashboard";
+  }
+
+
   // Business owner?
   const { data: biz } = await supabase
     .from("business_settings")

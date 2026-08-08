@@ -25,6 +25,7 @@ import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
 import Settings from "./pages/Settings.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import PendingApproval from "./pages/PendingApproval.tsx";
+import JoinInvite from "./pages/JoinInvite.tsx";
 import Kiosk from "./pages/Kiosk.tsx";
 import EmbedWidget from "./pages/EmbedWidget.tsx";
 import PublicBooking from "./pages/PublicBooking.tsx";
@@ -75,6 +76,7 @@ const App = () => (
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/pending-approval" element={<RequireVerifiedEmail><PendingApproval /></RequireVerifiedEmail>} />
+          <Route path="/join" element={<JoinInvite />} />
           <Route path="/kiosk/:companyCode" element={<Kiosk />} />
           <Route path="/embed/:userId" element={<EmbedWidget />} />
           <Route path="/book/:userId" element={<PublicBooking />} />

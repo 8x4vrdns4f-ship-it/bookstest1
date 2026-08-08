@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { handleTierError } from "@/lib/tierError";
 import { AppDialog } from "@/components/app/AppDialog";
 import { UserPlus } from "lucide-react";
+import { sendEmployeeInvite } from "@/lib/employeeInvite";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,12 +30,29 @@ interface AddEmployeeDialogProps {
 const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [roles, setRoles] = useState<Array<{ id: string; name: string }>>([]);
+  const [roleId, setRoleId] = useState<string>("");
   const { toast } = useToast();
 
   const form = useForm<EmployeeForm>({
     resolver: zodResolver(employeeSchema),
     defaultValues: { name: "", email: "", phone: "", position: "" },
   });
+
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      const { data } = await supabase
+        .from("company_roles")
+        .select("id, name")
+        .eq("user_id", userId)
+        .neq("name", "owner")
+        .order("name");
+      const list = data || [];
+      setRoles(list);
+      setRoleId((prev) => prev || list.find((r) => r.name === "employee")?.id || list[0]?.id || "");
+    })();
+  }, [open, userId]);
 
   const onSubmit = async (values: EmployeeForm) => {
     setLoading(true);
@@ -42,6 +62,7 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
       email: values.email.trim(),
       phone: values.phone?.trim() || null,
       position: values.position?.trim() || null,
+      role_id: roleId || null,
     }).select("id").single();
     setLoading(false);
 
@@ -58,24 +79,25 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
         .eq("user_id", userId)
         .maybeSingle();
       if (bs?.company_code && values.email.trim()) {
-        const { sendEmail } = await import("@/lib/sendEmail");
-        sendEmail("employee-invited", values.email.trim(), `emp-invite-${emp?.id ?? values.email.trim()}`, {
-          inviteeName: values.name.trim(),
+        await sendEmployeeInvite({
+          employeeId: emp?.id,
+          name: values.name.trim(),
+          email: values.email.trim(),
           businessName: bs.business_name || "the team",
           companyCode: bs.company_code,
-          joinUrl: `${window.location.origin}/auth?mode=signup`,
         });
       }
     } catch (e) { console.error("invite email failed", e); }
 
     toast({
-      title: "Employee added!",
-      description: `${values.name} has been invited via email and can join with your company code.`,
+      title: "Invite sent",
+      description: `${values.name} can now accept the invite from their email — no approval needed.`,
     });
     form.reset();
     setOpen(false);
     onEmployeeAdded?.();
   };
+
 
   return (
     <>
@@ -162,6 +184,22 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
                 </FormItem>
               )}
             />
+            <div className="space-y-2">
+              <Label>Access level</Label>
+              <Select value={roleId} onValueChange={setRoleId}>
+                <SelectTrigger className="bg-secondary border-border">
+                  <SelectValue placeholder="Select access level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((r) => (
+                    <SelectItem key={r.id} value={r.id} className="capitalize">{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Managers and receptionists get the full dashboard; employees see their own schedule.
+              </p>
+            </div>
           </form>
         </Form>
       </AppDialog>

@@ -19,7 +19,9 @@ interface Employee {
   position: string | null;
   manual_status: string | null;
   manual_status_date: string | null;
+  auth_user_id: string | null;
 }
+
 
 interface Shift {
   employee_id: string;
@@ -52,12 +54,14 @@ const StaffList = ({ userId }: { userId: string }) => {
     return () => clearInterval(t);
   }, []);
 
+  const [business, setBusiness] = useState<{ name: string; code: string } | null>(null);
+
   const load = async () => {
     setLoading(true);
-    const [empRes, shiftRes, bkRes] = await Promise.all([
+    const [empRes, shiftRes, bkRes, bsRes] = await Promise.all([
       supabase
         .from("employees")
-        .select("id, name, email, phone, position, manual_status, manual_status_date")
+        .select("id, name, email, phone, position, manual_status, manual_status_date, auth_user_id")
         .eq("user_id", userId)
         .order("name"),
       supabase
@@ -70,16 +74,27 @@ const StaffList = ({ userId }: { userId: string }) => {
         .select("assigned_employee_id, booking_time, duration_minutes, status")
         .eq("user_id", userId)
         .eq("booking_date", date),
+      supabase
+        .from("business_settings")
+        .select("business_name, company_code")
+        .eq("user_id", userId)
+        .maybeSingle(),
     ]);
     setEmployees((empRes.data as Employee[]) || []);
     setShifts((shiftRes.data as Shift[]) || []);
     setBookings((bkRes.data as BookingSlot[]) || []);
+    setBusiness(
+      bsRes.data
+        ? { name: bsRes.data.business_name || "", code: bsRes.data.company_code || "" }
+        : null
+    );
     setLoading(false);
   };
 
   useEffect(() => {
     load();
   }, [userId, date]);
+
 
   const { inProgress, free, unavailable, onShiftNow } = useMemo(() => {
     void tick;
@@ -235,6 +250,7 @@ const StaffList = ({ userId }: { userId: string }) => {
           shiftEmployeeIds={new Set(shifts.map((s) => s.employee_id))}
           date={date}
           onSelect={(id) => setProfileId(id)}
+          business={business}
         />
         {shifts.length === 0 ? (
         <EmptyState
