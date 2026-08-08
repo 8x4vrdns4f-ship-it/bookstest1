@@ -1,5 +1,5 @@
 import { publicOrigin } from "@/lib/publicUrl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,7 @@ const JoinInvite = () => {
     })();
   }, [code, invitedEmail]);
 
-  const finish = async () => {
+  const finish = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     const signedInEmail = user?.email || email.trim();
     if (!user) {
@@ -100,7 +100,7 @@ const JoinInvite = () => {
     toast({ title: "Welcome to the team!" });
     const { getDashboardRoute } = await import("@/lib/routeAfterAuth");
     navigate(await getDashboardRoute(), { replace: true });
-  };
+  }, [code, email, invitedEmail, navigate, toast]);
 
   useEffect(() => {
     if (checking || !businessName || !alreadySignedIn || autoJoining) return;
@@ -114,7 +114,7 @@ const JoinInvite = () => {
         });
       })
       .finally(() => setAutoJoining(false));
-  }, [alreadySignedIn, businessName, checking]);
+  }, [alreadySignedIn, autoJoining, businessName, checking, finish, toast]);
 
   const joinAsCurrentUser = async () => {
     setLoading(true);
