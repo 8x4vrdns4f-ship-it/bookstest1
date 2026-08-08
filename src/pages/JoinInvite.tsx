@@ -27,18 +27,33 @@ const JoinInvite = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [needsVerify, setNeedsVerify] = useState(false);
+  const [alreadySignedIn, setAlreadySignedIn] = useState(false);
+
 
   useEffect(() => {
     (async () => {
+      // If a different account is already signed in on this device (e.g. the owner),
+      // sign it out so the invite is claimed by the invited person, not the current session.
+      const { data: sess } = await supabase.auth.getSession();
+      const current = (sess.session?.user.email || "").toLowerCase();
+      if (current && invitedEmail && current !== invitedEmail.toLowerCase()) {
+        await supabase.auth.signOut();
+      } else if (current && invitedEmail && current === invitedEmail.toLowerCase()) {
+        setAlreadySignedIn(true);
+      }
+
       if (!code) { setChecking(false); return; }
       const { data } = await supabase.rpc("lookup_business_by_code", { p_code: code });
       const row = Array.isArray(data) ? data[0] : data;
       setBusinessName((row as { business_name?: string } | null)?.business_name || null);
       setChecking(false);
     })();
-  }, [code]);
+  }, [code, invitedEmail]);
 
   const finish = async () => {
+    const { data: sess } = await supabase.auth.getSession();
+    const signedInEmail = sess.session?.user.email || email.trim();
+
     // Try code-based claim first, then email-based fallback
     const { error: claimErr } = await supabase.rpc("claim_employee_seat", { p_company_code: code });
     if (claimErr) {
@@ -47,7 +62,7 @@ const JoinInvite = () => {
       if (!row) {
         toast({
           title: "Invite not found",
-          description: "We couldn't match this invite to your email. Ask your manager to resend it to the address you signed up with.",
+          description: `No open invite matches ${signedInEmail}. Ask your manager to resend the invite to that exact address.`,
           variant: "destructive",
         });
         return;
@@ -57,6 +72,13 @@ const JoinInvite = () => {
     const { getDashboardRoute } = await import("@/lib/routeAfterAuth");
     navigate(await getDashboardRoute(), { replace: true });
   };
+
+  const joinAsCurrentUser = async () => {
+    setLoading(true);
+    try { await finish(); } finally { setLoading(false); }
+  };
+
+
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +159,17 @@ const JoinInvite = () => {
               <Button asChild className="w-full"><Link to="/">Back to home</Link></Button>
             ) : !businessName ? (
               <Button asChild variant="outline" className="w-full"><Link to="/auth">Go to sign in</Link></Button>
+            ) : alreadySignedIn ? (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground text-center">
+                  You're signed in as {email}. Accept the invite to join.
+                </p>
+                <Button onClick={joinAsCurrentUser} disabled={loading} className="w-full font-semibold">
+                  {loading ? "Joining…" : "Accept invite"}
+                </Button>
+              </div>
             ) : (
+
               <form onSubmit={onSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="join-email">Email</Label>
