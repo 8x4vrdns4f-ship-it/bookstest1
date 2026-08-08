@@ -227,7 +227,15 @@ const StaffList = ({ userId }: { userId: string }) => {
           title="No staff yet"
           description="Add your first team member to start scheduling shifts and assigning bookings."
         />
-      ) : shifts.length === 0 ? (
+      ) : (
+        <>
+        <StaffRoster
+          employees={employees}
+          shiftEmployeeIds={new Set(shifts.map((s) => s.employee_id))}
+          date={date}
+          onSelect={(id) => setProfileId(id)}
+        />
+        {shifts.length === 0 ? (
         <EmptyState
           icon={<Clock size={20} />}
           title="No shifts scheduled"
