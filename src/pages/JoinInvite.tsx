@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import { publicOrigin } from "@/lib/publicUrl";
 
 const JoinInvite = () => {
   const [params] = useSearchParams();
@@ -90,7 +91,7 @@ const JoinInvite = () => {
           password,
           options: {
             data: { role: "employee" },
-            emailRedirectTo: `${window.location.origin}/join?code=${encodeURIComponent(code)}&email=${encodeURIComponent(email.trim())}`,
+            emailRedirectTo: `${publicOrigin()}/join?code=${encodeURIComponent(code)}&email=${encodeURIComponent(email.trim())}`,
           },
         });
         if (signErr) {

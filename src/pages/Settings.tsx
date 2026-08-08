@@ -26,6 +26,7 @@ import RolesManager from "@/components/dashboard/RolesManager";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS } from "@/lib/tierLimits";
 import { Link } from "react-router-dom";
+import { publicOrigin } from "@/lib/publicUrl";
 
 type DayHours = { open: string; close: string; closed: boolean };
 type WorkingHours = Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", DayHours>;
@@ -187,7 +188,7 @@ const Settings = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user.email) return;
     const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${publicOrigin()}/reset-password`,
     });
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else toast({ title: "Reset email sent", description: "Check your inbox." });
@@ -526,7 +527,7 @@ const Settings = () => {
             <AccordionContent className="space-y-3 pb-5">
               <ToggleRow
                 label="Self check-in kiosk"
-                hint={`Customers scan the QR code on their booking at a kiosk. Kiosk URL: ${window.location.origin}/kiosk/${companyCode}`}
+                hint={`Customers scan the QR code on their booking at a kiosk. Kiosk URL: ${publicOrigin()}/kiosk/${companyCode}`}
                 checked={form.self_checkin_enabled}
                 onChange={(v) => setForm({ ...form, self_checkin_enabled: v })}
               />

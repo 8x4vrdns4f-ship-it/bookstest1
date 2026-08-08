@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { joinCompanySchema, type JoinCompanyForm } from "@/lib/formSchemas";
 import {
+import { publicOrigin } from "@/lib/publicUrl";
   Form,
   FormControl,
   FormField,
@@ -38,7 +39,7 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
         password: values.password,
         options: {
           data: { role: "employee", display_name: values.name },
-          emailRedirectTo: `${window.location.origin}/pending-approval`,
+          emailRedirectTo: `${publicOrigin()}/pending-approval`,
         },
       });
       let uid = signUp?.user?.id;
@@ -105,7 +106,7 @@ const JoinCompanyDialog = ({ trigger }: { trigger?: React.ReactNode }) => {
                 applicantEmail: values.email.trim(),
                 applicantPhone: values.phone,
                 businessName: biz,
-                dashboardUrl: `${window.location.origin}/dashboard`,
+                dashboardUrl: `${publicOrigin()}/dashboard`,
               });
           }
         }

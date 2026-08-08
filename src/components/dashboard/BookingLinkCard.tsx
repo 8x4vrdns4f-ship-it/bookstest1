@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Check, Copy, ExternalLink, Code2, Share2 } from "lucide-react";
 import SectionCard from "@/components/app/SectionCard";
 import EmbedWidgetDialog from "@/components/dashboard/EmbedWidgetDialog";
+import { publicOrigin } from "@/lib/publicUrl";
 
 type Props = {
   userId: string;
@@ -20,7 +21,7 @@ export default function BookingLinkCard({
   className,
 }: Props) {
   const [copied, setCopied] = useState(false);
-  const bookingUrl = `${window.location.origin}/book/${userId}`;
+  const bookingUrl = `${publicOrigin()}/book/${userId}`;
 
   const copy = async () => {
     try {

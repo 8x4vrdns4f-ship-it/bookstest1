@@ -10,6 +10,7 @@ import { UserPlus, Check, X, Bell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
+import { publicOrigin } from "@/lib/publicUrl";
 
 type JoinRequest = {
   id: string;
@@ -80,7 +81,7 @@ const JoinRequestsCard = ({ businessUserId }: { businessUserId: string }) => {
       applicantName: acceptOpen.requester_name,
       businessName: bs?.business_name || "the team",
       role: roleName,
-      loginUrl: `${window.location.origin}/auth`,
+      loginUrl: `${publicOrigin()}/auth`,
     });
     toast({ title: `${acceptOpen.requester_name} accepted` });
     setAcceptOpen(null); setSelectedRole(""); load();

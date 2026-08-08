@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getConnectAuthHeaders, getStripeEnvironment } from "@/lib/connectPayments";
 import SectionCard from "@/components/app/SectionCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { publicOrigin } from "@/lib/publicUrl";
 
 type Props = { userId: string };
 
@@ -37,7 +38,7 @@ const OnboardingChecklist = ({ userId }: Props) => {
     }
   });
 
-  const bookingUrl = `${window.location.origin}/book/${userId}`;
+  const bookingUrl = `${publicOrigin()}/book/${userId}`;
 
   const copyLink = async () => {
     try {

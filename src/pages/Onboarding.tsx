@@ -16,6 +16,7 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 import {
+import { publicOrigin } from "@/lib/publicUrl";
   onboardingBusinessSchema, type OnboardingBusinessForm,
 } from "@/lib/formSchemas";
 
@@ -121,7 +122,7 @@ const Onboarding = () => {
   }, []);
 
   const bookingUrl = useMemo(
-    () => (userId ? `${window.location.origin}/book/${userId}` : ""),
+    () => (userId ? `${publicOrigin()}/book/${userId}` : ""),
     [userId]
   );
 

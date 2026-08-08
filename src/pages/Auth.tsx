@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, signupSchema, type LoginForm, type SignupForm } from "@/lib/formSchemas";
 import {
+import { publicOrigin } from "@/lib/publicUrl";
   Form,
   FormControl,
   FormField,
@@ -53,7 +54,7 @@ const Auth = () => {
     }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${publicOrigin()}/reset-password`,
     });
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -93,7 +94,7 @@ const Auth = () => {
         password: v.password,
         options: {
           data: { display_name: v.displayName },
-          emailRedirectTo: `${window.location.origin}/verify-email`,
+          emailRedirectTo: `${publicOrigin()}/verify-email`,
         },
       });
       if (error) {
