@@ -34,6 +34,11 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Same-origin relative path to return to after auth (used by the OAuth consent flow).
+  const rawNext = searchParams.get("next") ?? "";
+  const nextPath = /^\/(?!\/)/.test(rawNext) ? rawNext : "";
+
+
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
