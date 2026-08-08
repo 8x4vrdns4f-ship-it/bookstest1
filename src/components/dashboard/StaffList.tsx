@@ -6,6 +6,7 @@ import ManageShiftsDialog from "./ManageShiftsDialog";
 import PlanShiftsDialog from "./PlanShiftsDialog";
 import EmployeeActionsDialog, { type StaffMember, type DerivedStatus } from "./EmployeeActionsDialog";
 import EmployeeProfileDialog from "./EmployeeProfileDialog";
+import StaffRoster from "./StaffRoster";
 import { CheckCircle2, AlertCircle, Activity, Clock, User } from "lucide-react";
 import EmptyState from "@/components/app/EmptyState";
 import ListSkeleton from "@/components/app/ListSkeleton";
@@ -227,7 +228,15 @@ const StaffList = ({ userId }: { userId: string }) => {
           title="No staff yet"
           description="Add your first team member to start scheduling shifts and assigning bookings."
         />
-      ) : shifts.length === 0 ? (
+      ) : (
+        <>
+        <StaffRoster
+          employees={employees}
+          shiftEmployeeIds={new Set(shifts.map((s) => s.employee_id))}
+          date={date}
+          onSelect={(id) => setProfileId(id)}
+        />
+        {shifts.length === 0 ? (
         <EmptyState
           icon={<Clock size={20} />}
           title="No shifts scheduled"
@@ -282,6 +291,9 @@ const StaffList = ({ userId }: { userId: string }) => {
           </div>
         </>
       )}
+        </>
+      )}
+
 
       <EmployeeActionsDialog
         open={!!selected}
