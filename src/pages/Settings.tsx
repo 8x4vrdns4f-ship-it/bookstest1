@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +27,6 @@ import RolesManager from "@/components/dashboard/RolesManager";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS } from "@/lib/tierLimits";
 import { Link } from "react-router-dom";
-import { publicOrigin } from "@/lib/publicUrl";
 
 type DayHours = { open: string; close: string; closed: boolean };
 type WorkingHours = Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", DayHours>;

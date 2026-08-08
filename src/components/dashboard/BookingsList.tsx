@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,6 @@ import { handleTierError } from "@/lib/tierError";
 import { sendEmail, formatDate, formatTime } from "@/lib/sendEmail";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
-import { publicOrigin } from "@/lib/publicUrl";
 
 
 type Booking = {

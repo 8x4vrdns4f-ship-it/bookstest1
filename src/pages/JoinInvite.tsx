@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
-import { publicOrigin } from "@/lib/publicUrl";
 
 const JoinInvite = () => {
   const [params] = useSearchParams();

@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { getConnectAuthHeaders, getStripeEnvironment } from "@/lib/connectPayments";
 import SectionCard from "@/components/app/SectionCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { publicOrigin } from "@/lib/publicUrl";
 
 type Props = { userId: string };
 

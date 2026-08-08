@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,7 +17,6 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 import {
-import { publicOrigin } from "@/lib/publicUrl";
   onboardingBusinessSchema, type OnboardingBusinessForm,
 } from "@/lib/formSchemas";
 

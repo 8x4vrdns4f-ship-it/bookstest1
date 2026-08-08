@@ -1,10 +1,10 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Copy, ExternalLink, Code2, Share2 } from "lucide-react";
 import SectionCard from "@/components/app/SectionCard";
 import EmbedWidgetDialog from "@/components/dashboard/EmbedWidgetDialog";
-import { publicOrigin } from "@/lib/publicUrl";
 
 type Props = {
   userId: string;

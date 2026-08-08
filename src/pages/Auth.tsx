@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
@@ -15,7 +16,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, signupSchema, type LoginForm, type SignupForm } from "@/lib/formSchemas";
 import {
-import { publicOrigin } from "@/lib/publicUrl";
   Form,
   FormControl,
   FormField,

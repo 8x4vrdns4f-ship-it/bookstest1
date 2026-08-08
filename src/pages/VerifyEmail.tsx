@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +10,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { getDashboardRoute } from "@/lib/routeAfterAuth";
-import { publicOrigin } from "@/lib/publicUrl";
 
 const VerifyEmail = () => {
   const navigate = useNavigate();

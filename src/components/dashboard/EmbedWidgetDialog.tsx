@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { buildWidgetHtml } from "@/lib/widgetTemplate";
 import { getStripeEnvironment } from "@/lib/connectPayments";
 import { supabase } from "@/integrations/supabase/client";
-import { publicOrigin } from "@/lib/publicUrl";
 
 type Props = { userId: string; trigger: React.ReactNode };
 

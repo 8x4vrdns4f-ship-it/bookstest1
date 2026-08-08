@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import { UserPlus, Check, X, Bell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
-import { publicOrigin } from "@/lib/publicUrl";
 
 type JoinRequest = {
   id: string;
