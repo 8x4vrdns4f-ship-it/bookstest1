@@ -250,6 +250,7 @@ const StaffList = ({ userId }: { userId: string }) => {
           shiftEmployeeIds={new Set(shifts.map((s) => s.employee_id))}
           date={date}
           onSelect={(id) => setProfileId(id)}
+          business={business}
         />
         {shifts.length === 0 ? (
         <EmptyState
