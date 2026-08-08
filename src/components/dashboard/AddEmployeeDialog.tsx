@@ -184,6 +184,22 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
                 </FormItem>
               )}
             />
+            <div className="space-y-2">
+              <Label>Access level</Label>
+              <Select value={roleId} onValueChange={setRoleId}>
+                <SelectTrigger className="bg-secondary border-border">
+                  <SelectValue placeholder="Select access level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((r) => (
+                    <SelectItem key={r.id} value={r.id} className="capitalize">{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Managers and receptionists get the full dashboard; employees see their own schedule.
+              </p>
+            </div>
           </form>
         </Form>
       </AppDialog>
