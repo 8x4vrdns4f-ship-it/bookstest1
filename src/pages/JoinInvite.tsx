@@ -159,7 +159,17 @@ const JoinInvite = () => {
               <Button asChild className="w-full"><Link to="/">Back to home</Link></Button>
             ) : !businessName ? (
               <Button asChild variant="outline" className="w-full"><Link to="/auth">Go to sign in</Link></Button>
+            ) : alreadySignedIn ? (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground text-center">
+                  You're signed in as {email}. Accept the invite to join.
+                </p>
+                <Button onClick={joinAsCurrentUser} disabled={loading} className="w-full font-semibold">
+                  {loading ? "Joining…" : "Accept invite"}
+                </Button>
+              </div>
             ) : (
+
               <form onSubmit={onSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="join-email">Email</Label>
