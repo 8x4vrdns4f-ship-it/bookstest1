@@ -55,6 +55,11 @@ const VerifyEmail = () => {
     const finishVerification = async (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
       fireWelcome(user);
       localStorage.removeItem(storedEmailKey);
+      const rawNext = new URLSearchParams(window.location.search).get("next") ?? "";
+      if (/^\/(?!\/)/.test(rawNext)) {
+        window.location.href = rawNext;
+        return;
+      }
       const route = await getDashboardRoute();
       navigate(route, { replace: true });
     };

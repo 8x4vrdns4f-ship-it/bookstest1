@@ -1,0 +1,203 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://rehafgjaqbdeuatnfiyk.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "booksuite-your-all-in-one-solution",
+      "version": "0.1.0",
+      "title": "BookSuite: Your All-in-One Solution"
+    },
+    "tools": [
+      {
+        "name": "list_bookings",
+        "title": "List bookings",
+        "description": "List the signed-in business's bookings, optionally filtered by date range and status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string",
+              "description": "Start date (YYYY-MM-DD), inclusive."
+            },
+            "to": {
+              "type": "string",
+              "description": "End date (YYYY-MM-DD), inclusive."
+            },
+            "status": {
+              "type": "string",
+              "description": "Booking status filter, e.g. pending, confirmed, cancelled, completed."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum rows to return (default 50, max 200)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_booking",
+        "title": "Create booking",
+        "description": "Create a new booking for the signed-in business. Times use 24h HH:MM and dates use YYYY-MM-DD.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "client_name": {
+              "type": "string",
+              "description": "Customer name."
+            },
+            "booking_date": {
+              "type": "string",
+              "description": "Booking date, YYYY-MM-DD."
+            },
+            "booking_time": {
+              "type": "string",
+              "description": "Booking start time, 24h HH:MM."
+            },
+            "service": {
+              "type": "string",
+              "description": "Service name for this booking."
+            },
+            "duration_minutes": {
+              "type": "integer",
+              "description": "Duration in minutes (default 30)."
+            },
+            "client_email": {
+              "type": "string",
+              "description": "Customer email address."
+            },
+            "notes": {
+              "type": "string",
+              "description": "Internal notes for this booking."
+            },
+            "party_size": {
+              "type": "integer",
+              "description": "Number of people, for table/group bookings."
+            }
+          },
+          "required": [
+            "client_name",
+            "booking_date",
+            "booking_time",
+            "service"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_booking_status",
+        "title": "Update booking status",
+        "description": "Change the status of one of the signed-in business's bookings (e.g. confirmed, cancelled, completed).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "booking_id": {
+              "type": "string",
+              "description": "The booking id to update."
+            },
+            "status": {
+              "type": "string",
+              "description": "New status: pending, confirmed, cancelled, completed, or no_show."
+            },
+            "decline_reason": {
+              "type": "string",
+              "description": "Optional reason shown when cancelling."
+            }
+          },
+          "required": [
+            "booking_id",
+            "status"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_clients",
+        "title": "List clients",
+        "description": "List the signed-in business's saved clients, optionally filtered by a name or email search.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "search": {
+              "type": "string",
+              "description": "Case-insensitive text to match against name or email."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum rows to return (default 50, max 200)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_services",
+        "title": "List services",
+        "description": "List the services the signed-in business offers, with duration and price.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_staff",
+        "title": "List staff",
+        "description": "List the signed-in business's team members and their availability status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
