@@ -25,6 +25,7 @@ import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
 import Settings from "./pages/Settings.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import PendingApproval from "./pages/PendingApproval.tsx";
+import JoinInvite from "./pages/JoinInvite.tsx";
 import Kiosk from "./pages/Kiosk.tsx";
 import EmbedWidget from "./pages/EmbedWidget.tsx";
 import PublicBooking from "./pages/PublicBooking.tsx";
