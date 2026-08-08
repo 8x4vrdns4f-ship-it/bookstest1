@@ -89,8 +89,12 @@ const Auth = () => {
         navigate("/verify-email", { state: { email: v.email } });
       } else {
         toast({ title: "Welcome back!" });
-        const route = await getDashboardRoute();
-        navigate(route);
+        if (nextPath) {
+          window.location.href = nextPath;
+        } else {
+          const route = await getDashboardRoute();
+          navigate(route);
+        }
       }
     } else {
       const v = values as SignupForm;
@@ -99,7 +103,7 @@ const Auth = () => {
         password: v.password,
         options: {
           data: { display_name: v.displayName },
-          emailRedirectTo: `${publicOrigin()}/verify-email`,
+          emailRedirectTo: `${publicOrigin()}/verify-email${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`,
         },
       });
       if (error) {
