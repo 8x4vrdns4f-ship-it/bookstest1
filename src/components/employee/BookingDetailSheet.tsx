@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Mail, Phone, Users, StickyNote, Play, Check, UserX } from "lucide-react";
+import { Clock, Mail, Users, StickyNote, Play, Check, UserX, Timer } from "lucide-react";
 import { EmployeeBooking, formatTime } from "./types";
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onStatusChange: (id: string, status: string) => Promise<void>;
+  onRunningLate?: (id: string) => Promise<void>;
 };
 
 const actions = [
@@ -18,7 +19,7 @@ const actions = [
   { status: "no_show", label: "Mark no-show", icon: UserX },
 ];
 
-export default function BookingDetailSheet({ booking, open, onOpenChange, onStatusChange }: Props) {
+export default function BookingDetailSheet({ booking, open, onOpenChange, onStatusChange, onRunningLate }: Props) {
   const [saving, setSaving] = useState<string | null>(null);
   if (!booking) return null;
 
@@ -88,6 +89,23 @@ export default function BookingDetailSheet({ booking, open, onOpenChange, onStat
                 <Icon size={16} /> {saving === status ? "Saving…" : label}
               </Button>
             ))}
+            {onRunningLate && (
+              <Button
+                variant="outline"
+                disabled={saving !== null}
+                onClick={async () => {
+                  setSaving("late");
+                  try {
+                    await onRunningLate(booking.id);
+                  } finally {
+                    setSaving(null);
+                  }
+                }}
+                className="w-full justify-start gap-2 h-11"
+              >
+                <Timer size={16} /> {saving === "late" ? "Saving…" : "I'm running late"}
+              </Button>
+            )}
             <p className="text-[11px] text-muted-foreground text-center pt-1">
               Need to cancel or reschedule? Ask your manager.
             </p>

@@ -1,5 +1,6 @@
 import { useDashboardContext } from "@/hooks/useDashboardContext";
 import StaffList from "@/components/dashboard/StaffList";
+import TimeOffRequestsCard from "@/components/dashboard/TimeOffRequestsCard";
 import AddEmployeeDialog from "@/components/dashboard/AddEmployeeDialog";
 import PageHeader from "@/components/app/PageHeader";
 import SEO from "@/components/SEO";
@@ -16,6 +17,7 @@ export default function StaffPage() {
         actions={ctx.isOwner ? <AddEmployeeDialog userId={ctx.user.id} /> : undefined}
       />
       <StaffList userId={ctx.businessUserId} />
+      <TimeOffRequestsCard userId={ctx.businessUserId} />
     </>
   );
 }

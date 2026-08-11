@@ -30,8 +30,41 @@ export type EmployeeRecord = {
   user_id: string;
 };
 
+export type TimeOffRequest = {
+  id: string;
+  start_date: string;
+  end_date: string;
+  reason: string | null;
+  status: string;
+  decision_note: string | null;
+  created_at: string;
+};
+
+export type EmployeeNotification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  booking_id: string | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+export type EmployeeStats = {
+  completedThisWeek: number;
+  hoursThisWeek: number;
+  averageRating: number | null;
+  ratingCount: number;
+};
+
 export const todayISO = () => {
   const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+export const shiftISO = (days: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
@@ -48,3 +81,13 @@ export const formatDay = (iso: string) =>
     day: "numeric",
     month: "short",
   });
+
+export const relativeTime = (iso: string) => {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.round(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.round(hours / 24)}d ago`;
+};
