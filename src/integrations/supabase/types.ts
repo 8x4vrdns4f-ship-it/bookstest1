@@ -31,6 +31,7 @@ export type Database = {
           decline_reason: string | null
           deposit_amount: number | null
           duration_minutes: number
+          end_date: string | null
           id: string
           notes: string | null
           party_size: number | null
@@ -39,6 +40,7 @@ export type Database = {
           payment_status: string
           platform_fee_amount: number | null
           refund_id: string | null
+          rental_days: number | null
           resource_id: string | null
           review_sent_at: string | null
           review_submitted_at: string | null
@@ -69,6 +71,7 @@ export type Database = {
           decline_reason?: string | null
           deposit_amount?: number | null
           duration_minutes?: number
+          end_date?: string | null
           id?: string
           notes?: string | null
           party_size?: number | null
@@ -77,6 +80,7 @@ export type Database = {
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
+          rental_days?: number | null
           resource_id?: string | null
           review_sent_at?: string | null
           review_submitted_at?: string | null
@@ -107,6 +111,7 @@ export type Database = {
           decline_reason?: string | null
           deposit_amount?: number | null
           duration_minutes?: number
+          end_date?: string | null
           id?: string
           notes?: string | null
           party_size?: number | null
@@ -115,6 +120,7 @@ export type Database = {
           payment_status?: string
           platform_fee_amount?: number | null
           refund_id?: string | null
+          rental_days?: number | null
           resource_id?: string | null
           review_sent_at?: string | null
           review_submitted_at?: string | null
@@ -166,6 +172,7 @@ export type Database = {
           allow_same_day: boolean
           assignment_mode: string
           auto_confirm: boolean
+          booking_mode: string
           buffer_minutes: number
           business_address: string | null
           business_category: string | null
@@ -181,6 +188,8 @@ export type Database = {
           deposit_amount: number
           id: string
           max_advance_days: number
+          max_rental_days: number
+          min_rental_days: number
           notify_client_confirmation: boolean
           notify_client_reminder: boolean
           notify_client_review_request: boolean
@@ -209,6 +218,7 @@ export type Database = {
           allow_same_day?: boolean
           assignment_mode?: string
           auto_confirm?: boolean
+          booking_mode?: string
           buffer_minutes?: number
           business_address?: string | null
           business_category?: string | null
@@ -224,6 +234,8 @@ export type Database = {
           deposit_amount?: number
           id?: string
           max_advance_days?: number
+          max_rental_days?: number
+          min_rental_days?: number
           notify_client_confirmation?: boolean
           notify_client_reminder?: boolean
           notify_client_review_request?: boolean
@@ -252,6 +264,7 @@ export type Database = {
           allow_same_day?: boolean
           assignment_mode?: string
           auto_confirm?: boolean
+          booking_mode?: string
           buffer_minutes?: number
           business_address?: string | null
           business_category?: string | null
@@ -267,6 +280,8 @@ export type Database = {
           deposit_amount?: number
           id?: string
           max_advance_days?: number
+          max_rental_days?: number
+          min_rental_days?: number
           notify_client_confirmation?: boolean
           notify_client_reminder?: boolean
           notify_client_review_request?: boolean
@@ -812,6 +827,7 @@ export type Database = {
           decline_reason: string | null
           deposit_amount: number
           duration_minutes: number
+          end_date: string | null
           expired_at: string | null
           expires_at: string
           id: string
@@ -821,6 +837,7 @@ export type Database = {
           payment_option: string
           platform_fee_amount: number
           reminder_sent_at: string | null
+          rental_days: number | null
           resource_id: string | null
           service: string
           service_id: string | null
@@ -845,6 +862,7 @@ export type Database = {
           decline_reason?: string | null
           deposit_amount: number
           duration_minutes?: number
+          end_date?: string | null
           expired_at?: string | null
           expires_at?: string
           id?: string
@@ -854,6 +872,7 @@ export type Database = {
           payment_option?: string
           platform_fee_amount: number
           reminder_sent_at?: string | null
+          rental_days?: number | null
           resource_id?: string | null
           service: string
           service_id?: string | null
@@ -878,6 +897,7 @@ export type Database = {
           decline_reason?: string | null
           deposit_amount?: number
           duration_minutes?: number
+          end_date?: string | null
           expired_at?: string | null
           expires_at?: string
           id?: string
@@ -887,6 +907,7 @@ export type Database = {
           payment_option?: string
           platform_fee_amount?: number
           reminder_sent_at?: string | null
+          rental_days?: number | null
           resource_id?: string | null
           service?: string
           service_id?: string | null
@@ -1358,6 +1379,7 @@ export type Database = {
           booking_date: string
           booking_time: string
           duration_minutes: number
+          end_date: string
           resource_id: string
           status: string
         }[]
@@ -1422,11 +1444,14 @@ export type Database = {
           accent_color: string
           allow_same_day: boolean
           assignment_mode: string
+          booking_mode: string
           buffer_minutes: number
           business_name: string
           currency: string
           deposit_amount: number
           max_advance_days: number
+          max_rental_days: number
+          min_rental_days: number
           party_size_enabled: boolean
           payment_mode: string
           resource_label: string
