@@ -30,3 +30,4 @@ Two dashboards: owners → /dashboard, employees → /employee-dashboard. Route 
 - [Dashboard Charts](mem://features/dashboard-charts) — Revenue stat, completed-today donut, switchable bookings bar chart
 - [Roles & Join Requests](mem://features/roles-and-join-requests) — Per-business company_roles, employee_join_requests approval flow, pending-approval page, role-based routing
 - [Trust Pages & Rate Limits](mem://features/trust-pages-and-rate-limits) — About/Contact/Cookies pages, cookie banner, contact form pipeline, edge-function rate limiting
+- [Employee Live & Time Off](mem://features/employee-live-and-time-off) — Realtime employee dashboard, notification bell, time-off requests and manager approval
