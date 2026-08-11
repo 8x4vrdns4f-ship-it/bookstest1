@@ -23,6 +23,9 @@ export const WIDGET_STYLES = `
   .bw .date:hover{background:#141B2A;border-color:#2A3547}
   .bw .date.sel{background:#5BADE8;color:#0A0F1A;border-color:#5BADE8}
   .bw .date.closed{opacity:.35;cursor:not-allowed}
+  .bw .date.inrange{background:rgba(91,173,232,.15);border-color:rgba(91,173,232,.45)}
+  .bw .summary{margin-top:14px;border:1px solid #1F2937;border-radius:12px;padding:12px 14px;font-size:13px;color:#CBD5E1;line-height:1.5}
+  .bw .summary strong{color:#F3F4F6}
   .bw .date.closed .dd{text-decoration:line-through}
   .bw .date .dn{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.75}
   .bw .date .dd{font-size:19px;font-weight:700;line-height:1.2;margin:2px 0}
@@ -73,16 +76,18 @@ export const WIDGET_MARKUP = `
     <div class="deposit-pill" id="bw-deposit">Loading…</div>
   </div>
 
-  <div class="label">Day</div>
+  <div class="label" id="bw-day-label">Day</div>
   <div class="dates-wrap"><div class="dates" id="bw-dates"></div></div>
+  <div id="bw-range-hint" style="display:none;font-size:12px;color:#94A3B8;margin-top:2px"></div>
 
   <div id="bw-svc-wrap" style="display:none">
-    <div class="label">Service</div>
+    <div class="label" id="bw-svc-label">Service</div>
     <div class="slots" id="bw-services" style="grid-template-columns:repeat(2,1fr)"></div>
   </div>
 
-  <div class="label">Start time</div>
+  <div class="label" id="bw-time-label">Start time</div>
   <div class="slots" id="bw-slots"></div>
+
 
   <div id="bw-dur-wrap">
     <div class="label">Duration</div>
@@ -103,6 +108,8 @@ export const WIDGET_MARKUP = `
     <div class="label">Payment</div>
     <div class="slots" id="bw-payopts" style="grid-template-columns:repeat(2,1fr)"></div>
   </div>
+
+  <div class="summary" id="bw-summary" style="display:none"></div>
 
   <div class="label">Your details</div>
   <div class="row">
@@ -167,13 +174,16 @@ export const buildWidgetScript = (opts: {
     party_size_enabled: false,
     assignment_mode: 'client_pick',
     services_enabled: false,
-    payment_mode: 'deposit'
+    payment_mode: 'deposit',
+    booking_mode: 'hourly',
+    min_rental_days: 1,
+    max_rental_days: 30
   };
   var busy = [];
   var overrides = {};
   var resources = [];
   var services = [];
-  var selDate = null, selSlot = null, selDur = null, selResource = null, selService = null, selPayOption = 'deposit';
+  var selDate = null, selEndDate = null, selSlot = null, selDur = null, selResource = null, selService = null, selPayOption = 'deposit';
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
   var stripe = null, elements = null, paymentEl = null, elementsReady = false;
 
@@ -190,6 +200,49 @@ export const buildWidgetScript = (opts: {
   function fmtDate(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
   function toMin(t){ var p = t.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); }
   function fmtMin(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
+  // ---- day-based (rental) helpers ----
+  function dailyOn(){ return settings.booking_mode === 'daily'; }
+  function minDays(){ return Math.max(1, Number(settings.min_rental_days) || 1); }
+  function maxDays(){ return Math.max(minDays(), Number(settings.max_rental_days) || 30); }
+  function parseDate(ds){ return new Date(ds + 'T00:00:00'); }
+  function dayDiff(a, b){ return Math.round((parseDate(b) - parseDate(a)) / 86400000); }
+  function rentalDays(){
+    if (!dailyOn()) return null;
+    if (!selDate || !selEndDate) return null;
+    return dayDiff(selDate, selEndDate) + 1;
+  }
+  function prettyDate(ds){ return parseDate(ds).toLocaleDateString(undefined,{ day:'numeric', month:'short' }); }
+  // Is this calendar day already taken by an existing booking (whole range blocked)?
+  function dayTakenBy(dateStr, resourceId){
+    return busy.some(function(b){
+      var start = b.booking_date;
+      var end = b.end_date || b.booking_date;
+      if (dateStr < start || dateStr > end) return false;
+      if (resourceId) return b.resource_id === resourceId;
+      return true;
+    });
+  }
+  function dayUnavailable(dateStr){
+    if (!dailyOn()) return false;
+    if (settings.resources_enabled) {
+      var fits = fittingResources();
+      if (fits.length === 0) return false;
+      if (selResource) return dayTakenBy(dateStr, selResource);
+      // unavailable only when every fitting resource is taken that day
+      return fits.every(function(r){ return dayTakenBy(dateStr, r.id); });
+    }
+    return dayTakenBy(dateStr, null);
+  }
+  function rangeIsFree(startDs, endDs, resourceId){
+    var d = parseDate(startDs);
+    var endD = parseDate(endDs);
+    while (d <= endD){
+      var ds = fmtDate(d);
+      if (resourceId ? dayTakenBy(ds, resourceId) : dayUnavailable(ds)) return false;
+      d.setDate(d.getDate() + 1);
+    }
+    return true;
+  }
   function showErr(msg){
     var errEl = document.getElementById('bw-err');
     errEl.innerHTML = '';
@@ -283,6 +336,21 @@ export const buildWidgetScript = (opts: {
     }
     return set;
   }
+  function pickDay(ds){
+    if (!dailyOn()){
+      selDate = ds; selSlot = null; selDur = null; selResource = null; renderAll(); return;
+    }
+    // daily: first tap sets pick-up, second tap sets return
+    if (!selDate || selEndDate || ds < selDate){
+      selDate = ds; selEndDate = null;
+    } else {
+      var days = dayDiff(selDate, ds) + 1;
+      if (days > maxDays()) { selDate = ds; selEndDate = null; }
+      else selEndDate = ds;
+    }
+    selSlot = null; selResource = null;
+    renderAll();
+  }
   function renderDates(){
     var wrap = document.getElementById('bw-dates');
     wrap.innerHTML = '';
@@ -293,15 +361,31 @@ export const buildWidgetScript = (opts: {
       var d = new Date(today); d.setDate(d.getDate()+i);
       var ds = fmtDate(d);
       var hrs = dayHoursFor(ds);
+      var taken = dayUnavailable(ds);
+      var blocked = hrs.closed || taken;
+      var inRange = dailyOn() && selDate && selEndDate && ds > selDate && ds <= selEndDate;
       var el = document.createElement('div');
-      el.className = 'date' + (selDate === ds ? ' sel' : '') + (hrs.closed ? ' closed' : '');
+      el.className = 'date' + (selDate === ds || selEndDate === ds ? ' sel' : (inRange ? ' inrange' : '')) + (blocked ? ' closed' : '');
       el.innerHTML = '<div class="dn">'+d.toLocaleDateString(undefined,{weekday:'short'})+'</div>'+
                      '<div class="dd">'+d.getDate()+'</div>'+
-                     '<div class="dm">'+(hrs.closed ? 'Closed' : d.toLocaleDateString(undefined,{month:'short'}))+'</div>';
-      if (!hrs.closed){
-        (function(ds_){ el.onclick = function(){ selDate = ds_; selSlot = null; selDur = null; selResource = null; renderAll(); }; })(ds);
+                     '<div class="dm">'+(hrs.closed ? 'Closed' : (taken ? 'Booked' : d.toLocaleDateString(undefined,{month:'short'})))+'</div>';
+      if (!blocked){
+        (function(ds_){ el.onclick = function(){ pickDay(ds_); }; })(ds);
       }
       wrap.appendChild(el);
+    }
+    var dayLabel = document.getElementById('bw-day-label');
+    var hint = document.getElementById('bw-range-hint');
+    if (dailyOn()){
+      dayLabel.textContent = selDate && !selEndDate ? 'Return day' : 'Pick-up day';
+      hint.style.display = '';
+      var rd = rentalDays();
+      hint.textContent = rd
+        ? prettyDate(selDate) + ' \u2192 ' + prettyDate(selEndDate) + ' \u00B7 ' + rd + (rd === 1 ? ' day' : ' days')
+        : (selDate ? 'Now choose the return day (max ' + maxDays() + ' days).' : 'Choose the pick-up day.');
+    } else {
+      dayLabel.textContent = 'Day';
+      hint.style.display = 'none';
     }
   }
   function emptyMsg(text){
@@ -312,10 +396,12 @@ export const buildWidgetScript = (opts: {
   function renderSlots(){
     var wrap = document.getElementById('bw-slots');
     wrap.innerHTML = '';
+    document.getElementById('bw-time-label').textContent = dailyOn() ? 'Pick-up time' : 'Start time';
     if (!selDate){ wrap.innerHTML = emptyMsg('Pick a day first'); return; }
+    if (dailyOn() && !selEndDate){ wrap.innerHTML = emptyMsg('Pick a return day first'); return; }
     var hrs = dayHoursFor(selDate);
     if (hrs.closed){ wrap.innerHTML = emptyMsg('Closed this day'); return; }
-    var bset = busyMinutes(selDate);
+    var bset = dailyOn() ? {} : busyMinutes(selDate);
     var cut = pastCutoff(selDate);
     var startM = toMin(hrs.open), endM = toMin(hrs.close);
     var shown = 0;
@@ -327,21 +413,23 @@ export const buildWidgetScript = (opts: {
       el.className = 'slot' + (isBusy?' busy':'') + (selSlot === m?' sel':'');
       el.textContent = fmtMin(m);
       if (!isBusy){
-        (function(mm){ el.onclick = function(){ selSlot = mm; selDur = servicesOn() && selService ? (Number(selService.duration_minutes) || 30) : null; selResource = null; renderAll(); }; })(m);
+        (function(mm){ el.onclick = function(){ selSlot = mm; selDur = servicesOn() && selService ? (Number(selService.duration_minutes) || 30) : (dailyOn() ? 60 : null); selResource = dailyOn() ? selResource : null; renderAll(); }; })(m);
       }
       wrap.appendChild(el);
     }
     if (shown === 0) wrap.innerHTML = emptyMsg('No times left today — pick another day');
   }
 
+
   function servicesOn(){ return !!settings.services_enabled && services.length > 0; }
   function renderServices(){
     var wrap = document.getElementById('bw-svc-wrap');
     if (!servicesOn()){ wrap.style.display = 'none'; return; }
     wrap.style.display = '';
+    document.getElementById('bw-svc-label').textContent = dailyOn() ? 'What are you hiring?' : 'Service';
     var list = document.getElementById('bw-services');
     list.innerHTML = '';
-    var bset = selDate ? busyMinutes(selDate) : {};
+    var bset = (selDate && !dailyOn()) ? busyMinutes(selDate) : {};
     var hrs = selDate ? dayHoursFor(selDate) : null;
     var endLimit = hrs ? toMin(hrs.close) : 0;
     var ccy = (settings.currency || 'GBP').toUpperCase();
@@ -349,23 +437,24 @@ export const buildWidgetScript = (opts: {
     services.forEach(function(sv){
       var d = Number(sv.duration_minutes) || 30;
       var disabled = false;
-      if (selSlot !== null && selSlot !== undefined){
+      if (!dailyOn() && selSlot !== null && selSlot !== undefined){
         if (selSlot + d > endLimit) disabled = true;
         for (var mm = selSlot; mm < selSlot + d; mm += 30){ if (bset[mm]) { disabled = true; break; } }
       }
       var el = document.createElement('div');
       el.className = 'slot' + (disabled ? ' busy' : '') + (selService && selService.id === sv.id ? ' sel' : '');
-      var price = (sv.price === null || sv.price === undefined || Number(sv.price) === 0) ? '' : ' \u00B7 ' + sym + Number(sv.price).toFixed(ccy === 'JPY' ? 0 : 2);
-      el.textContent = sv.name + ' \u00B7 ' + d + ' min' + price;
+      var priceNum = (sv.price === null || sv.price === undefined) ? null : Number(sv.price);
+      var priceTxt = (priceNum === null || priceNum === 0) ? '' : ' \u00B7 ' + sym + priceNum.toFixed(ccy === 'JPY' ? 0 : 2) + (dailyOn() ? '/day' : '');
+      el.textContent = sv.name + (dailyOn() ? '' : ' \u00B7 ' + d + ' min') + priceTxt;
       if (!disabled){
-        (function(svc){ el.onclick = function(){ selService = svc; selDur = Number(svc.duration_minutes) || 30; selResource = null; renderAll(); }; })(sv);
+        (function(svc){ el.onclick = function(){ selService = svc; selDur = Number(svc.duration_minutes) || (dailyOn() ? 60 : 30); if (!dailyOn()) selResource = null; renderAll(); }; })(sv);
       }
       list.appendChild(el);
     });
   }
   function renderDurs(){
     var durWrap = document.getElementById('bw-dur-wrap');
-    if (servicesOn()){ durWrap.style.display = 'none'; return; }
+    if (servicesOn() || dailyOn()){ durWrap.style.display = 'none'; if (dailyOn() && !selDur) selDur = 60; return; }
     durWrap.style.display = '';
     var wrap = document.getElementById('bw-durs');
     wrap.innerHTML = '';
@@ -391,6 +480,10 @@ export const buildWidgetScript = (opts: {
   }
   // Which resources are free for the currently-selected date/time/duration/party?
   function resourceIsFree(resourceId){
+    if (dailyOn()){
+      if (!selDate) return true;
+      return rangeIsFree(selDate, selEndDate || selDate, resourceId);
+    }
     if (!selDate || selSlot === null || !selDur) return true;
     var buf = settings.buffer_minutes || 0;
     var startWant = selSlot;
@@ -448,7 +541,8 @@ export const buildWidgetScript = (opts: {
   function fullAmount(){
     var p = servicePrice();
     if (p === null) return null;
-    return Math.max(Number(settings.deposit_amount || 0), p);
+    var total = dailyOn() ? p * (rentalDays() || 1) : p;
+    return Math.max(Number(settings.deposit_amount || 0), total);
   }
   function chargeNow(){
     return (selPayOption === 'full' && fullAmount() !== null) ? fullAmount() : Number(settings.deposit_amount || 0);
@@ -490,14 +584,30 @@ export const buildWidgetScript = (opts: {
     wrap.style.display = '';
     document.getElementById('bw-party-label').textContent = 'Party size';
   }
+  function renderSummary(){
+    var box = document.getElementById('bw-summary');
+    if (!box) return;
+    var days = rentalDays();
+    if (!dailyOn() || !days){ box.style.display = 'none'; return; }
+    box.style.display = '';
+    var p = servicePrice();
+    var lines = '<div><strong>' + days + (days === 1 ? ' day' : ' days') + '</strong> \u00B7 ' +
+      prettyDate(selDate) + ' \u2192 ' + prettyDate(selEndDate) + '</div>';
+    if (p !== null){
+      lines += '<div>' + days + ' \u00D7 ' + money(p) + ' = <strong>' + money(p * days) + '</strong></div>';
+    }
+    box.innerHTML = lines;
+  }
   function renderAll(){
-    renderDates(); renderSlots(); renderServices(); renderDurs(); renderParty(); renderResources(); renderPayOptions();
+    renderDates(); renderSlots(); renderServices(); renderDurs(); renderParty(); renderResources(); renderPayOptions(); renderSummary();
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
     var needResource = settings.resources_enabled && settings.assignment_mode === 'client_pick';
     var resourceOk = !needResource || !!selResource;
-    btn.disabled = !(selDate && selSlot !== null && selDur && name && email && elementsReady && resourceOk);
+    var days = rentalDays();
+    var rangeOk = !dailyOn() || (!!days && days >= minDays() && days <= maxDays());
+    btn.disabled = !(selDate && rangeOk && selSlot !== null && selDur && name && email && elementsReady && resourceOk);
   }
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
@@ -543,7 +653,7 @@ export const buildWidgetScript = (opts: {
     againBtn.addEventListener('click', function(){
       document.getElementById('bw-done').style.display = 'none';
       document.getElementById('bw').style.display = '';
-      selSlot = null; selDur = null; selResource = null;
+      selSlot = null; selDur = null; selResource = null; selEndDate = null;
       document.getElementById('bw-name').value = '';
       document.getElementById('bw-email').value = '';
       document.getElementById('bw-err').innerHTML = '';
@@ -608,7 +718,9 @@ export const buildWidgetScript = (opts: {
           resource_id: settings.resources_enabled ? selResource : null,
           party_size: settings.party_size_enabled ? partySize() : null,
           service_id: selService ? selService.id : null,
-          payment_option: selPayOption
+          payment_option: selPayOption,
+          end_date: dailyOn() ? selEndDate : null,
+          rental_days: dailyOn() ? rentalDays() : null
         })
       });
       var saveData = await saveRes.json();

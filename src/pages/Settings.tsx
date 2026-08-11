@@ -78,6 +78,9 @@ type SettingsForm = {
   assignment_mode: "client_pick" | "auto";
   waitlist_enabled: boolean;
   services_enabled: boolean;
+  booking_mode: "hourly" | "daily";
+  min_rental_days: number;
+  max_rental_days: number;
 
 };
 
@@ -102,6 +105,7 @@ const Settings = () => {
     self_checkin_enabled: false, reception_checkin_enabled: true,
     resources_enabled: false, resource_label: "Resource",
     party_size_enabled: false, assignment_mode: "client_pick", waitlist_enabled: false, services_enabled: false,
+    booking_mode: "hourly", min_rental_days: 1, max_rental_days: 30,
 
   });
 
@@ -150,6 +154,9 @@ const Settings = () => {
             assignment_mode: ((data as any).assignment_mode as "client_pick" | "auto") ?? "client_pick",
             waitlist_enabled: (data as any).waitlist_enabled ?? false,
             services_enabled: (data as any).services_enabled ?? false,
+            booking_mode: ((data as any).booking_mode as "hourly" | "daily") ?? "hourly",
+            min_rental_days: Number((data as any).min_rental_days ?? 1),
+            max_rental_days: Number((data as any).max_rental_days ?? 30),
 
           });
         }
@@ -173,6 +180,9 @@ const Settings = () => {
     if (form.deposit_amount < 10) { toast({ title: "Deposit must be at least £10", variant: "destructive" }); return; }
     if (!form.self_checkin_enabled && !form.reception_checkin_enabled) {
       toast({ title: "Enable at least one check-in method", variant: "destructive" }); return;
+    }
+    if (form.booking_mode === "daily" && form.max_rental_days < form.min_rental_days) {
+      toast({ title: "Maximum days must be at least the minimum", variant: "destructive" }); return;
     }
     setSaving(true);
     const { error } = await supabase.from("business_settings").upsert(
@@ -328,6 +338,42 @@ const Settings = () => {
                 </span>
               </AccordionTrigger>
             <AccordionContent className="space-y-4 pb-5">
+              <div className="rounded-2xl border border-border bg-secondary/40 p-4 space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Booking length</p>
+                  <p className="text-xs text-muted-foreground">Choose how clients book your time — by the hour, or by the day for rentals and hire.</p>
+                </div>
+                {[
+                  { key: "hourly", label: "By the hour", hint: "Clients pick a date and a time slot. Best for appointments." },
+                  { key: "daily", label: "By the day", hint: "Clients pick a pick-up and return date. Best for car, equipment or venue hire." },
+                ].map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setForm({ ...form, booking_mode: opt.key as "hourly" | "daily" })}
+                    className={`w-full text-left rounded-xl border px-4 py-3 transition-colors ${form.booking_mode === opt.key ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-secondary"}`}
+                  >
+                    <span className="block text-sm font-medium text-foreground">{opt.label}</span>
+                    <span className="block text-xs text-muted-foreground">{opt.hint}</span>
+                  </button>
+                ))}
+                {form.booking_mode === "daily" && (
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <Field label="Minimum days" hint="Shortest hire length.">
+                      <Input type="number" min={1} max={365} value={form.min_rental_days} onChange={(e) => setForm({ ...form, min_rental_days: Number(e.target.value) })} className="bg-secondary border-border" />
+                    </Field>
+                    <Field label="Maximum days" hint="Longest hire length.">
+                      <Input type="number" min={1} max={365} value={form.max_rental_days} onChange={(e) => setForm({ ...form, max_rental_days: Number(e.target.value) })} className="bg-secondary border-border" />
+                    </Field>
+                  </div>
+                )}
+                {form.booking_mode === "daily" && (
+                  <p className="text-xs text-muted-foreground">
+                    In day mode, service prices are treated as a <strong className="text-foreground">per-day rate</strong>, and each booking blocks the whole date range for that {form.resource_label.toLowerCase() || "resource"}.
+                  </p>
+                )}
+              </div>
+
               <Field label={`Deposit per booking (${form.currency}) — min £10`} hint="Charged only when you accept a booking.">
                 <Input type="number" min={10} step="0.50" value={form.deposit_amount} onChange={(e) => setForm({ ...form, deposit_amount: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>

@@ -1,4 +1,4 @@
-import { Code2, CreditCard, Globe, MailCheck, Scissors, Dumbbell, Stethoscope, UtensilsCrossed, GraduationCap, Wrench, Truck } from "lucide-react";
+import { Code2, CreditCard, Globe, MailCheck, Scissors, Dumbbell, Stethoscope, UtensilsCrossed, GraduationCap, Wrench, Truck, Car, PackageOpen } from "lucide-react";
 
 const metrics = [
   { Icon: CreditCard, label: "Deposits and payouts via Stripe" },
@@ -15,6 +15,8 @@ const industries = [
   { Icon: UtensilsCrossed, label: "Restaurants" },
   { Icon: GraduationCap, label: "Tutors" },
   { Icon: Wrench, label: "Trades" },
+  { Icon: Car, label: "Car rental" },
+  { Icon: PackageOpen, label: "Equipment hire" },
   { Icon: Truck, label: "Mobile services" },
 ];
 

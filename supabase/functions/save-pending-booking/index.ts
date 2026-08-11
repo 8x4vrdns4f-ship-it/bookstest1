@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
       party_size,
       payment_option,
       service_id,
+      end_date,
     } = body;
 
     const env = resolveEnv(environment);
@@ -62,6 +63,8 @@ Deno.serve(async (req) => {
     if (typeof service !== "string" || !service.trim() || service.length > 200) return bad("Invalid service");
     if (typeof booking_date !== "string" || !dateRe.test(booking_date)) return bad("Invalid date");
     if (typeof booking_time !== "string" || !timeRe.test(booking_time)) return bad("Invalid time");
+    if (end_date != null && (typeof end_date !== "string" || !dateRe.test(end_date))) return bad("Invalid return date");
+
     const dur = Number(duration_minutes ?? 60);
     if (!Number.isInteger(dur) || dur < 15 || dur > 480) return bad("Invalid duration");
     if (notes != null && (typeof notes !== "string" || notes.length > 2000)) return bad("Notes too long");
@@ -81,10 +84,27 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes, services_enabled, payment_mode, timezone")
+      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes, services_enabled, payment_mode, timezone, booking_mode, min_rental_days, max_rental_days")
       .eq("user_id", userId)
       .maybeSingle();
     if (!settings) return bad("Business not found");
+
+    // --- Day-based (rental) mode ---
+    const isDaily = String((settings as any).booking_mode || "hourly") === "daily";
+    const minDays = Math.max(1, Number((settings as any).min_rental_days) || 1);
+    const maxDays = Math.max(minDays, Number((settings as any).max_rental_days) || 30);
+    let finalEndDate: string | null = null;
+    let days = 1;
+    if (isDaily) {
+      finalEndDate = typeof end_date === "string" ? end_date : booking_date;
+      if (finalEndDate < booking_date) return bad("Return date must be on or after the pick-up date");
+      days = Math.round(
+        (Date.parse(`${finalEndDate}T00:00:00Z`) - Date.parse(`${booking_date}T00:00:00Z`)) / 86400000,
+      ) + 1;
+      if (days < minDays) return bad(`Minimum booking length is ${minDays} day${minDays === 1 ? "" : "s"}`);
+      if (days > maxDays) return bad(`Maximum booking length is ${maxDays} day${maxDays === 1 ? "" : "s"}`);
+    }
+
 
     // Reject bookings in the past (evaluated in the business's own timezone)
     try {
@@ -116,6 +136,17 @@ Deno.serve(async (req) => {
       const endMin = startMin + dur;
 
       const overlaps = async (resId: string): Promise<boolean> => {
+        if (isDaily) {
+          // A rental blocks its whole date range for that resource.
+          const { data: rows } = await admin
+            .from("bookings")
+            .select("booking_date, end_date")
+            .eq("user_id", userId)
+            .eq("resource_id", resId)
+            .in("status", ["pending", "confirmed"])
+            .lte("booking_date", finalEndDate!);
+          return (rows || []).some((b: any) => (b.end_date || b.booking_date) >= booking_date);
+        }
         const { data: rows } = await admin
           .from("bookings")
           .select("booking_time, duration_minutes")
@@ -181,7 +212,9 @@ Deno.serve(async (req) => {
       if (paymentMode === "full") finalOption = "full";
       else if (paymentMode === "client_choice" && payment_option === "full") finalOption = "full";
     }
-    const chargeAmount = finalOption === "full" ? Math.max(deposit, servicePrice as number) : deposit;
+    // In daily mode the service price is a per-day rate.
+    const totalPrice = servicePrice == null ? null : servicePrice * (isDaily ? days : 1);
+    const chargeAmount = finalOption === "full" ? Math.max(deposit, totalPrice as number) : deposit;
 
     const { data: pending, error: pErr } = await admin
       .from("pending_bookings")
@@ -193,12 +226,14 @@ Deno.serve(async (req) => {
         service,
         booking_date,
         booking_time,
+        end_date: isDaily ? finalEndDate : null,
+        rental_days: isDaily ? days : null,
         duration_minutes: dur,
         notes: notes || null,
         deposit_amount: deposit,
         platform_fee_amount: (chargeAmount * feePct) / 100,
         payment_option: finalOption,
-        service_price: servicePrice,
+        service_price: totalPrice,
         charge_amount: chargeAmount,
         currency: settings.currency || "GBP",
         payment_environment: env,

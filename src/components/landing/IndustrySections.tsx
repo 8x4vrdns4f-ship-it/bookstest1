@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Scissors, UtensilsCrossed, Wrench, Stethoscope, GraduationCap, Check } from "lucide-react";
+import { Scissors, UtensilsCrossed, Wrench, Stethoscope, GraduationCap, Car, Check } from "lucide-react";
 
 type Industry = {
   id: string;
@@ -63,6 +63,17 @@ const INDUSTRIES: Industry[] = [
       "Recurring availability and one-off overrides for holidays",
       "Gift codes and referral perks to fill your roster",
       "In-person or online — pick per service and share a link",
+    ],
+  },
+  {
+    id: "rentals",
+    label: "Rentals & Hire",
+    icon: Car,
+    pitch: "Hire out cars, vans, tools or venues by the day — with availability that actually blocks the whole booking.",
+    benefits: [
+      "Switch your calendar to day-based booking instead of hourly slots",
+      "Per-day rates with the total calculated across the hire period",
+      "Each vehicle or item is a bookable resource, blocked for the full range",
     ],
   },
 ];

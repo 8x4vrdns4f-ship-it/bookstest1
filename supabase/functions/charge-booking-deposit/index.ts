@@ -138,6 +138,8 @@ Deno.serve(async (req) => {
         charge_amount: chargeTotal,
         resource_id: (pending as any).resource_id ?? null,
         party_size: (pending as any).party_size ?? null,
+        end_date: (pending as any).end_date ?? null,
+        rental_days: (pending as any).rental_days ?? null,
       })
       .select()
       .single();
