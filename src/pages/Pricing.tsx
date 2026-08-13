@@ -1,5 +1,5 @@
-import { Helmet } from "react-helmet-async";
 import SEO from "@/components/SEO";
+import JsonLd from "@/components/JsonLd";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
