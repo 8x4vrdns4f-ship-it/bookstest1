@@ -1,5 +1,5 @@
-import { Helmet } from "react-helmet-async";
 import SEO from "@/components/SEO";
+import JsonLd from "@/components/JsonLd";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
@@ -63,19 +63,17 @@ const Pricing = () => {
         description="BookSuite pricing plans for service businesses. Silver, Gold, and Platinum tiers with transparent transaction fees and staff limits."
         path="/pricing"
       />
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Product",
-          name: "BookSuite",
-          description: "All-in-one booking platform for small service businesses.",
-          brand: { "@type": "Brand", name: "BookSuite" },
-          offers: tiers.map((t) => ({
-            "@type": "Offer", name: t.name, price: t.gbp, priceCurrency: "GBP",
-            url: "https://booksuite.online/pricing", availability: "https://schema.org/InStock",
-          })),
-        })}</script>
-      </Helmet>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: "BookSuite",
+        description: "All-in-one booking platform for small service businesses.",
+        brand: { "@type": "Brand", name: "BookSuite" },
+        offers: tiers.map((t) => ({
+          "@type": "Offer", name: t.name, price: t.gbp, priceCurrency: "GBP",
+          url: "https://booksuite.online/pricing", availability: "https://schema.org/InStock",
+        })),
+      }} />
       <Navbar />
       <main>
         <section className="px-8 md:px-16 pt-32 pb-24">
