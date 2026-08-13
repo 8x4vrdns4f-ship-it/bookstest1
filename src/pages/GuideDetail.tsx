@@ -1,5 +1,5 @@
-import { Helmet } from "react-helmet-async";
 import { Link, useParams } from "react-router-dom";
+import JsonLd from "@/components/JsonLd";
 import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
