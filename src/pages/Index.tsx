@@ -71,10 +71,7 @@ const Index = () => {
         description="All-in-one booking software for small service businesses. Take appointments and deposits, manage clients and staff, and embed a booking widget on your site."
         path="/"
       />
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify(softwareApplicationLd)}</script>
-        <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
-      </Helmet>
+      <JsonLd data={[softwareApplicationLd, faqLd]} />
       <Navbar />
       <main>
         <HeroSection />
