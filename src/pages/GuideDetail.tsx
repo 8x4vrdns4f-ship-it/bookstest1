@@ -259,10 +259,7 @@ const GuideDetail = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO title={`${guide.title} — BookSuite`} description={guide.description} path={`/guides/${guide.slug}`} />
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify(articleLd)}</script>
-        <script type="application/ld+json">{JSON.stringify(breadcrumbLd)}</script>
-      </Helmet>
+      <JsonLd data={[articleLd, breadcrumbLd]} />
       <Navbar />
       <main className="flex-1 px-6 md:px-16 py-12 max-w-3xl mx-auto w-full">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
