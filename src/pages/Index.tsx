@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Helmet } from "react-helmet-async";
 import SEO from "@/components/SEO";
+import JsonLd from "@/components/JsonLd";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import SocialProofStrip from "@/components/landing/SocialProofStrip";
