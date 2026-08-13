@@ -1315,6 +1315,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_create_gift_code: { Args: never; Returns: boolean }
       check_in_by_code: {
         Args: { p_company_code: string; p_confirmation_code: string }
         Returns: {
