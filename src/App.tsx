@@ -40,6 +40,8 @@ import NotFound from "./pages/NotFound.tsx";
 import OAuthConsent from "./pages/OAuthConsent.tsx";
 import GuideDetail from "./pages/GuideDetail.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
+import { SubscriptionProvider } from "./hooks/useSubscription.tsx";
+
 import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
