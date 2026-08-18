@@ -104,8 +104,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
  */
 export function useSubscription(): SubscriptionState {
   const ctx = useContext(SubscriptionContext);
-  const fallback = useSubscriptionState.length === 0 ? null : null; // no-op, keeps hook order stable
-  void fallback;
   if (!ctx) {
     throw new Error("useSubscription must be used inside <SubscriptionProvider>");
   }
