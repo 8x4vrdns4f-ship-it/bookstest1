@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tier } from "@/lib/tierLimits";
 
@@ -14,7 +14,9 @@ export interface SubscriptionState {
   refresh: () => Promise<void>;
 }
 
-export function useSubscription(): SubscriptionState {
+const SubscriptionContext = createContext<SubscriptionState | null>(null);
+
+function useSubscriptionState(): SubscriptionState {
   const [loading, setLoading] = useState(true);
   const [tier, setTier] = useState<Tier | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
@@ -89,4 +91,21 @@ export function useSubscription(): SubscriptionState {
     currentPeriodEnd,
     refresh,
   };
+}
+
+export function SubscriptionProvider({ children }: { children: ReactNode }) {
+  const state = useSubscriptionState();
+  return <SubscriptionContext.Provider value={state}>{children}</SubscriptionContext.Provider>;
+}
+
+/**
+ * Shared subscription state. Reads from the provider when available so the
+ * check-subscription call happens once per session instead of once per consumer.
+ */
+export function useSubscription(): SubscriptionState {
+  const ctx = useContext(SubscriptionContext);
+  if (!ctx) {
+    throw new Error("useSubscription must be used inside <SubscriptionProvider>");
+  }
+  return ctx;
 }
