@@ -51,9 +51,12 @@ const queryClient = new QueryClient();
 
 const Guarded = ({ children }: { children: React.ReactNode }) => (
   <RequireVerifiedEmail>
-    <RequireSubscription>{children}</RequireSubscription>
+    <SubscriptionProvider>
+      <RequireSubscription>{children}</RequireSubscription>
+    </SubscriptionProvider>
   </RequireVerifiedEmail>
 );
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
