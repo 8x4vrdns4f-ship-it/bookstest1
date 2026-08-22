@@ -1,0 +1,1 @@
+DELETE FROM public.bookings WHERE client_name = 'QA TEST Booking';

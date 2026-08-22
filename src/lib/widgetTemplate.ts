@@ -177,7 +177,8 @@ export const buildWidgetScript = (opts: {
     payment_mode: 'deposit',
     booking_mode: 'hourly',
     min_rental_days: 1,
-    max_rental_days: 30
+    max_rental_days: 30,
+    payments_enabled: true
   };
   var busy = [];
   var overrides = {};
@@ -550,6 +551,7 @@ export const buildWidgetScript = (opts: {
   function renderPayOptions(){
     var wrap = document.getElementById('bw-pay-wrap');
     var mode = settings.payment_mode || 'deposit';
+    if (settings.payments_enabled === false){ wrap.style.display = 'none'; renderDepositPill(); return; }
     var full = fullAmount();
     if (full === null) { selPayOption = 'deposit'; }
     else if (mode === 'full') { selPayOption = 'full'; }
@@ -575,6 +577,7 @@ export const buildWidgetScript = (opts: {
   function renderDepositPill(){
     var pill = document.getElementById('bw-deposit');
     if (!pill) return;
+    if (settings.payments_enabled === false) { pill.textContent = 'No payment required'; return; }
     var amt = chargeNow();
     pill.textContent = money(amt) + (selPayOption === 'full' ? ' total' : ' deposit');
   }
@@ -607,7 +610,8 @@ export const buildWidgetScript = (opts: {
     var resourceOk = !needResource || !!selResource;
     var days = rentalDays();
     var rangeOk = !dailyOn() || (!!days && days >= minDays() && days <= maxDays());
-    btn.disabled = !(selDate && rangeOk && selSlot !== null && selDur && name && email && elementsReady && resourceOk);
+    var payOk = (settings.payments_enabled === false) || elementsReady;
+    btn.disabled = !(selDate && rangeOk && selSlot !== null && selDur && name && email && payOk && resourceOk);
   }
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
@@ -666,37 +670,42 @@ export const buildWidgetScript = (opts: {
 
   document.getElementById('bw-submit').addEventListener('click', async function(){
     var btn = this;
-    btn.disabled = true; btn.textContent = 'Saving card...';
+    var noPay = settings.payments_enabled === false;
+    btn.disabled = true; btn.textContent = noPay ? 'Sending request...' : 'Saving card...';
     document.getElementById('bw-err').innerHTML = '';
     try {
-      // 1) validate card form
-      var subm = await elements.submit();
-      if (subm.error) throw new Error(subm.error.message || 'Card details invalid');
-
-      // 2) create SetupIntent server-side
       var email = document.getElementById('bw-email').value.trim();
       var name = document.getElementById('bw-name').value.trim();
-      var intentRes = await fetch(URL_ + '/functions/v1/create-booking-intent', {
-        method: 'POST',
-        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: UID, client_email: email, environment: PAYMENT_ENV })
-      });
-      var intentData = await intentRes.json();
-      if (!intentRes.ok || !intentData.client_secret) {
-        throw new Error(intentData.error || 'Could not initialise payment.');
-      }
+      var intentData = {}; var pmId = null;
 
-      // 3) confirm setup (saves the card, no charge)
-      btn.textContent = 'Confirming...';
-      var confirmRes = await stripe.confirmSetup({
-        elements: elements,
-        clientSecret: intentData.client_secret,
-        confirmParams: { payment_method_data: { billing_details: { name: name, email: email } } },
-        redirect: 'if_required'
-      });
-      if (confirmRes.error) throw new Error(confirmRes.error.message || 'Could not save card');
-      var pmId = confirmRes.setupIntent && confirmRes.setupIntent.payment_method;
-      if (!pmId) throw new Error('Card not saved. Please try again.');
+      if (!noPay) {
+        // 1) validate card form
+        var subm = await elements.submit();
+        if (subm.error) throw new Error(subm.error.message || 'Card details invalid');
+
+        // 2) create SetupIntent server-side
+        var intentRes = await fetch(URL_ + '/functions/v1/create-booking-intent', {
+          method: 'POST',
+          headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: UID, client_email: email, environment: PAYMENT_ENV })
+        });
+        intentData = await intentRes.json();
+        if (!intentRes.ok || !intentData.client_secret) {
+          throw new Error(intentData.error || 'Could not initialise payment.');
+        }
+
+        // 3) confirm setup (saves the card, no charge)
+        btn.textContent = 'Confirming...';
+        var confirmRes = await stripe.confirmSetup({
+          elements: elements,
+          clientSecret: intentData.client_secret,
+          confirmParams: { payment_method_data: { billing_details: { name: name, email: email } } },
+          redirect: 'if_required'
+        });
+        if (confirmRes.error) throw new Error(confirmRes.error.message || 'Could not save card');
+        pmId = confirmRes.setupIntent && confirmRes.setupIntent.payment_method;
+        if (!pmId) throw new Error('Card not saved. Please try again.');
+      }
 
       // 4) persist the pending booking
       btn.textContent = 'Sending request...';
@@ -712,9 +721,9 @@ export const buildWidgetScript = (opts: {
           booking_time: fmtMin(selSlot) + ':00',
           duration_minutes: selDur,
           environment: PAYMENT_ENV,
-          stripe_customer_id: intentData.customer_id,
-          stripe_payment_method_id: pmId,
-          stripe_setup_intent_id: intentData.setup_intent_id,
+          stripe_customer_id: noPay ? null : intentData.customer_id,
+          stripe_payment_method_id: noPay ? null : pmId,
+          stripe_setup_intent_id: noPay ? null : intentData.setup_intent_id,
           resource_id: settings.resources_enabled ? selResource : null,
           party_size: settings.party_size_enabled ? partySize() : null,
           service_id: selService ? selService.id : null,
@@ -762,7 +771,9 @@ export const buildWidgetScript = (opts: {
       var depAmt = Number(settings.deposit_amount);
       var ccy = (settings.currency || 'GBP').toUpperCase();
       var sym = ccy === 'USD' ? '$' : ccy === 'EUR' ? '€' : ccy === 'JPY' ? '¥' : ccy === 'AUD' ? 'A$' : ccy === 'CAD' ? 'C$' : '£';
-      document.getElementById('bw-deposit').textContent = sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' deposit';
+      document.getElementById('bw-deposit').textContent = settings.payments_enabled === false
+        ? 'No payment required'
+        : sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' deposit';
     } else {
       document.getElementById('bw-deposit').textContent = 'Booking';
     }
@@ -786,8 +797,17 @@ export const buildWidgetScript = (opts: {
     }
     if (!selDate){ var d0 = new Date(today); d0.setDate(d0.getDate()+startI); selDate = fmtDate(d0); }
 
-    renderAll();
-    loadStripeJs(mountStripeElements);
+    if (settings.payments_enabled === false) {
+      var cardLabel = document.getElementById('bw-payel').previousElementSibling;
+      if (cardLabel) cardLabel.style.display = 'none';
+      document.getElementById('bw-payel').style.display = 'none';
+      var pn = document.getElementById('bw-paynote');
+      if (pn) pn.querySelector('span').textContent = 'No payment needed now — the business will confirm your request by email.';
+      renderAll();
+    } else {
+      renderAll();
+      loadStripeJs(mountStripeElements);
+    }
   }).catch(function(e){
     document.getElementById('bw-deposit').textContent = 'Could not load';
   });
