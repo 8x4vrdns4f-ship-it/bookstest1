@@ -68,9 +68,13 @@ Deno.serve(async (req) => {
     const dur = Number(duration_minutes ?? 60);
     if (!Number.isInteger(dur) || dur < 15 || dur > 480) return bad("Invalid duration");
     if (notes != null && (typeof notes !== "string" || notes.length > 2000)) return bad("Notes too long");
-    if (typeof stripe_customer_id !== "string" || !stripe_customer_id.startsWith("cus_")) return bad("Invalid customer");
-    if (typeof stripe_payment_method_id !== "string" || !stripe_payment_method_id.startsWith("pm_")) return bad("Invalid payment method");
-    if (typeof stripe_setup_intent_id !== "string" || !stripe_setup_intent_id.startsWith("seti_")) return bad("Invalid setup intent");
+    // A business that has not connected Stripe takes card-free booking requests.
+    const noPayment = stripe_customer_id == null && stripe_payment_method_id == null && stripe_setup_intent_id == null;
+    if (!noPayment) {
+      if (typeof stripe_customer_id !== "string" || !stripe_customer_id.startsWith("cus_")) return bad("Invalid customer");
+      if (typeof stripe_payment_method_id !== "string" || !stripe_payment_method_id.startsWith("pm_")) return bad("Invalid payment method");
+      if (typeof stripe_setup_intent_id !== "string" || !stripe_setup_intent_id.startsWith("seti_")) return bad("Invalid setup intent");
+    }
     if (resource_id != null && (typeof resource_id !== "string" || !uuidRe.test(resource_id))) return bad("Invalid resource");
     if (payment_option != null && payment_option !== "deposit" && payment_option !== "full") return bad("Invalid payment option");
     if (service_id != null && (typeof service_id !== "string" || !uuidRe.test(service_id))) return bad("Invalid service selection");
@@ -126,7 +130,9 @@ Deno.serve(async (req) => {
       .eq("user_id", userId)
       .eq("environment", env)
       .maybeSingle();
-    if (!connect || !connect.charges_enabled) return bad("Business is not accepting payments");
+    const paymentsEnabled = !!connect && !!connect.charges_enabled;
+    if (noPayment && paymentsEnabled) return bad("This business requires a card to hold your booking");
+    if (!noPayment && !paymentsEnabled) return bad("Business is not accepting payments");
 
     // --- Resource resolution ---
     let finalResourceId: string | null = null;
