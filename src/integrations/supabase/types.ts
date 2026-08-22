@@ -1455,6 +1455,7 @@ export type Database = {
           min_rental_days: number
           party_size_enabled: boolean
           payment_mode: string
+          payments_enabled: boolean
           resource_label: string
           resources_enabled: boolean
           services_enabled: boolean
