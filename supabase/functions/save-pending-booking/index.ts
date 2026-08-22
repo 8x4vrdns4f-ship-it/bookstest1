@@ -291,7 +291,7 @@ Deno.serve(async (req) => {
       .from("pending_bookings")
       .insert({
         user_id: userId,
-        stripe_account_id: connect.stripe_account_id,
+        stripe_account_id: connect!.stripe_account_id,
         client_name,
         client_email,
         service,
