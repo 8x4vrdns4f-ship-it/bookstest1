@@ -2,9 +2,10 @@ import { publicOrigin } from "@/lib/publicUrl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Copy, ExternalLink, Code2, Share2 } from "lucide-react";
+import { Check, Copy, ExternalLink, Code2, Share2, AlertTriangle } from "lucide-react";
 import SectionCard from "@/components/app/SectionCard";
 import EmbedWidgetDialog from "@/components/dashboard/EmbedWidgetDialog";
+import { usePaymentsReady } from "@/hooks/usePaymentsReady";
 
 type Props = {
   userId: string;
@@ -21,6 +22,7 @@ export default function BookingLinkCard({
   className,
 }: Props) {
   const [copied, setCopied] = useState(false);
+  const paymentsReady = usePaymentsReady(userId);
   const bookingUrl = `${publicOrigin()}/book/${userId}`;
 
   const copy = async () => {
@@ -41,6 +43,15 @@ export default function BookingLinkCard({
       description={description}
     >
       <div className="space-y-3">
+        {paymentsReady === false && (
+          <div className="flex gap-2.5 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning">
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-px" />
+            <p>
+              Your link won't take bookings until you finish payment setup. Connect payments in the Payments
+              card above, then share it.
+            </p>
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row gap-2">
           <Input readOnly value={bookingUrl} className="font-mono text-xs" aria-label="Your booking link" />
           <Button type="button" variant="secondary" onClick={copy} className="shrink-0">
