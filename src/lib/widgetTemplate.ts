@@ -675,6 +675,19 @@ export const buildWidgetScript = (opts: {
     });
   }
 
+  function showBlocked(){
+    var main = document.getElementById('bw');
+    if (main) main.style.display = 'none';
+    var blocked = document.getElementById('bw-blocked');
+    if (blocked) {
+      if (settings.business_name) {
+        document.getElementById('bw-blocked-title').textContent = settings.business_name + ' isn\'t taking bookings yet';
+      }
+      blocked.style.display = 'block';
+    }
+    notifyHeight();
+  }
+
   document.getElementById('bw-submit').addEventListener('click', async function(){
     var btn = this;
     btn.disabled = true; btn.textContent = 'Saving card...';
@@ -684,7 +697,7 @@ export const buildWidgetScript = (opts: {
       var name = document.getElementById('bw-name').value.trim();
       var intentData = {}; var pmId = null;
 
-      if (!noPay) {
+      {
         // 1) validate card form
         var subm = await elements.submit();
         if (subm.error) throw new Error(subm.error.message || 'Card details invalid');
