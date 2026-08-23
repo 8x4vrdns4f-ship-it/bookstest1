@@ -122,15 +122,14 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
             </Button>
           </>
         )}
-        {!ready && status?.connected && (
-          <p className="text-xs text-muted-foreground w-full">
-            Stripe still needs more details before you can accept payments. Click "Finish onboarding".
-          </p>
-        )}
-        {!status?.connected && !loading && (
-          <p className="text-xs text-muted-foreground w-full">
-            Until you connect Stripe, customers cannot book through your widget.
-          </p>
+        {!ready && !loading && (
+          <div className="flex gap-2.5 w-full rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-px" />
+            <p>
+              Your booking link is not accepting bookings yet. Customers see "not taking bookings" until
+              payment setup is finished.
+            </p>
+          </div>
         )}
       </div>
     </SectionCard>
