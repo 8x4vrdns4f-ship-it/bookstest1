@@ -685,7 +685,6 @@ export const buildWidgetScript = (opts: {
       }
       blocked.style.display = 'block';
     }
-    notifyHeight();
   }
 
   document.getElementById('bw-submit').addEventListener('click', async function(){
