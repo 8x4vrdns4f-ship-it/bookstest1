@@ -128,6 +128,15 @@ export const WIDGET_MARKUP = `
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
 </div>
 
+<div class="bw" id="bw-blocked" style="display:none">
+  <div class="head">
+    <div class="ht">
+      <h2 id="bw-blocked-title">Online booking unavailable</h2>
+      <p class="sub" id="bw-blocked-sub">This business hasn't finished setting up online bookings yet. Please contact them directly to arrange a booking.</p>
+    </div>
+  </div>
+</div>
+
 <div class="bw" id="bw-done" style="display:none">
   <div class="ok">
     <div class="ic">✓</div>
@@ -551,7 +560,6 @@ export const buildWidgetScript = (opts: {
   function renderPayOptions(){
     var wrap = document.getElementById('bw-pay-wrap');
     var mode = settings.payment_mode || 'deposit';
-    if (settings.payments_enabled === false){ wrap.style.display = 'none'; renderDepositPill(); return; }
     var full = fullAmount();
     if (full === null) { selPayOption = 'deposit'; }
     else if (mode === 'full') { selPayOption = 'full'; }
@@ -577,7 +585,6 @@ export const buildWidgetScript = (opts: {
   function renderDepositPill(){
     var pill = document.getElementById('bw-deposit');
     if (!pill) return;
-    if (settings.payments_enabled === false) { pill.textContent = 'No payment required'; return; }
     var amt = chargeNow();
     pill.textContent = money(amt) + (selPayOption === 'full' ? ' total' : ' deposit');
   }
@@ -610,7 +617,7 @@ export const buildWidgetScript = (opts: {
     var resourceOk = !needResource || !!selResource;
     var days = rentalDays();
     var rangeOk = !dailyOn() || (!!days && days >= minDays() && days <= maxDays());
-    var payOk = (settings.payments_enabled === false) || elementsReady;
+    var payOk = elementsReady;
     btn.disabled = !(selDate && rangeOk && selSlot !== null && selDur && name && email && payOk && resourceOk);
   }
   document.getElementById('bw-name').addEventListener('input', renderAll);
@@ -670,8 +677,7 @@ export const buildWidgetScript = (opts: {
 
   document.getElementById('bw-submit').addEventListener('click', async function(){
     var btn = this;
-    var noPay = settings.payments_enabled === false;
-    btn.disabled = true; btn.textContent = noPay ? 'Sending request...' : 'Saving card...';
+    btn.disabled = true; btn.textContent = 'Saving card...';
     document.getElementById('bw-err').innerHTML = '';
     try {
       var email = document.getElementById('bw-email').value.trim();
@@ -721,9 +727,9 @@ export const buildWidgetScript = (opts: {
           booking_time: fmtMin(selSlot) + ':00',
           duration_minutes: selDur,
           environment: PAYMENT_ENV,
-          stripe_customer_id: noPay ? null : intentData.customer_id,
-          stripe_payment_method_id: noPay ? null : pmId,
-          stripe_setup_intent_id: noPay ? null : intentData.setup_intent_id,
+          stripe_customer_id: intentData.customer_id,
+          stripe_payment_method_id: pmId,
+          stripe_setup_intent_id: intentData.setup_intent_id,
           resource_id: settings.resources_enabled ? selResource : null,
           party_size: settings.party_size_enabled ? partySize() : null,
           service_id: selService ? selService.id : null,
@@ -771,9 +777,7 @@ export const buildWidgetScript = (opts: {
       var depAmt = Number(settings.deposit_amount);
       var ccy = (settings.currency || 'GBP').toUpperCase();
       var sym = ccy === 'USD' ? '$' : ccy === 'EUR' ? '€' : ccy === 'JPY' ? '¥' : ccy === 'AUD' ? 'A$' : ccy === 'CAD' ? 'C$' : '£';
-      document.getElementById('bw-deposit').textContent = settings.payments_enabled === false
-        ? 'No payment required'
-        : sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' deposit';
+      document.getElementById('bw-deposit').textContent = sym + depAmt.toFixed(ccy === 'JPY' ? 0 : 2) + ' deposit';
     } else {
       document.getElementById('bw-deposit').textContent = 'Booking';
     }
@@ -798,16 +802,11 @@ export const buildWidgetScript = (opts: {
     if (!selDate){ var d0 = new Date(today); d0.setDate(d0.getDate()+startI); selDate = fmtDate(d0); }
 
     if (settings.payments_enabled === false) {
-      var cardLabel = document.getElementById('bw-payel').previousElementSibling;
-      if (cardLabel) cardLabel.style.display = 'none';
-      document.getElementById('bw-payel').style.display = 'none';
-      var pn = document.getElementById('bw-paynote');
-      if (pn) pn.querySelector('span').textContent = 'No payment needed now — the business will confirm your request by email.';
-      renderAll();
-    } else {
-      renderAll();
-      loadStripeJs(mountStripeElements);
+      showBlocked();
+      return;
     }
+    renderAll();
+    loadStripeJs(mountStripeElements);
   }).catch(function(e){
     document.getElementById('bw-deposit').textContent = 'Could not load';
   });
