@@ -681,7 +681,7 @@ export const buildWidgetScript = (opts: {
     var blocked = document.getElementById('bw-blocked');
     if (blocked) {
       if (settings.business_name) {
-        document.getElementById('bw-blocked-title').textContent = settings.business_name + ' isn\'t taking bookings yet';
+        document.getElementById('bw-blocked-title').textContent = settings.business_name + ' is not taking bookings yet';
       }
       blocked.style.display = 'block';
     }
