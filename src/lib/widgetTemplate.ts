@@ -681,7 +681,7 @@ export const buildWidgetScript = (opts: {
     var blocked = document.getElementById('bw-blocked');
     if (blocked) {
       if (settings.business_name) {
-        document.getElementById('bw-blocked-title').textContent = settings.business_name + ' isn\'t taking bookings yet';
+        document.getElementById('bw-blocked-title').textContent = settings.business_name + ' is not taking bookings yet';
       }
       blocked.style.display = 'block';
     }
@@ -831,8 +831,15 @@ const RESIZE_SCRIPT = `
   if (window.parent === window) return;
   var last = 0;
   function send(){
-    var el = document.documentElement;
-    var h = Math.max(el.scrollHeight, document.body ? document.body.scrollHeight : 0);
+    var h = 0;
+    var cards = document.querySelectorAll('.bw');
+    for (var i = 0; i < cards.length; i++){
+      var c = cards[i];
+      if (c.offsetParent === null) continue; // hidden
+      var r = c.getBoundingClientRect();
+      h = Math.max(h, Math.ceil(r.bottom + window.scrollY) + 8);
+    }
+    if (!h) h = document.documentElement.scrollHeight;
     if (!h || Math.abs(h - last) < 4) return;
     last = h;
     try { window.parent.postMessage({ type: 'booksuite:height', height: h }, '*'); } catch (e) {}

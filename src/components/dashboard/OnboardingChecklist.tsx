@@ -111,7 +111,9 @@ const OnboardingChecklist = ({ userId }: Props) => {
         {
           key: "share",
           label: "Share your booking link",
-          hint: bookingUrl,
+          hint: stripeConnected
+            ? bookingUrl
+            : "Connect payments first — your link can't take bookings until then.",
           done: hasBookings,
           action: { label: copied ? "Copied" : "Copy link", onClick: copyLink },
         },
@@ -124,8 +126,8 @@ const OnboardingChecklist = ({ userId }: Props) => {
         },
         {
           key: "stripe",
-          label: "Connect Stripe to take deposits",
-          hint: "Reduce no-shows by charging a deposit at booking.",
+          label: "Connect payments to take bookings",
+          hint: "Required — your booking link stays closed until payments are set up.",
           done: stripeConnected,
           action: stripeConnected ? undefined : { label: "Connect", to: "/payments" },
         },
