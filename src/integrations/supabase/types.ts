@@ -1459,6 +1459,7 @@ export type Database = {
           resource_label: string
           resources_enabled: boolean
           services_enabled: boolean
+          show_branding: boolean
           timezone: string
           user_id: string
           waitlist_enabled: boolean
@@ -1531,9 +1532,20 @@ export type Database = {
           request_id: string
         }[]
       }
+      tier_allows: {
+        Args: { _feature: string; _tier: string }
+        Returns: boolean
+      }
       tier_booking_limit: { Args: { _tier: string }; Returns: number }
       tier_fee_percent: { Args: { _tier: string }; Returns: number }
+      tier_resources_limit: { Args: { _tier: string }; Returns: number }
+      tier_retention_months: { Args: { _tier: string }; Returns: number }
+      tier_services_limit: { Args: { _tier: string }; Returns: number }
       tier_staff_limit: { Args: { _tier: string }; Returns: number }
+      user_tier_allows: {
+        Args: { _feature: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"
