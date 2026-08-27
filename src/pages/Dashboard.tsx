@@ -142,7 +142,7 @@ export default function Dashboard() {
           ) : null}
 
 
-          {isOwner && <GiftCodesCard />}
+          {isOwner && tier && TIER_LIMITS[tier].giftCodes && <GiftCodesCard />}
 
           {role.canApprove && <JoinRequestsCard businessUserId={businessUserId} />}
 

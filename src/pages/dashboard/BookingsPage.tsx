@@ -4,9 +4,13 @@ import BookingRequestsCard from "@/components/dashboard/BookingRequestsCard";
 import WaitlistCard from "@/components/dashboard/WaitlistCard";
 import PageHeader from "@/components/app/PageHeader";
 import SEO from "@/components/SEO";
+import { useSubscription } from "@/hooks/useSubscription";
+import { TIER_LIMITS } from "@/lib/tierLimits";
 
 export default function BookingsPage() {
   const ctx = useDashboardContext();
+  const { tier } = useSubscription();
+  const canWaitlist = tier ? TIER_LIMITS[tier].waitlist : false;
   if (!ctx) return null;
   return (
     <>
@@ -14,7 +18,7 @@ export default function BookingsPage() {
       <PageHeader title="Bookings" description="Every appointment, past and upcoming." />
       <div className="space-y-4">
         <BookingRequestsCard userId={ctx.businessUserId} />
-        <WaitlistCard userId={ctx.businessUserId} />
+        {canWaitlist && <WaitlistCard userId={ctx.businessUserId} />}
         <BookingsList userId={ctx.businessUserId} />
       </div>
     </>

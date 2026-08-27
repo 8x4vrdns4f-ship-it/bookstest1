@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2, LayoutGrid } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { handleTierError } from "@/lib/tierError";
 import EmptyState from "@/components/app/EmptyState";
 import ListSkeleton from "@/components/app/ListSkeleton";
 
@@ -49,7 +50,7 @@ export default function ResourcesManager({ userId, label }: { userId: string; la
       capacity: Math.max(1, Math.floor(newCap || 1)),
       sort_order: nextOrder,
     });
-    if (error) { toast({ title: "Add failed", description: error.message, variant: "destructive" }); return; }
+    if (error) { if (!handleTierError(error)) toast({ title: "Add failed", description: error.message, variant: "destructive" }); return; }
     setNewName(""); setNewCap(1);
     load();
   };
