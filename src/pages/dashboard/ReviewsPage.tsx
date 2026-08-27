@@ -7,6 +7,9 @@ import SectionCard from "@/components/app/SectionCard";
 import StatCard from "@/components/app/StatCard";
 import EmptyState from "@/components/app/EmptyState";
 import SEO from "@/components/SEO";
+import LockedFeature from "@/components/LockedFeature";
+import { useSubscription } from "@/hooks/useSubscription";
+import { TIER_LIMITS } from "@/lib/tierLimits";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -165,6 +168,21 @@ export default function ReviewsPage() {
 
   if (!ctx) return null;
 
+  if (!canReviews) {
+    return (
+      <>
+        <SEO title="Reviews — BookSuite" description="Client ratings and feedback." path="/dashboard/reviews" noIndex />
+        <PageHeader title="Reviews" description="Ratings and feedback from clients after their appointments." />
+        <LockedFeature
+          requiredTier="gold"
+          title="Reviews are a Gold feature"
+          description="Upgrade to Gold to collect star ratings, publish feedback on your booking page and reply to clients."
+        >
+          <div className="h-72 rounded-2xl border border-border bg-card" />
+        </LockedFeature>
+      </>
+    );
+  }
 
   return (
     <>
