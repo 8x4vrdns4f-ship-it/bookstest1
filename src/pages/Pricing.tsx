@@ -20,20 +20,49 @@ const Pricing = () => {
   const tiers = [
     {
       name: "Silver", tier: "silver" as const, gbp: 20,
-      features: [t("pricing.f.silver_bookings"), t("pricing.f.silver_staff"), t("pricing.f.email_support"), t("pricing.f.basic_analytics"), `12.5% ${t("pricing.fee")}`],
+      features: [
+        t("pricing.f.silver_bookings"),
+        t("pricing.f.silver_staff"),
+        "Up to 5 services",
+        t("pricing.f.email_support"),
+        t("pricing.f.basic_analytics"),
+        `12.5% ${t("pricing.fee")}`,
+      ],
       badge: "bg-zinc-400/20 text-zinc-300",
     },
     {
       name: "Gold", tier: "gold" as const, gbp: 59,
-      features: [t("pricing.f.gold_bookings"), t("pricing.f.gold_staff"), t("pricing.f.priority_support"), t("pricing.f.advanced_analytics"), t("pricing.f.custom_branding"), `5% ${t("pricing.fee")}`],
+      features: [
+        t("pricing.f.gold_bookings"),
+        t("pricing.f.gold_staff"),
+        "Unlimited services + up to 10 bookable resources",
+        "Reviews, waitlist & SMS reminders",
+        "Day & rental bookings",
+        t("pricing.f.advanced_analytics"),
+        t("pricing.f.custom_branding"),
+        t("pricing.f.priority_support"),
+        `5% ${t("pricing.fee")}`,
+      ],
       badge: "bg-yellow-500/20 text-yellow-300", popular: true,
     },
     {
       name: "Platinum", tier: "platinum" as const, gbp: 199,
-      features: [t("pricing.f.unlimited_bookings"), t("pricing.f.unlimited_staff"), t("pricing.f.dedicated_support"), t("pricing.f.full_analytics"), t("pricing.f.custom_branding"), t("pricing.f.api"), `2% ${t("pricing.fee")}`],
+      features: [
+        t("pricing.f.unlimited_bookings"),
+        t("pricing.f.unlimited_staff"),
+        "Unlimited services & bookable resources",
+        "Everything in Gold, plus CSV export",
+        "Gift codes for clients & partners",
+        'No "Powered by BookSuite" on your widget',
+        t("pricing.f.api"),
+        t("pricing.f.full_analytics"),
+        t("pricing.f.dedicated_support"),
+        `2% ${t("pricing.fee")}`,
+      ],
       badge: "bg-cyan-400/20 text-cyan-200",
     },
   ];
+
 
   const handleSubscribe = async (tier: "silver" | "gold" | "platinum", mode: "paid" | "trial") => {
     const key = `${tier}-${mode}`;
