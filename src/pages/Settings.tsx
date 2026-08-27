@@ -410,14 +410,8 @@ const Settings = () => {
                     onClick={() => setForm({ ...form, payment_mode: opt.key })}
                     className={`w-full text-left rounded-xl border px-4 py-3 transition-colors ${form.payment_mode === opt.key ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-secondary"}`}
                   >
-                    <span className="block text-sm font-medium text-foreground">
-                      {opt.label}
-                      {opt.key === "daily" && !canDayMode && (
-                        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary align-middle">
-                          <Lock size={10} /> Gold
-                        </span>
-                      )}
-                    </span>
+                    <span className="block text-sm font-medium text-foreground">{opt.label}</span>
+
                     <span className="block text-xs text-muted-foreground">{opt.hint}</span>
                   </button>
                 ))}
