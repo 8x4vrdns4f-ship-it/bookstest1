@@ -662,15 +662,23 @@ const Field = ({ label, hint, children }: { label: string; hint?: string; childr
   </div>
 );
 
-const ToggleRow = ({ label, hint, checked, onChange }: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void }) => (
+const ToggleRow = ({ label, hint, checked, onChange, lockedTier }: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void; lockedTier?: string }) => (
   <div className="flex items-center justify-between gap-4 p-2 rounded-md bg-secondary/40">
     <div>
-      <p className="text-sm text-foreground font-medium">{label}</p>
+      <p className="text-sm text-foreground font-medium flex items-center gap-2">
+        {label}
+        {lockedTier && (
+          <Link to="/pricing" className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+            <Lock size={10} /> {lockedTier}
+          </Link>
+        )}
+      </p>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
-    <Switch checked={checked} onCheckedChange={onChange} />
+    <Switch checked={lockedTier ? false : checked} onCheckedChange={onChange} disabled={!!lockedTier} />
   </div>
 );
+
 
 const DangerRow = ({ icon, title, hint, action }: { icon: React.ReactNode; title: string; hint: string; action: React.ReactNode }) => (
   <div className="flex items-center justify-between gap-4 p-3 rounded-md bg-secondary/40">
