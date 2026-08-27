@@ -89,6 +89,12 @@ const Settings = () => {
   const { toast } = useToast();
   const { tier } = useSubscription();
   const canBrand = tier ? TIER_LIMITS[tier].customBranding : false;
+  const canReviews = tier ? TIER_LIMITS[tier].reviews : false;
+  const canWaitlist = tier ? TIER_LIMITS[tier].waitlist : false;
+  const canResources = tierAllowsResources(tier);
+  const canDayMode = tier ? TIER_LIMITS[tier].dayMode : false;
+  const lockLabel = (allowed: boolean, need: "Gold" | "Platinum") => (allowed ? undefined : need);
+
   const [userId, setUserId] = useState<string | null>(null);
   const [companyCode, setCompanyCode] = useState("");
   const [copied, setCopied] = useState(false);
