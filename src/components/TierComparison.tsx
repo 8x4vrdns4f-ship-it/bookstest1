@@ -15,12 +15,23 @@ interface Feature {
 const features: Feature[] = [
   { name: "Monthly Bookings", silver: "Up to 100", gold: "Up to 500", platinum: "Unlimited" },
   { name: "Team Members", silver: "2", gold: "Up to 10", platinum: "Unlimited" },
+  { name: "Services", silver: "Up to 5", gold: "Unlimited", platinum: "Unlimited" },
+  { name: "Bookable Resources", silver: false, gold: "Up to 10", platinum: "Unlimited" },
   { name: "Transaction Fee", silver: "12.5%", gold: "5%", platinum: "2%" },
   { name: "Automated Reminders", silver: "Email", gold: "Email & SMS", platinum: "Email & SMS" },
+  { name: "Reviews & Ratings", silver: false, gold: true, platinum: true },
+  { name: "Waitlist", silver: false, gold: true, platinum: true },
+  { name: "Day & Rental Bookings", silver: false, gold: true, platinum: true },
   { name: "Analytics & Reports", silver: false, gold: true, platinum: "Advanced" },
   { name: "Custom Branding", silver: false, gold: true, platinum: true },
+  { name: "CSV Export", silver: false, gold: false, platinum: true },
+  { name: "Gift Codes", silver: false, gold: false, platinum: true },
+  { name: "API Access", silver: false, gold: false, platinum: true },
+  { name: "Remove BookSuite Badge", silver: false, gold: false, platinum: true },
+  { name: "Data History", silver: "6 months", gold: "2 years", platinum: "Unlimited" },
   { name: "Priority Support", silver: "Email", gold: "24h response", platinum: "1h response" },
 ];
+
 
 // Monthly prices in GBP; annual = monthly * 12 * 0.8 (20% off).
 const tiers = [

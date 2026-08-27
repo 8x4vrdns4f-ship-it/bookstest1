@@ -30,6 +30,22 @@ export function handleTierError(error: { message?: string } | null | undefined):
     });
     return true;
   }
+  if (msg.includes("TIER_LIMIT_SERVICES")) {
+    toast({
+      title: "Service limit reached",
+      description: "Your plan's service menu is full. Upgrade to Gold for unlimited services.",
+      variant: "destructive",
+    });
+    return true;
+  }
+  if (msg.includes("TIER_LIMIT_RESOURCES")) {
+    toast({
+      title: "Resource limit reached",
+      description: "Bookable resources are available on Gold (up to 10) and Platinum (unlimited).",
+      variant: "destructive",
+    });
+    return true;
+  }
   if (msg.includes("TIER_LIMIT_GIFT_CODES")) {
     toast({
       title: "Monthly gift code limit reached",

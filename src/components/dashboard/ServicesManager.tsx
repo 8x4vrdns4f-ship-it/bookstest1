@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2, ListChecks } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { handleTierError } from "@/lib/tierError";
 import EmptyState from "@/components/app/EmptyState";
 import ListSkeleton from "@/components/app/ListSkeleton";
 
@@ -54,7 +55,7 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
       price: parsedPrice != null && !Number.isNaN(parsedPrice) ? parsedPrice : null,
       sort_order: nextOrder,
     });
-    if (error) { toast({ title: "Add failed", description: error.message, variant: "destructive" }); return; }
+    if (error) { if (!handleTierError(error)) toast({ title: "Add failed", description: error.message, variant: "destructive" }); return; }
     setNewName(""); setNewDur(30); setNewPrice("");
     load();
   };

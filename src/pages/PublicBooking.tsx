@@ -27,6 +27,7 @@ const PublicBooking = () => {
   const { userId } = useParams<{ userId: string }>();
   const [info, setInfo] = useState<PublicInfo | null>(null);
   const [waitlistEnabled, setWaitlistEnabled] = useState(false);
+  const [showBranding, setShowBranding] = useState(true);
   const [loading, setLoading] = useState(true);
   const [widgetHeight, setWidgetHeight] = useState(760);
 
@@ -52,6 +53,7 @@ const PublicBooking = () => {
       if (!active) return;
       setInfo((pub as PublicInfo[] | null)?.[0] ?? null);
       setWaitlistEnabled(!!(ws as any[] | null)?.[0]?.waitlist_enabled);
+      setShowBranding((ws as any[] | null)?.[0]?.show_branding !== false);
       setLoading(false);
     })();
     return () => { active = false; };
@@ -145,6 +147,7 @@ const PublicBooking = () => {
         <PublicBookingTrustStrip cancellationHours={info?.cancellation_hours} />
 
 
+        {showBranding && (
         <footer className="text-center text-xs text-muted-foreground pt-4">
           Powered by{" "}
           <a
@@ -156,6 +159,7 @@ const PublicBooking = () => {
             BookSuite
           </a>
         </footer>
+        )}
       </div>
     </div>
   );
