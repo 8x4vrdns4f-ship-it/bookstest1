@@ -25,7 +25,7 @@ import SectionCard from "@/components/app/SectionCard";
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
 import { useSubscription } from "@/hooks/useSubscription";
-import { TIER_LIMITS } from "@/lib/tierLimits";
+import { TIER_LIMITS, tierAllowsResources } from "@/lib/tierLimits";
 import { Link } from "react-router-dom";
 
 type DayHours = { open: string; close: string; closed: boolean };
@@ -356,10 +356,21 @@ const Settings = () => {
                   <button
                     key={opt.key}
                     type="button"
-                    onClick={() => setForm({ ...form, booking_mode: opt.key as "hourly" | "daily" })}
+                    onClick={() => {
+                      if (opt.key === "daily" && !canDayMode) return;
+                      setForm({ ...form, booking_mode: opt.key as "hourly" | "daily" });
+                    }}
+                    disabled={opt.key === "daily" && !canDayMode}
                     className={`w-full text-left rounded-xl border px-4 py-3 transition-colors ${form.booking_mode === opt.key ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-secondary"}`}
                   >
-                    <span className="block text-sm font-medium text-foreground">{opt.label}</span>
+                    <span className="block text-sm font-medium text-foreground">
+                      {opt.label}
+                      {opt.key === "daily" && !canDayMode && (
+                        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary align-middle">
+                          <Lock size={10} /> Gold
+                        </span>
+                      )}
+                    </span>
                     <span className="block text-xs text-muted-foreground">{opt.hint}</span>
                   </button>
                 ))}
@@ -399,7 +410,14 @@ const Settings = () => {
                     onClick={() => setForm({ ...form, payment_mode: opt.key })}
                     className={`w-full text-left rounded-xl border px-4 py-3 transition-colors ${form.payment_mode === opt.key ? "border-primary bg-primary/10" : "border-border bg-background hover:bg-secondary"}`}
                   >
-                    <span className="block text-sm font-medium text-foreground">{opt.label}</span>
+                    <span className="block text-sm font-medium text-foreground">
+                      {opt.label}
+                      {opt.key === "daily" && !canDayMode && (
+                        <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary align-middle">
+                          <Lock size={10} /> Gold
+                        </span>
+                      )}
+                    </span>
                     <span className="block text-xs text-muted-foreground">{opt.hint}</span>
                   </button>
                 ))}
@@ -473,8 +491,9 @@ const Settings = () => {
                   hint="Adds a resource picker to your booking widget."
                   checked={form.resources_enabled}
                   onChange={(v) => setForm({ ...form, resources_enabled: v })}
+                  lockedTier={lockLabel(canResources, "Gold")}
                 />
-                {form.resources_enabled && (
+                {form.resources_enabled && canResources && (
                   <>
                     <Field label="Resource label" hint="Shown on the widget, e.g. Table, Room, Chair, Court.">
                       <Input
@@ -541,8 +560,8 @@ const Settings = () => {
               <ToggleRow label="Daily Summary Email" hint="Recap of tomorrow's appointments." checked={form.notify_daily_summary} onChange={(v) => setForm({ ...form, notify_daily_summary: v })} />
               <ToggleRow label="Client Booking Confirmation" hint="Email clients when their booking is confirmed." checked={form.notify_client_confirmation} onChange={(v) => setForm({ ...form, notify_client_confirmation: v })} />
               <ToggleRow label="Client Reminder" hint="Send clients a reminder 24 hours before their appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
-              <ToggleRow label="Client Review Request" hint="Ask clients for a review after their appointment." checked={form.notify_client_review_request} onChange={(v) => setForm({ ...form, notify_client_review_request: v })} />
-              <ToggleRow label="Waitlist" hint="Let clients join a waitlist for fully-booked dates, and auto-email them when a slot opens." checked={form.waitlist_enabled} onChange={(v) => setForm({ ...form, waitlist_enabled: v })} />
+              <ToggleRow label="Client Review Request" hint="Ask clients for a review after their appointment." checked={form.notify_client_review_request} onChange={(v) => setForm({ ...form, notify_client_review_request: v })} lockedTier={lockLabel(canReviews, "Gold")} />
+              <ToggleRow label="Waitlist" hint="Let clients join a waitlist for fully-booked dates, and auto-email them when a slot opens." checked={form.waitlist_enabled} onChange={(v) => setForm({ ...form, waitlist_enabled: v })} lockedTier={lockLabel(canWaitlist, "Gold")} />
             </AccordionContent>
 
           </AccordionItem>
