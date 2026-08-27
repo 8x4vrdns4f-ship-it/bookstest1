@@ -59,6 +59,9 @@ function Stars({ value, size = 14 }: { value: number; size?: number }) {
 
 export default function ReviewsPage() {
   const ctx = useDashboardContext();
+  const { tier } = useSubscription();
+  const canReviews = tier ? TIER_LIMITS[tier].reviews : false;
+
   const { toast } = useToast();
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [employees, setEmployees] = useState<EmployeeRow[]>([]);
