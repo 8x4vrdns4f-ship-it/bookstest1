@@ -33,6 +33,8 @@ import { template as contactConfirmation } from './contact-confirmation.tsx'
 import { template as contactReceivedOwner } from './contact-received-owner.tsx'
 import { template as platformAlert } from './platform-alert.tsx'
 import { template as platformDailySummary } from './platform-daily-summary.tsx'
+import { template as rebookingReminder } from './rebooking-reminder.tsx'
+import { template as campaignEmail } from './campaign-email.tsx'
 
 
 
@@ -61,5 +63,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'contact-received-owner': contactReceivedOwner,
   'platform-alert': platformAlert,
   'platform-daily-summary': platformDailySummary,
+  'rebooking-reminder': rebookingReminder,
+  'campaign-email': campaignEmail,
 }
 
