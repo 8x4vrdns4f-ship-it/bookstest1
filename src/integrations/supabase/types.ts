@@ -39,6 +39,7 @@ export type Database = {
           payment_option: string
           payment_status: string
           platform_fee_amount: number | null
+          promo_code_id: string | null
           refund_id: string | null
           rental_days: number | null
           resource_id: string | null
@@ -79,6 +80,7 @@ export type Database = {
           payment_option?: string
           payment_status?: string
           platform_fee_amount?: number | null
+          promo_code_id?: string | null
           refund_id?: string | null
           rental_days?: number | null
           resource_id?: string | null
@@ -119,6 +121,7 @@ export type Database = {
           payment_option?: string
           payment_status?: string
           platform_fee_amount?: number | null
+          promo_code_id?: string | null
           refund_id?: string | null
           rental_days?: number | null
           resource_id?: string | null
@@ -148,6 +151,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
             referencedColumns: ["id"]
           },
           {
@@ -200,6 +210,8 @@ export type Database = {
           payment_mode: string
           pending_request_ttl_hours: number
           platform_fee_percent: number
+          rebooking_reminder_days: number
+          rebooking_reminder_enabled: boolean
           reception_checkin_enabled: boolean
           require_deposit: boolean
           resource_label: string
@@ -246,6 +258,8 @@ export type Database = {
           payment_mode?: string
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
+          rebooking_reminder_days?: number
+          rebooking_reminder_enabled?: boolean
           reception_checkin_enabled?: boolean
           require_deposit?: boolean
           resource_label?: string
@@ -292,6 +306,8 @@ export type Database = {
           payment_mode?: string
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
+          rebooking_reminder_days?: number
+          rebooking_reminder_enabled?: boolean
           reception_checkin_enabled?: boolean
           require_deposit?: boolean
           resource_label?: string
@@ -304,6 +320,45 @@ export type Database = {
           waitlist_enabled?: boolean
           welcome_message?: string | null
           working_hours?: Json
+        }
+        Relationships: []
+      }
+      campaigns: {
+        Row: {
+          audience_count: number
+          body: string
+          created_at: string
+          id: string
+          sent_at: string | null
+          sent_count: number
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audience_count?: number
+          body: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audience_count?: number
+          body?: string
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -836,6 +891,7 @@ export type Database = {
           payment_environment: string
           payment_option: string
           platform_fee_amount: number
+          promo_code_id: string | null
           reminder_sent_at: string | null
           rental_days: number | null
           resource_id: string | null
@@ -871,6 +927,7 @@ export type Database = {
           payment_environment?: string
           payment_option?: string
           platform_fee_amount: number
+          promo_code_id?: string | null
           reminder_sent_at?: string | null
           rental_days?: number | null
           resource_id?: string | null
@@ -906,6 +963,7 @@ export type Database = {
           payment_environment?: string
           payment_option?: string
           platform_fee_amount?: number
+          promo_code_id?: string | null
           reminder_sent_at?: string | null
           rental_days?: number | null
           resource_id?: string | null
@@ -921,6 +979,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "pending_bookings_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "pending_bookings_resource_id_fkey"
             columns: ["resource_id"]
@@ -964,6 +1029,48 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          times_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          times_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          times_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           bucket: string
@@ -993,6 +1100,38 @@ export type Database = {
           window_start?: string
         }
         Relationships: []
+      }
+      rebooking_reminders: {
+        Row: {
+          client_email: string
+          id: string
+          last_booking_id: string | null
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          client_email: string
+          id?: string
+          last_booking_id?: string | null
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          client_email?: string
+          id?: string
+          last_booking_id?: string | null
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rebooking_reminders_last_booking_id_fkey"
+            columns: ["last_booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       resources: {
         Row: {
@@ -1385,6 +1524,19 @@ export type Database = {
           status: string
         }[]
       }
+      get_lapsed_clients: {
+        Args: never
+        Returns: {
+          business_name: string
+          client_email: string
+          client_name: string
+          last_booking_date: string
+          last_booking_id: string
+          last_service: string
+          rebooking_reminder_days: number
+          user_id: string
+        }[]
+      }
       get_owner_email: { Args: { _user_id: string }; Returns: string }
       get_public_business_info: {
         Args: { _user_id: string }
@@ -1545,6 +1697,15 @@ export type Database = {
       user_tier_allows: {
         Args: { _feature: string; _user_id: string }
         Returns: boolean
+      }
+      validate_promo_code: {
+        Args: { p_code: string; p_user_id: string }
+        Returns: {
+          discount_type: string
+          discount_value: number
+          message: string
+          valid: boolean
+        }[]
       }
     }
     Enums: {
