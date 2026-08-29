@@ -45,6 +45,7 @@ Deno.serve(async (req) => {
       payment_option,
       service_id,
       end_date,
+      promo_code,
     } = body;
 
     const env = resolveEnv(environment);
