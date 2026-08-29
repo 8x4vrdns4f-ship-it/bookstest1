@@ -102,6 +102,12 @@ Deno.serve(async (req) => {
       if (!updated) continue;
       expired++;
 
+      // Release the promo-code use so the client can book again with it.
+      if ((pending as any).promo_code_id) {
+        try { await admin.rpc("release_promo_code_use", { p_id: (pending as any).promo_code_id }); }
+        catch (e) { console.warn("promo release failed (non-fatal)", pending.id, e); }
+      }
+
       const { data: settings } = await admin
         .from("business_settings")
         .select("business_name")

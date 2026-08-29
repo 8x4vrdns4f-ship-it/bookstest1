@@ -93,6 +93,11 @@ Deno.serve(async (req) => {
 
     await admin.from("pending_bookings").delete().eq("id", pending.id);
 
+    // Release the promo-code use so the client can rebook with it.
+    if ((pending as any).promo_code_id) {
+      await admin.rpc("release_promo_code_use", { p_id: (pending as any).promo_code_id });
+    }
+
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
