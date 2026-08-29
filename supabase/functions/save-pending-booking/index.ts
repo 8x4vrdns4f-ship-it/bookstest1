@@ -45,6 +45,7 @@ Deno.serve(async (req) => {
       payment_option,
       service_id,
       end_date,
+      promo_code,
     } = body;
 
     const env = resolveEnv(environment);
@@ -214,7 +215,47 @@ Deno.serve(async (req) => {
     }
     // In daily mode the service price is a per-day rate.
     const totalPrice = servicePrice == null ? null : servicePrice * (isDaily ? days : 1);
-    const chargeAmount = finalOption === "full" ? Math.max(deposit, totalPrice as number) : deposit;
+    let chargeAmount = finalOption === "full" ? Math.max(deposit, totalPrice as number) : deposit;
+
+    // --- Promo code (validated and redeemed server-side; never trust the browser) ---
+    let promoCodeId: string | null = null;
+    if (promo_code != null) {
+      if (typeof promo_code !== "string" || promo_code.length > 40) return bad("Invalid promo code");
+      const { data: promoAllowed } = await admin.rpc("user_tier_allows", {
+        _user_id: userId, _feature: "promo_codes",
+      });
+      if (!promoAllowed) return bad("That promo code is not valid");
+
+      const normalizedCode = promo_code.trim().toUpperCase();
+      const { data: pc } = await admin
+        .from("promo_codes")
+        .select("id, discount_type, discount_value, expires_at, max_uses, times_used, active")
+        .eq("user_id", userId)
+        .eq("code", normalizedCode)
+        .maybeSingle();
+      if (!pc || !pc.active) return bad("That promo code is not valid");
+      if (pc.expires_at && new Date(pc.expires_at) < new Date()) return bad("That promo code has expired");
+      if (pc.max_uses != null && Number(pc.times_used) >= Number(pc.max_uses)) {
+        return bad("That promo code has been fully used");
+      }
+
+      // Atomic redemption: only succeeds if the usage count hasn't moved.
+      const { data: redeemed } = await admin
+        .from("promo_codes")
+        .update({ times_used: Number(pc.times_used) + 1 })
+        .eq("id", pc.id)
+        .eq("times_used", pc.times_used)
+        .select("id");
+      if (!redeemed || redeemed.length === 0) return bad("That promo code has just been fully used");
+
+      const rawDiscount = pc.discount_type === "percent"
+        ? (chargeAmount * Number(pc.discount_value)) / 100
+        : Number(pc.discount_value);
+      // Keep at least 1.00 in the charge currency so the later card charge can succeed.
+      const discount = Math.min(rawDiscount, Math.max(chargeAmount - 1, 0));
+      chargeAmount = Math.round((chargeAmount - discount) * 100) / 100;
+      promoCodeId = pc.id;
+    }
 
     const { data: pending, error: pErr } = await admin
       .from("pending_bookings")
@@ -243,6 +284,7 @@ Deno.serve(async (req) => {
         stripe_setup_intent_id,
         resource_id: finalResourceId,
         party_size: ps,
+        promo_code_id: promoCodeId,
       })
       .select()
       .single();

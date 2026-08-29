@@ -140,6 +140,7 @@ Deno.serve(async (req) => {
         party_size: (pending as any).party_size ?? null,
         end_date: (pending as any).end_date ?? null,
         rental_days: (pending as any).rental_days ?? null,
+        promo_code_id: (pending as any).promo_code_id ?? null,
       })
       .select()
       .single();

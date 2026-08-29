@@ -68,6 +68,8 @@ type SettingsForm = {
   notify_client_confirmation: boolean;
   notify_client_reminder: boolean;
   notify_client_review_request: boolean;
+  rebooking_reminder_enabled: boolean;
+  rebooking_reminder_days: number;
   welcome_message: string;
   accent_color: string;
   self_checkin_enabled: boolean;
@@ -107,6 +109,7 @@ const Settings = () => {
     buffer_minutes: 0, max_advance_days: 30, cancellation_hours: 24, pending_request_ttl_hours: 48,
     notify_new_booking: true, notify_daily_summary: false,
     notify_client_confirmation: true, notify_client_reminder: true, notify_client_review_request: true,
+    rebooking_reminder_enabled: false, rebooking_reminder_days: 60,
     welcome_message: "", accent_color: "#3B82F6",
     self_checkin_enabled: false, reception_checkin_enabled: true,
     resources_enabled: false, resource_label: "Resource",
@@ -150,6 +153,8 @@ const Settings = () => {
             notify_client_confirmation: data.notify_client_confirmation,
             notify_client_reminder: data.notify_client_reminder,
             notify_client_review_request: (data as any).notify_client_review_request ?? true,
+            rebooking_reminder_enabled: (data as any).rebooking_reminder_enabled ?? false,
+            rebooking_reminder_days: Number((data as any).rebooking_reminder_days ?? 60),
             welcome_message: data.welcome_message || "",
             accent_color: data.accent_color || "#3B82F6",
             self_checkin_enabled: !!data.self_checkin_enabled,
@@ -556,6 +561,23 @@ const Settings = () => {
               <ToggleRow label="Client Reminder" hint="Send clients a reminder 24 hours before their appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
               <ToggleRow label="Client Review Request" hint="Ask clients for a review after their appointment." checked={form.notify_client_review_request} onChange={(v) => setForm({ ...form, notify_client_review_request: v })} lockedTier={lockLabel(canReviews, "Gold")} />
               <ToggleRow label="Waitlist" hint="Let clients join a waitlist for fully-booked dates, and auto-email them when a slot opens." checked={form.waitlist_enabled} onChange={(v) => setForm({ ...form, waitlist_enabled: v })} lockedTier={lockLabel(canWaitlist, "Gold")} />
+              <ToggleRow label="Rebooking Reminders" hint="Automatically email clients who haven't booked in a while." checked={form.rebooking_reminder_enabled} onChange={(v) => setForm({ ...form, rebooking_reminder_enabled: v })} />
+              {form.rebooking_reminder_enabled && (
+                <div className="flex items-center justify-between gap-3 pl-1 pr-1">
+                  <label htmlFor="rebooking-days" className="text-sm text-muted-foreground">
+                    Remind after this many quiet days
+                  </label>
+                  <Input
+                    id="rebooking-days"
+                    type="number"
+                    min={7}
+                    max={365}
+                    className="w-24"
+                    value={form.rebooking_reminder_days}
+                    onChange={(e) => setForm({ ...form, rebooking_reminder_days: Math.max(7, Math.min(365, Number(e.target.value) || 60)) })}
+                  />
+                </div>
+              )}
             </AccordionContent>
 
           </AccordionItem>
