@@ -46,6 +46,8 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     csvExport: false,
     giftCodes: false,
     removeBranding: false,
+    campaigns: false,
+    promoCodes: false,
   },
   gold: {
     name: "Gold",
@@ -67,6 +69,8 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     csvExport: false,
     giftCodes: false,
     removeBranding: false,
+    campaigns: true,
+    promoCodes: true,
   },
   platinum: {
     name: "Platinum",
@@ -88,6 +92,8 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     csvExport: true,
     giftCodes: true,
     removeBranding: true,
+    campaigns: true,
+    promoCodes: true,
   },
 };
 
@@ -102,7 +108,9 @@ export type TierFeature =
   | "dayMode"
   | "csvExport"
   | "giftCodes"
-  | "removeBranding";
+  | "removeBranding"
+  | "campaigns"
+  | "promoCodes";
 
 export const FEATURE_LABELS: Record<TierFeature, string> = {
   customBranding: "Custom branding",
@@ -116,6 +124,8 @@ export const FEATURE_LABELS: Record<TierFeature, string> = {
   csvExport: "CSV export",
   giftCodes: "Gift codes",
   removeBranding: 'Remove "Powered by BookSuite"',
+  campaigns: "Email campaigns",
+  promoCodes: "Promo codes",
 };
 
 const TIER_ORDER: Tier[] = ["silver", "gold", "platinum"];
