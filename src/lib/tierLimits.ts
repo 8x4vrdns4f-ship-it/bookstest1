@@ -21,6 +21,8 @@ export interface TierConfig {
   csvExport: boolean;
   giftCodes: boolean;
   removeBranding: boolean;
+  campaigns: boolean;
+  promoCodes: boolean;
 }
 
 export const TIER_LIMITS: Record<Tier, TierConfig> = {
