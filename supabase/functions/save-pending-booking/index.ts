@@ -284,6 +284,7 @@ Deno.serve(async (req) => {
         stripe_setup_intent_id,
         resource_id: finalResourceId,
         party_size: ps,
+        promo_code_id: promoCodeId,
       })
       .select()
       .single();
