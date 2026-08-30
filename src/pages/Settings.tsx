@@ -600,6 +600,30 @@ const Settings = () => {
           </AccordionItem>
           </SectionCard>
 
+          {/* Promo Codes */}
+          <SectionCard>
+            <AccordionItem value="promos" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <TicketPercent size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Promo Codes</span>
+                </span>
+              </AccordionTrigger>
+            <AccordionContent>
+              {canPromo ? (
+                userId && <PromoCodesManager userId={userId} />
+              ) : (
+                <p className="text-sm text-muted-foreground pb-5">
+                  Promo codes are available on the Gold and Platinum plans.{" "}
+                  <Link to="/pricing" className="text-primary underline underline-offset-2">Upgrade</Link>
+                </p>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+          </SectionCard>
+
           {/* Check-In */}
           <SectionCard>
             <AccordionItem value="checkin" className="border-0">
