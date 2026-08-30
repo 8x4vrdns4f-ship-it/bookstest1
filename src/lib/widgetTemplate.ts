@@ -117,6 +117,12 @@ export const WIDGET_MARKUP = `
     <input id="bw-email" type="email" placeholder="Email" required>
   </div>
 
+  <div class="label" style="margin-top:2px">Promo code <span style="opacity:.55;font-weight:400;text-transform:none">(optional)</span></div>
+  <div class="row" style="grid-template-columns:1fr">
+    <input id="bw-promo" placeholder="e.g. SUMMER20" maxlength="40" autocomplete="off" style="text-transform:uppercase">
+  </div>
+  <div id="bw-promo-note" style="font-size:12.5px;margin:-2px 0 10px"></div>
+
   <div class="label">Card details</div>
   <div id="bw-payel"></div>
   <div class="paynote" id="bw-paynote">
@@ -554,8 +560,15 @@ export const buildWidgetScript = (opts: {
     var total = dailyOn() ? p * (rentalDays() || 1) : p;
     return Math.max(Number(settings.deposit_amount || 0), total);
   }
+  function applyPromo(base){
+    if (!promoDiscount) return base;
+    var d = promoDiscount.type === 'percent' ? base * (promoDiscount.value / 100) : promoDiscount.value;
+    d = Math.min(d, Math.max(base - 1, 0));
+    return Math.round((base - d) * 100) / 100;
+  }
   function chargeNow(){
-    return (selPayOption === 'full' && fullAmount() !== null) ? fullAmount() : Number(settings.deposit_amount || 0);
+    var base = (selPayOption === 'full' && fullAmount() !== null) ? fullAmount() : Number(settings.deposit_amount || 0);
+    return applyPromo(base);
   }
   function renderPayOptions(){
     var wrap = document.getElementById('bw-pay-wrap');
@@ -586,7 +599,12 @@ export const buildWidgetScript = (opts: {
     var pill = document.getElementById('bw-deposit');
     if (!pill) return;
     var amt = chargeNow();
-    pill.textContent = money(amt) + (selPayOption === 'full' ? ' total' : ' deposit');
+    var label = money(amt) + (selPayOption === 'full' ? ' total' : ' deposit');
+    if (promoDiscount){
+      var base = (selPayOption === 'full' && fullAmount() !== null) ? fullAmount() : Number(settings.deposit_amount || 0);
+      if (amt < base) label = money(amt) + ' \u2014 was ' + money(base);
+    }
+    pill.textContent = label;
   }
   function renderParty(){
     var wrap = document.getElementById('bw-party-wrap');
@@ -623,6 +641,38 @@ export const buildWidgetScript = (opts: {
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
   document.getElementById('bw-party').addEventListener('input', function(){ selResource = null; renderAll(); });
+
+  var promoDiscount = null;
+  var promoCheckTimer = null;
+  document.getElementById('bw-promo').addEventListener('input', function(){
+    var note = document.getElementById('bw-promo-note');
+    var code = this.value.trim();
+    promoDiscount = null;
+    note.textContent = '';
+    if (promoCheckTimer) clearTimeout(promoCheckTimer);
+    if (!code) { renderAll(); return; }
+    promoCheckTimer = setTimeout(function(){
+      api('/rest/v1/rpc/validate_promo_code', {
+        method: 'POST',
+        body: JSON.stringify({ p_user_id: UID, p_code: code })
+      }).then(function(r){ return r.json(); }).then(function(res){
+        var row = Array.isArray(res) ? res[0] : res;
+        var input = document.getElementById('bw-promo');
+        if (!row || !row.valid) {
+          promoDiscount = null;
+          note.style.color = '#f87171';
+          note.textContent = (row && row.message) ? row.message : 'Invalid code';
+        } else {
+          promoDiscount = { type: row.discount_type, value: Number(row.discount_value) };
+          note.style.color = '#4ade80';
+          note.textContent = 'Code applied \u2014 discount included below';
+          if (input.value.trim() !== code) return;
+        }
+        renderAll();
+      }).catch(function(){ /* ignore */ });
+    }, 400);
+    renderAll();
+  });
 
   function mountStripeElements(){
     if (!window.Stripe || !STRIPE_PK) {
@@ -747,7 +797,8 @@ export const buildWidgetScript = (opts: {
           service_id: selService ? selService.id : null,
           payment_option: selPayOption,
           end_date: dailyOn() ? selEndDate : null,
-          rental_days: dailyOn() ? rentalDays() : null
+          rental_days: dailyOn() ? rentalDays() : null,
+          promo_code: promoDiscount ? document.getElementById('bw-promo').value.trim() : null
         })
       });
       var saveData = await saveRes.json();
