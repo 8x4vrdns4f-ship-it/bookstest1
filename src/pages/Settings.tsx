@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Copy, Check, LogOut, KeyRound, Trash2, XCircle,
-  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock, LayoutGrid, ListChecks,
+  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock, LayoutGrid, ListChecks, TicketPercent,
 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ResourcesManager from "@/components/dashboard/ResourcesManager";
@@ -24,6 +24,7 @@ import SectionCard from "@/components/app/SectionCard";
 
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
+import PromoCodesManager from "@/components/dashboard/PromoCodesManager";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS, tierAllowsResources } from "@/lib/tierLimits";
 import { Link } from "react-router-dom";
@@ -95,6 +96,7 @@ const Settings = () => {
   const canWaitlist = tier ? TIER_LIMITS[tier].waitlist : false;
   const canResources = tierAllowsResources(tier);
   const canDayMode = tier ? TIER_LIMITS[tier].dayMode : false;
+  const canPromo = tier ? TIER_LIMITS[tier].promoCodes : false;
   const lockLabel = (allowed: boolean, need: "Gold" | "Platinum") => (allowed ? undefined : need);
 
   const [userId, setUserId] = useState<string | null>(null);
