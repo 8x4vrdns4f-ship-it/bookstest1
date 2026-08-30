@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Copy, Check, LogOut, KeyRound, Trash2, XCircle,
-  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock, LayoutGrid, ListChecks,
+  Building2, Clock, CalendarCheck, Bell, Shield, QrCode, Palette, Lock, LayoutGrid, ListChecks, TicketPercent,
 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ResourcesManager from "@/components/dashboard/ResourcesManager";
@@ -24,6 +24,7 @@ import SectionCard from "@/components/app/SectionCard";
 
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
+import PromoCodesManager from "@/components/dashboard/PromoCodesManager";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS, tierAllowsResources } from "@/lib/tierLimits";
 import { Link } from "react-router-dom";
@@ -95,6 +96,7 @@ const Settings = () => {
   const canWaitlist = tier ? TIER_LIMITS[tier].waitlist : false;
   const canResources = tierAllowsResources(tier);
   const canDayMode = tier ? TIER_LIMITS[tier].dayMode : false;
+  const canPromo = tier ? TIER_LIMITS[tier].promoCodes : false;
   const lockLabel = (allowed: boolean, need: "Gold" | "Platinum") => (allowed ? undefined : need);
 
   const [userId, setUserId] = useState<string | null>(null);
@@ -596,6 +598,30 @@ const Settings = () => {
               </AccordionTrigger>
             <AccordionContent className="pb-5">
               {userId && <RolesManager userId={userId} />}
+            </AccordionContent>
+          </AccordionItem>
+          </SectionCard>
+
+          {/* Promo Codes */}
+          <SectionCard>
+            <AccordionItem value="promos" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <TicketPercent size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Promo Codes</span>
+                </span>
+              </AccordionTrigger>
+            <AccordionContent>
+              {canPromo ? (
+                userId && <PromoCodesManager userId={userId} />
+              ) : (
+                <p className="text-sm text-muted-foreground pb-5">
+                  Promo codes are available on the Gold and Platinum plans.{" "}
+                  <Link to="/pricing" className="text-primary underline underline-offset-2">Upgrade</Link>
+                </p>
+              )}
             </AccordionContent>
           </AccordionItem>
           </SectionCard>
