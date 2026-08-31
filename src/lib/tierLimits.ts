@@ -23,6 +23,7 @@ export interface TierConfig {
   removeBranding: boolean;
   campaigns: boolean;
   promoCodes: boolean;
+  promoCodesMax: number; // 0 = feature not available
 }
 
 export const TIER_LIMITS: Record<Tier, TierConfig> = {
@@ -48,6 +49,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     removeBranding: false,
     campaigns: false,
     promoCodes: false,
+    promoCodesMax: 0,
   },
   gold: {
     name: "Gold",
@@ -71,6 +73,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     removeBranding: false,
     campaigns: true,
     promoCodes: true,
+    promoCodesMax: 1,
   },
   platinum: {
     name: "Platinum",
@@ -94,6 +97,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     removeBranding: true,
     campaigns: true,
     promoCodes: true,
+    promoCodesMax: 2,
   },
 };
 
