@@ -615,7 +615,7 @@ const Settings = () => {
               </AccordionTrigger>
             <AccordionContent>
               {canPromo ? (
-                userId && <PromoCodesManager userId={userId} />
+                userId && <PromoCodesManager userId={userId} maxCodes={tier ? TIER_LIMITS[tier].promoCodesMax : 0} />
               ) : (
                 <p className="text-sm text-muted-foreground pb-5">
                   Promo codes are available on the Gold and Platinum plans.{" "}
