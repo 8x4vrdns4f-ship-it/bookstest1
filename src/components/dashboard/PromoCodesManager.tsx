@@ -27,9 +27,10 @@ interface PromoCode {
 
 interface Props {
   userId: string;
+  maxCodes: number;
 }
 
-const PromoCodesManager = ({ userId }: Props) => {
+const PromoCodesManager = ({ userId, maxCodes }: Props) => {
   const { toast } = useToast();
   const [codes, setCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,9 +88,12 @@ const PromoCodesManager = ({ userId }: Props) => {
     } as never);
     setSaving(false);
     if (error) {
+      const msg = error.message.includes("TIER_LIMIT_PROMO_CODES")
+        ? `Your plan allows ${maxCodes} promo code${maxCodes === 1 ? "" : "s"}. Upgrade for more.`
+        : error.message.includes("duplicate") ? "That code already exists" : error.message;
       toast({
         title: "Could not create code",
-        description: error.message.includes("duplicate") ? "That code already exists" : error.message,
+        description: msg,
         variant: "destructive",
       });
       return;
@@ -112,8 +116,13 @@ const PromoCodesManager = ({ userId }: Props) => {
   const isExpired = (pc: PromoCode) => pc.expires_at && new Date(pc.expires_at) < new Date();
   const isUsedUp = (pc: PromoCode) => pc.max_uses != null && pc.times_used >= pc.max_uses;
 
+  const atCap = codes.length >= maxCodes;
+
   return (
     <div className="space-y-3 pb-5">
+      <p className="text-xs text-muted-foreground">
+        {codes.length} of {maxCodes} promo code{maxCodes === 1 ? "" : "s"} used on your plan.
+      </p>
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : codes.length === 0 ? (
@@ -142,9 +151,15 @@ const PromoCodesManager = ({ userId }: Props) => {
           ))}
         </div>
       )}
-      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)} disabled={atCap}>
         <Plus size={14} className="mr-1.5" /> New promo code
       </Button>
+      {atCap && (
+        <p className="text-xs text-muted-foreground">
+          You've reached your plan's promo code limit. Pause a code to stop it, or{" "}
+          <a href="/pricing" className="text-primary underline underline-offset-2">upgrade</a> for more.
+        </p>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
