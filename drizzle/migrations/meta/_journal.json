@@ -8,6 +8,13 @@
       "when": 1787990858125,
       "tag": "0000_release_promo_code_use",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788202596220,
+      "tag": "0001_promo_code_tier_limits",
+      "breakpoints": true
     }
   ]
 }
