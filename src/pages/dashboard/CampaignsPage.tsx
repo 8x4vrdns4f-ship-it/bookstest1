@@ -39,7 +39,8 @@ const statusBadge = (c: Campaign) => {
 };
 
 export default function CampaignsPage() {
-  const { businessUserId } = useDashboardContext();
+  const ctx = useDashboardContext();
+  const businessUserId = ctx?.businessUserId ?? "";
   const { tier, loading: subLoading } = useSubscription();
   const { toast } = useToast();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
