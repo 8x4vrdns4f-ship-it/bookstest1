@@ -1691,6 +1691,7 @@ export type Database = {
       }
       tier_booking_limit: { Args: { _tier: string }; Returns: number }
       tier_fee_percent: { Args: { _tier: string }; Returns: number }
+      tier_promo_codes_limit: { Args: { _tier: string }; Returns: number }
       tier_resources_limit: { Args: { _tier: string }; Returns: number }
       tier_retention_months: { Args: { _tier: string }; Returns: number }
       tier_services_limit: { Args: { _tier: string }; Returns: number }
