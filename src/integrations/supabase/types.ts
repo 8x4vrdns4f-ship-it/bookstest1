@@ -1454,6 +1454,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_businesses: {
+        Args: never
+        Returns: {
+          bookings_count: number
+          business_category: string
+          business_name: string
+          created_at: string
+          owner_email: string
+          status: string
+          subscribed: boolean
+          tier: string
+          user_id: string
+        }[]
+      }
+      admin_platform_stats: {
+        Args: never
+        Returns: {
+          active_subscriptions: number
+          bookings_last_30d: number
+          bookings_total: number
+          gift_codes_total: number
+          gold_subscriptions: number
+          mrr_estimate: number
+          open_messages: number
+          platinum_subscriptions: number
+          total_businesses: number
+          total_users: number
+        }[]
+      }
+      admin_recent_signups: {
+        Args: { p_limit?: number }
+        Returns: {
+          created_at: string
+          display_name: string
+          owner_email: string
+          user_id: string
+        }[]
+      }
       can_create_gift_code: { Args: never; Returns: boolean }
       check_in_by_code: {
         Args: { p_company_code: string; p_confirmation_code: string }
