@@ -125,7 +125,7 @@ export default function AdminGiftCodes() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Badge variant="secondary" className="capitalize">{c.tier}</Badge>
-                  <Badge variant={c.redeemed_at ? "success" : "secondary"}>
+                  <Badge variant={c.redeemed_at ? "default" : "secondary"}>
                     {c.redeemed_at ? "Redeemed" : "Unused"}
                   </Badge>
                 </div>
