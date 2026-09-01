@@ -15,6 +15,13 @@
       "when": 1788202596220,
       "tag": "0001_promo_code_tier_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788228655393,
+      "tag": "0002_admin_panel_rls_policies",
+      "breakpoints": true
     }
   ]
 }
