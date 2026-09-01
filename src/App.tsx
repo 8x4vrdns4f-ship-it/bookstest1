@@ -40,6 +40,12 @@ import PaymentsRefresh from "./pages/PaymentsRefresh.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import OAuthConsent from "./pages/OAuthConsent.tsx";
 import GuideDetail from "./pages/GuideDetail.tsx";
+import AdminGuard from "./components/admin/AdminGuard.tsx";
+import AdminLayout from "./components/admin/AdminLayout.tsx";
+import AdminOverview from "./pages/admin/AdminOverview.tsx";
+import AdminBusinesses from "./pages/admin/AdminBusinesses.tsx";
+import AdminInbox from "./pages/admin/AdminInbox.tsx";
+import AdminGiftCodes from "./pages/admin/AdminGiftCodes.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import { SubscriptionProvider } from "./hooks/useSubscription.tsx";
 
