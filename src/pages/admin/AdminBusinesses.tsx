@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import SectionCard from "@/components/app/SectionCard";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,6 @@ type Business = {
   created_at: string;
 };
 
-const statusVariant = (status: string) =>
-  status === "active" ? "success" : status === "cancelled" ? "destructive" : "secondary";
-
 export default function AdminBusinesses() {
   const [rows, setRows] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,41 +27,41 @@ export default function AdminBusinesses() {
     (async () => {
       const { data, error } = await supabase.rpc("admin_list_businesses");
       if (error) setError(error.message);
-      else setRows(data as unknown as Business[]);
+      else setRows((data as unknown as Business[]) ?? []);
       setLoading(false);
     })();
   }, []);
 
-  const filtered = useMemo(() => {
+  const filtered = rows.filter((r) => {
     const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
-      (r) =>
-        r.owner_email?.toLowerCase().includes(q) ||
-        r.business_name?.toLowerCase().includes(q)
+    if (!q) return true;
+    return (
+      r.owner_email?.toLowerCase().includes(q) ||
+      r.business_name?.toLowerCase().includes(q)
     );
-  }, [rows, search]);
+  });
 
   if (loading) return <p className="text-sm text-muted-foreground">Loading businesses…</p>;
   if (error) return <p className="text-sm text-destructive">Could not load businesses: {error}</p>;
 
   return (
     <div className="space-y-4">
-      <div className="relative">
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search by owner email or business name…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
+          className="pl-9"
         />
       </div>
 
       <SectionCard title={`Businesses (${filtered.length})`}>
         {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No businesses match.</p>
+          <p className="text-sm text-muted-foreground">No businesses match that search.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-left">
               <thead>
                 <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground border-b border-border">
                   <th className="py-2 pr-4">Business</th>
@@ -73,21 +70,24 @@ export default function AdminBusinesses() {
                   <th className="py-2 pr-4">Plan</th>
                   <th className="py-2 pr-4">Bookings</th>
                   <th className="py-2 pr-4">Joined</th>
-                </table-th>
+                </tr>
               </thead>
               <tbody>
                 {filtered.map((r) => (
                   <tr key={r.user_id} className="border-b border-border/50 last:border-0">
                     <td className="py-3 pr-4 font-medium">{r.business_name || "—"}</td>
-                    <td className="py-2 pr-4 text-sm text-muted-foreground">{r.owner_email}</td>
-                    <td className="py-2 pr-4 text-sm">{r.business_category || "—"}</td>
-                    <td className="py-2 pr-4">
-                      <Badge variant={statusVariant(r.status) as any} className="capitalize">
+                    <td className="py-3 pr-4 text-sm text-muted-foreground">{r.owner_email}</td>
+                    <td className="py-3 pr-4 text-sm capitalize">{r.business_category || "—"}</td>
+                    <td className="py-3 pr-4">
+                      <Badge
+                        variant={r.status === "active" ? "default" : r.status === "cancelled" ? "destructive" : "secondary"}
+                        className="capitalize"
+                      >
                         {r.tier === "none" ? "No plan" : r.tier} · {r.status}
                       </Badge>
                     </td>
-                    <td className="py-2 pr-4 text-sm">{r.bookings_count}</td>
-                    <td className="py-2 pr-4 text-xs text-muted-foreground whitespace-nowrap">
+                    <td className="py-3 pr-4 text-sm">{r.bookings_count}</td>
+                    <td className="py-3 pr-4 text-xs text-muted-foreground whitespace-nowrap">
                       {new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                     </td>
                   </tr>
