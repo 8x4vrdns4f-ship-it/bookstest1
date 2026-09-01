@@ -120,6 +120,11 @@ const App = () => (
             <Route path="/payments/refresh" element={<PaymentsRefresh />} />
           </Route>
 
+          <Route path="/admin" element={<AdminGuard><AdminLayout><AdminOverview /></AdminLayout></AdminGuard>} />
+          <Route path="/admin/businesses" element={<AdminGuard><AdminLayout><AdminBusinesses /></AdminLayout></AdminGuard>} />
+          <Route path="/admin/inbox" element={<AdminGuard><AdminLayout><AdminInbox /></AdminLayout></AdminGuard>} />
+          <Route path="/admin/gift-codes" element={<AdminGuard><AdminLayout><AdminGiftCodes /></AdminLayout></AdminGuard>} />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
