@@ -43,6 +43,13 @@
       "when": 1788349476312,
       "tag": "0005_harden_admin_access",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788350247203,
+      "tag": "0006_fix_admin_function_return_casts",
+      "breakpoints": true
     }
   ]
 }
