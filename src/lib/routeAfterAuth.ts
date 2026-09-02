@@ -13,6 +13,16 @@ export const getDashboardRoute = async (): Promise<string> => {
   if (!session) return "/auth";
   const uid = session.user.id;
 
+  // Platform admin? Straight to the admin panel.
+  const { data: adminRole } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", uid)
+    .eq("role", "admin")
+    .maybeSingle();
+  if (adminRole) return "/admin";
+
+
   // Linked employee?
   const { data: emp } = await supabase
     .from("employees")
