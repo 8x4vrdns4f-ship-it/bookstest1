@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import SectionCard from "@/components/app/SectionCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, ChevronRight } from "lucide-react";
+import BusinessDetailSheet from "@/components/admin/BusinessDetailSheet";
 
 type Business = {
   user_id: string;
@@ -22,6 +23,7 @@ export default function AdminBusinesses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -70,11 +72,16 @@ export default function AdminBusinesses() {
                   <th className="py-2 pr-4">Plan</th>
                   <th className="py-2 pr-4">Bookings</th>
                   <th className="py-2 pr-4">Joined</th>
+                  <th className="py-2" />
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((r) => (
-                  <tr key={r.user_id} className="border-b border-border/50 last:border-0">
+                  <tr
+                    key={r.user_id}
+                    onClick={() => setSelected(r.user_id)}
+                    className="border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/40 transition-colors"
+                  >
                     <td className="py-3 pr-4 font-medium">{r.business_name || "—"}</td>
                     <td className="py-3 pr-4 text-sm text-muted-foreground">{r.owner_email}</td>
                     <td className="py-3 pr-4 text-sm capitalize">{r.business_category || "—"}</td>
@@ -90,6 +97,7 @@ export default function AdminBusinesses() {
                     <td className="py-3 pr-4 text-xs text-muted-foreground whitespace-nowrap">
                       {new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                     </td>
+                    <td className="py-3 text-muted-foreground"><ChevronRight className="h-4 w-4" /></td>
                   </tr>
                 ))}
               </tbody>
@@ -97,6 +105,8 @@ export default function AdminBusinesses() {
           </div>
         )}
       </SectionCard>
+
+      <BusinessDetailSheet userId={selected} onOpenChange={(o) => !o && setSelected(null)} />
     </div>
   );
 }
