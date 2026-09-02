@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface Props { children: ReactNode }
 
@@ -9,29 +9,7 @@ interface Props { children: ReactNode }
  * has_role policies), never from client storage, so it can't be spoofed.
  */
 export default function AdminGuard({ children }: Props) {
-  const [state, setState] = useState<"loading" | "admin" | "signedin" | "anon">("loading");
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const check = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (cancelled) return;
-      if (!user) { setState("anon"); return; }
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      if (cancelled) return;
-      setState(error ? "signedin" : data ? "admin" : "signedin");
-    };
-
-    check();
-    const { data: sub } = supabase.auth.onAuthStateChange(() => { check(); });
-    return () => { cancelled = true; sub.subscription.unsubscribe(); };
-  }, []);
+  const state = useIsAdmin();
 
   if (state === "loading") {
     return (

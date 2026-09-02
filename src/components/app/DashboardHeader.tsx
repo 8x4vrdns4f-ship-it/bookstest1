@@ -19,6 +19,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications, type NotificationKind } from "@/context/NotificationsContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +68,8 @@ export default function DashboardHeader() {
   const [initials, setInitials] = useState("BS");
   const [email, setEmail] = useState("");
   const { notifications, unreadCount, markAllRead, markRead, clearAll } = useNotifications();
+  const adminState = useIsAdmin();
+
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -203,12 +207,18 @@ export default function DashboardHeader() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="text-xs text-muted-foreground truncate">{email || "Account"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {adminState === "admin" && (
+              <DropdownMenuItem asChild>
+                <Link to="/admin">Admin panel</Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link to="/settings">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/payments">Payments</Link>
             </DropdownMenuItem>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
               <LogOut className="h-4 w-4 mr-2" /> Log out
