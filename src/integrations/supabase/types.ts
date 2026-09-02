@@ -1454,6 +1454,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_business_detail: { Args: { p_user_id: string }; Returns: Json }
       admin_list_businesses: {
         Args: never
         Returns: {
