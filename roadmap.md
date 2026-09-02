@@ -1,0 +1,5 @@
+- [x] Add secure admin business detail RPC
+- [x] Make business rows open a full detail view
+- [ ] Make overview metrics and signups drill into relevant records
+- [ ] Make inbox messages and gift codes open detailed views with actions
+- [ ] Verify the admin routes build and render cleanly
