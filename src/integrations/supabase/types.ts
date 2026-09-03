@@ -1455,6 +1455,24 @@ export type Database = {
     }
     Functions: {
       admin_business_detail: { Args: { p_user_id: string }; Returns: Json }
+      admin_list_bookings: {
+        Args: { p_limit?: number }
+        Returns: {
+          booking_date: string
+          booking_id: string
+          booking_time: string
+          business_name: string
+          business_user_id: string
+          charge_amount: number
+          client_email: string
+          client_name: string
+          created_at: string
+          payment_status: string
+          platform_fee_amount: number
+          service: string
+          status: string
+        }[]
+      }
       admin_list_businesses: {
         Args: never
         Returns: {
@@ -1466,6 +1484,23 @@ export type Database = {
           status: string
           subscribed: boolean
           tier: string
+          user_id: string
+        }[]
+      }
+      admin_list_subscriptions: {
+        Args: never
+        Returns: {
+          business_name: string
+          canceled_at: string
+          created_at: string
+          current_period_end: string
+          owner_email: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          subscribed: boolean
+          tier: string
+          trial_end: string
           user_id: string
         }[]
       }

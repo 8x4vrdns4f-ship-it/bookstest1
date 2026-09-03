@@ -6,6 +6,8 @@ import BrandLogo from "@/components/BrandLogo";
 const tabs = [
   { to: "/admin", label: "Overview", end: true },
   { to: "/admin/businesses", label: "Businesses" },
+  { to: "/admin/bookings", label: "Bookings" },
+  { to: "/admin/subscriptions", label: "Subscriptions" },
   { to: "/admin/inbox", label: "Inbox" },
   { to: "/admin/gift-codes", label: "Gift codes" },
 ];

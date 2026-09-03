@@ -46,6 +46,8 @@ import AdminOverview from "./pages/admin/AdminOverview.tsx";
 import AdminBusinesses from "./pages/admin/AdminBusinesses.tsx";
 import AdminInbox from "./pages/admin/AdminInbox.tsx";
 import AdminGiftCodes from "./pages/admin/AdminGiftCodes.tsx";
+import AdminBookings from "./pages/admin/AdminBookings.tsx";
+import AdminSubscriptions from "./pages/admin/AdminSubscriptions.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import { SubscriptionProvider } from "./hooks/useSubscription.tsx";
 
@@ -122,6 +124,8 @@ const App = () => (
 
           <Route path="/admin" element={<AdminGuard><AdminLayout><AdminOverview /></AdminLayout></AdminGuard>} />
           <Route path="/admin/businesses" element={<AdminGuard><AdminLayout><AdminBusinesses /></AdminLayout></AdminGuard>} />
+          <Route path="/admin/bookings" element={<AdminGuard><AdminLayout><AdminBookings /></AdminLayout></AdminGuard>} />
+          <Route path="/admin/subscriptions" element={<AdminGuard><AdminLayout><AdminSubscriptions /></AdminLayout></AdminGuard>} />
           <Route path="/admin/inbox" element={<AdminGuard><AdminLayout><AdminInbox /></AdminLayout></AdminGuard>} />
           <Route path="/admin/gift-codes" element={<AdminGuard><AdminLayout><AdminGiftCodes /></AdminLayout></AdminGuard>} />
 
