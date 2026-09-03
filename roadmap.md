@@ -2,4 +2,5 @@
 - [x] Make business rows open a full detail view
 - [x] Make overview metrics and signups drill into relevant records
 - [x] Make inbox messages and gift codes open detailed views with actions
+- [x] Add admin bookings & subscriptions tabs with search, filters, and business drill-down
 - [ ] Signed-in browser verification of /admin drill-downs (blocked: no admin session available)
