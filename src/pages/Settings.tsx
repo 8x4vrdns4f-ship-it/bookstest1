@@ -18,6 +18,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ResourcesManager from "@/components/dashboard/ResourcesManager";
 import ServicesManager from "@/components/dashboard/ServicesManager";
+import SettingsAssistant from "@/components/dashboard/SettingsAssistant";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
