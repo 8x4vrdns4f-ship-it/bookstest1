@@ -240,6 +240,9 @@ const Settings = () => {
           <p className="page-subtitle">Manage your business, hours, booking preferences and more.</p>
         </div>
 
+        <SettingsAssistant onApplied={() => setReloadKey((k) => k + 1)} />
+
+
 
         <Accordion type="multiple" defaultValue={["company", "hours"]} className="space-y-3">
           {/* Company Info */}
