@@ -362,6 +362,42 @@ export type Database = {
         }
         Relationships: []
       }
+      client_portal_sessions: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          ip: string | null
+          session_expires_at: string | null
+          session_token_hash: string | null
+          token_hash: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          ip?: string | null
+          session_expires_at?: string | null
+          session_token_hash?: string | null
+          token_hash: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          ip?: string | null
+          session_expires_at?: string | null
+          session_token_hash?: string | null
+          token_hash?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           created_at: string
