@@ -35,6 +35,7 @@ import { template as platformAlert } from './platform-alert.tsx'
 import { template as platformDailySummary } from './platform-daily-summary.tsx'
 import { template as rebookingReminder } from './rebooking-reminder.tsx'
 import { template as campaignEmail } from './campaign-email.tsx'
+import { template as clientPortalLink } from './client-portal-link.tsx'
 
 
 
@@ -65,5 +66,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'platform-daily-summary': platformDailySummary,
   'rebooking-reminder': rebookingReminder,
   'campaign-email': campaignEmail,
+  'client-portal-link': clientPortalLink,
 }
 
