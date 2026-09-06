@@ -33,6 +33,8 @@ import PublicBooking from "./pages/PublicBooking.tsx";
 import BookingSuccess from "./pages/BookingSuccess.tsx";
 import BookingCancelled from "./pages/BookingCancelled.tsx";
 import ManageBooking from "./pages/ManageBooking.tsx";
+import MyBookings from "./pages/MyBookings.tsx";
+import MyBookingsVerify from "./pages/MyBookingsVerify.tsx";
 import SubmitReview from "./pages/SubmitReview.tsx";
 import Payments from "./pages/Payments.tsx";
 import PaymentsReturn from "./pages/PaymentsReturn.tsx";
@@ -99,7 +101,10 @@ const App = () => (
           <Route path="/book/:userId/success" element={<BookingSuccess />} />
           <Route path="/book/:userId/cancelled" element={<BookingCancelled />} />
           <Route path="/booking/manage/:token" element={<ManageBooking />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/my-bookings/verify" element={<MyBookingsVerify />} />
           <Route path="/review/:token" element={<SubmitReview />} />
+
           <Route path="/employee-dashboard" element={<RequireVerifiedEmail><EmployeeDashboard /></RequireVerifiedEmail>} />
           <Route path="/onboarding" element={<RequireVerifiedEmail><Onboarding /></RequireVerifiedEmail>} />
 
