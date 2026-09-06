@@ -18,6 +18,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ResourcesManager from "@/components/dashboard/ResourcesManager";
 import ServicesManager from "@/components/dashboard/ServicesManager";
+import SettingsAssistant from "@/components/dashboard/SettingsAssistant";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
@@ -104,6 +105,7 @@ const Settings = () => {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [form, setForm] = useState<SettingsForm>({
     business_name: "", business_phone: "", business_email: "", business_address: "",
     business_category: "", currency: "GBP", timezone: "Europe/London", deposit_amount: 10, payment_mode: "deposit",
@@ -175,7 +177,7 @@ const Settings = () => {
         }
         setLoading(false);
       });
-  }, [userId]);
+  }, [userId, reloadKey]);
 
   const copyCode = async () => {
     await navigator.clipboard.writeText(companyCode);
@@ -239,6 +241,9 @@ const Settings = () => {
           <h1 className="page-title">Settings</h1>
           <p className="page-subtitle">Manage your business, hours, booking preferences and more.</p>
         </div>
+
+        <SettingsAssistant onApplied={() => setReloadKey((k) => k + 1)} />
+
 
 
         <Accordion type="multiple" defaultValue={["company", "hours"]} className="space-y-3">
@@ -465,7 +470,7 @@ const Settings = () => {
                 {form.services_enabled && userId && (
                   <div className="pt-2 border-t border-border">
                     <Label className="text-foreground">Your services</Label>
-                    <div className="mt-3"><ServicesManager userId={userId} currency={form.currency} /></div>
+                    <div className="mt-3"><ServicesManager key={reloadKey} userId={userId} currency={form.currency} /></div>
                   </div>
                 )}
               </AccordionContent>
@@ -536,7 +541,7 @@ const Settings = () => {
                     </div>
                     <div className="pt-2 border-t border-border">
                       <Label className="text-foreground">Your {form.resource_label.toLowerCase() || "resource"}s</Label>
-                      {userId && <div className="mt-3"><ResourcesManager userId={userId} label={form.resource_label || "Resource"} /></div>}
+                      {userId && <div className="mt-3"><ResourcesManager key={reloadKey} userId={userId} label={form.resource_label || "Resource"} /></div>}
                     </div>
                   </>
                 )}
