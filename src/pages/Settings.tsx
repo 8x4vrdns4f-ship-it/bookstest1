@@ -104,6 +104,7 @@ const Settings = () => {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [form, setForm] = useState<SettingsForm>({
     business_name: "", business_phone: "", business_email: "", business_address: "",
     business_category: "", currency: "GBP", timezone: "Europe/London", deposit_amount: 10, payment_mode: "deposit",
