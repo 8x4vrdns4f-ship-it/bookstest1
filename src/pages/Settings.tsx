@@ -536,7 +536,7 @@ const Settings = () => {
                     </div>
                     <div className="pt-2 border-t border-border">
                       <Label className="text-foreground">Your {form.resource_label.toLowerCase() || "resource"}s</Label>
-                      {userId && <div className="mt-3"><ResourcesManager userId={userId} label={form.resource_label || "Resource"} /></div>}
+                      {userId && <div className="mt-3"><ResourcesManager key={reloadKey} userId={userId} label={form.resource_label || "Resource"} /></div>}
                     </div>
                   </>
                 )}
