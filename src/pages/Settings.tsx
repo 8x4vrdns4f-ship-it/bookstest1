@@ -465,7 +465,7 @@ const Settings = () => {
                 {form.services_enabled && userId && (
                   <div className="pt-2 border-t border-border">
                     <Label className="text-foreground">Your services</Label>
-                    <div className="mt-3"><ServicesManager userId={userId} currency={form.currency} /></div>
+                    <div className="mt-3"><ServicesManager key={reloadKey} userId={userId} currency={form.currency} /></div>
                   </div>
                 )}
               </AccordionContent>
