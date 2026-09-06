@@ -175,7 +175,7 @@ const Settings = () => {
         }
         setLoading(false);
       });
-  }, [userId]);
+  }, [userId, reloadKey]);
 
   const copyCode = async () => {
     await navigator.clipboard.writeText(companyCode);
