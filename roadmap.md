@@ -4,3 +4,4 @@
 - [x] Make inbox messages and gift codes open detailed views with actions
 - [x] Add admin bookings & subscriptions tabs with search, filters, and business drill-down
 - [ ] Signed-in browser verification of /admin drill-downs (blocked: no admin session available)
+- [x] Customer bookings portal (/my-bookings): emailed sign-in link, list, cancel, reschedule, rebook, calendar, details

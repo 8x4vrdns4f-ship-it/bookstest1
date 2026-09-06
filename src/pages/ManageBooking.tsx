@@ -221,8 +221,8 @@ const ManageBooking = () => {
                 </AlertDialog>
               )}
 
-              <Button variant="outline" className="w-full" onClick={() => navigate(`/book/${booking.id}`)}>
-                Book another appointment
+              <Button variant="outline" className="w-full" onClick={() => navigate("/my-bookings")}>
+                See all my bookings
               </Button>
             </CardContent>
           </Card>
