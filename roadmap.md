@@ -5,3 +5,4 @@
 - [x] Add admin bookings & subscriptions tabs with search, filters, and business drill-down
 - [ ] Signed-in browser verification of /admin drill-downs (blocked: no admin session available)
 - [x] Customer bookings portal (/my-bookings): emailed sign-in link, list, cancel, reschedule, rebook, calendar, details
+- [x] Performance & SEO polish: favicon 719KB→12KB, route code-splitting, lazy landing images, backend preconnect; SEO scan all green
