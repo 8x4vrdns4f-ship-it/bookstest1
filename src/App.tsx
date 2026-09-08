@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -11,56 +12,65 @@ import Security from "./pages/Security.tsx";
 import About from "./pages/About.tsx";
 import Contact from "./pages/Contact.tsx";
 import Cookies from "./pages/Cookies.tsx";
-import Auth from "./pages/Auth.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
-import BookingsPage from "./pages/dashboard/BookingsPage.tsx";
-import CalendarPage from "./pages/dashboard/CalendarPage.tsx";
-import ClientsPage from "./pages/dashboard/ClientsPage.tsx";
-import StaffPage from "./pages/dashboard/StaffPage.tsx";
-import ShiftsPage from "./pages/dashboard/ShiftsPage.tsx";
-import ReviewsPage from "./pages/dashboard/ReviewsPage.tsx";
-import InsightsPage from "./pages/dashboard/InsightsPage.tsx";
-import CampaignsPage from "./pages/dashboard/CampaignsPage.tsx";
-
-import EmployeeDashboard from "./pages/EmployeeDashboard.tsx";
-import Settings from "./pages/Settings.tsx";
-import ResetPassword from "./pages/ResetPassword.tsx";
-import PendingApproval from "./pages/PendingApproval.tsx";
-import JoinInvite from "./pages/JoinInvite.tsx";
-import Kiosk from "./pages/Kiosk.tsx";
-import EmbedWidget from "./pages/EmbedWidget.tsx";
-import PublicBooking from "./pages/PublicBooking.tsx";
-import BookingSuccess from "./pages/BookingSuccess.tsx";
-import BookingCancelled from "./pages/BookingCancelled.tsx";
-import ManageBooking from "./pages/ManageBooking.tsx";
-import MyBookings from "./pages/MyBookings.tsx";
-import MyBookingsVerify from "./pages/MyBookingsVerify.tsx";
-import SubmitReview from "./pages/SubmitReview.tsx";
-import Payments from "./pages/Payments.tsx";
-import PaymentsReturn from "./pages/PaymentsReturn.tsx";
-import PaymentsRefresh from "./pages/PaymentsRefresh.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import OAuthConsent from "./pages/OAuthConsent.tsx";
 import GuideDetail from "./pages/GuideDetail.tsx";
-import AdminGuard from "./components/admin/AdminGuard.tsx";
-import AdminLayout from "./components/admin/AdminLayout.tsx";
-import AdminOverview from "./pages/admin/AdminOverview.tsx";
-import AdminBusinesses from "./pages/admin/AdminBusinesses.tsx";
-import AdminInbox from "./pages/admin/AdminInbox.tsx";
-import AdminGiftCodes from "./pages/admin/AdminGiftCodes.tsx";
-import AdminBookings from "./pages/admin/AdminBookings.tsx";
-import AdminSubscriptions from "./pages/admin/AdminSubscriptions.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import { SubscriptionProvider } from "./hooks/useSubscription.tsx";
 
 import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
-import VerifyEmail from "./pages/VerifyEmail.tsx";
-import Onboarding from "./pages/Onboarding.tsx";
 import AppLayout from "./components/app/AppLayout.tsx";
 import { LocaleProvider } from "./contexts/LocaleContext.tsx";
 import CookieBanner from "./components/CookieBanner.tsx";
 
+const Auth = lazy(() => import("./pages/Auth.tsx"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail.tsx"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
+const PendingApproval = lazy(() => import("./pages/PendingApproval.tsx"));
+const JoinInvite = lazy(() => import("./pages/JoinInvite.tsx"));
+const Kiosk = lazy(() => import("./pages/Kiosk.tsx"));
+const EmbedWidget = lazy(() => import("./pages/EmbedWidget.tsx"));
+const PublicBooking = lazy(() => import("./pages/PublicBooking.tsx"));
+const BookingSuccess = lazy(() => import("./pages/BookingSuccess.tsx"));
+const BookingCancelled = lazy(() => import("./pages/BookingCancelled.tsx"));
+const ManageBooking = lazy(() => import("./pages/ManageBooking.tsx"));
+const MyBookings = lazy(() => import("./pages/MyBookings.tsx"));
+const MyBookingsVerify = lazy(() => import("./pages/MyBookingsVerify.tsx"));
+const SubmitReview = lazy(() => import("./pages/SubmitReview.tsx"));
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
+const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
+const EmployeeDashboard = lazy(() => import("./pages/EmployeeDashboard.tsx"));
+
+const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const BookingsPage = lazy(() => import("./pages/dashboard/BookingsPage.tsx"));
+const CalendarPage = lazy(() => import("./pages/dashboard/CalendarPage.tsx"));
+const ClientsPage = lazy(() => import("./pages/dashboard/ClientsPage.tsx"));
+const StaffPage = lazy(() => import("./pages/dashboard/StaffPage.tsx"));
+const ShiftsPage = lazy(() => import("./pages/dashboard/ShiftsPage.tsx"));
+const ReviewsPage = lazy(() => import("./pages/dashboard/ReviewsPage.tsx"));
+const InsightsPage = lazy(() => import("./pages/dashboard/InsightsPage.tsx"));
+const CampaignsPage = lazy(() => import("./pages/dashboard/CampaignsPage.tsx"));
+const Settings = lazy(() => import("./pages/Settings.tsx"));
+const Payments = lazy(() => import("./pages/Payments.tsx"));
+const PaymentsReturn = lazy(() => import("./pages/PaymentsReturn.tsx"));
+const PaymentsRefresh = lazy(() => import("./pages/PaymentsRefresh.tsx"));
+
+const AdminGuard = lazy(() => import("./components/admin/AdminGuard.tsx"));
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout.tsx"));
+const AdminOverview = lazy(() => import("./pages/admin/AdminOverview.tsx"));
+const AdminBusinesses = lazy(() => import("./pages/admin/AdminBusinesses.tsx"));
+const AdminInbox = lazy(() => import("./pages/admin/AdminInbox.tsx"));
+const AdminGiftCodes = lazy(() => import("./pages/admin/AdminGiftCodes.tsx"));
+const AdminBookings = lazy(() => import("./pages/admin/AdminBookings.tsx"));
+const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions.tsx"));
+
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+
 const queryClient = new QueryClient();
+
+const PageFallback = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+  </div>
+);
 
 const Guarded = ({ children }: { children: React.ReactNode }) => (
   <RequireVerifiedEmail>
