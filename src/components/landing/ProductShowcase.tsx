@@ -154,6 +154,7 @@ const ProductShowcase = () => {
                   width={current.w}
                   height={current.h}
                   loading="lazy"
+                  decoding="async"
                   className="block w-full h-auto"
                 />
               </BrowserFrame>
