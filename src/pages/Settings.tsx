@@ -20,6 +20,7 @@ import ResourcesManager from "@/components/dashboard/ResourcesManager";
 import ServicesManager from "@/components/dashboard/ServicesManager";
 import SettingsAssistant from "@/components/dashboard/SettingsAssistant";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
+import DeleteAccountDialog from "@/components/dashboard/DeleteAccountDialog";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
 
