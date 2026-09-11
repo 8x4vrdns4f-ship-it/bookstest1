@@ -3,6 +3,6 @@
 - [x] Make overview metrics and signups drill into relevant records
 - [x] Make inbox messages and gift codes open detailed views with actions
 - [x] Add admin bookings & subscriptions tabs with search, filters, and business drill-down
-- [ ] Signed-in browser verification of /admin drill-downs (blocked: no admin session available)
+- [x] Signed-in QA sweep: admin drill-downs, non-admin guard, owner dashboard actions, employee tabs/time-off/notifications, customer portal entry
 - [x] Customer bookings portal (/my-bookings): emailed sign-in link, list, cancel, reschedule, rebook, calendar, details
 - [x] Performance & SEO polish: favicon 719KB→12KB, route code-splitting, lazy landing images, backend preconnect; SEO scan all green
