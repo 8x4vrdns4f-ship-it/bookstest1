@@ -20,6 +20,7 @@ import ResourcesManager from "@/components/dashboard/ResourcesManager";
 import ServicesManager from "@/components/dashboard/ServicesManager";
 import SettingsAssistant from "@/components/dashboard/SettingsAssistant";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
+import DeleteAccountDialog from "@/components/dashboard/DeleteAccountDialog";
 import { useToast } from "@/hooks/use-toast";
 import SectionCard from "@/components/app/SectionCard";
 
@@ -717,7 +718,7 @@ const Settings = () => {
             <DangerRow icon={<KeyRound size={16} />} title="Reset Password" hint="Send a password reset email." action={<Button variant="outline" onClick={handleResetPassword}>Reset Password</Button>} />
             <DangerRow icon={<XCircle size={16} />} title="Cancel Subscription" hint="Instantly ends your plan and removes access. You won't be eligible for the free trial again." action={<CancelSubscriptionDialog />} />
             <DangerRow icon={<LogOut size={16} />} title="Log Out" hint="Sign out on this device." action={<Button variant="outline" onClick={handleLogout}>Log Out</Button>} />
-            <DangerRow icon={<Trash2 size={16} />} title="Delete Account" hint="Permanently delete your account. (Coming soon.)" action={<Button variant="destructive" disabled>Delete Account</Button>} />
+            <DangerRow icon={<Trash2 size={16} />} title="Delete Account" hint="Permanently delete your account and all business data. This cannot be undone." action={<DeleteAccountDialog />} />
           </CardContent>
         </Card>
       </div>
