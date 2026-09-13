@@ -7,4 +7,6 @@
 - [x] Customer bookings portal (/my-bookings): emailed sign-in link, list, cancel, reschedule, rebook, calendar, details
 - [x] Performance & SEO polish: favicon 719KB→12KB, route code-splitting, lazy landing images, backend preconnect; SEO scan all green
 - [x] Pre-launch gaps: working Delete Account (with confirmation + subscription cancel), gift-code marketing copy fixed in 5 languages, security scan clean
+- [x] Final polish: app-wide error screen, auto-recover from stale version, branded 404, home-screen icon/manifest/theme colour, no-flicker page loader
 - [ ] Add real registered company name, address and company number on Privacy/Terms/About (currently "[TO BE ADDED]")
+- [ ] Fix www.booksuite.online DNS at Cloudflare (A record to 185.158.133.1 + verification TXT) — needs registrar access
