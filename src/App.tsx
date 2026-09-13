@@ -1,4 +1,5 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
+import ErrorBoundary from "./components/ErrorBoundary.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -66,11 +67,20 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
 
-const PageFallback = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-  </div>
-);
+const PageFallback = () => {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const id = window.setTimeout(() => setShow(true), 200);
+    return () => window.clearTimeout(id);
+  }, []);
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      {show && (
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      )}
+    </div>
+  );
+};
 
 const Guarded = ({ children }: { children: React.ReactNode }) => (
   <RequireVerifiedEmail>
@@ -88,6 +98,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ErrorBoundary>
         <Suspense fallback={<PageFallback />}>
         <Routes>
           {/* Public */}
@@ -149,6 +160,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
+        </ErrorBoundary>
         <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>
