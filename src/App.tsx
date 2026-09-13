@@ -98,6 +98,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ErrorBoundary>
         <Suspense fallback={<PageFallback />}>
         <Routes>
           {/* Public */}
