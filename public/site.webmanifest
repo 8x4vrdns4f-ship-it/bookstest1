@@ -4,8 +4,8 @@
   "description": "All-in-one booking software for small service businesses.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0B1220",
-  "theme_color": "#0B1220",
+  "background_color": "#070c14",
+  "theme_color": "#070c14",
   "icons": [
     {
       "src": "/favicon.png",

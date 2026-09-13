@@ -4,6 +4,7 @@ import DashboardSidebar from "./DashboardSidebar";
 import DashboardHeader from "./DashboardHeader";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { useDashboardContext } from "@/hooks/useDashboardContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function AppLayout() {
   const ctx = useDashboardContext();
@@ -19,7 +20,9 @@ export default function AppLayout() {
             <DashboardHeader />
             <main className="flex-1 overflow-x-hidden">
               <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-6 md:py-8">
-                <Outlet />
+                <ErrorBoundary>
+                  <Outlet />
+                </ErrorBoundary>
               </div>
             </main>
           </div>
