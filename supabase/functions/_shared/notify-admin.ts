@@ -35,7 +35,7 @@ export async function notifyAdmin(admin: SupabaseClient, alert: AdminAlert): Pro
   try {
     const to = adminAlertEmail();
     if (!to) return;
-    await admin.functions.invoke("send-transactional-email", {
+    await admin.functions.invoke("app-email", {
       body: {
         templateName: "platform-alert",
         recipientEmail: to,

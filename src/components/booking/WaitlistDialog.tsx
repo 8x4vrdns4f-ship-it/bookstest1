@@ -48,10 +48,10 @@ const WaitlistDialog = ({ userId, businessName }: Props) => {
       return;
     }
 
-    // Fire-and-forget confirmation email (invoke without auth is fine — send-transactional-email is public).
+    // Fire-and-forget confirmation email (invoke without auth is fine — app-email is public).
     try {
       const timeWindow = form.start && form.end ? `${form.start}–${form.end}` : form.start || form.end || undefined;
-      await supabase.functions.invoke("send-transactional-email", {
+      await supabase.functions.invoke("app-email", {
         body: {
           templateName: "waitlist-added",
           recipientEmail: form.email,

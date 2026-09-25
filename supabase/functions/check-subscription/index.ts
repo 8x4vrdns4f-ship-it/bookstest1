@@ -149,7 +149,7 @@ serve(async (req) => {
     // Fire activation email on first transition false -> true OR new billing period
     if (subscribed && tier && (!prevSub?.subscribed || prevSub?.current_period_end !== periodEnd)) {
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "subscription-activated",
             recipientEmail: user.email,

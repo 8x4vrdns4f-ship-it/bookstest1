@@ -63,7 +63,7 @@ serve(async (req) => {
       }, { onConflict: "user_id" });
 
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "subscription-canceled",
             recipientEmail: user.email,
@@ -125,7 +125,7 @@ serve(async (req) => {
     }, { onConflict: "user_id" });
 
     try {
-      await admin.functions.invoke("send-transactional-email", {
+      await admin.functions.invoke("app-email", {
         body: {
           templateName: "subscription-canceled",
           recipientEmail: user.email,

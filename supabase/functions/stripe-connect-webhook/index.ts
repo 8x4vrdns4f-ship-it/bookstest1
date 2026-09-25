@@ -90,12 +90,12 @@ async function sendEmail(
   templateData: Record<string, unknown>,
 ) {
   try {
-    const { error } = await admin.functions.invoke("send-transactional-email", {
+    const { error } = await admin.functions.invoke("app-email", {
       body: { templateName, recipientEmail, idempotencyKey, templateData },
     });
-    if (error) console.error("send-transactional-email error", { templateName, recipientEmail, error });
+    if (error) console.error("app-email error", { templateName, recipientEmail, error });
   } catch (e) {
-    console.error("send-transactional-email threw", e);
+    console.error("app-email threw", e);
   }
 }
 

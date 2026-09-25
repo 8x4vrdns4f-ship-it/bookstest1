@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
     let notified = 0;
     for (const e of entries) {
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "waitlist-slot-open",
             recipientEmail: e.client_email,

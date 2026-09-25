@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     const link = `${origin}/my-bookings/verify?token=${token}`;
 
     try {
-      await admin.functions.invoke("send-transactional-email", {
+      await admin.functions.invoke("app-email", {
         body: {
           templateName: "client-portal-link",
           recipientEmail: email,

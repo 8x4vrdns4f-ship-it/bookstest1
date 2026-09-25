@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       const depositStr = dep > 0 ? `${sym}${dep.toFixed(ccy === "JPY" ? 0 : 2)}` : "";
 
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-request-reminder-owner",
             recipientEmail: ownerEmail,

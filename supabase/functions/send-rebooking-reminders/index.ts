@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     for (const row of lapsed || []) {
       const bookingUrl = `https://booksuite.online/book/${row.user_id}`;
       try {
-        const { error: sendErr } = await admin.functions.invoke("send-transactional-email", {
+        const { error: sendErr } = await admin.functions.invoke("app-email", {
           body: {
             templateName: "rebooking-reminder",
             recipientEmail: row.client_email,

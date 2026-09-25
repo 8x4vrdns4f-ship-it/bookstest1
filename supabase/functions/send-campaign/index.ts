@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
         }
         const unsubscribeUrl = `${SUPABASE_URL}/functions/v1/handle-email-unsubscribe?token=${unsubToken}`;
 
-        const { error: sendErr } = await admin.functions.invoke("send-transactional-email", {
+        const { error: sendErr } = await admin.functions.invoke("app-email", {
           body: {
             templateName: "campaign-email",
             recipientEmail: email,

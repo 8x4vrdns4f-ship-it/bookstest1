@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
       await admin.from("bookings").update(updates).eq("id", booking.id);
 
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-cancelled-client",
             recipientEmail: booking.client_email,
@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
     if (upErr) throw upErr;
 
     try {
-      await admin.functions.invoke("send-transactional-email", {
+      await admin.functions.invoke("app-email", {
         body: {
           templateName: "booking-confirmed",
           recipientEmail: booking.client_email,

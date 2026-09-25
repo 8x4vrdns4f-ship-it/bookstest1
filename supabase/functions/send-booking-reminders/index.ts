@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
         : "";
 
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-reminder-client",
             recipientEmail: booking.client_email,

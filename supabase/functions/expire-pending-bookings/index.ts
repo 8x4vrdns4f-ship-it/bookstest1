@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
 
       if (pending.client_email) {
         try {
-          await admin.functions.invoke("send-transactional-email", {
+          await admin.functions.invoke("app-email", {
             body: {
               templateName: "booking-request-expired",
               recipientEmail: pending.client_email,
@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
         const { data: ownerEmailData } = await admin.rpc("get_owner_email", { _user_id: pending.user_id });
         const ownerEmail = ownerEmailData as string | null;
         if (ownerEmail) {
-          await admin.functions.invoke("send-transactional-email", {
+          await admin.functions.invoke("app-email", {
             body: {
               templateName: "booking-request-expired-owner",
               recipientEmail: ownerEmail,

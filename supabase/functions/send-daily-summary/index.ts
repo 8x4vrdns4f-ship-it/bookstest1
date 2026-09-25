@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
       ? "No activity across BookSuite in the last 24 hours."
       : `${newProfiles.length} new signup(s), ${bookings.length} booking(s), ${money(gross)} processed, ${money(fees)} in platform fees.`;
 
-    await admin.functions.invoke("send-transactional-email", {
+    await admin.functions.invoke("app-email", {
       body: {
         templateName: "platform-daily-summary",
         recipientEmail: adminAlertEmail(),
