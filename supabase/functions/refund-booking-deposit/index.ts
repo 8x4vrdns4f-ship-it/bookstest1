@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
 
     if (booking.client_email) {
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-refunded",
             recipientEmail: booking.client_email,

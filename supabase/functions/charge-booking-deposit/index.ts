@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
       : undefined;
     try {
       if (booking.client_email) {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-confirmed",
             recipientEmail: booking.client_email,

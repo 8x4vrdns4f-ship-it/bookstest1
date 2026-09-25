@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     // Email the customer
     if (pending.client_email) {
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-declined",
             recipientEmail: pending.client_email,

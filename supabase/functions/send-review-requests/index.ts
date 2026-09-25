@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       const reviewUrl = `https://booksuite.online/review/${booking.review_token}`;
 
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "review-request-client",
             recipientEmail: booking.client_email,

@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
 
     // Notify support, then confirm to the sender. Neither failure blocks the save.
     try {
-      await admin.functions.invoke("send-transactional-email", {
+      await admin.functions.invoke("app-email", {
         body: {
           templateName: "contact-received-owner",
           recipientEmail: SUPPORT_EMAIL,
@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     }
 
     try {
-      await admin.functions.invoke("send-transactional-email", {
+      await admin.functions.invoke("app-email", {
         body: {
           templateName: "contact-confirmation",
           recipientEmail: email,

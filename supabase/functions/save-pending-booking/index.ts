@@ -300,7 +300,7 @@ Deno.serve(async (req) => {
     }
     if (ownerEmail && settings.notify_new_booking !== false) {
       try {
-        await admin.functions.invoke("send-transactional-email", {
+        await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-paid-owner",
             recipientEmail: ownerEmail,
