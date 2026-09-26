@@ -147,19 +147,7 @@ const PublicBooking = () => {
         <PublicBookingTrustStrip cancellationHours={info?.cancellation_hours} />
 
 
-        {showBranding && (
-        <footer className="text-center text-xs text-muted-foreground pt-4">
-          Powered by{" "}
-          <a
-            href="https://booksuite.online"
-            className="font-medium text-foreground hover:text-primary transition-colors"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            BookSuite
-          </a>
-        </footer>
-        )}
+        {showBranding && <PoweredByBookSuite className="pt-2" source="booking-page" />}
       </div>
     </div>
   );
