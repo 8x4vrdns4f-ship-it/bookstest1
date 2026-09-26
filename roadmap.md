@@ -11,3 +11,4 @@
 - [x] Honest email claims made true: businesses choose their own sender name + replies (Settings → Emails to your customers), BookSuite credited in every customer email, waitlist confirmations now actually send
 - [ ] Add real registered company name, address and company number on Privacy/Terms/About (currently "[TO BE ADDED]")
 - [x] Fix www.booksuite.online DNS at Cloudflare — verified 2026-09-26: A + TXT correct, status active, redirects to booksuite.online over HTTPS
+- [x] Custom booking widget design (logo, colours, font, corners, live preview, save)
