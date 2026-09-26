@@ -69,6 +69,7 @@ Deno.serve(async (req) => {
         await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-declined",
+            businessUserId: pending.user_id,
             recipientEmail: pending.client_email,
             idempotencyKey: `pending-declined-${pending.id}`,
             templateData: {
