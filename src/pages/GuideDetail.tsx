@@ -199,8 +199,9 @@ const GUIDES: Guide[] = [
 
         <h2>Reminders in BookSuite</h2>
         <p>
-          BookSuite sends the confirmation, 24-hour, and 2-hour reminders automatically from
-          your own verified sending domain — meaning inbox deliverability stays high.{" "}
+          BookSuite sends the confirmation, 24-hour, and 2-hour reminders automatically from a
+          verified, authenticated sending domain — so they reach inboxes rather than spam folders.
+          Your business name shows as the sender, and replies can land straight in your own inbox.{" "}
           <Link to="/pricing" className="text-primary underline">
             See pricing
           </Link>{" "}

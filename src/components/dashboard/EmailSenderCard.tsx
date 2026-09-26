@@ -86,7 +86,7 @@ const EmailSenderCard = ({ userId }: { userId: string }) => {
     return () => {
       active = false;
     };
-  }, [userId, savedLocal]);
+  }, [userId]);
 
   const derivedLocal = slugToLocalPart(businessName);
   const effectiveLocal = isValidLocalPart(localPart) ? localPart : derivedLocal;
@@ -133,7 +133,7 @@ const EmailSenderCard = ({ userId }: { userId: string }) => {
         service: "Sample of how your emails look",
         date: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
         time: "14:30",
-        manageUrl: `${publicBookingUrl()}`,
+        manageUrl: "https://booksuite.online/my-bookings",
       },
       userId
     );
@@ -262,9 +262,5 @@ const EmailSenderCard = ({ userId }: { userId: string }) => {
     </SectionCard>
   );
 };
-
-function publicBookingUrl(): string {
-  return "https://booksuite.online/my-bookings";
-}
 
 export default EmailSenderCard;
