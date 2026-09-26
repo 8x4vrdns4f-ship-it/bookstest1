@@ -48,22 +48,11 @@ const WaitlistDialog = ({ userId, businessName }: Props) => {
       return;
     }
 
-    // Fire-and-forget confirmation email (invoke without auth is fine — app-email is public).
+    // The confirmation email is sent server-side: a visitor joining a waitlist
+    // is not signed in, and app-email only accepts authenticated callers.
     try {
-      const timeWindow = form.start && form.end ? `${form.start}–${form.end}` : form.start || form.end || undefined;
-      await supabase.functions.invoke("app-email", {
-        body: {
-          templateName: "waitlist-added",
-          recipientEmail: form.email,
-          idempotencyKey: `waitlist-added-${userId}-${form.email}-${form.date}`,
-          templateData: {
-            businessName,
-            clientName: form.name,
-            service: form.service || undefined,
-            date: new Date(form.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
-            timeWindow,
-          },
-        },
+      await supabase.functions.invoke("confirm-waitlist-join", {
+        body: { user_id: userId, client_email: form.email, preferred_date: form.date },
       });
     } catch { /* non-fatal */ }
 
