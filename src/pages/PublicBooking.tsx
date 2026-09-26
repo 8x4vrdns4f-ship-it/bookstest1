@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import PublicBookingHeader from "@/components/booking/PublicBookingHeader";
 import PublicBookingTrustStrip from "@/components/booking/PublicBookingTrustStrip";
+import PoweredByBookSuite from "@/components/booking/PoweredByBookSuite";
 import WaitlistDialog from "@/components/booking/WaitlistDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -147,19 +148,7 @@ const PublicBooking = () => {
         <PublicBookingTrustStrip cancellationHours={info?.cancellation_hours} />
 
 
-        {showBranding && (
-        <footer className="text-center text-xs text-muted-foreground pt-4">
-          Powered by{" "}
-          <a
-            href="https://booksuite.online"
-            className="font-medium text-foreground hover:text-primary transition-colors"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            BookSuite
-          </a>
-        </footer>
-        )}
+        {showBranding && <PoweredByBookSuite className="pt-2" source="booking-page" />}
       </div>
     </div>
   );
