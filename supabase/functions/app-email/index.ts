@@ -14,6 +14,7 @@ const CLIENT_FACING_TEMPLATES = new Set([
   'booking-followup',
   'booking-cancelled-client',
   'booking-reminder-client',
+  'booking-refunded',
   'review-request-client',
   'waitlist-added',
   'waitlist-slot-open',

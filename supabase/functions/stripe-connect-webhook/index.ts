@@ -295,7 +295,7 @@ async function handleChargeRefunded(
       date: formatDate(booking.booking_date),
       time: formatTime(booking.booking_time),
       refundAmount,
-    });
+    }, booking.user_id);
   }
 }
 
