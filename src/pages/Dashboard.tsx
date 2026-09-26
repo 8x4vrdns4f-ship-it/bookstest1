@@ -22,6 +22,7 @@ import JoinRequestsCard from "@/components/dashboard/JoinRequestsCard";
 import GiftCodesCard from "@/components/dashboard/GiftCodesCard";
 import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 import BookingLinkCard from "@/components/dashboard/BookingLinkCard";
+import ShareKitCard from "@/components/dashboard/ShareKitCard";
 import { StatsSkeleton } from "@/components/app/ListSkeleton";
 
 import ReceptionistView from "@/components/dashboard/ReceptionistView";
@@ -123,6 +124,8 @@ export default function Dashboard() {
           {isOwner && !statsLoading && !hasAnyActivity && (
             <BookingLinkCard userId={user.id} />
           )}
+
+          {isOwner && <ShareKitCard userId={user.id} businessName={displayName} />}
 
           {/* Stats */}
           {statsLoading ? (
