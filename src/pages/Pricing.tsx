@@ -126,9 +126,20 @@ const Pricing = () => {
           </h1>
           <p className="text-muted-foreground text-center mb-4 max-w-lg mx-auto">{t("pricing.sub")}</p>
           <p className="text-center text-sm text-primary mb-4">{t("pricing.trial")}</p>
-          <p className="text-center text-xs text-muted-foreground mb-12 max-w-xl mx-auto">
+          <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto">
             {t("pricing.note", { currency })}
           </p>
+          {signedIn && (
+            <div className="text-center mb-10">
+              <Button
+                onClick={handleSignOut}
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground gap-2"
+              >
+                Log out
+              </Button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {tiers.map((tier) => (
