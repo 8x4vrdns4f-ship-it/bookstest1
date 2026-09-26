@@ -89,7 +89,7 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, onChanged }
           businessName: bs?.business_name || "the business",
           clientName: booking.client_name, service: booking.service,
           date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
-        });
+        }, ownerId);
       }
       // Notify waitlist for that date (non-fatal).
       try {
