@@ -20,6 +20,7 @@ import ResourcesManager from "@/components/dashboard/ResourcesManager";
 import ServicesManager from "@/components/dashboard/ServicesManager";
 import SettingsAssistant from "@/components/dashboard/SettingsAssistant";
 import EmailSenderCard from "@/components/dashboard/EmailSenderCard";
+import WidgetDesignCard from "@/components/dashboard/WidgetDesignCard";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import DeleteAccountDialog from "@/components/dashboard/DeleteAccountDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -75,7 +76,6 @@ type SettingsForm = {
   rebooking_reminder_enabled: boolean;
   rebooking_reminder_days: number;
   welcome_message: string;
-  accent_color: string;
   self_checkin_enabled: boolean;
   reception_checkin_enabled: boolean;
   resources_enabled: boolean;
@@ -116,7 +116,7 @@ const Settings = () => {
     notify_new_booking: true, notify_daily_summary: false,
     notify_client_confirmation: true, notify_client_reminder: true, notify_client_review_request: true,
     rebooking_reminder_enabled: false, rebooking_reminder_days: 60,
-    welcome_message: "", accent_color: "#3B82F6",
+    welcome_message: "",
     self_checkin_enabled: false, reception_checkin_enabled: true,
     resources_enabled: false, resource_label: "Resource",
     party_size_enabled: false, assignment_mode: "client_pick", waitlist_enabled: false, services_enabled: false,
@@ -162,7 +162,6 @@ const Settings = () => {
             rebooking_reminder_enabled: (data as any).rebooking_reminder_enabled ?? false,
             rebooking_reminder_days: Number((data as any).rebooking_reminder_days ?? 60),
             welcome_message: data.welcome_message || "",
-            accent_color: data.accent_color || "#3B82F6",
             self_checkin_enabled: !!data.self_checkin_enabled,
             reception_checkin_enabled: data.reception_checkin_enabled ?? true,
             resources_enabled: (data as any).resources_enabled ?? false,
@@ -696,16 +695,13 @@ const Settings = () => {
                   disabled={!canBrand}
                 />
               </Field>
-              <Field label="Accent Color" hint="Primary color for your booking page.">
-                <div className="flex items-center gap-3">
-                  <input type="color" value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className="h-10 w-16 rounded cursor-pointer bg-secondary border border-border disabled:opacity-50 disabled:cursor-not-allowed" disabled={!canBrand} />
-                  <Input value={form.accent_color} onChange={(e) => setForm({ ...form, accent_color: e.target.value })} className="bg-secondary border-border max-w-[140px]" disabled={!canBrand} />
-                </div>
-              </Field>
             </AccordionContent>
 
           </AccordionItem>
           </SectionCard>
+
+          {/* Widget design */}
+          {userId && <WidgetDesignCard userId={userId} canBrand={canBrand} />}
         </Accordion>
 
         <Button onClick={handleSave} disabled={saving} className="w-full mt-6 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">

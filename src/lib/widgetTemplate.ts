@@ -966,6 +966,7 @@ export const buildWidgetHtml = (opts: {
   userId: string;
   paymentEnvironment?: "sandbox" | "live";
   stripePublishableKey: string;
+  previewTheme?: WidgetTheme;
 }) => `<!DOCTYPE html>
 <html lang="en">
 <head>
