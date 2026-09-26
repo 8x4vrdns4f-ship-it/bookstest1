@@ -24,6 +24,46 @@ export interface SendTemplateEmailOptions {
   /** Dedupes retries of the same logical send; defaults to a random UUID (no dedupe). */
   idempotencyKey?: string
   replyTo?: string
+  /**
+   * Display name in the From line (e.g. a business name). Defaults to SITE_NAME.
+   * Never used as an address — it is sanitised and quoted when needed.
+   */
+  fromName?: string
+  /**
+   * Address in the From line. Must sit on the verified sending domain
+   * (FROM_DOMAIN); anything else throws. Defaults to noreply@FROM_DOMAIN.
+   */
+  fromAddress?: string
+}
+
+/** Strips header-injection characters and clamps length. */
+function cleanDisplayName(value: string): string {
+  return value
+    .replace(/[\r\n\t]/g, ' ')
+    .replace(/[<>]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .slice(0, 80)
+}
+
+/**
+ * RFC 5322 display names made of letters, digits, spaces and a few benign
+ * marks can go unquoted; anything else must be double-quoted to stay valid.
+ */
+function formatDisplayName(value: string): string {
+  return /^[\w\s'&+.,-]+$/.test(value) ? value : `"${value.replace(/["\\]/g, '')}"`
+}
+
+/** Only addresses on the verified sending domain may appear in From:. */
+function resolveFromAddress(value: string): string {
+  const address = value.trim().toLowerCase()
+  const domain = address.split('@')[1]
+  if (!address.includes('@') || domain !== FROM_DOMAIN.toLowerCase()) {
+    throw new Error(
+      `From address must be on the verified sending domain (${FROM_DOMAIN})`
+    )
+  }
+  return address
 }
 
 /**
