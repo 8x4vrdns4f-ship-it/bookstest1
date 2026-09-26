@@ -196,6 +196,8 @@ export type Database = {
           day_end_hour: number
           day_start_hour: number
           deposit_amount: number
+          email_from_local: string | null
+          email_from_mode: string
           id: string
           max_advance_days: number
           max_rental_days: number
@@ -244,6 +246,8 @@ export type Database = {
           day_end_hour?: number
           day_start_hour?: number
           deposit_amount?: number
+          email_from_local?: string | null
+          email_from_mode?: string
           id?: string
           max_advance_days?: number
           max_rental_days?: number
@@ -292,6 +296,8 @@ export type Database = {
           day_end_hour?: number
           day_start_hour?: number
           deposit_amount?: number
+          email_from_local?: string | null
+          email_from_mode?: string
           id?: string
           max_advance_days?: number
           max_rental_days?: number
