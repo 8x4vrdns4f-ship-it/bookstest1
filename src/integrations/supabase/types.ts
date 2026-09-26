@@ -1625,6 +1625,7 @@ export type Database = {
           status: string
         }[]
       }
+      get_founding_spots_remaining: { Args: never; Returns: number }
       get_lapsed_clients: {
         Args: never
         Returns: {
