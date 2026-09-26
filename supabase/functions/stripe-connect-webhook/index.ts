@@ -88,10 +88,11 @@ async function sendEmail(
   recipientEmail: string,
   idempotencyKey: string,
   templateData: Record<string, unknown>,
+  businessUserId?: string,
 ) {
   try {
     const { error } = await admin.functions.invoke("app-email", {
-      body: { templateName, recipientEmail, idempotencyKey, templateData },
+      body: { templateName, recipientEmail, idempotencyKey, templateData, businessUserId },
     });
     if (error) console.error("app-email error", { templateName, recipientEmail, error });
   } catch (e) {
@@ -224,7 +225,7 @@ async function handleCheckoutCompleted(
       confirmationCode: booking.confirmation_code,
       checkInUrl,
       depositAmount,
-    });
+    }, booking.user_id);
   }
 
   // 2) Owner notification (respect toggle)
