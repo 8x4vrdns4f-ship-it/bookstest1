@@ -11,7 +11,7 @@ export default function ClientsPage() {
       <SEO title="Clients — BookSuite" description="Your client database." path="/dashboard/clients" noIndex />
       <PageHeader
         title="Clients"
-        description="Everyone who has booked with you. Clients are added automatically the first time someone books — there's nothing to import."
+        description="Everyone who has booked with you. Clients are added automatically when someone books — or import your existing list from another tool in one go."
       />
       <ClientList userId={ctx.businessUserId} />
     </>

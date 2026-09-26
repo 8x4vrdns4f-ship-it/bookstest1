@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Mail, Phone, Users } from "lucide-react";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
+import ImportClientsDialog from "@/components/dashboard/ImportClientsDialog";
 
 type Client = {
   id: string;
@@ -65,6 +66,8 @@ const ClientList = ({ userId }: { userId: string }) => {
       title="Clients"
       description="Your customer contact list."
       actions={
+        <div className="flex items-center gap-2">
+        <ImportClientsDialog userId={userId} onImported={fetchClients} />
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="sm" variant="premium" className="gap-1">
@@ -100,6 +103,7 @@ const ClientList = ({ userId }: { userId: string }) => {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       }
     >
       {clients.length === 0 ? (
