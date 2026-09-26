@@ -131,7 +131,7 @@ const Pricing = () => {
           <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto">
             {t("pricing.note", { currency })}
           </p>
-          {signedIn && (
+          {signedIn && !subLoading && !isActive && (
             <div className="text-center mb-10">
               <Button
                 onClick={handleSignOut}
