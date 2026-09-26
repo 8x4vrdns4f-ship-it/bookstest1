@@ -15,6 +15,19 @@ export const DEFAULT_FEE_PERCENT = 12.5;
  * tier is found, so the platform is never under-charged by accident.
  */
 export async function resolveFeePercent(
+  admin: { from: (t: string) => any; rpc?: (fn: string, args: any) => any },
+  userId: string,
+): Promise<number> {
+  const base = await resolveBaseFeePercent(admin, userId);
+  // Founding members (first 100 businesses) pay half fees for their first 30 days.
+  try {
+    const { data } = await admin.rpc!("is_founding_discount_active", { _user_id: userId });
+    if (data === true) return base / 2;
+  } catch (_) { /* fall back to full fee */ }
+  return base;
+}
+
+async function resolveBaseFeePercent(
   admin: { from: (t: string) => any },
   userId: string,
 ): Promise<number> {

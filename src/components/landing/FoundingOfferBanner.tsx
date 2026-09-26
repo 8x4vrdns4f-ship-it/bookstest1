@@ -24,7 +24,7 @@ const FoundingOfferBanner = () => {
         <span className="flex items-center gap-2 text-foreground">
           <Sparkles className="h-4 w-4 text-primary" aria-hidden />
           <span>
-            <strong>Founding member offer:</strong> 30 days free + we'll import your clients for you.{" "}
+            <strong>Founding member offer:</strong> half-price booking fees for your first 30 days.{" "}
             <span className="font-semibold text-primary">Only {remaining} of 100 spots left.</span>
           </span>
         </span>
