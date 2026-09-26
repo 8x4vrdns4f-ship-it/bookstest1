@@ -233,6 +233,32 @@ Deno.serve(async (req) => {
   }
 
 
+  // Sender identity: customer-facing emails use the business's own choice
+  // (BookSuite-branded by default); everything else stays plain BookSuite.
+  if (businessUserId && !UUID_RE.test(businessUserId)) {
+    return new Response(JSON.stringify({ error: 'Invalid businessUserId' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  if (businessUserId && callerRole === 'authenticated' && businessUserId !== callerUserId) {
+    console.warn('app-email: businessUserId does not belong to caller', { callerUserId, templateName })
+    return new Response(JSON.stringify({ error: 'businessUserId does not match the caller' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  let sender: SenderIdentity | undefined
+  if (CLIENT_FACING_TEMPLATES.has(templateName)) {
+    try {
+      sender = await resolveSenderIdentity(supabase, businessUserId)
+    } catch (err) {
+      console.warn('app-email: sender identity lookup failed', {
+        message: err instanceof Error ? err.message : String(err),
+      })
+    }
+  }
+
   // Send through Lovable's managed email API (suppression enforced server-side).
   const json = (body: Record<string, unknown>, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -253,6 +279,9 @@ Deno.serve(async (req) => {
     const result = await sendTemplateEmail(templateName, effectiveRecipient, {
       templateData,
       idempotencyKey,
+      fromName: sender?.fromName,
+      fromAddress: sender?.fromAddress,
+      replyTo: sender?.replyTo,
     })
     if (!result.sent) {
       await log({ status: 'suppressed' })
