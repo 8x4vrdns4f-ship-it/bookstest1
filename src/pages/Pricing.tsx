@@ -11,14 +11,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import GiftCodeRedeem from "@/components/GiftCodeRedeem";
 import { useLocale } from "@/contexts/LocaleContext";
-import { useSubscription } from "@/hooks/useSubscription";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
   const navigate = useNavigate();
   const { t, formatPrice, currency } = useLocale();
-  const { loading: subLoading, isActive } = useSubscription();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSignedIn(!!session));
@@ -131,7 +129,7 @@ const Pricing = () => {
           <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto">
             {t("pricing.note", { currency })}
           </p>
-          {signedIn && !subLoading && !isActive && (
+          {signedIn && (
             <div className="text-center mb-10">
               <Button
                 onClick={handleSignOut}
