@@ -17,3 +17,8 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 
 - Route-level `React.lazy` in `src/App.tsx` with a delayed `PageFallback`. Why: keeps the landing bundle small without a loading-flicker.
 - Colours, shadows and radii come from the tokens in `src/index.css`; never hardcode colour utilities. Why: dark mode and theming depend on them.
+
+## Booking widget
+
+- Widget look (accent/bg/text/font/radius/logo) lives on `business_settings` and is applied at runtime by the widget script from `get_widget_settings`, which falls back to defaults unless the tier allows `custom_branding`. Why: embeds already on customer sites update without re-copying code, and gating stays server-side.
+- Widget logos are stored as small resized data URLs in `widget_logo_url`, not in Storage. Why: public buckets are blocked on this workspace.
