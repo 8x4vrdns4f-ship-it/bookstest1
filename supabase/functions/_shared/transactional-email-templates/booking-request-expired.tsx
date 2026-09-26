@@ -4,6 +4,7 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -36,6 +37,7 @@ const BookingRequestExpiredEmail = ({
           <strong>No charge was made</strong> to your card. You're welcome to request another time whenever you're ready.
         </Text>
         <Text style={footer}>— {businessName}</Text>
+        <PoweredByFooter source="expired-request-email" />
       </Container>
     </Body>
   </Html>

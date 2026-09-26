@@ -2,6 +2,7 @@
 import * as React from 'npm:react@18.3.1'
 import { Body, Container, Head, Heading, Html, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -32,6 +33,7 @@ const BookingCancelledClientEmail = ({
         </Section>
         <Text style={text}>If this was unexpected, please contact {businessName} directly.</Text>
         <Text style={footer}>— {businessName}</Text>
+        <PoweredByFooter source="cancellation-email" />
       </Container>
     </Body>
   </Html>
