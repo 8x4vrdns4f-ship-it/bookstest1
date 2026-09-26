@@ -4,6 +4,7 @@ import {
   Body, Container, Head, Heading, Html, Img, Preview, Section, Text, Button,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -71,6 +72,7 @@ const BookingConfirmedEmail = ({
             </Section>
           )}
           <Text style={footer}>See you soon — {businessName}</Text>
+          <PoweredByFooter source="confirmation-email" />
         </Container>
       </Body>
     </Html>
