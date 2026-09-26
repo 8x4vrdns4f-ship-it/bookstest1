@@ -95,6 +95,7 @@ Deno.serve(async (req) => {
         await admin.functions.invoke("app-email", {
           body: {
             templateName: "waitlist-slot-open",
+            businessUserId: user_id,
             recipientEmail: e.client_email,
             idempotencyKey: `waitlist-open-${e.id}-${date}`,
             templateData: {

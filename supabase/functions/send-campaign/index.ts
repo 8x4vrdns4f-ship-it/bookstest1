@@ -115,6 +115,7 @@ Deno.serve(async (req) => {
         const { error: sendErr } = await admin.functions.invoke("app-email", {
           body: {
             templateName: "campaign-email",
+            businessUserId: user.id,
             recipientEmail: email,
             idempotencyKey: `campaign-${campaignId}-${email}`,
             templateData: {
