@@ -156,12 +156,22 @@ export const WIDGET_MARKUP = `
 </div>
 `;
 
+export type WidgetTheme = {
+  accent: string;
+  bg: string;
+  text: string;
+  font: string;
+  radius: "sharp" | "rounded" | "pill";
+  logo: string | null;
+};
+
 export const buildWidgetScript = (opts: {
   supabaseUrl: string;
   supabaseKey: string;
   userId: string;
   paymentEnvironment?: "sandbox" | "live";
   stripePublishableKey: string;
+  previewTheme?: WidgetTheme;
 }) => `
 (function(){
   var URL_ = ${JSON.stringify(opts.supabaseUrl)};
@@ -169,6 +179,46 @@ export const buildWidgetScript = (opts: {
   var UID = ${JSON.stringify(opts.userId)};
   var PAYMENT_ENV = ${JSON.stringify(opts.paymentEnvironment || "live")};
   var STRIPE_PK = ${JSON.stringify(opts.stripePublishableKey)};
+  var PREVIEW_THEME = ${JSON.stringify(opts.previewTheme || null).replace(/</g, "\\u003c")};
+  var FONTS = ['Plus Jakarta Sans','Inter','Poppins','Playfair Display','Lora','Montserrat','DM Sans','Space Grotesk'];
+  var THEME = { accent:'#5BADE8', bg:'#0F1420', text:'#F3F4F6', input:'#131a28', muted:'#94A3B8', border:'#1F2937', font:'Plus Jakarta Sans', radius:'10px', dark:true };
+
+  function hexOk(h){ return typeof h === 'string' && /^#[0-9a-fA-F]{6}$/.test(h); }
+  function rgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+  function lum(h){ var c = rgb(h).map(function(v){ v/=255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); }); return .2126*c[0] + .7152*c[1] + .0722*c[2]; }
+  function mix(a, b, t){ var x = rgb(a), y = rgb(b); return '#' + x.map(function(v,i){ return ('0' + Math.round(v*t + y[i]*(1-t)).toString(16)).slice(-2); }).join(''); }
+  function fontCssUrl(f){ return 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(f).replace(/%20/g,'+') + ':wght@400;500;600;700&display=swap'; }
+  function applyTheme(t){
+    if (!t) return;
+    var root = document.documentElement.style;
+    if (hexOk(t.accent)) THEME.accent = t.accent;
+    if (hexOk(t.bg)) THEME.bg = t.bg;
+    if (hexOk(t.text)) THEME.text = t.text;
+    THEME.dark = lum(THEME.bg) < .4;
+    THEME.muted = mix(THEME.text, THEME.bg, .6);
+    THEME.border = mix(THEME.text, THEME.bg, .13);
+    THEME.input = mix(THEME.text, THEME.bg, .04);
+    THEME.radius = t.radius === 'sharp' ? '2px' : t.radius === 'pill' ? '999px' : '10px';
+    root.setProperty('--bw-accent', THEME.accent);
+    root.setProperty('--bw-on-accent', lum(THEME.accent) > .45 ? '#0A0F1A' : '#FFFFFF');
+    root.setProperty('--bw-bg', THEME.bg);
+    root.setProperty('--bw-text', THEME.text);
+    root.setProperty('--bw-r', THEME.radius);
+    root.setProperty('--bw-r-card', t.radius === 'sharp' ? '4px' : t.radius === 'pill' ? '28px' : '20px');
+    if (FONTS.indexOf(t.font) !== -1) {
+      THEME.font = t.font;
+      if (t.font !== 'Plus Jakarta Sans') {
+        var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = fontCssUrl(t.font); document.head.appendChild(l);
+      }
+      root.setProperty('--bw-font', "'" + t.font + "'");
+    }
+    var logo = document.getElementById('bw-logo');
+    if (logo) {
+      if (typeof t.logo === 'string' && /^data:image\\/(png|jpeg|webp);base64,/.test(t.logo)) { logo.src = t.logo; logo.style.display = 'block'; }
+      else { logo.removeAttribute('src'); logo.style.display = 'none'; }
+    }
+  }
+
 
   var settings = {
     working_hours: {
@@ -688,21 +738,22 @@ export const buildWidgetScript = (opts: {
       mode: 'setup',
       currency: ccy,
       paymentMethodTypes: ['card'],
+      fonts: [{ cssSrc: fontCssUrl(THEME.font) }],
       appearance: {
-        theme: 'night',
+        theme: THEME.dark ? 'night' : 'stripe',
         variables: {
-          colorPrimary: '#5BADE8',
-          colorBackground: '#0A0F1A',
-          colorText: '#F3F4F6',
-          colorTextPlaceholder: '#64748B',
-          borderRadius: '10px',
+          colorPrimary: THEME.accent,
+          colorBackground: THEME.input,
+          colorText: THEME.text,
+          colorTextPlaceholder: THEME.muted,
+          borderRadius: THEME.radius,
           fontSizeBase: '14px',
-          fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+          fontFamily: "'" + THEME.font + "', -apple-system, BlinkMacSystemFont, sans-serif"
         },
         rules: {
-          '.Input': { border: '1px solid #1F2937', boxShadow: 'none' },
-          '.Input:focus': { border: '1px solid #5BADE8', boxShadow: '0 0 0 3px rgba(91,173,232,.15)' },
-          '.Tab': { border: '1px solid #1F2937' }
+          '.Input': { border: '1px solid ' + THEME.border, boxShadow: 'none' },
+          '.Input:focus': { border: '1px solid ' + THEME.accent, boxShadow: 'none' },
+          '.Tab': { border: '1px solid ' + THEME.border }
         }
       }
     });
@@ -835,6 +886,10 @@ export const buildWidgetScript = (opts: {
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];
       Object.keys(s).forEach(function(k){ if (s[k] !== null && s[k] !== undefined) settings[k] = s[k]; });
+      applyTheme(PREVIEW_THEME || {
+        accent: s.accent_color, bg: s.widget_bg_color, text: s.widget_text_color,
+        font: s.widget_font, radius: s.widget_radius, logo: s.widget_logo_url
+      });
       if (settings.business_name) document.getElementById('bw-title').textContent = 'Book at ' + settings.business_name;
       if (settings.welcome_message) {
         var sub = document.querySelector('.bw .sub');
