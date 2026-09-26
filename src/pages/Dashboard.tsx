@@ -125,7 +125,7 @@ export default function Dashboard() {
             <BookingLinkCard userId={user.id} />
           )}
 
-          {isOwner && <ShareKitCard userId={user.id} businessName={displayName} />}
+          {isOwner && <ShareKitCard userId={user.id} />}
 
           {/* Stats */}
           {statsLoading ? (
