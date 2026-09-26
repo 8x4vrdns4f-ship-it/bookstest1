@@ -106,11 +106,19 @@ export async function sendTemplateEmail(
       ? template.subject(templateData)
       : template.subject
 
+  const displayName = formatDisplayName(cleanDisplayName(options.fromName || '') || SITE_NAME)
+  const fromAddress = resolveFromAddress(options.fromAddress || `noreply@${FROM_DOMAIN}`)
+  const replyTo = (options.replyTo || '').trim()
+  const safeReplyTo =
+    replyTo && replyTo.length <= 254 && !/[\r\n<>"']/g.test(replyTo) && replyTo.includes('@')
+      ? replyTo
+      : undefined
+
   try {
     await sendLovableEmail(
       {
         to: recipient,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+        from: `${displayName} <${fromAddress}>`,
         sender_domain: SENDER_DOMAIN,
         subject,
         html,
@@ -118,7 +126,7 @@ export async function sendTemplateEmail(
         purpose: 'transactional',
         label: templateName,
         idempotency_key: options.idempotencyKey || crypto.randomUUID(),
-        reply_to: options.replyTo,
+        reply_to: safeReplyTo,
       },
       { apiKey, sendUrl: Deno.env.get('LOVABLE_SEND_URL') }
     )
