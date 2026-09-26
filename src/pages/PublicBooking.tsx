@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import PublicBookingHeader from "@/components/booking/PublicBookingHeader";
 import PublicBookingTrustStrip from "@/components/booking/PublicBookingTrustStrip";
+import PoweredByBookSuite from "@/components/booking/PoweredByBookSuite";
 import WaitlistDialog from "@/components/booking/WaitlistDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
