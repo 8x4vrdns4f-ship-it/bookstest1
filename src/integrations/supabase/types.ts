@@ -1732,6 +1732,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_founding_discount_active: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       join_waitlist: {
         Args: {
           p_client_email: string

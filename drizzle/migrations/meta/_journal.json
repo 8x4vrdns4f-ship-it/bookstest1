@@ -71,6 +71,13 @@
       "when": 1790435461888,
       "tag": "0009_founding_spots_remaining",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790435617399,
+      "tag": "0010_founding_fee_discount",
+      "breakpoints": true
     }
   ]
 }
