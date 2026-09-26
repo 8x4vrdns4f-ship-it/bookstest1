@@ -115,6 +115,6 @@ export async function resolveSenderIdentity(
   return {
     fromName: businessName ? `${businessName} via ${SITE_NAME}` : SITE_NAME,
     fromAddress: `noreply@${FROM_DOMAIN}`,
-    replyTo: replyEmail ? SUPPORT_EMAIL : SUPPORT_EMAIL,
+    replyTo: SUPPORT_EMAIL,
   }
 }
