@@ -18,6 +18,7 @@ const Pricing = () => {
   const [signedIn, setSignedIn] = useState(false);
   const navigate = useNavigate();
   const { t, formatPrice, currency } = useLocale();
+  const { loading: subLoading, isActive } = useSubscription();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSignedIn(!!session));
