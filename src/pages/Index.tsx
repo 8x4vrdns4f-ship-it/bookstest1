@@ -7,6 +7,7 @@ import SocialProofStrip from "@/components/landing/SocialProofStrip";
 import InfoCards from "@/components/InfoCards";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 import Footer from "@/components/Footer";
+import FoundingOfferBanner from "@/components/landing/FoundingOfferBanner";
 
 // Below-the-fold: lazy-load to shrink the initial JS payload for better LCP/TTI.
 const ProductShowcase = lazy(() => import("@/components/landing/ProductShowcase"));
@@ -72,6 +73,7 @@ const Index = () => {
         path="/"
       />
       <JsonLd data={[softwareApplicationLd, faqLd]} />
+      <FoundingOfferBanner />
       <Navbar />
       <main>
         <HeroSection />
