@@ -64,6 +64,13 @@
       "when": 1788695936688,
       "tag": "0008_client_portal_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790435461888,
+      "tag": "0009_founding_spots_remaining",
+      "breakpoints": true
     }
   ]
 }
