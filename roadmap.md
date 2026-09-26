@@ -10,4 +10,4 @@
 - [x] Final polish: app-wide error screen, auto-recover from stale version, branded 404, home-screen icon/manifest/theme colour, no-flicker page loader
 - [x] Honest email claims made true: businesses choose their own sender name + replies (Settings → Emails to your customers), BookSuite credited in every customer email, waitlist confirmations now actually send
 - [ ] Add real registered company name, address and company number on Privacy/Terms/About (currently "[TO BE ADDED]")
-- [ ] Fix www.booksuite.online DNS at Cloudflare (A record to 185.158.133.1 + verification TXT) — needs registrar access
+- [x] Fix www.booksuite.online DNS at Cloudflare — verified 2026-09-26: A + TXT correct, status active, redirects to booksuite.online over HTTPS
