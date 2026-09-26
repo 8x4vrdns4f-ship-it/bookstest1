@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -14,8 +14,22 @@ import { useLocale } from "@/contexts/LocaleContext";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
   const navigate = useNavigate();
   const { t, formatPrice, currency } = useLocale();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSignedIn(!!session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) =>
+      setSignedIn(!!session)
+    );
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
 
   const tiers = [
     {
