@@ -19,6 +19,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ResourcesManager from "@/components/dashboard/ResourcesManager";
 import ServicesManager from "@/components/dashboard/ServicesManager";
 import SettingsAssistant from "@/components/dashboard/SettingsAssistant";
+import EmailSenderCard from "@/components/dashboard/EmailSenderCard";
 import CancelSubscriptionDialog from "@/components/dashboard/CancelSubscriptionDialog";
 import DeleteAccountDialog from "@/components/dashboard/DeleteAccountDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -308,6 +309,9 @@ const Settings = () => {
             </AccordionContent>
           </AccordionItem>
           </SectionCard>
+
+          {/* Emails to your customers */}
+          {userId && <EmailSenderCard userId={userId} />}
 
           {/* Working Hours */}
           <SectionCard>

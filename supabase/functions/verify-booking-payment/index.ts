@@ -23,10 +23,11 @@ async function sendEmail(
   recipientEmail: string,
   idempotencyKey: string,
   templateData: Record<string, unknown>,
+  businessUserId?: string,
 ) {
   try {
     const { error } = await admin.functions.invoke("app-email", {
-      body: { templateName, recipientEmail, idempotencyKey, templateData },
+      body: { templateName, recipientEmail, idempotencyKey, templateData, businessUserId },
     });
     if (error) console.error("email send failed", templateName, error);
   } catch (e) { console.error("email invoke threw", e); }
@@ -157,7 +158,7 @@ Deno.serve(async (req) => {
         confirmationCode: booking.confirmation_code,
         checkInUrl,
         depositAmount,
-      });
+      }, pending.user_id);
     }
     if (ownerEmail && settings?.notify_new_booking !== false) {
       await sendEmail(admin, "booking-paid-owner", ownerEmail, `owner-paid-${booking.id}`, {

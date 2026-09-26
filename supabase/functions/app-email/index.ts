@@ -2,6 +2,27 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 import { sendTemplateEmail } from '../_shared/transactional-email-templates/send-email.ts'
+import { resolveSenderIdentity, type SenderIdentity } from '../_shared/sender-identity.ts'
+
+// Templates that go to a business's customers. These are the only emails that
+// use the business's own sender identity — owner notices, platform alerts and
+// admin mail always come from BookSuite itself.
+const CLIENT_FACING_TEMPLATES = new Set([
+  'booking-confirmed',
+  'booking-declined',
+  'booking-request-expired',
+  'booking-followup',
+  'booking-cancelled-client',
+  'booking-reminder-client',
+  'booking-refunded',
+  'review-request-client',
+  'waitlist-added',
+  'waitlist-slot-open',
+  'rebooking-reminder',
+  'campaign-email',
+])
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
 // gateway validates the caller's JWT (anon or service_role) before the request
@@ -91,6 +112,7 @@ Deno.serve(async (req) => {
   let idempotencyKey: string
   let messageId: string
   let templateData: Record<string, any> = {}
+  let businessUserId: string | null = null
   try {
     const body = await req.json()
     templateName = body.templateName || body.template_name
@@ -99,6 +121,10 @@ Deno.serve(async (req) => {
     idempotencyKey = body.idempotencyKey || body.idempotency_key || messageId
     if (body.templateData && typeof body.templateData === 'object') {
       templateData = body.templateData
+    }
+    const rawBusinessUserId = body.businessUserId || body.business_user_id
+    if (typeof rawBusinessUserId === 'string' && rawBusinessUserId) {
+      businessUserId = rawBusinessUserId
     }
   } catch {
     return new Response(
@@ -208,6 +234,32 @@ Deno.serve(async (req) => {
   }
 
 
+  // Sender identity: customer-facing emails use the business's own choice
+  // (BookSuite-branded by default); everything else stays plain BookSuite.
+  if (businessUserId && !UUID_RE.test(businessUserId)) {
+    return new Response(JSON.stringify({ error: 'Invalid businessUserId' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  if (businessUserId && callerRole === 'authenticated' && businessUserId !== callerUserId) {
+    console.warn('app-email: businessUserId does not belong to caller', { callerUserId, templateName })
+    return new Response(JSON.stringify({ error: 'businessUserId does not match the caller' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+  let sender: SenderIdentity | undefined
+  if (CLIENT_FACING_TEMPLATES.has(templateName)) {
+    try {
+      sender = await resolveSenderIdentity(supabase, businessUserId)
+    } catch (err) {
+      console.warn('app-email: sender identity lookup failed', {
+        message: err instanceof Error ? err.message : String(err),
+      })
+    }
+  }
+
   // Send through Lovable's managed email API (suppression enforced server-side).
   const json = (body: Record<string, unknown>, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -228,6 +280,9 @@ Deno.serve(async (req) => {
     const result = await sendTemplateEmail(templateName, effectiveRecipient, {
       templateData,
       idempotencyKey,
+      fromName: sender?.fromName,
+      fromAddress: sender?.fromAddress,
+      replyTo: sender?.replyTo,
     })
     if (!result.sent) {
       await log({ status: 'suppressed' })

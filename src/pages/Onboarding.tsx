@@ -393,6 +393,11 @@ const Onboarding = () => {
                       Connect Stripe to take deposits, add your team, and share your link. The
                       "Get set up" checklist on your dashboard walks you through each one.
                     </p>
+                    <p className="text-muted-foreground">
+                      Under <span className="text-foreground">Settings → Emails to your customers</span>{" "}
+                      you choose how customer emails are signed — your business name with replies in your
+                      own inbox — and can send yourself a sample first.
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">

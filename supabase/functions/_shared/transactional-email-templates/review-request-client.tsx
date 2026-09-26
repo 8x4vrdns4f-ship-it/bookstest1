@@ -4,6 +4,7 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text, Button,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -41,6 +42,7 @@ const ReviewRequestClientEmail = ({
           Your feedback helps us improve and lets others know what to expect.
         </Text>
         <Text style={footer}>— {businessName}</Text>
+        <PoweredByFooter source="review-request-email" />
       </Container>
     </Body>
   </Html>

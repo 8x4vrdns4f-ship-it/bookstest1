@@ -4,11 +4,12 @@ export async function sendEmail(
   templateName: string,
   recipientEmail: string,
   idempotencyKey: string,
-  templateData: Record<string, unknown> = {}
+  templateData: Record<string, unknown> = {},
+  businessUserId?: string
 ) {
   try {
     const { error } = await supabase.functions.invoke("app-email", {
-      body: { templateName, recipientEmail, idempotencyKey, templateData },
+      body: { templateName, recipientEmail, idempotencyKey, templateData, businessUserId },
     });
     if (error) console.error("[sendEmail]", templateName, error);
   } catch (e) {

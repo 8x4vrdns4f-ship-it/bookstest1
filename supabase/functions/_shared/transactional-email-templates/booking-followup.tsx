@@ -4,6 +4,7 @@ import {
   Body, Button, Container, Head, Heading, Html, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -32,6 +33,7 @@ const BookingFollowupEmail = ({
           <Button href={reviewUrl} style={btn}>Leave a review</Button>
         </Section>
         <Text style={footer}>See you again soon — {businessName}</Text>
+        <PoweredByFooter source="follow-up-email" />
       </Container>
     </Body>
   </Html>

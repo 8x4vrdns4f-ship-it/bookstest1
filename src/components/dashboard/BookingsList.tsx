@@ -168,7 +168,7 @@ const BookingsList = ({ userId }: { userId: string }) => {
         businessName, clientName: b.client_name, service: b.service,
         date: formatDate(b.booking_date), time: formatTime(b.booking_time),
         confirmationCode: codeData, checkInUrl,
-      });
+      }, userId);
     }
     toast({ title: `Accepted — code ${codeData}`, description: `Share with ${b.client_name}` });
   };
@@ -187,7 +187,7 @@ const BookingsList = ({ userId }: { userId: string }) => {
       sendEmail("booking-declined", b.client_email, `booking-decline-${b.id}`, {
         businessName, clientName: b.client_name, service: b.service,
         date: formatDate(b.booking_date), time: formatTime(b.booking_time), reason,
-      });
+      }, userId);
     }
     toast({ title: "Booking declined" });
   };

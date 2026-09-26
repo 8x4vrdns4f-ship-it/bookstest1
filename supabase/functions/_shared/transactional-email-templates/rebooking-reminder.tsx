@@ -4,6 +4,7 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text, Button,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -39,6 +40,7 @@ const RebookingReminderEmail = ({
           </Section>
         )}
         <Text style={footer}>— {businessName}</Text>
+        <PoweredByFooter source="rebooking-email" />
       </Container>
     </Body>
   </Html>

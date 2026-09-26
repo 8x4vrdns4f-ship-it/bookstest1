@@ -7,13 +7,13 @@ import { TEMPLATES } from './registry.ts'
 // expose sending to the browser.
 
 // Configuration baked in at scaffold time
-const SITE_NAME = "BookSuite"
+export const SITE_NAME = "BookSuite"
 // SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
 // It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
 const SENDER_DOMAIN = "notify.booksuite.online"
 // FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
 // Can be the root domain when display_from_root is enabled — this is cosmetic only.
-const FROM_DOMAIN = "booksuite.online"
+export const FROM_DOMAIN = "booksuite.online"
 
 export type SendTemplateEmailResult =
   | { sent: true }
@@ -24,6 +24,46 @@ export interface SendTemplateEmailOptions {
   /** Dedupes retries of the same logical send; defaults to a random UUID (no dedupe). */
   idempotencyKey?: string
   replyTo?: string
+  /**
+   * Display name in the From line (e.g. a business name). Defaults to SITE_NAME.
+   * Never used as an address — it is sanitised and quoted when needed.
+   */
+  fromName?: string
+  /**
+   * Address in the From line. Must sit on the verified sending domain
+   * (FROM_DOMAIN); anything else throws. Defaults to noreply@FROM_DOMAIN.
+   */
+  fromAddress?: string
+}
+
+/** Strips header-injection characters and clamps length. */
+function cleanDisplayName(value: string): string {
+  return value
+    .replace(/[\r\n\t]/g, ' ')
+    .replace(/[<>]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .slice(0, 80)
+}
+
+/**
+ * RFC 5322 display names made of letters, digits, spaces and a few benign
+ * marks can go unquoted; anything else must be double-quoted to stay valid.
+ */
+function formatDisplayName(value: string): string {
+  return /^[\w\s'&+.,-]+$/.test(value) ? value : `"${value.replace(/["\\]/g, '')}"`
+}
+
+/** Only addresses on the verified sending domain may appear in From:. */
+function resolveFromAddress(value: string): string {
+  const address = value.trim().toLowerCase()
+  const domain = address.split('@')[1]
+  if (!address.includes('@') || domain !== FROM_DOMAIN.toLowerCase()) {
+    throw new Error(
+      `From address must be on the verified sending domain (${FROM_DOMAIN})`
+    )
+  }
+  return address
 }
 
 /**
@@ -66,11 +106,19 @@ export async function sendTemplateEmail(
       ? template.subject(templateData)
       : template.subject
 
+  const displayName = formatDisplayName(cleanDisplayName(options.fromName || '') || SITE_NAME)
+  const fromAddress = resolveFromAddress(options.fromAddress || `noreply@${FROM_DOMAIN}`)
+  const replyTo = (options.replyTo || '').trim()
+  const safeReplyTo =
+    replyTo && replyTo.length <= 254 && !/[\r\n<>"']/g.test(replyTo) && replyTo.includes('@')
+      ? replyTo
+      : undefined
+
   try {
     await sendLovableEmail(
       {
         to: recipient,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+        from: `${displayName} <${fromAddress}>`,
         sender_domain: SENDER_DOMAIN,
         subject,
         html,
@@ -78,7 +126,7 @@ export async function sendTemplateEmail(
         purpose: 'transactional',
         label: templateName,
         idempotency_key: options.idempotencyKey || crypto.randomUUID(),
-        reply_to: options.replyTo,
+        reply_to: safeReplyTo,
       },
       { apiKey, sendUrl: Deno.env.get('LOVABLE_SEND_URL') }
     )

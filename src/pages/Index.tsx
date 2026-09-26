@@ -32,7 +32,7 @@ const FAQS: { q: string; a: string }[] = [
   { q: "Who is BookSuite for?", a: "Service businesses that take bookings — beauty, fitness, health, trades, tutors, consultants, mobile services, and more." },
   { q: "Can I embed the booking widget on my own website?", a: "Yes. Copy one snippet of HTML/JS from your dashboard and paste it into any site. Bookings flow straight back into BookSuite." },
   { q: "How do payouts work?", a: "Payments go through Stripe Connect. Once you connect your Stripe account, payouts go directly to your bank on Stripe's standard schedule." },
-  { q: "Do customers actually receive the emails?", a: "Yes — transactional emails are sent from your own verified sending domain with proper authentication for strong inbox deliverability." },
+  { q: "Do customers actually receive the emails?", a: "Yes. Emails leave from a domain BookSuite has verified and authenticated, so they land in inboxes rather than spam folders. Your business name appears as the sender, and you can have replies come straight to your own inbox." },
   { q: "How do I get support?", a: "Reach our team at help@booksuite.online — we typically respond within one business day." },
 ];
 

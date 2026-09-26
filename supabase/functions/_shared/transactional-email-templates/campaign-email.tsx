@@ -4,6 +4,7 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text, Button, Hr,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -47,6 +48,7 @@ const CampaignEmail = ({
             </>
           ) : null}
         </Text>
+        <PoweredByFooter source="campaign-email" />
       </Container>
     </Body>
   </Html>

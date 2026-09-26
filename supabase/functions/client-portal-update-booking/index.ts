@@ -74,6 +74,7 @@ Deno.serve(async (req) => {
         await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-cancelled-client",
+            businessUserId: booking.user_id,
             recipientEmail: booking.client_email,
             idempotencyKey: `portal-cancel-${booking.id}`,
             templateData: {
@@ -134,6 +135,7 @@ Deno.serve(async (req) => {
       await admin.functions.invoke("app-email", {
         body: {
           templateName: "booking-confirmed",
+          businessUserId: booking.user_id,
           recipientEmail: booking.client_email,
           idempotencyKey: `portal-reschedule-${booking.id}-${date}-${time}`,
           templateData: {

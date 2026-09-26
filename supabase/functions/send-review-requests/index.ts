@@ -68,6 +68,7 @@ Deno.serve(async (req) => {
         await admin.functions.invoke("app-email", {
           body: {
             templateName: "review-request-client",
+            businessUserId: booking.user_id,
             recipientEmail: booking.client_email,
             idempotencyKey: `review-request-${booking.id}`,
             templateData: {

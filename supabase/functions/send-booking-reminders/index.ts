@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
         await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-reminder-client",
+            businessUserId: booking.user_id,
             recipientEmail: booking.client_email,
             idempotencyKey: `booking-remind-${booking.id}`,
             templateData: {

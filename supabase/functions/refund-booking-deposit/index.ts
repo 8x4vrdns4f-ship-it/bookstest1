@@ -81,6 +81,7 @@ Deno.serve(async (req) => {
         await admin.functions.invoke("app-email", {
           body: {
             templateName: "booking-refunded",
+            businessUserId: booking.user_id,
             recipientEmail: booking.client_email,
             idempotencyKey: `refund-${booking.id}-${refund.id}`,
             templateData: {

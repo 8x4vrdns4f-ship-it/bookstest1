@@ -4,6 +4,7 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { PoweredByFooter } from './powered-by.tsx'
 
 interface Props {
   businessName?: string
@@ -37,6 +38,7 @@ const BookingDeclinedEmail = ({
         <Text style={reasonBox}>{reason}</Text>
         <Text style={text}>You're welcome to try another time that works for you.</Text>
         <Text style={footer}>— {businessName}</Text>
+        <PoweredByFooter source="decline-email" />
       </Container>
     </Body>
   </Html>
