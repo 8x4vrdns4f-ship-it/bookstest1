@@ -5,17 +5,33 @@ import Footer from "@/components/Footer";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import GiftCodeRedeem from "@/components/GiftCodeRedeem";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
   const navigate = useNavigate();
   const { t, formatPrice, currency } = useLocale();
+  const { loading: subLoading, isActive } = useSubscription();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSignedIn(!!session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) =>
+      setSignedIn(!!session)
+    );
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
 
   const tiers = [
     {
@@ -112,9 +128,20 @@ const Pricing = () => {
           </h1>
           <p className="text-muted-foreground text-center mb-4 max-w-lg mx-auto">{t("pricing.sub")}</p>
           <p className="text-center text-sm text-primary mb-4">{t("pricing.trial")}</p>
-          <p className="text-center text-xs text-muted-foreground mb-12 max-w-xl mx-auto">
+          <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto">
             {t("pricing.note", { currency })}
           </p>
+          {signedIn && !subLoading && !isActive && (
+            <div className="text-center mb-10">
+              <Button
+                onClick={handleSignOut}
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground gap-2"
+              >
+                Log out
+              </Button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {tiers.map((tier) => (
