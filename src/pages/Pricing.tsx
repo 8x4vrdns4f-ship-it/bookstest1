@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import GiftCodeRedeem from "@/components/GiftCodeRedeem";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
