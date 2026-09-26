@@ -225,6 +225,11 @@ export type Database = {
           user_id: string
           waitlist_enabled: boolean
           welcome_message: string | null
+          widget_bg_color: string
+          widget_font: string
+          widget_logo_url: string | null
+          widget_radius: string
+          widget_text_color: string
           working_hours: Json
         }
         Insert: {
@@ -275,6 +280,11 @@ export type Database = {
           user_id: string
           waitlist_enabled?: boolean
           welcome_message?: string | null
+          widget_bg_color?: string
+          widget_font?: string
+          widget_logo_url?: string | null
+          widget_radius?: string
+          widget_text_color?: string
           working_hours?: Json
         }
         Update: {
@@ -325,6 +335,11 @@ export type Database = {
           user_id?: string
           waitlist_enabled?: boolean
           welcome_message?: string | null
+          widget_bg_color?: string
+          widget_font?: string
+          widget_logo_url?: string | null
+          widget_radius?: string
+          widget_text_color?: string
           working_hours?: Json
         }
         Relationships: []
@@ -1724,6 +1739,11 @@ export type Database = {
           user_id: string
           waitlist_enabled: boolean
           welcome_message: string
+          widget_bg_color: string
+          widget_font: string
+          widget_logo_url: string
+          widget_radius: string
+          widget_text_color: string
           working_hours: Json
         }[]
       }

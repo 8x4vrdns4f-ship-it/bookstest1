@@ -3,29 +3,31 @@
 // The deposit is only charged if/when the business accepts the request.
 
 export const WIDGET_STYLES = `
+  :root{--bw-accent:#5BADE8;--bw-on-accent:#0A0F1A;--bw-bg:#0F1420;--bw-text:#F3F4F6;--bw-font:'Plus Jakarta Sans';--bw-r:10px;--bw-r-card:20px;--bw-muted:color-mix(in srgb,var(--bw-text) 60%,var(--bw-bg));--bw-border:color-mix(in srgb,var(--bw-text) 13%,var(--bw-bg));--bw-border-strong:color-mix(in srgb,var(--bw-text) 22%,var(--bw-bg));--bw-hover:color-mix(in srgb,var(--bw-text) 6%,var(--bw-bg));--bw-input:color-mix(in srgb,var(--bw-text) 4%,var(--bw-bg))}
+  .bw .logo{display:block;max-height:48px;max-width:160px;object-fit:contain;margin:0 0 12px}
   *,*::before,*::after{box-sizing:border-box}
-  body{margin:0;font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:transparent;-webkit-font-smoothing:antialiased}
-  .bw{max-width:460px;margin:0 auto;background:#0F1420;border:1px solid #1F2937;border-radius:20px;padding:22px;color:#F3F4F6;box-shadow:0 8px 32px -12px rgba(0,0,0,.55)}
+  body{margin:0;font-family:var(--bw-font),-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:transparent;-webkit-font-smoothing:antialiased}
+  .bw{max-width:460px;margin:0 auto;background:var(--bw-bg);border:1px solid var(--bw-border);border-radius:var(--bw-r-card);padding:22px;color:var(--bw-text);box-shadow:0 8px 32px -12px rgba(0,0,0,.55)}
   .bw .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}
   .bw .head .ht{flex:1;min-width:0}
-  .bw h2{font-size:20px;margin:0 0 4px;color:#F3F4F6;font-weight:700;letter-spacing:-.01em;line-height:1.2}
-  .bw .sub{font-size:13px;color:#94A3B8;margin:0;line-height:1.4}
-  .bw .deposit-pill{flex:0 0 auto;font-size:11px;color:#5BADE8;background:rgba(91,173,232,.08);border:1px solid rgba(91,173,232,.25);padding:5px 10px;border-radius:999px;font-weight:600;white-space:nowrap;line-height:1.2}
-  .bw .label{font-size:11px;color:#94A3B8;margin:18px 0 8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .bw h2{font-size:20px;margin:0 0 4px;color:var(--bw-text);font-weight:700;letter-spacing:-.01em;line-height:1.2}
+  .bw .sub{font-size:13px;color:var(--bw-muted);margin:0;line-height:1.4}
+  .bw .deposit-pill{flex:0 0 auto;font-size:11px;color:var(--bw-accent);background:color-mix(in srgb,var(--bw-accent) 8%,transparent);border:1px solid color-mix(in srgb,var(--bw-accent) 25%,transparent);padding:5px 10px;border-radius:999px;font-weight:600;white-space:nowrap;line-height:1.2}
+  .bw .label{font-size:11px;color:var(--bw-muted);margin:18px 0 8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
   .bw .dates-wrap{position:relative}
   .bw .dates-wrap::before,.bw .dates-wrap::after{content:'';position:absolute;top:0;bottom:6px;width:18px;pointer-events:none;z-index:1}
-  .bw .dates-wrap::before{left:0;background:linear-gradient(90deg,#0F1420,rgba(15,20,32,0))}
-  .bw .dates-wrap::after{right:0;background:linear-gradient(-90deg,#0F1420,rgba(15,20,32,0))}
+  .bw .dates-wrap::before{left:0;background:linear-gradient(90deg,var(--bw-bg),transparent)}
+  .bw .dates-wrap::after{right:0;background:linear-gradient(-90deg,var(--bw-bg),transparent)}
   .bw .dates{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;scroll-behavior:smooth}
   .bw .dates::-webkit-scrollbar{height:4px}
-  .bw .dates::-webkit-scrollbar-thumb{background:#1F2937;border-radius:2px}
-  .bw .date{flex:0 0 auto;min-width:64px;padding:10px 8px;border-radius:12px;background:transparent;border:1px solid #1F2937;text-align:center;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
-  .bw .date:hover{background:#141B2A;border-color:#2A3547}
-  .bw .date.sel{background:#5BADE8;color:#0A0F1A;border-color:#5BADE8}
+  .bw .dates::-webkit-scrollbar-thumb{background:var(--bw-border);border-radius:2px}
+  .bw .date{flex:0 0 auto;min-width:64px;padding:10px 8px;border-radius:var(--bw-r);background:transparent;border:1px solid var(--bw-border);text-align:center;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+  .bw .date:hover{background:var(--bw-hover);border-color:var(--bw-border-strong)}
+  .bw .date.sel{background:var(--bw-accent);color:var(--bw-on-accent);border-color:var(--bw-accent)}
   .bw .date.closed{opacity:.35;cursor:not-allowed}
-  .bw .date.inrange{background:rgba(91,173,232,.15);border-color:rgba(91,173,232,.45)}
-  .bw .summary{margin-top:14px;border:1px solid #1F2937;border-radius:12px;padding:12px 14px;font-size:13px;color:#CBD5E1;line-height:1.5}
-  .bw .summary strong{color:#F3F4F6}
+  .bw .date.inrange{background:color-mix(in srgb,var(--bw-accent) 15%,transparent);border-color:color-mix(in srgb,var(--bw-accent) 45%,transparent)}
+  .bw .summary{margin-top:14px;border:1px solid var(--bw-border);border-radius:var(--bw-r);padding:12px 14px;font-size:13px;color:var(--bw-text);line-height:1.5}
+  .bw .summary strong{color:var(--bw-text)}
   .bw .date.closed .dd{text-decoration:line-through}
   .bw .date .dn{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.75}
   .bw .date .dd{font-size:19px;font-weight:700;line-height:1.2;margin:2px 0}
@@ -33,41 +35,42 @@ export const WIDGET_STYLES = `
   .bw .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:220px;overflow-y:auto;padding:2px}
   @media (min-width:400px){.bw .slots{grid-template-columns:repeat(4,1fr)}}
   .bw .slots::-webkit-scrollbar{width:4px}
-  .bw .slots::-webkit-scrollbar-thumb{background:#1F2937;border-radius:2px}
-  .bw .slot{height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:transparent;border:1px solid #1F2937;text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;font-variant-numeric:tabular-nums;letter-spacing:.01em}
-  .bw .slot:hover:not(:disabled):not(.busy){background:#141B2A;border-color:#2A3547}
-  .bw .slot.sel{background:#5BADE8;color:#0A0F1A;border-color:#5BADE8}
-  .bw .slot.busy{color:#4B5563;cursor:not-allowed;text-decoration:line-through;opacity:.6}
-  .bw .empty{grid-column:1/-1;color:#64748B;font-size:12px;text-align:center;padding:20px 8px;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .bw .slots::-webkit-scrollbar-thumb{background:var(--bw-border);border-radius:2px}
+  .bw .slot{height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--bw-r);background:transparent;border:1px solid var(--bw-border);text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .bw .slot:hover:not(:disabled):not(.busy){background:var(--bw-hover);border-color:var(--bw-border-strong)}
+  .bw .slot.sel{background:var(--bw-accent);color:var(--bw-on-accent);border-color:var(--bw-accent)}
+  .bw .slot.busy{color:var(--bw-muted);cursor:not-allowed;text-decoration:line-through;opacity:.6}
+  .bw .empty{grid-column:1/-1;color:var(--bw-muted);font-size:12px;text-align:center;padding:20px 8px;display:flex;flex-direction:column;align-items:center;gap:6px}
   .bw .empty svg{opacity:.5}
   .bw .durs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .bw .dur{height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:transparent;border:1px solid #1F2937;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;color:inherit;font-family:inherit}
-  .bw .dur:hover:not(:disabled){background:#141B2A;border-color:#2A3547}
-  .bw .dur.sel{background:#5BADE8;color:#0A0F1A;border-color:#5BADE8}
+  .bw .dur{height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--bw-r);background:transparent;border:1px solid var(--bw-border);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;color:inherit;font-family:inherit}
+  .bw .dur:hover:not(:disabled){background:var(--bw-hover);border-color:var(--bw-border-strong)}
+  .bw .dur.sel{background:var(--bw-accent);color:var(--bw-on-accent);border-color:var(--bw-accent)}
   .bw .dur:disabled{opacity:.35;cursor:not-allowed}
-  .bw input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #1F2937;background:#0A0F1A;color:#F3F4F6;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
-  .bw input::placeholder{color:#64748B}
-  .bw input:focus{border-color:#5BADE8;box-shadow:0 0 0 3px rgba(91,173,232,.15)}
+  .bw input{width:100%;padding:12px 14px;border-radius:var(--bw-r);border:1px solid var(--bw-border);background:var(--bw-input);color:var(--bw-text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+  .bw input::placeholder{color:var(--bw-muted)}
+  .bw input:focus{border-color:var(--bw-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--bw-accent) 15%,transparent)}
   .bw .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   @media (max-width:380px){.bw .row{grid-template-columns:1fr}}
-  .bw #bw-payel{background:#0A0F1A;border:1px solid #1F2937;border-radius:10px;padding:12px;min-height:44px}
-  .bw .paynote{display:flex;align-items:center;gap:6px;font-size:11px;color:#94A3B8;margin-top:8px;line-height:1.4}
+  .bw #bw-payel{background:var(--bw-input);border:1px solid var(--bw-border);border-radius:var(--bw-r);padding:12px;min-height:44px}
+  .bw .paynote{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--bw-muted);margin-top:8px;line-height:1.4}
   .bw .paynote svg{flex:0 0 auto;opacity:.7}
-  .bw button.submit{width:100%;height:48px;border:none;border-radius:12px;background:#5BADE8;color:#0A0F1A;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;margin-top:16px;transition:transform .1s,box-shadow .15s,background .15s;letter-spacing:.01em}
-  .bw button.submit:hover:not(:disabled){background:#6BB8EC;transform:translateY(-1px);box-shadow:0 6px 18px -6px rgba(91,173,232,.4)}
+  .bw button.submit{width:100%;height:48px;border:none;border-radius:var(--bw-r);background:var(--bw-accent);color:var(--bw-on-accent);font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;margin-top:16px;transition:transform .1s,box-shadow .15s,background .15s;letter-spacing:.01em}
+  .bw button.submit:hover:not(:disabled){background:var(--bw-accent);transform:translateY(-1px);box-shadow:0 6px 18px -6px color-mix(in srgb,var(--bw-accent) 40%,transparent)}
   .bw button.submit:active:not(:disabled){transform:translateY(0)}
   .bw button.submit:disabled{opacity:.4;cursor:not-allowed}
   .bw .ok{text-align:center;padding:28px 8px}
-  .bw .ok .ic{width:56px;height:56px;border-radius:50%;background:rgba(91,173,232,.12);color:#5BADE8;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 14px}
+  .bw .ok .ic{width:56px;height:56px;border-radius:50%;background:color-mix(in srgb,var(--bw-accent) 12%,transparent);color:var(--bw-accent);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 14px}
   .bw .ok h3{margin:0 0 8px;font-size:17px;font-weight:700}
-  .bw .ok p{margin:0 0 16px;font-size:13px;color:#94A3B8;line-height:1.5}
-  .bw .ok .again{background:transparent;border:1px solid #1F2937;color:#F3F4F6;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s}
-  .bw .ok .again:hover{background:#141B2A;border-color:#2A3547}
+  .bw .ok p{margin:0 0 16px;font-size:13px;color:var(--bw-muted);line-height:1.5}
+  .bw .ok .again{background:transparent;border:1px solid var(--bw-border);color:var(--bw-text);padding:10px 18px;border-radius:var(--bw-r);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s}
+  .bw .ok .again:hover{background:var(--bw-hover);border-color:var(--bw-border-strong)}
   .bw .err{background:#2A1518;color:#FCA5A5;padding:10px 12px 10px 14px;border-radius:8px;border-left:3px solid #EF4444;font-size:12px;margin-top:10px;line-height:1.4}
 `;
 
 export const WIDGET_MARKUP = `
 <div class="bw" id="bw">
+  <img id="bw-logo" class="logo" alt="" style="display:none">
   <div class="head">
     <div class="ht">
       <h2 id="bw-title">Book an Appointment</h2>
@@ -78,7 +81,7 @@ export const WIDGET_MARKUP = `
 
   <div class="label" id="bw-day-label">Day</div>
   <div class="dates-wrap"><div class="dates" id="bw-dates"></div></div>
-  <div id="bw-range-hint" style="display:none;font-size:12px;color:#94A3B8;margin-top:2px"></div>
+  <div id="bw-range-hint" style="display:none;font-size:12px;color:var(--bw-muted);margin-top:2px"></div>
 
   <div id="bw-svc-wrap" style="display:none">
     <div class="label" id="bw-svc-label">Service</div>
@@ -153,12 +156,22 @@ export const WIDGET_MARKUP = `
 </div>
 `;
 
+export type WidgetTheme = {
+  accent: string;
+  bg: string;
+  text: string;
+  font: string;
+  radius: "sharp" | "rounded" | "pill";
+  logo: string | null;
+};
+
 export const buildWidgetScript = (opts: {
   supabaseUrl: string;
   supabaseKey: string;
   userId: string;
   paymentEnvironment?: "sandbox" | "live";
   stripePublishableKey: string;
+  previewTheme?: WidgetTheme;
 }) => `
 (function(){
   var URL_ = ${JSON.stringify(opts.supabaseUrl)};
@@ -166,6 +179,46 @@ export const buildWidgetScript = (opts: {
   var UID = ${JSON.stringify(opts.userId)};
   var PAYMENT_ENV = ${JSON.stringify(opts.paymentEnvironment || "live")};
   var STRIPE_PK = ${JSON.stringify(opts.stripePublishableKey)};
+  var PREVIEW_THEME = ${JSON.stringify(opts.previewTheme || null).replace(/</g, "\\u003c")};
+  var FONTS = ['Plus Jakarta Sans','Inter','Poppins','Playfair Display','Lora','Montserrat','DM Sans','Space Grotesk'];
+  var THEME = { accent:'#5BADE8', bg:'#0F1420', text:'#F3F4F6', input:'#131a28', muted:'#94A3B8', border:'#1F2937', font:'Plus Jakarta Sans', radius:'10px', dark:true };
+
+  function hexOk(h){ return typeof h === 'string' && /^#[0-9a-fA-F]{6}$/.test(h); }
+  function rgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+  function lum(h){ var c = rgb(h).map(function(v){ v/=255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); }); return .2126*c[0] + .7152*c[1] + .0722*c[2]; }
+  function mix(a, b, t){ var x = rgb(a), y = rgb(b); return '#' + x.map(function(v,i){ return ('0' + Math.round(v*t + y[i]*(1-t)).toString(16)).slice(-2); }).join(''); }
+  function fontCssUrl(f){ return 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(f).replace(/%20/g,'+') + ':wght@400;500;600;700&display=swap'; }
+  function applyTheme(t){
+    if (!t) return;
+    var root = document.documentElement.style;
+    if (hexOk(t.accent)) THEME.accent = t.accent;
+    if (hexOk(t.bg)) THEME.bg = t.bg;
+    if (hexOk(t.text)) THEME.text = t.text;
+    THEME.dark = lum(THEME.bg) < .4;
+    THEME.muted = mix(THEME.text, THEME.bg, .6);
+    THEME.border = mix(THEME.text, THEME.bg, .13);
+    THEME.input = mix(THEME.text, THEME.bg, .04);
+    THEME.radius = t.radius === 'sharp' ? '2px' : t.radius === 'pill' ? '999px' : '10px';
+    root.setProperty('--bw-accent', THEME.accent);
+    root.setProperty('--bw-on-accent', lum(THEME.accent) > .45 ? '#0A0F1A' : '#FFFFFF');
+    root.setProperty('--bw-bg', THEME.bg);
+    root.setProperty('--bw-text', THEME.text);
+    root.setProperty('--bw-r', THEME.radius);
+    root.setProperty('--bw-r-card', t.radius === 'sharp' ? '4px' : t.radius === 'pill' ? '28px' : '20px');
+    if (FONTS.indexOf(t.font) !== -1) {
+      THEME.font = t.font;
+      if (t.font !== 'Plus Jakarta Sans') {
+        var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = fontCssUrl(t.font); document.head.appendChild(l);
+      }
+      root.setProperty('--bw-font', "'" + t.font + "'");
+    }
+    var logo = document.getElementById('bw-logo');
+    if (logo) {
+      if (typeof t.logo === 'string' && /^data:image\\/(png|jpeg|webp);base64,/.test(t.logo)) { logo.src = t.logo; logo.style.display = 'block'; }
+      else { logo.removeAttribute('src'); logo.style.display = 'none'; }
+    }
+  }
+
 
   var settings = {
     working_hours: {
@@ -685,21 +738,22 @@ export const buildWidgetScript = (opts: {
       mode: 'setup',
       currency: ccy,
       paymentMethodTypes: ['card'],
+      fonts: [{ cssSrc: fontCssUrl(THEME.font) }],
       appearance: {
-        theme: 'night',
+        theme: THEME.dark ? 'night' : 'stripe',
         variables: {
-          colorPrimary: '#5BADE8',
-          colorBackground: '#0A0F1A',
-          colorText: '#F3F4F6',
-          colorTextPlaceholder: '#64748B',
-          borderRadius: '10px',
+          colorPrimary: THEME.accent,
+          colorBackground: THEME.input,
+          colorText: THEME.text,
+          colorTextPlaceholder: THEME.muted,
+          borderRadius: THEME.radius,
           fontSizeBase: '14px',
-          fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+          fontFamily: "'" + THEME.font + "', -apple-system, BlinkMacSystemFont, sans-serif"
         },
         rules: {
-          '.Input': { border: '1px solid #1F2937', boxShadow: 'none' },
-          '.Input:focus': { border: '1px solid #5BADE8', boxShadow: '0 0 0 3px rgba(91,173,232,.15)' },
-          '.Tab': { border: '1px solid #1F2937' }
+          '.Input': { border: '1px solid ' + THEME.border, boxShadow: 'none' },
+          '.Input:focus': { border: '1px solid ' + THEME.accent, boxShadow: 'none' },
+          '.Tab': { border: '1px solid ' + THEME.border }
         }
       }
     });
@@ -832,6 +886,10 @@ export const buildWidgetScript = (opts: {
     if (arr[0] && arr[0][0]) {
       var s = arr[0][0];
       Object.keys(s).forEach(function(k){ if (s[k] !== null && s[k] !== undefined) settings[k] = s[k]; });
+      applyTheme(PREVIEW_THEME || {
+        accent: s.accent_color, bg: s.widget_bg_color, text: s.widget_text_color,
+        font: s.widget_font, radius: s.widget_radius, logo: s.widget_logo_url
+      });
       if (settings.business_name) document.getElementById('bw-title').textContent = 'Book at ' + settings.business_name;
       if (settings.welcome_message) {
         var sub = document.querySelector('.bw .sub');
@@ -908,6 +966,7 @@ export const buildWidgetHtml = (opts: {
   userId: string;
   paymentEnvironment?: "sandbox" | "live";
   stripePublishableKey: string;
+  previewTheme?: WidgetTheme;
 }) => `<!DOCTYPE html>
 <html lang="en">
 <head>

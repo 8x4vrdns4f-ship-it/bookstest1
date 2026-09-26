@@ -85,6 +85,20 @@
       "when": 1790449382997,
       "tag": "0011_business_email_sender_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790450340524,
+      "tag": "0012_widget_design",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790450355537,
+      "tag": "0013_widget_logo_inline",
+      "breakpoints": true
     }
   ]
 }
