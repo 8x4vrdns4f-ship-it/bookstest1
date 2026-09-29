@@ -12,7 +12,7 @@
 - The approval card for managers shows the same day count and the employee's remaining balance.
 
 ## How days are counted
-- Only days the business is open count, using its weekly opening hours. Mon–Fri businesses skip weekends. A business open on Saturdays counts Saturdays.
+- Only the employee's own working days count — a day is deducted only if the business is open that day AND the employee normally works that day (from their shifts in `employee_shifts`, or a weekly pattern of which days they work). An employee who works Mon–Thu is never charged for a Friday.
 - Bank holidays and closed days are skipped.
 - Only approved leave comes off the balance. Pending leave is shown separately. Declined or cancelled leave is never counted.
 - Leave that runs across New Year is split between the two years.
