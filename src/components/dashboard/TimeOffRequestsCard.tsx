@@ -26,6 +26,8 @@ const TimeOffRequestsCard = ({ userId }: { userId: string }) => {
   const [names, setNames] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
+  const [dayCounts, setDayCounts] = useState<Record<string, number>>({});
+  const [balances, setBalances] = useState<Record<string, { allowance: number; used: number; pending: number; remaining: number }>>({});
 
   const load = useCallback(async () => {
     const [reqRes, empRes] = await Promise.all([
@@ -37,10 +39,26 @@ const TimeOffRequestsCard = ({ userId }: { userId: string }) => {
         .limit(30),
       supabase.from("employees").select("id, name").eq("user_id", userId),
     ]);
-    setRows((reqRes.data as Row[]) || []);
+    const list = (reqRes.data as Row[]) || [];
+    setRows(list);
     const map: Record<string, string> = {};
     (empRes.data || []).forEach((e: { id: string; name: string }) => { map[e.id] = e.name; });
     setNames(map);
+
+    const year = new Date().getFullYear();
+    const counts: Record<string, number> = {};
+    const bals: Record<string, { allowance: number; used: number; pending: number; remaining: number }> = {};
+    await Promise.all(list.map(async (r) => {
+      const { data } = await supabase.rpc("leave_working_days", { _employee_id: r.employee_id, _start: r.start_date, _end: r.end_date });
+      if (typeof data === "number") counts[r.id] = data;
+    }));
+    await Promise.all([...new Set(list.map((r) => r.employee_id))].map(async (empId) => {
+      const { data } = await supabase.rpc("get_leave_balance", { _employee_id: empId, _year: year });
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row) bals[empId] = row as { allowance: number; used: number; pending: number; remaining: number };
+    }));
+    setDayCounts(counts);
+    setBalances(bals);
   }, [userId]);
 
   useEffect(() => { load(); }, [load]);
@@ -87,7 +105,15 @@ const TimeOffRequestsCard = ({ userId }: { userId: string }) => {
               <p className="text-sm text-foreground font-medium">
                 {names[r.employee_id] || "Team member"} · {fmt(r.start_date)}
                 {r.end_date !== r.start_date ? ` – ${fmt(r.end_date)}` : ""}
+                {dayCounts[r.id] != null && (
+                  <span className="text-muted-foreground font-normal"> · uses {dayCounts[r.id]} day{dayCounts[r.id] === 1 ? "" : "s"}</span>
+                )}
               </p>
+              {balances[r.employee_id] && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {balances[r.employee_id].remaining} of {balances[r.employee_id].allowance} holiday days left this year
+                </p>
+              )}
               {r.reason && <p className="text-xs text-muted-foreground mt-0.5">{r.reason}</p>}
             </div>
             <Input

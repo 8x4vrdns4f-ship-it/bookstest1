@@ -51,6 +51,9 @@ const EmployeeProfileDialog = ({ open, onOpenChange, employeeId, userId }: Props
   const [upcomingShifts, setUpcomingShifts] = useState<Shift[]>([]);
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [stats, setStats] = useState({ completed: 0, hoursWeek: 0, hoursMonth: 0 });
+  const [leave, setLeave] = useState<{ allowance: number; used: number; pending: number; remaining: number } | null>(null);
+  const [leaveOverride, setLeaveOverride] = useState("");
+  const [savingLeave, setSavingLeave] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -128,6 +131,15 @@ const EmployeeProfileDialog = ({ open, onOpenChange, employeeId, userId }: Props
         hoursWeek: Math.round(sumHours(weekShiftsRes.data || []) * 10) / 10,
         hoursMonth: Math.round(sumHours(monthShiftsRes.data || []) * 10) / 10,
       });
+
+      const { data: bal } = await supabase.rpc("get_leave_balance", {
+        _employee_id: employeeId,
+        _year: new Date().getFullYear(),
+      });
+      const balRow = Array.isArray(bal) ? bal[0] : bal;
+      if (balRow) setLeave(balRow as { allowance: number; used: number; pending: number; remaining: number });
+      const { data: empRow } = await supabase.from("employees").select("annual_leave_days").eq("id", employeeId).maybeSingle();
+      setLeaveOverride(empRow?.annual_leave_days != null ? String(empRow.annual_leave_days) : "");
       setLoading(false);
     })();
   }, [open, employeeId, userId]);
@@ -180,6 +192,56 @@ const EmployeeProfileDialog = ({ open, onOpenChange, employeeId, userId }: Props
                 </div>
               </div>
             </section>
+
+            {/* Holiday allowance */}
+            {leave && (
+              <section className="space-y-2">
+                <h4 className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2"><CalendarDays size={12} /> Holiday</h4>
+                <div className="p-3 rounded border border-border bg-secondary/40">
+                  <p className="text-sm text-foreground">
+                    <span className="font-bold">{leave.remaining}</span> of {leave.allowance} days left
+                    {leave.pending > 0 && <span className="text-amber-400 text-xs"> · {leave.pending} pending</span>}
+                  </p>
+                  <div className="h-1.5 rounded-full bg-secondary mt-2 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${leave.allowance > 0 ? Math.min(100, (leave.used / leave.allowance) * 100) : 0}%` }}
+                    />
+                  </div>
+                  <div className="flex items-end gap-2 mt-3">
+                    <div className="flex-1">
+                      <label className="text-[11px] text-muted-foreground">Their yearly allowance (blank = business default)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={366}
+                        value={leaveOverride}
+                        onChange={(e) => setLeaveOverride(e.target.value)}
+                        placeholder="Business default"
+                        className="mt-1 w-full h-9 rounded-md border border-border bg-secondary px-3 text-sm text-foreground"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      disabled={savingLeave}
+                      onClick={async () => {
+                        setSavingLeave(true);
+                        const n = leaveOverride.trim() === "" ? null : parseInt(leaveOverride, 10);
+                        if (n !== null && (isNaN(n) || n < 0 || n > 366)) { setSavingLeave(false); return; }
+                        await supabase.from("employees").update({ annual_leave_days: n }).eq("id", emp.id);
+                        const { data: bal } = await supabase.rpc("get_leave_balance", { _employee_id: emp.id, _year: new Date().getFullYear() });
+                        const row = Array.isArray(bal) ? bal[0] : bal;
+                        if (row) setLeave(row as typeof leave);
+                        setSavingLeave(false);
+                      }}
+                      className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
+                    >
+                      {savingLeave ? "…" : "Save"}
+                    </button>
+                  </div>
+                </div>
+              </section>
+            )}
 
             {/* Upcoming Shifts */}
             <section className="space-y-2">

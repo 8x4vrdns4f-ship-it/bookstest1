@@ -32,6 +32,7 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
   const [loading, setLoading] = useState(false);
   const [roles, setRoles] = useState<Array<{ id: string; name: string }>>([]);
   const [roleId, setRoleId] = useState<string>("");
+  const [leaveDays, setLeaveDays] = useState<string>("28");
   const { toast } = useToast();
 
   const form = useForm<EmployeeForm>({
@@ -51,11 +52,18 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
       const list = data || [];
       setRoles(list);
       setRoleId((prev) => prev || list.find((r) => r.name === "employee")?.id || list[0]?.id || "");
+      const { data: bs } = await supabase
+        .from("business_settings")
+        .select("default_leave_days")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (bs?.default_leave_days != null) setLeaveDays(String(bs.default_leave_days));
     })();
   }, [open, userId]);
 
   const onSubmit = async (values: EmployeeForm) => {
     setLoading(true);
+    const parsedLeave = parseInt(leaveDays, 10);
     const { data: emp, error } = await supabase.from("employees").insert({
       user_id: userId,
       name: values.name.trim(),
@@ -63,6 +71,7 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
       phone: values.phone?.trim() || null,
       position: values.position?.trim() || null,
       role_id: roleId || null,
+      annual_leave_days: isNaN(parsedLeave) ? null : Math.max(0, Math.min(366, parsedLeave)),
     }).select("id").single();
     setLoading(false);
 
@@ -198,6 +207,21 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
               </Select>
               <p className="text-xs text-muted-foreground">
                 Managers and receptionists get the full dashboard; employees see their own schedule.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="leave-days">Holiday days per year</Label>
+              <Input
+                id="leave-days"
+                type="number"
+                min={0}
+                max={366}
+                value={leaveDays}
+                onChange={(e) => setLeaveDays(e.target.value)}
+                className="bg-secondary border-border"
+              />
+              <p className="text-xs text-muted-foreground">
+                Pre-filled with your business default. They'll see how many days they have left on their profile.
               </p>
             </div>
           </form>

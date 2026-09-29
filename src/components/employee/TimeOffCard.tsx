@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,26 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
   const [end, setEnd] = useState(todayISO());
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
+  const [balance, setBalance] = useState<{ allowance: number; used: number; pending: number; remaining: number } | null>(null);
+  const [requestDays, setRequestDays] = useState<number | null>(null);
+
+  const year = new Date().getFullYear();
+
+  const loadBalance = async () => {
+    const { data } = await supabase.rpc("get_leave_balance", { _employee_id: employee.id, _year: year });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) setBalance(row as { allowance: number; used: number; pending: number; remaining: number });
+  };
+
+  useEffect(() => { loadBalance(); }, [employee.id]);
+
+  useEffect(() => {
+    if (!open || !start || !end || end < start) { setRequestDays(null); return; }
+    let cancelled = false;
+    supabase.rpc("leave_working_days", { _employee_id: employee.id, _start: start, _end: end })
+      .then(({ data }) => { if (!cancelled) setRequestDays(typeof data === "number" ? data : null); });
+    return () => { cancelled = true; };
+  }, [open, start, end, employee.id]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +72,7 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
     setReason("");
     setOpen(false);
     toast({ title: "Time off requested", description: "Your manager will review it." });
+    loadBalance();
     onChanged();
   };
 
@@ -91,6 +112,16 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
                   <Input id="to-end" type="date" min={start} value={end} onChange={(e) => setEnd(e.target.value)} className="bg-secondary border-border" />
                 </div>
               </div>
+              {requestDays !== null && (
+                <p className="text-xs text-muted-foreground">
+                  This uses <span className="text-foreground font-medium">{requestDays} day{requestDays === 1 ? "" : "s"}</span> of your holiday
+                  {balance && requestDays > balance.remaining && (
+                    <span className="block text-amber-400 mt-0.5">
+                      That's more than your {balance.remaining} remaining — your manager will make the final call.
+                    </span>
+                  )}
+                </p>
+              )}
               <div className="space-y-1.5">
                 <Label htmlFor="to-reason">Reason (optional)</Label>
                 <Textarea id="to-reason" value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="bg-secondary border-border" />
@@ -105,6 +136,25 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
         </Dialog>
       </CardHeader>
       <CardContent className="space-y-2">
+        {balance && (
+          <div className="rounded-[14px] border border-border bg-secondary/40 p-3 mb-1">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-sm text-foreground">
+                <span className="font-bold text-lg">{balance.remaining}</span> of {balance.allowance} days left
+              </p>
+              {balance.pending > 0 && (
+                <p className="text-xs text-amber-400">{balance.pending} pending approval</p>
+              )}
+            </div>
+            <div className="h-1.5 rounded-full bg-secondary mt-2 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${balance.allowance > 0 ? Math.min(100, (balance.used / balance.allowance) * 100) : 0}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1.5">Resets 1 January · only your scheduled work days count</p>
+          </div>
+        )}
         {requests.length === 0 ? (
           <p className="text-sm text-muted-foreground">No time off requested.</p>
         ) : (
