@@ -51,6 +51,9 @@ const EmployeeProfileDialog = ({ open, onOpenChange, employeeId, userId }: Props
   const [upcomingShifts, setUpcomingShifts] = useState<Shift[]>([]);
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [stats, setStats] = useState({ completed: 0, hoursWeek: 0, hoursMonth: 0 });
+  const [leave, setLeave] = useState<{ allowance: number; used: number; pending: number; remaining: number } | null>(null);
+  const [leaveOverride, setLeaveOverride] = useState("");
+  const [savingLeave, setSavingLeave] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

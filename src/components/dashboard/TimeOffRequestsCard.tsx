@@ -105,7 +105,15 @@ const TimeOffRequestsCard = ({ userId }: { userId: string }) => {
               <p className="text-sm text-foreground font-medium">
                 {names[r.employee_id] || "Team member"} · {fmt(r.start_date)}
                 {r.end_date !== r.start_date ? ` – ${fmt(r.end_date)}` : ""}
+                {dayCounts[r.id] != null && (
+                  <span className="text-muted-foreground font-normal"> · uses {dayCounts[r.id]} day{dayCounts[r.id] === 1 ? "" : "s"}</span>
+                )}
               </p>
+              {balances[r.employee_id] && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {balances[r.employee_id].remaining} of {balances[r.employee_id].allowance} holiday days left this year
+                </p>
+              )}
               {r.reason && <p className="text-xs text-muted-foreground mt-0.5">{r.reason}</p>}
             </div>
             <Input
