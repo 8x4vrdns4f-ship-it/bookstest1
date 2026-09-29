@@ -63,6 +63,7 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
 
   const onSubmit = async (values: EmployeeForm) => {
     setLoading(true);
+    const parsedLeave = parseInt(leaveDays, 10);
     const { data: emp, error } = await supabase.from("employees").insert({
       user_id: userId,
       name: values.name.trim(),
@@ -70,6 +71,7 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
       phone: values.phone?.trim() || null,
       position: values.position?.trim() || null,
       role_id: roleId || null,
+      annual_leave_days: isNaN(parsedLeave) ? null : Math.max(0, Math.min(366, parsedLeave)),
     }).select("id").single();
     setLoading(false);
 
