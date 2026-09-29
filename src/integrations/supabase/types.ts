@@ -195,9 +195,11 @@ export type Database = {
           currency: string
           day_end_hour: number
           day_start_hour: number
+          default_leave_days: number
           deposit_amount: number
           email_from_local: string | null
           email_from_mode: string
+          holiday_country: string | null
           id: string
           max_advance_days: number
           max_rental_days: number
@@ -250,9 +252,11 @@ export type Database = {
           currency?: string
           day_end_hour?: number
           day_start_hour?: number
+          default_leave_days?: number
           deposit_amount?: number
           email_from_local?: string | null
           email_from_mode?: string
+          holiday_country?: string | null
           id?: string
           max_advance_days?: number
           max_rental_days?: number
@@ -305,9 +309,11 @@ export type Database = {
           currency?: string
           day_end_hour?: number
           day_start_hour?: number
+          default_leave_days?: number
           deposit_amount?: number
           email_from_local?: string | null
           email_from_mode?: string
+          holiday_country?: string | null
           id?: string
           max_advance_days?: number
           max_rental_days?: number
@@ -839,6 +845,7 @@ export type Database = {
       }
       employees: {
         Row: {
+          annual_leave_days: number | null
           auth_user_id: string | null
           available_now: boolean
           created_at: string
@@ -854,6 +861,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          annual_leave_days?: number | null
           auth_user_id?: string | null
           available_now?: boolean
           created_at?: string
@@ -869,6 +877,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          annual_leave_days?: number | null
           auth_user_id?: string | null
           available_now?: boolean
           created_at?: string
@@ -1125,6 +1134,27 @@ export type Database = {
           times_used?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      public_holidays: {
+        Row: {
+          country: string
+          holiday_date: string
+          id: string
+          name: string
+        }
+        Insert: {
+          country: string
+          holiday_date: string
+          id?: string
+          name: string
+        }
+        Update: {
+          country?: string
+          holiday_date?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -1660,6 +1690,15 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_leave_balance: {
+        Args: { _employee_id: string; _year: number }
+        Returns: {
+          allowance: number
+          pending: number
+          remaining: number
+          used: number
+        }[]
+      }
       get_owner_email: { Args: { _user_id: string }; Returns: string }
       get_public_business_info: {
         Args: { _user_id: string }
@@ -1776,6 +1815,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      leave_working_days: {
+        Args: { _employee_id: string; _end: string; _start: string }
+        Returns: number
       }
       lookup_business_by_code: {
         Args: { p_code: string }

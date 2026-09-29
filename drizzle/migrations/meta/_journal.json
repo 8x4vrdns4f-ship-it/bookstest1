@@ -99,6 +99,13 @@
       "when": 1790450355537,
       "tag": "0013_widget_logo_inline",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790682290654,
+      "tag": "0014_holiday_allowance",
+      "breakpoints": true
     }
   ]
 }
