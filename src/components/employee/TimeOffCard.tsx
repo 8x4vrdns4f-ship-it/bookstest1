@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,26 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
   const [end, setEnd] = useState(todayISO());
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
+  const [balance, setBalance] = useState<{ allowance: number; used: number; pending: number; remaining: number } | null>(null);
+  const [requestDays, setRequestDays] = useState<number | null>(null);
+
+  const year = new Date().getFullYear();
+
+  const loadBalance = async () => {
+    const { data } = await supabase.rpc("get_leave_balance", { _employee_id: employee.id, _year: year });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) setBalance(row as { allowance: number; used: number; pending: number; remaining: number });
+  };
+
+  useEffect(() => { loadBalance(); }, [employee.id]);
+
+  useEffect(() => {
+    if (!open || !start || !end || end < start) { setRequestDays(null); return; }
+    let cancelled = false;
+    supabase.rpc("leave_working_days", { _employee_id: employee.id, _start: start, _end: end })
+      .then(({ data }) => { if (!cancelled) setRequestDays(typeof data === "number" ? data : null); });
+    return () => { cancelled = true; };
+  }, [open, start, end, employee.id]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
