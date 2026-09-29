@@ -131,6 +131,15 @@ const EmployeeProfileDialog = ({ open, onOpenChange, employeeId, userId }: Props
         hoursWeek: Math.round(sumHours(weekShiftsRes.data || []) * 10) / 10,
         hoursMonth: Math.round(sumHours(monthShiftsRes.data || []) * 10) / 10,
       });
+
+      const { data: bal } = await supabase.rpc("get_leave_balance", {
+        _employee_id: employeeId,
+        _year: new Date().getFullYear(),
+      });
+      const balRow = Array.isArray(bal) ? bal[0] : bal;
+      if (balRow) setLeave(balRow as { allowance: number; used: number; pending: number; remaining: number });
+      const { data: empRow } = await supabase.from("employees").select("annual_leave_days").eq("id", employeeId).maybeSingle();
+      setLeaveOverride(empRow?.annual_leave_days != null ? String(empRow.annual_leave_days) : "");
       setLoading(false);
     })();
   }, [open, employeeId, userId]);
