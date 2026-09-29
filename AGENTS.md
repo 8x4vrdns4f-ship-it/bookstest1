@@ -22,3 +22,8 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 
 - Widget look (accent/bg/text/font/radius/logo) lives on `business_settings` and is applied at runtime by the widget script from `get_widget_settings`, which falls back to defaults unless the tier allows `custom_branding`. Why: embeds already on customer sites update without re-copying code, and gating stays server-side.
 - Widget logos are stored as small resized data URLs in `widget_logo_url`, not in Storage. Why: public buckets are blocked on this workspace.
+
+## Shifts
+
+- Weekly schedules live in `employee_schedules` (one per employee) and are expanded into `employee_shifts` ~12 weeks ahead by `apply_employee_schedule`; `extend_business_schedules` tops up on Shifts page load. Why: the rest of the app (staff view, holiday counting) only reads concrete shifts.
+- Hand edits set `employee_shifts.is_override`, and days switched off are stored in `employee_shift_skips`. Why: re-applying a schedule must never undo one-off changes.
