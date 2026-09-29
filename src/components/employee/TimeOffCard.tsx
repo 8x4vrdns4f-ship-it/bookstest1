@@ -72,6 +72,7 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
     setReason("");
     setOpen(false);
     toast({ title: "Time off requested", description: "Your manager will review it." });
+    loadBalance();
     onChanged();
   };
 
@@ -111,6 +112,16 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
                   <Input id="to-end" type="date" min={start} value={end} onChange={(e) => setEnd(e.target.value)} className="bg-secondary border-border" />
                 </div>
               </div>
+              {requestDays !== null && (
+                <p className="text-xs text-muted-foreground">
+                  This uses <span className="text-foreground font-medium">{requestDays} day{requestDays === 1 ? "" : "s"}</span> of your holiday
+                  {balance && requestDays > balance.remaining && (
+                    <span className="block text-amber-400 mt-0.5">
+                      That's more than your {balance.remaining} remaining — your manager will make the final call.
+                    </span>
+                  )}
+                </p>
+              )}
               <div className="space-y-1.5">
                 <Label htmlFor="to-reason">Reason (optional)</Label>
                 <Textarea id="to-reason" value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="bg-secondary border-border" />
