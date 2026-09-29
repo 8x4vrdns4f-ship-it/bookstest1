@@ -28,6 +28,7 @@ import SectionCard from "@/components/app/SectionCard";
 
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
+import HolidayAllowanceCard from "@/components/dashboard/HolidayAllowanceCard";
 import PromoCodesManager from "@/components/dashboard/PromoCodesManager";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS, tierAllowsResources } from "@/lib/tierLimits";

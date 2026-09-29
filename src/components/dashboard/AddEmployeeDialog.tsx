@@ -32,6 +32,7 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
   const [loading, setLoading] = useState(false);
   const [roles, setRoles] = useState<Array<{ id: string; name: string }>>([]);
   const [roleId, setRoleId] = useState<string>("");
+  const [leaveDays, setLeaveDays] = useState<string>("28");
   const { toast } = useToast();
 
   const form = useForm<EmployeeForm>({
