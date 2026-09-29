@@ -18,6 +18,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, Save } from "lucide-react";
 import { addDays, eachDayOfInterval, format, parseISO } from "date-fns";
 import PlanShiftsDialog from "./PlanShiftsDialog";
 import AddEmployeeDialog from "./AddEmployeeDialog";
+import WeeklySchedulesCard from "./WeeklySchedulesCard";
 
 interface Employee {
   id: string;
@@ -56,11 +57,14 @@ const ShiftsView = ({ userId }: { userId: string }) => {
   const [rows, setRows] = useState<DayRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [applyAll, setApplyAll] = useState(false);
+  const [tick, setTick] = useState(0);
   const { toast } = useToast();
 
   // Load employee list once
   useEffect(() => {
     (async () => {
+      await supabase.rpc("extend_business_schedules", { _user_id: userId });
       const { data } = await supabase
         .from("employees")
         .select("id, name, position")
@@ -120,7 +124,7 @@ const ShiftsView = ({ userId }: { userId: string }) => {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeId, from, to]);
+  }, [employeeId, from, to, tick]);
 
   const update = (idx: number, patch: Partial<DayRow>) => {
     setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
@@ -150,6 +154,7 @@ const ShiftsView = ({ userId }: { userId: string }) => {
     if (!employeeId) return;
     setSaving(true);
     try {
+      let lastTimes: { start: string; end: string } | null = null;
       for (const r of rows) {
         const changed =
           r.on !== r.initial.on ||
@@ -158,10 +163,12 @@ const ShiftsView = ({ userId }: { userId: string }) => {
         if (!changed) continue;
 
         if (r.on) {
+          lastTimes = { start: r.start_time, end: r.end_time };
+          await supabase.from("employee_shift_skips").delete().eq("employee_id", employeeId).eq("skip_date", r.date);
           if (r.shiftId) {
             await supabase
               .from("employee_shifts")
-              .update({ start_time: r.start_time, end_time: r.end_time })
+              .update({ start_time: r.start_time, end_time: r.end_time, is_override: !applyAll })
               .eq("id", r.shiftId);
           } else {
             await supabase.from("employee_shifts").insert({
@@ -170,12 +177,27 @@ const ShiftsView = ({ userId }: { userId: string }) => {
               shift_date: r.date,
               start_time: r.start_time,
               end_time: r.end_time,
+              is_override: true,
             });
           }
         } else if (r.shiftId) {
           await supabase.from("employee_shifts").delete().eq("id", r.shiftId);
+          await supabase.from("employee_shift_skips").upsert(
+            { user_id: userId, employee_id: employeeId, skip_date: r.date },
+            { onConflict: "employee_id,skip_date" },
+          );
         }
       }
+      if (applyAll && lastTimes) {
+        const { data: sched } = await supabase.from("employee_schedules").select("id").eq("employee_id", employeeId).maybeSingle();
+        if (sched) {
+          await supabase.from("employee_schedules").update({ start_time: lastTimes.start, end_time: lastTimes.end }).eq("id", sched.id);
+          await supabase.rpc("apply_employee_schedule", { _employee_id: employeeId, _from: todayStr(), _replace: true });
+        } else {
+          toast({ title: "No weekly schedule yet", description: "Set one under Weekly schedules first — this change was saved for these days only." });
+        }
+      }
+      setApplyAll(false);
       const emp = employees.find((e) => e.id === employeeId);
       toast({
         title: "Shifts saved",
@@ -282,6 +304,8 @@ const ShiftsView = ({ userId }: { userId: string }) => {
         </div>
       </div>
 
+      <WeeklySchedulesCard userId={userId} employees={employees} onChanged={() => setTick((t) => t + 1)} />
+
       {employees.length === 0 ? (
         <EmptyState
           icon={<CalendarDays size={24} />}
@@ -336,7 +360,11 @@ const ShiftsView = ({ userId }: { userId: string }) => {
               </p>
             )}
           </SectionCard>
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+              <Checkbox checked={applyAll} onCheckedChange={(v) => setApplyAll(!!v)} />
+              Apply the new hours to all their days
+            </label>
             <Button
               onClick={save}
               disabled={saving || !employeeId}

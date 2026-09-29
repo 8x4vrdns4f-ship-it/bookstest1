@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import WeeklyScheduleEditor from "./WeeklyScheduleEditor";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
@@ -192,6 +193,16 @@ const EmployeeProfileDialog = ({ open, onOpenChange, employeeId, userId }: Props
                 </div>
               </div>
             </section>
+
+            {/* Weekly schedule */}
+            {employeeId && (
+              <section className="space-y-2">
+                <h4 className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-2"><CalendarDays size={12} /> Weekly schedule</h4>
+                <div className="p-3 rounded border border-border bg-secondary/40">
+                  <WeeklyScheduleEditor userId={userId} employeeId={employeeId} />
+                </div>
+              </section>
+            )}
 
             {/* Holiday allowance */}
             {leave && (
