@@ -209,6 +209,21 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
                 Managers and receptionists get the full dashboard; employees see their own schedule.
               </p>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="leave-days">Holiday days per year</Label>
+              <Input
+                id="leave-days"
+                type="number"
+                min={0}
+                max={366}
+                value={leaveDays}
+                onChange={(e) => setLeaveDays(e.target.value)}
+                className="bg-secondary border-border"
+              />
+              <p className="text-xs text-muted-foreground">
+                Pre-filled with your business default. They'll see how many days they have left on their profile.
+              </p>
+            </div>
           </form>
         </Form>
       </AppDialog>
