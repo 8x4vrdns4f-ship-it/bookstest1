@@ -810,12 +810,89 @@ export type Database = {
           },
         ]
       }
+      employee_schedules: {
+        Row: {
+          created_at: string
+          effective_from: string
+          employee_id: string
+          end_time: string
+          id: string
+          start_time: string
+          updated_at: string
+          user_id: string
+          weekdays: number[]
+        }
+        Insert: {
+          created_at?: string
+          effective_from?: string
+          employee_id: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          updated_at?: string
+          user_id: string
+          weekdays?: number[]
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string
+          employee_id?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          updated_at?: string
+          user_id?: string
+          weekdays?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_schedules_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: true
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_shift_skips: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          skip_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          skip_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          skip_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_shift_skips_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_shifts: {
         Row: {
           created_at: string
           employee_id: string
           end_time: string
           id: string
+          is_override: boolean
           shift_date: string
           start_time: string
           updated_at: string
@@ -826,6 +903,7 @@ export type Database = {
           employee_id: string
           end_time?: string
           id?: string
+          is_override?: boolean
           shift_date: string
           start_time?: string
           updated_at?: string
@@ -836,6 +914,7 @@ export type Database = {
           employee_id?: string
           end_time?: string
           id?: string
+          is_override?: boolean
           shift_date?: string
           start_time?: string
           updated_at?: string
@@ -1615,6 +1694,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      apply_employee_schedule: {
+        Args: { _employee_id: string; _from?: string; _replace?: boolean }
+        Returns: number
+      }
       can_create_gift_code: { Args: never; Returns: boolean }
       check_in_by_code: {
         Args: { p_company_code: string; p_confirmation_code: string }
@@ -1659,6 +1742,10 @@ export type Database = {
           p_request_id: string
           p_role_id: string
         }
+        Returns: undefined
+      }
+      extend_business_schedules: {
+        Args: { _user_id: string }
         Returns: undefined
       }
       generate_booking_code: { Args: never; Returns: string }
