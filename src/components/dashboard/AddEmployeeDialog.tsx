@@ -52,6 +52,12 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
       const list = data || [];
       setRoles(list);
       setRoleId((prev) => prev || list.find((r) => r.name === "employee")?.id || list[0]?.id || "");
+      const { data: bs } = await supabase
+        .from("business_settings")
+        .select("default_leave_days")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (bs?.default_leave_days != null) setLeaveDays(String(bs.default_leave_days));
     })();
   }, [open, userId]);
 
