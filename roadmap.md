@@ -12,3 +12,4 @@
 - [ ] Add real registered company name, address and company number on Privacy/Terms/About (currently "[TO BE ADDED]")
 - [x] Fix www.booksuite.online DNS at Cloudflare — verified 2026-09-26: A + TXT correct, status active, redirects to booksuite.online over HTTPS
 - [x] Custom booking widget design (logo, colours, font, corners, live preview, save)
+- [x] Holiday allowance: owner sets default days + bank-holiday country in Settings, per-employee override in Add Employee & profile; employees see days left with progress bar; only scheduled shift days count (verified: Mon-Thu worker loses 4 days for a Mon-Fri week, bank holidays skipped)
