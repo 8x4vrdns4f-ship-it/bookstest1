@@ -136,6 +136,25 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
         </Dialog>
       </CardHeader>
       <CardContent className="space-y-2">
+        {balance && (
+          <div className="rounded-[14px] border border-border bg-secondary/40 p-3 mb-1">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-sm text-foreground">
+                <span className="font-bold text-lg">{balance.remaining}</span> of {balance.allowance} days left
+              </p>
+              {balance.pending > 0 && (
+                <p className="text-xs text-amber-400">{balance.pending} pending approval</p>
+              )}
+            </div>
+            <div className="h-1.5 rounded-full bg-secondary mt-2 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${balance.allowance > 0 ? Math.min(100, (balance.used / balance.allowance) * 100) : 0}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1.5">Resets 1 January · only your scheduled work days count</p>
+          </div>
+        )}
         {requests.length === 0 ? (
           <p className="text-sm text-muted-foreground">No time off requested.</p>
         ) : (
