@@ -2,7 +2,11 @@
 // request is about halfway through its configured TTL and still unanswered.
 // Triggered by pg_cron hourly.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 const DEFAULT_TTL_HOURS = 48;
 
