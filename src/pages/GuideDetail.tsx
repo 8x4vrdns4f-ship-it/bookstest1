@@ -243,7 +243,7 @@ const GuideDetail = () => {
     publisher: {
       "@type": "Organization",
       name: "BookSuite",
-      logo: { "@type": "ImageObject", url: "https://booksuite.online/favicon.png" },
+      logo: { "@type": "ImageObject", url: "https://booksuite.online/icon-512.png" },
     },
     mainEntityOfPage: url,
   };
