@@ -8,6 +8,7 @@
 - [x] Performance & SEO polish: favicon 719KB→12KB, route code-splitting, lazy landing images, backend preconnect; SEO scan all green
 - [x] Pre-launch gaps: working Delete Account (with confirmation + subscription cancel), gift-code marketing copy fixed in 5 languages, security scan clean
 - [x] Final polish: app-wide error screen, auto-recover from stale version, branded 404, home-screen icon/manifest/theme colour, no-flicker page loader
+- [x] App icons re-cut square from the full-res original (favicon 64, home-screen 180, manifest 192/512 + maskable, .ico 16/32/48/64); footer social links (Instagram, YouTube, TikTok) confirmed correct
 - [x] Honest email claims made true: businesses choose their own sender name + replies (Settings → Emails to your customers), BookSuite credited in every customer email, waitlist confirmations now actually send
 - [ ] Add real registered company name, address and company number on Privacy/Terms/About (currently "[TO BE ADDED]")
 - [x] Fix www.booksuite.online DNS at Cloudflare — verified 2026-09-26: A + TXT correct, status active, redirects to booksuite.online over HTTPS
