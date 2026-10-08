@@ -189,6 +189,286 @@ export const NICHES: Niche[] = [
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
   },
+  {
+    slug: "dog-groomers",
+    name: "Dog Groomers",
+    seoTitle: "Dog Grooming Booking Software with Deposits & Reminders — BookSuite",
+    seoDescription:
+      "Online booking for dog groomers and pet salons: 24/7 appointments, deposits to stop no-shows, reminders for owners and easy rebooking. 30-day free trial.",
+    headline: "Dog grooming booking software that keeps your table busy",
+    subheadline:
+      "Let owners book their dog's next groom any time, take a deposit for long full-groom slots, and remind them before every visit.",
+    pains: [
+      { title: "Owners who don't turn up", body: "A missed two-hour full groom leaves a big gap in your day." },
+      { title: "Calls while your hands are full", body: "You can't answer the phone mid-bath with a wet dog on the table." },
+      { title: "Clients forgetting the next groom", body: "Coats get matted when owners leave it too long between visits." },
+    ],
+    features: [
+      { title: "Deposits for long grooms", body: "Take a deposit or full payment upfront for full grooms and hand-strips." },
+      { title: "Booking notes", body: "Owners can share their dog's name, breed and anything you should know." },
+      { title: "Automatic reminders", body: "Owners get a reminder email before the appointment." },
+      { title: "Easy rebooking", body: "Owners can book the next groom in a few taps from their bookings page." },
+      { title: "Several groomers", body: "Give each groomer their own weekly schedule and time off." },
+      { title: "Reviews", body: "Ask happy owners for a review after each visit." },
+    ],
+    exampleServices: [
+      { name: "Full groom (small dog)", duration: "90 min" },
+      { name: "Full groom (large dog)", duration: "2 hr 30 min" },
+      { name: "Bath & brush", duration: "60 min" },
+      { name: "Nail trim", duration: "15 min" },
+    ],
+    faqs: [
+      { q: "Can I set different lengths for small and large dogs?", a: "Yes. Create a separate service for each size, each with its own time and price." },
+      { q: "Can I take a deposit?", a: "Yes. Owners pay a deposit or the full price online when they book." },
+      { q: "Can owners tell me about their dog when booking?", a: "Yes. They can add notes to the booking so you know what to expect." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
+  {
+    slug: "massage-therapists",
+    name: "Massage Therapists",
+    seoTitle: "Massage & Holistic Therapist Booking Software — BookSuite",
+    seoDescription:
+      "Booking software for massage, reflexology and holistic therapists: online booking, payment upfront, reminders and treatment rooms. 30-day free trial.",
+    headline: "Calm, simple booking for massage and holistic therapists",
+    subheadline:
+      "Clients book and pay online, get a reminder before their treatment, and you never double-book a treatment room again.",
+    pains: [
+      { title: "Answering the phone mid-treatment", body: "Interrupting a relaxing session to take a booking ruins the mood." },
+      { title: "Late cancellations", body: "A cancelled hour-long treatment is income you rarely fill." },
+      { title: "Sharing treatment rooms", body: "Several therapists and limited rooms make double-bookings easy." },
+    ],
+    features: [
+      { title: "Pay when booking", body: "Take a deposit or full payment so cancellations don't cost you." },
+      { title: "Treatment rooms", body: "Set up rooms as bookable resources so they're never double-booked." },
+      { title: "Reminders", body: "Clients get a reminder email before every treatment." },
+      { title: "Gift codes", body: "Sell gift codes — a popular present for massages and treatments." },
+      { title: "Client portal", body: "Clients cancel or reschedule themselves from a secure link." },
+      { title: "Booking notes", body: "Clients can mention injuries or preferences when they book." },
+    ],
+    exampleServices: [
+      { name: "Deep tissue massage", duration: "60 min" },
+      { name: "Hot stone massage", duration: "90 min" },
+      { name: "Reflexology", duration: "45 min" },
+      { name: "Sports massage", duration: "30 min" },
+    ],
+    faqs: [
+      { q: "Can I manage several treatment rooms?", a: "Yes. Add each room as a bookable resource and BookSuite keeps them from being double-booked." },
+      { q: "Can I sell gift vouchers?", a: "Yes. You can create gift codes that clients redeem when they book." },
+      { q: "Can clients reschedule themselves?", a: "Yes. Clients get a secure link to cancel, reschedule or rebook." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
+  {
+    slug: "lash-brow-artists",
+    name: "Lash & Brow Artists",
+    seoTitle: "Booking App for Lash & Brow Artists with Deposits — BookSuite",
+    seoDescription:
+      "Online booking for lash and brow artists: Instagram booking link, deposits, reminders and infill rebooking. Works solo or in a shared studio. 30-day free trial.",
+    headline: "Booking for lash and brow artists, straight from your bio",
+    subheadline:
+      "Turn followers into booked appointments, protect your time with deposits, and keep clients coming back on schedule for infills and tints.",
+    pains: [
+      { title: "No-shows on full sets", body: "A missed two-hour full set means lost income and wasted prep." },
+      { title: "DMs all evening", body: "Booking through messages eats into your time off." },
+      { title: "Infills left too long", body: "Clients who forget to rebook end up needing a full set." },
+    ],
+    features: [
+      { title: "Booking link for Instagram", body: "One link in your bio, plus a QR poster for your studio." },
+      { title: "Deposits", body: "A deposit at booking means clients take the slot seriously." },
+      { title: "Rebook in seconds", body: "Clients book their next infill from their bookings page." },
+      { title: "Reminders", body: "Automatic reminder emails before every appointment." },
+      { title: "Your own look", body: "Add your logo, colours and font to your booking page on paid plans." },
+      { title: "Waitlist", body: "When you're booked up, clients join the waitlist for cancellations." },
+    ],
+    exampleServices: [
+      { name: "Classic full set", duration: "2 hr" },
+      { name: "Lash infill", duration: "60 min" },
+      { name: "Brow lamination & tint", duration: "45 min" },
+      { name: "Lash lift", duration: "60 min" },
+    ],
+    faqs: [
+      { q: "Does it work if I rent a chair in someone else's studio?", a: "Yes. BookSuite works for solo artists with their own booking page." },
+      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online when they book." },
+      { q: "Can my booking page match my brand?", a: "Yes. On paid plans you can add your logo, colours and font." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
+  {
+    slug: "photographers",
+    name: "Photographers",
+    seoTitle: "Booking Software for Photographers & Photo Studios — BookSuite",
+    seoDescription:
+      "Online booking for photographers and studios: book shoots 24/7, take deposits upfront, reserve studio space and send reminders. 30-day free trial.",
+    headline: "Booking software for photographers and photo studios",
+    subheadline:
+      "Let clients pick a shoot and pay their deposit online, reserve your studio automatically, and stop losing evenings to booking emails.",
+    pains: [
+      { title: "Chasing deposits", body: "Shoots aren't secure until money is paid, and chasing it is awkward." },
+      { title: "Studio double-bookings", body: "Sharing a studio or set makes clashes easy to miss." },
+      { title: "Email ping-pong", body: "Agreeing a date for a shoot takes far too many messages." },
+    ],
+    features: [
+      { title: "Deposits taken online", body: "Clients pay a deposit or the full fee when they book a shoot." },
+      { title: "Studios & equipment", body: "Book studios, sets or kit as resources so nothing clashes." },
+      { title: "Long sessions", body: "Set shoots from 30-minute headshots to full-day sessions." },
+      { title: "Booking requests", body: "Review requests before you confirm a date." },
+      { title: "Reminders", body: "Clients are reminded before their shoot." },
+      { title: "Gift codes", body: "Sell gift codes for portrait sessions and mini-shoots." },
+    ],
+    exampleServices: [
+      { name: "Headshot session", duration: "30 min" },
+      { name: "Family portrait shoot", duration: "60 min" },
+      { name: "Product shoot", duration: "3 hr" },
+      { name: "Studio hire", duration: "2 hr" },
+    ],
+    faqs: [
+      { q: "Can I approve shoots before they're confirmed?", a: "Yes. Turn on booking requests and confirm each one yourself." },
+      { q: "Can I hire out my studio too?", a: "Yes. Add the studio as a bookable resource so it can't be double-booked." },
+      { q: "Can I take a deposit for a shoot?", a: "Yes. Deposits are paid online when the client books." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
+  {
+    slug: "car-detailing",
+    name: "Car Detailing",
+    seoTitle: "Car Detailing & Mobile Valeting Booking Software — BookSuite",
+    seoDescription:
+      "Online booking for car detailers and mobile valeters: customers book 24/7, pay a deposit upfront, get reminders and reschedule easily. 30-day free trial.",
+    headline: "Booking software for car detailers and mobile valeters",
+    subheadline:
+      "Customers pick their valet, pay a deposit and get reminded — while you stay focused on the car in front of you.",
+    pains: [
+      { title: "Long jobs, big no-shows", body: "An empty half-day ceramic slot is money you can't get back." },
+      { title: "Missed calls on the job", body: "You can't answer the phone with a polisher in your hand." },
+      { title: "Weather reschedules", body: "Rain means moving bookings, and that means a lot of messages." },
+    ],
+    features: [
+      { title: "Deposits upfront", body: "Take a deposit or full payment for big jobs like ceramic coatings." },
+      { title: "Self-service reschedules", body: "Customers move their booking themselves from a secure link." },
+      { title: "Booking notes", body: "Customers can add their car model and address when they book." },
+      { title: "Reminders", body: "Automatic reminder emails before every job." },
+      { title: "Team schedules", body: "Give each detailer their own working pattern." },
+      { title: "Reviews", body: "Collect reviews from happy customers to win new work." },
+    ],
+    exampleServices: [
+      { name: "Mini valet", duration: "60 min" },
+      { name: "Full valet", duration: "3 hr" },
+      { name: "Machine polish", duration: "5 hr" },
+      { name: "Ceramic coating", duration: "1 day" },
+    ],
+    faqs: [
+      { q: "Does it work for mobile valeting?", a: "Yes. Customers can add their address and car details in the booking notes." },
+      { q: "Can customers reschedule if the weather's bad?", a: "Yes. They can move their booking themselves from a secure link." },
+      { q: "Can I take a deposit for ceramic coatings?", a: "Yes. Deposits or full payment are taken online at booking." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
+  {
+    slug: "driving-instructors",
+    name: "Driving Instructors & Tutors",
+    seoTitle: "Booking Software for Driving Instructors & Tutors — BookSuite",
+    seoDescription:
+      "Online lesson booking for driving instructors and tutors: students book 24/7, pay upfront, get reminders and rebook their next lesson easily. 30-day free trial.",
+    headline: "Lesson booking for driving instructors and tutors",
+    subheadline:
+      "Students book and pay for lessons online, get reminded beforehand, and book their next lesson without a single text.",
+    pains: [
+      { title: "Last-minute cancellations", body: "A student cancelling an hour before leaves you with an unpaid gap." },
+      { title: "Texting about times", body: "Arranging every lesson by message takes up your evenings." },
+      { title: "Chasing lesson payments", body: "Collecting money after lessons is slow and awkward." },
+    ],
+    features: [
+      { title: "Pay when booking", body: "Students pay for the lesson, or a deposit, when they book." },
+      { title: "Easy rebooking", body: "Students book their next lesson from their bookings page." },
+      { title: "Reminders", body: "Automatic reminder emails before every lesson." },
+      { title: "Your weekly hours", body: "Set your regular teaching pattern and block off days as needed." },
+      { title: "Gift codes", body: "Sell gift codes for lessons — great for birthdays." },
+      { title: "Calendar files", body: "Students add lessons straight to their phone calendar." },
+    ],
+    exampleServices: [
+      { name: "Driving lesson", duration: "60 min" },
+      { name: "Double lesson", duration: "2 hr" },
+      { name: "Maths tutoring", duration: "60 min" },
+      { name: "Trial lesson", duration: "30 min" },
+    ],
+    faqs: [
+      { q: "Can students pay before the lesson?", a: "Yes. You can take full payment or a deposit when they book." },
+      { q: "Can parents book lessons for their children?", a: "Yes. Anyone can book and add the student's name in the notes." },
+      { q: "Can I offer a cheaper first lesson?", a: "Yes. Add a trial lesson as its own service with its own price." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
+  {
+    slug: "piercing-studios",
+    name: "Piercing Studios",
+    seoTitle: "Piercing Studio Booking Software — BookSuite",
+    seoDescription:
+      "Online booking for piercing studios: quick appointments booked 24/7, deposits, piercer schedules, reminders and reviews. 30-day free trial.",
+    headline: "Fast, simple booking for piercing studios",
+    subheadline:
+      "Fill short appointment slots all day, let clients pick their piercer, and stop no-shows with a small deposit.",
+    pains: [
+      { title: "Lots of short appointments", body: "Busy days full of 15-minute slots are hard to manage on paper." },
+      { title: "Weekend no-shows", body: "Missed slots on Saturdays add up quickly." },
+      { title: "Queues at the door", body: "Walk-ins waiting around make the studio feel chaotic." },
+    ],
+    features: [
+      { title: "Short time slots", body: "Set services from 15 minutes, so every gap can be booked." },
+      { title: "Deposits", body: "A small deposit makes sure clients turn up." },
+      { title: "Choose a piercer", body: "Each piercer has their own schedule and time off." },
+      { title: "Reminders", body: "Automatic reminder emails before each appointment." },
+      { title: "Link in bio & QR code", body: "Share your booking link online or on a poster in the window." },
+      { title: "Reviews", body: "Collect reviews from happy clients." },
+    ],
+    exampleServices: [
+      { name: "Lobe piercing", duration: "15 min" },
+      { name: "Helix piercing", duration: "20 min" },
+      { name: "Nose piercing", duration: "20 min" },
+      { name: "Jewellery change", duration: "10 min" },
+    ],
+    faqs: [
+      { q: "Can I set very short appointments?", a: "Yes. Each service can have its own length, even a few minutes." },
+      { q: "Can clients choose their piercer?", a: "Yes. Bookings are matched to piercers who are actually on shift." },
+      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
+  {
+    slug: "rentals",
+    name: "Car & Tool Rental",
+    seoTitle: "Rental Booking Software for Car, Van & Tool Hire — BookSuite",
+    seoDescription:
+      "Booking software for car hire, van hire and tool rental: customers book by the day, pay upfront, and every item is tracked so nothing is double-booked. 30-day free trial.",
+    headline: "Rental booking software for car, van and tool hire",
+    subheadline:
+      "Customers pick what they want, choose their days and pay online — and BookSuite makes sure the same car or tool is never booked twice.",
+    pains: [
+      { title: "Double-booked items", body: "Two customers turning up for the same van is a nightmare." },
+      { title: "Tracking who has what", body: "Paper diaries and spreadsheets lose track of what's out and when it's back." },
+      { title: "Unpaid hires", body: "Customers who don't pay upfront are more likely to cancel or not turn up." },
+    ],
+    features: [
+      { title: "Book by the day", body: "Customers choose start and end days for multi-day hires." },
+      { title: "Every item tracked", body: "Add each car, van or tool as a resource so it can't be double-booked." },
+      { title: "Pay upfront", body: "Take a deposit or the full hire cost when they book." },
+      { title: "Reminders", body: "Customers are reminded before their pick-up." },
+      { title: "Self-service changes", body: "Customers cancel or change dates from a secure link." },
+      { title: "Your own look", body: "Brand your booking page with your logo and colours on paid plans." },
+    ],
+    exampleServices: [
+      { name: "Small car hire", duration: "Per day" },
+      { name: "Transit van hire", duration: "Per day" },
+      { name: "Mini digger hire", duration: "Per day" },
+      { name: "Pressure washer hire", duration: "Per day" },
+    ],
+    faqs: [
+      { q: "Can customers book for several days?", a: "Yes. Rentals can be booked by the day, with a start and end date." },
+      { q: "How does it stop the same item being booked twice?", a: "Each car, van or tool is set up as its own resource, so once it's booked those days are blocked." },
+      { q: "Does it work for both cars and tools?", a: "Yes. Anything you hire out can be added as a bookable item." },
+      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+    ],
+  },
 ];
 
 export const getNiche = (slug?: string) => NICHES.find((n) => n.slug === slug);
