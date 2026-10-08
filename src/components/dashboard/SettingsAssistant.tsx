@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,21 @@ export default function SettingsAssistant({ onApplied }: { onApplied: () => void
   const [pending, setPending] = useState<ChangeSet | null>(null);
   const [busy, setBusy] = useState(false);
   const [applying, setApplying] = useState(false);
+  const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
+
+  const loadUsage = async () => {
+    const { data } = await supabase.rpc("get_assistant_usage");
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) setUsage({ used: row.used, limit: row.monthly_limit });
+  };
+  useEffect(() => { loadUsage(); }, []);
+
+  // Non-2xx responses hide the body in error.context; read the friendly message from it.
+  const readError = async (error: any, data: any) => {
+    if (data?.error) return data.error as string;
+    try { const b = await error?.context?.json(); if (b?.error) return b.error as string; } catch { /* ignore */ }
+    return error?.message || "Please try again.";
+  };
 
   const send = async (text: string) => {
     const msg = text.trim();
@@ -42,9 +57,9 @@ export default function SettingsAssistant({ onApplied }: { onApplied: () => void
     setBusy(false);
     inputRef.current?.focus();
 
-    const err = (data as any)?.error;
-    if (error || err) {
-      const description = err || error?.message || "Please try again.";
+    loadUsage();
+    if (error || (data as any)?.error) {
+      const description = await readError(error, data);
       setMessages((m) => [...m, { role: "assistant", content: description }]);
       return;
     }
@@ -79,6 +94,11 @@ export default function SettingsAssistant({ onApplied }: { onApplied: () => void
         <div className="min-w-0">
           <h2 className="text-base font-semibold text-foreground leading-tight">Ask to change anything</h2>
           <p className="text-xs text-muted-foreground">Describe what you want and I'll set it up for you.</p>
+          {usage && usage.limit > 0 && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {Math.max(0, usage.limit - usage.used)} of {usage.limit} requests left this month
+            </p>
+          )}
         </div>
       </div>
 
@@ -143,7 +163,7 @@ export default function SettingsAssistant({ onApplied }: { onApplied: () => void
           placeholder="e.g. Add a service: skin fade, 30 minutes, £25"
           className="bg-background border-border"
         />
-        <Button type="submit" size="icon" disabled={busy || !input.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0">
+        <Button type="submit" size="icon" disabled={busy || !input.trim() || (!!usage && usage.limit > 0 && usage.used >= usage.limit)} className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0">
           <Send size={16} />
         </Button>
       </form>

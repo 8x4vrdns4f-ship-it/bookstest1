@@ -242,6 +242,19 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) return json({ error: "The assistant isn't configured yet." }, 500);
 
+    // Plan-based monthly allowance + short cooldown, enforced in the database.
+    const { data: remaining, error: quotaErr } = await userClient.rpc("consume_assistant_request");
+    if (quotaErr) {
+      const m = quotaErr.message || "";
+      if (m.includes("ASSISTANT_COOLDOWN")) return json({ error: "Give it a few seconds before your next request." }, 429);
+      if (m.includes("ASSISTANT_NO_PLAN")) return json({ error: "The assistant needs an active plan." }, 403);
+      if (m.includes("ASSISTANT_LIMIT")) {
+        return json({ error: "You've used all your assistant requests for this month. Upgrade your plan for more, or wait until next month.", limit_reached: true }, 429);
+      }
+      console.error("quota error", quotaErr);
+      return json({ error: "Couldn't check your assistant allowance." }, 500);
+    }
+
     const [{ data: settings }, { data: resources }, { data: services }] = await Promise.all([
       userClient.from("business_settings").select("*").eq("user_id", user.id).maybeSingle(),
       userClient.from("resources").select("id, name, capacity, active").eq("user_id", user.id).order("sort_order"),

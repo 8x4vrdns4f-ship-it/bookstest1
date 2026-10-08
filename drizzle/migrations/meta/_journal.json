@@ -113,6 +113,13 @@
       "when": 1790710245742,
       "tag": "0015_employee_weekly_schedules",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1791458292317,
+      "tag": "0016_assistant_usage_limits",
+      "breakpoints": true
     }
   ]
 }
