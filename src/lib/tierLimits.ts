@@ -24,6 +24,7 @@ export interface TierConfig {
   campaigns: boolean;
   promoCodes: boolean;
   promoCodesMax: number; // 0 = feature not available
+  assistantRequestsPerMonth: number; // AI settings assistant
 }
 
 export const TIER_LIMITS: Record<Tier, TierConfig> = {
@@ -50,6 +51,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     campaigns: false,
     promoCodes: false,
     promoCodesMax: 0,
+    assistantRequestsPerMonth: 20,
   },
   gold: {
     name: "Gold",
@@ -74,6 +76,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     campaigns: true,
     promoCodes: true,
     promoCodesMax: 1,
+    assistantRequestsPerMonth: 100,
   },
   platinum: {
     name: "Platinum",
@@ -98,6 +101,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     campaigns: true,
     promoCodes: true,
     promoCodesMax: 2,
+    assistantRequestsPerMonth: 500,
   },
 };
 
