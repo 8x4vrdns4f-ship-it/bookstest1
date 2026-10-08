@@ -28,3 +28,7 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 - Weekly schedules live in `employee_schedules` (one per employee) and are expanded into `employee_shifts` ~12 weeks ahead by `apply_employee_schedule`; `extend_business_schedules` tops up on Shifts page load. Why: the rest of the app (staff view, holiday counting) only reads concrete shifts.
 - Hand edits set `employee_shifts.is_override`, and days switched off are stored in `employee_shift_skips`. Why: re-applying a schedule must never undo one-off changes.
 - Plan allowances (incl. AI assistant monthly requests) live in tier_* SQL functions and are enforced in the database; `src/lib/tierLimits.ts` mirrors them for display. Why: limits must hold even if the UI is bypassed.
+
+## SEO
+
+- Industry landing pages are one template (`/for/:slug`) driven by `src/lib/niches.ts`; new niches also go in `scripts/generate-sitemap.ts`. Why: one page design, content edited in one place, and Google finds every page.

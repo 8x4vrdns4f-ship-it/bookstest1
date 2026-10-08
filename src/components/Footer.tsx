@@ -2,6 +2,7 @@ import { Instagram, Youtube, Music2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import BrandLogo from "./BrandLogo";
 import { useLocale } from "@/contexts/LocaleContext";
+import { NICHES } from "@/lib/niches";
 
 const socials = [
   { Icon: Instagram, href: "https://www.instagram.com/booksuite.online", label: "Instagram" },
@@ -41,7 +42,13 @@ const Footer = () => {
           ))}
         </div>
       </div>
-      <p className="text-center text-muted-foreground text-xs mt-8">
+      <nav aria-label="Industries" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground mt-8">
+        <span className="font-semibold text-foreground">Built for:</span>
+        {NICHES.map((n) => (
+          <Link key={n.slug} to={`/for/${n.slug}`} className="hover:text-primary transition-colors">{n.name}</Link>
+        ))}
+      </nav>
+      <p className="text-center text-muted-foreground text-xs mt-6">
         © {new Date().getFullYear()} BookSuite. {t("footer.rights")}
       </p>
     </footer>
