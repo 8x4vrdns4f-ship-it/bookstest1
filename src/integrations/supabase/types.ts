@@ -1409,6 +1409,24 @@ export type Database = {
         }
         Relationships: []
       }
+      settings_assistant_usage: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           canceled_at: string | null
@@ -1735,6 +1753,7 @@ export type Database = {
           role_name: string
         }[]
       }
+      consume_assistant_request: { Args: never; Returns: number }
       decide_join_request: {
         Args: {
           p_decision: string
@@ -1752,6 +1771,14 @@ export type Database = {
       generate_company_code: { Args: never; Returns: string }
       generate_gift_code: { Args: never; Returns: string }
       get_active_tier: { Args: { _user_id: string }; Returns: string }
+      get_assistant_usage: {
+        Args: never
+        Returns: {
+          monthly_limit: number
+          tier: string
+          used: number
+        }[]
+      }
       get_busy_slots: {
         Args: { p_from: string; p_to: string; p_user_id: string }
         Returns: {
@@ -1934,6 +1961,7 @@ export type Database = {
         Args: { _feature: string; _tier: string }
         Returns: boolean
       }
+      tier_assistant_limit: { Args: { _tier: string }; Returns: number }
       tier_booking_limit: { Args: { _tier: string }; Returns: number }
       tier_fee_percent: { Args: { _tier: string }; Returns: number }
       tier_promo_codes_limit: { Args: { _tier: string }; Returns: number }
