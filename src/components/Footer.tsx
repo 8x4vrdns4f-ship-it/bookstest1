@@ -18,6 +18,7 @@ const Footer = () => {
         <BrandLogo size="sm" />
         <nav className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
           <Link to="/pricing" className="hover:text-primary transition-colors">Pricing</Link>
+          <Link to="/tools/no-show-calculator" className="hover:text-primary transition-colors">No-show calculator</Link>
           <Link to="/about" className="hover:text-primary transition-colors">About</Link>
           <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
           <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>

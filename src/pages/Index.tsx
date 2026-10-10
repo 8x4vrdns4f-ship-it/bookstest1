@@ -11,6 +11,8 @@ import FoundingOfferBanner from "@/components/landing/FoundingOfferBanner";
 
 // Below-the-fold: lazy-load to shrink the initial JS payload for better LCP/TTI.
 const ProductShowcase = lazy(() => import("@/components/landing/ProductShowcase"));
+const DemoBookingWidget = lazy(() => import("@/components/landing/DemoBookingWidget"));
+const SwitchingSection = lazy(() => import("@/components/landing/SwitchingSection"));
 const HowItWorks = lazy(() => import("@/components/landing/HowItWorks"));
 const FeaturesStrip = lazy(() => import("@/components/FeaturesStrip"));
 const ExpandedFeatures = lazy(() => import("@/components/landing/ExpandedFeatures"));
@@ -81,7 +83,9 @@ const Index = () => {
         <InfoCards />
         <Suspense fallback={<Fallback />}>
           <ProductShowcase />
+          <DemoBookingWidget />
           <HowItWorks />
+          <SwitchingSection />
           <FeaturesStrip />
           <ExpandedFeatures />
           <TierComparison />
