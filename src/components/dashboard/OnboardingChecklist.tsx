@@ -276,6 +276,9 @@ const OnboardingChecklist = ({ userId }: Props) => {
                   )}
                 </div>
               </div>
+              {!s.done && s.custom && (
+                <ImportClientsDialog userId={userId} onImported={() => setSteps((prev) => prev.map((p) => (p.key === "import" ? { ...p, done: true } : p)))} />
+              )}
               {!s.done && s.action?.to && (
                 <Button asChild size="sm" variant="outline" className="h-8 text-xs shrink-0">
                   <Link to={s.action.to}>{s.action.label}</Link>
