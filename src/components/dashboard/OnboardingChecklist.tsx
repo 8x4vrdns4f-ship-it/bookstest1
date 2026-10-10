@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getConnectAuthHeaders, getStripeEnvironment } from "@/lib/connectPayments";
 import SectionCard from "@/components/app/SectionCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import ImportClientsDialog from "@/components/dashboard/ImportClientsDialog";
 
 type Props = { userId: string };
 
@@ -16,6 +17,8 @@ type Step = {
   hint?: string;
   done: boolean;
   action?: { label: string; to?: string; onClick?: () => void };
+  /** Renders the client import dialog instead of a plain button. */
+  custom?: boolean;
 };
 
 /** Session-scoped hide, so the guide returns next visit until setup is complete. */
@@ -56,7 +59,7 @@ const OnboardingChecklist = ({ userId }: Props) => {
       const { data: { session } } = await supabase.auth.getSession();
       const emailVerified = !!session?.user?.email_confirmed_at || !!(session?.user as any)?.confirmed_at;
 
-      const [empRes, bookingRes, settingsRes] = await Promise.all([
+      const [empRes, bookingRes, settingsRes, svcRes, clientRes] = await Promise.all([
         supabase.from("employees").select("id", { count: "exact", head: true }).eq("user_id", userId),
         supabase.from("bookings").select("id", { count: "exact", head: true }).eq("user_id", userId),
         supabase
@@ -64,6 +67,8 @@ const OnboardingChecklist = ({ userId }: Props) => {
           .select("business_name, working_hours, onboarding_completed_at")
           .eq("user_id", userId)
           .maybeSingle(),
+        supabase.from("services").select("id", { count: "exact", head: true }).eq("user_id", userId),
+        supabase.from("clients").select("id", { count: "exact", head: true }).eq("user_id", userId),
       ]);
 
       const settings = settingsRes.data as
@@ -86,7 +91,39 @@ const OnboardingChecklist = ({ userId }: Props) => {
 
       if (cancelled) return;
 
+      const hasServices = (svcRes.count || 0) > 0;
+      const hasClients = (clientRes.count || 0) > 0;
+
+      // The three steps that matter most come first: hours + service, payments, link.
       const next: Step[] = [
+        {
+          key: "hours",
+          label: "Set your opening hours & add a service",
+          hint: !hoursSet ? "Customers can only book inside the hours you open." : "Add at least one service with its price and length.",
+          done: hoursSet && hasServices,
+          action: hoursSet && hasServices ? undefined : { label: hoursSet ? "Add service" : "Set hours", to: "/settings" },
+        },
+        {
+          key: "stripe",
+          label: "Connect payments",
+          hint: "Required — your booking link stays closed until payments are set up.",
+          done: stripeConnected,
+          action: stripeConnected ? undefined : { label: "Connect", to: "/payments" },
+        },
+        {
+          key: "share",
+          label: "Copy your booking link",
+          hint: stripeConnected ? "Put it in your Instagram or TikTok bio." : "Connect payments first — your link can't take bookings until then.",
+          done: hasBookings,
+          action: { label: copied ? "Copied" : "Copy link", onClick: copyLink },
+        },
+        {
+          key: "import",
+          label: "Bring your clients over",
+          hint: "Switching from Fresha, Treatwell or a spreadsheet? Upload your client list.",
+          done: hasClients,
+          custom: true,
+        },
         {
           key: "verify",
           label: "Verify your email",
@@ -102,34 +139,11 @@ const OnboardingChecklist = ({ userId }: Props) => {
           action: settings?.business_name ? undefined : { label: "Add details", to: "/settings" },
         },
         {
-          key: "hours",
-          label: "Set your opening hours",
-          hint: "Customers can only book inside the hours you open.",
-          done: hoursSet,
-          action: hoursSet ? undefined : { label: "Set hours", to: "/settings" },
-        },
-        {
-          key: "share",
-          label: "Share your booking link",
-          hint: stripeConnected
-            ? bookingUrl
-            : "Connect payments first — your link can't take bookings until then.",
-          done: hasBookings,
-          action: { label: copied ? "Copied" : "Copy link", onClick: copyLink },
-        },
-        {
           key: "employee",
           label: "Add your first team member",
           hint: "Optional if you work solo — you can do this any time.",
           done: (empRes.count || 0) > 0,
           action: { label: "Add staff", to: "/dashboard/staff" },
-        },
-        {
-          key: "stripe",
-          label: "Connect payments to take bookings",
-          hint: "Required — your booking link stays closed until payments are set up.",
-          done: stripeConnected,
-          action: stripeConnected ? undefined : { label: "Connect", to: "/payments" },
         },
         {
           key: "booking",
