@@ -21,6 +21,7 @@ const entries: SitemapEntry[] = [
   { path: "/guides/how-to-take-deposits-for-appointments",    lastmod: today, changefreq: "monthly", priority: "0.8" },
   { path: "/guides/reduce-no-shows-appointment-reminders",    lastmod: today, changefreq: "monthly", priority: "0.8" },
   ...["barbers","hair-salons","personal-trainers","tattoo-artists","nail-technicians","dog-groomers","massage-therapists","lash-brow-artists","photographers","car-detailing","driving-instructors","piercing-studios","rentals"].map((s) => ({ path: `/for/${s}`, lastmod: today, changefreq: "monthly" as const, priority: "0.8" })),
+  { path: "/tools/no-show-calculator", lastmod: today, changefreq: "monthly" as const, priority: "0.7" },
   { path: "/about",    lastmod: today, changefreq: "monthly", priority: "0.7" },
   { path: "/contact",  lastmod: today, changefreq: "monthly", priority: "0.6" },
   { path: "/cookies",  lastmod: today, changefreq: "yearly",  priority: "0.3" },

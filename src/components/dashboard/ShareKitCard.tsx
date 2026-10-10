@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Download, Printer, Share2, Copy, Check, Instagram } from "lucide-react";
 import SectionCard from "@/components/app/SectionCard";
+import SocialLaunchKit from "./SocialLaunchKit";
 
 type Props = { userId: string; businessName?: string | null; className?: string };
 
@@ -106,6 +107,7 @@ export default function ShareKitCard({ userId, businessName, className }: Props)
           </div>
         </div>
       </div>
+      <SocialLaunchKit bookingUrl={bookingUrl} name={businessName || "us"} />
     </SectionCard>
   );
 }

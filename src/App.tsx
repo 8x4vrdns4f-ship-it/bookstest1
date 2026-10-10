@@ -64,6 +64,7 @@ const AdminBookings = lazy(() => import("./pages/admin/AdminBookings.tsx"));
 const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions.tsx"));
 
 const NicheLanding = lazy(() => import("./pages/NicheLanding.tsx"));
+const NoShowCalculator = lazy(() => import("./pages/NoShowCalculator.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
@@ -114,6 +115,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/guides/:slug" element={<GuideDetail />} />
           <Route path="/for/:slug" element={<NicheLanding />} />
+          <Route path="/tools/no-show-calculator" element={<NoShowCalculator />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
           <Route path="/reset-password" element={<ResetPassword />} />
