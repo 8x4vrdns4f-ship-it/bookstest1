@@ -45,7 +45,7 @@ const softwareApplicationLd = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   url: "https://booksuite.online/",
-  description: "All-in-one booking, scheduling, and client management platform for small service businesses.",
+  description: "All-in-one booking, scheduling, and client management platform for service-based businesses.",
   offers: {
     "@type": "AggregateOffer",
     priceCurrency: "GBP",
@@ -70,8 +70,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="BookSuite — Booking Software for Small Service Businesses"
-        description="All-in-one booking software for small service businesses. Take appointments and deposits, manage clients and staff, and embed a booking widget on your site."
+        title="BookSuite — Booking Software for Service-Based Businesses"
+        description="All-in-one booking software for service-based businesses. Take appointments and deposits, manage clients and staff, and embed a booking widget on your site."
         path="/"
       />
       <JsonLd data={[softwareApplicationLd, faqLd]} />
