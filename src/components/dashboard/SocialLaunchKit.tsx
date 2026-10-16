@@ -21,7 +21,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, max: number) {
   lines.push(line); return lines;
 }
 
-async function drawStory(c: HTMLCanvasElement, o: { theme: Theme; hook: string; name: string; services: string[]; url: string }) {
+async function drawStory(c: HTMLCanvasElement, o: { theme: Theme; hook: string; name: string; subtitle: string; cta: string; services: string[]; url: string }) {
   const W = 1080, H = 1920; c.width = W; c.height = H;
   const ctx = c.getContext("2d")!; const t = o.theme;
   const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, t.bg[0]); g.addColorStop(1, t.bg[1]);
@@ -43,11 +43,11 @@ async function drawStory(c: HTMLCanvasElement, o: { theme: Theme; hook: string; 
   lines.forEach((l, i) => ctx.fillText(l, W / 2, 440 + i * 115));
   let y = 440 + lines.length * 115;
   ctx.fillStyle = t.muted; ctx.font = `500 40px ${t.font}`;
-  ctx.fillText("Book your next appointment in seconds", W / 2, y); y += 70;
+  if (o.subtitle) { ctx.fillText(o.subtitle, W / 2, y); y += 70; }
 
   // service pills
   ctx.font = `700 38px ${t.font}`;
-  const svc = o.services.slice(0, 4);
+  const svc = o.services.filter((s) => s.trim()).slice(0, 4);
   svc.forEach((s, i) => {
     const label = s.length > 28 ? s.slice(0, 27) + "…" : s;
     const pw = Math.min(W - 200, ctx.measureText(label).width + 90);
@@ -67,31 +67,44 @@ async function drawStory(c: HTMLCanvasElement, o: { theme: Theme; hook: string; 
   ctx.drawImage(img, x, y, size, size);
   y += size + 110;
 
-  ctx.fillStyle = t.fg; ctx.font = `800 54px ${t.font}`; ctx.fillText("Scan or tap the link to book", W / 2, y);
+  ctx.fillStyle = t.fg; ctx.font = `800 54px ${t.font}`; ctx.fillText(o.cta, W / 2, y);
   ctx.fillStyle = t.accent; ctx.font = `600 34px ${t.font}`;
   ctx.fillText(o.url.replace(/^https?:\/\//, "").slice(0, 48), W / 2, y + 60);
   ctx.fillStyle = t.muted; ctx.font = `500 30px ${t.font}`; ctx.fillText("Booked with BookSuite", W / 2, 1850);
 }
 
+const DEFAULT_SUB = "Book your next appointment in seconds";
+const DEFAULT_CTA = "Scan or tap the link to book";
+
 export default function SocialLaunchKit({ bookingUrl, name }: { bookingUrl: string; name: string }) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [theme, setTheme] = useState(THEMES[0]);
   const [hook, setHook] = useState(HOOKS[0]);
+  const [title, setTitle] = useState(name);
+  const [subtitle, setSubtitle] = useState(DEFAULT_SUB);
+  const [cta, setCta] = useState(DEFAULT_CTA);
+  const [dbServices, setDbServices] = useState<string[]>([]);
   const [services, setServices] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => { setTitle(name); }, [name]);
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       const { data } = await supabase.from("services").select("name").eq("user_id", u.user.id).limit(4);
-      setServices((data ?? []).map((s: any) => s.name).filter(Boolean));
+      const list = (data ?? []).map((s: any) => s.name).filter(Boolean);
+      setDbServices(list); setServices(list);
     })();
   }, []);
 
   useEffect(() => {
-    if (canvasRef.current) drawStory(canvasRef.current, { theme, hook, name, services, url: bookingUrl }).catch(() => {});
-  }, [theme, hook, name, services, bookingUrl]);
+    if (canvasRef.current) drawStory(canvasRef.current, { theme, hook, name: title, subtitle, cta, services, url: bookingUrl }).catch(() => {});
+  }, [theme, hook, title, subtitle, cta, services, bookingUrl]);
+
+  const reset = () => { setHook(HOOKS[0]); setTitle(name); setSubtitle(DEFAULT_SUB); setCta(DEFAULT_CTA); setServices(dbServices); };
+  const field = "w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs text-foreground";
 
   const download = () => {
     const a = document.createElement("a");
