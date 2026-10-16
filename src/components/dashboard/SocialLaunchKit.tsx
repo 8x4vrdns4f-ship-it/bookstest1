@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, ImageDown } from "lucide-react";
+import { Copy, Check, ImageDown, Plus, X, RotateCcw } from "lucide-react";
 
 type Theme = { key: string; label: string; bg: [string, string]; accent: string; fg: string; muted: string; pill: string; font: string };
 
@@ -144,9 +144,28 @@ export default function SocialLaunchKit({ bookingUrl, name }: { bookingUrl: stri
                 <Button key={h} size="sm" variant={hook === h ? "default" : "outline"} onClick={() => setHook(h)}>{h}</Button>
               ))}
             </div>
+            <input className={`${field} mt-2`} maxLength={34} value={hook} onChange={(e) => setHook(e.target.value)} placeholder="Write your own headline" aria-label="Headline text" />
           </div>
-          {services.length === 0 && <p className="text-xs text-muted-foreground">Add services and they'll appear on your story automatically.</p>}
-          <Button size="sm" className="gap-1.5" onClick={download}><ImageDown className="h-3.5 w-3.5" /> Download story image</Button>
+          <div className="grid gap-2">
+            <div className="text-xs font-semibold text-foreground">Text on your story</div>
+            <input className={field} maxLength={40} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Business name" aria-label="Business name text" />
+            <input className={field} maxLength={50} value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="Subtitle (leave empty to hide)" aria-label="Subtitle text" />
+            <input className={field} maxLength={36} value={cta} onChange={(e) => setCta(e.target.value)} placeholder="Bottom message" aria-label="Bottom message text" />
+          </div>
+          <div className="grid gap-2">
+            <div className="text-xs font-semibold text-foreground">Services shown (up to 4)</div>
+            {services.map((s, i) => (
+              <div key={i} className="flex gap-2">
+                <input className={field} maxLength={30} value={s} onChange={(e) => setServices(services.map((x, j) => (j === i ? e.target.value : x)))} placeholder="e.g. Skin fade • £25" aria-label={`Service ${i + 1}`} />
+                <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setServices(services.filter((_, j) => j !== i))} aria-label="Remove service"><X className="h-3.5 w-3.5" /></Button>
+              </div>
+            ))}
+            {services.length < 4 && <Button size="sm" variant="outline" className="gap-1.5 self-start" onClick={() => setServices([...services, ""])}><Plus className="h-3.5 w-3.5" /> Add a line</Button>}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" className="gap-1.5" onClick={download}><ImageDown className="h-3.5 w-3.5" /> Download story image</Button>
+            <Button size="sm" variant="ghost" className="gap-1.5" onClick={reset}><RotateCcw className="h-3.5 w-3.5" /> Reset</Button>
+          </div>
         </div>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
