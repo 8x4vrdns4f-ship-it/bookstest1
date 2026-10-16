@@ -75,7 +75,8 @@ export default function AssistantPanel() {
     inputRef.current?.focus();
     loadUsage();
     if (error || (data as any)?.error) {
-      setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${await readError(error, data)}` }]);
+      const description = await readError(error, data);
+      setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${description}` }]);
       return;
     }
     setMessages((m) => [...m, { role: "assistant", content: (data as any).reply }]);
