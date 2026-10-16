@@ -23,7 +23,7 @@ const SUGGESTIONS: Record<string, string[]> = {
   "/dashboard/clients": ["Who hasn't booked in 60 days?", "Add a client: Jake Smith, jake@email.com"],
   "/dashboard/campaigns": ["Write an email inviting clients back this month", "Draft a Christmas opening hours email"],
   "/dashboard/insights": ["What was my most popular service last month?", "How much did I make this month?"],
-  "/dashboard/settings": ["Open 9am to 6pm Mon–Sat, closed Sunday", "Add a service: skin fade, 30 minutes, £25"],
+  "/settings": ["Open 9am to 6pm Mon–Sat, closed Sunday", "Add a service: skin fade, 30 minutes, £25"],
 };
 const DEFAULT_SUGGESTIONS = ["What's on today?", "How many bookings this week?", "Add a service: skin fade, 30 minutes, £25"];
 

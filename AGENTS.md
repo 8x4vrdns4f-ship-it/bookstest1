@@ -29,6 +29,10 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 - Hand edits set `employee_shifts.is_override`, and days switched off are stored in `employee_shift_skips`. Why: re-applying a schedule must never undo one-off changes.
 - Plan allowances (incl. AI assistant monthly requests) live in tier_* SQL functions and are enforced in the database; `src/lib/tierLimits.ts` mirrors them for display. Why: limits must hold even if the UI is bypassed.
 
+## AI assistant
+
+- One owner-only assistant (`business-assistant` Edge Function, opened from every dashboard page) answers via read tools and only writes through a proposed change set the owner Applies/Sends. Why: owners must approve every change or email, and limits/validation live server-side.
+
 ## SEO
 
 - Industry landing pages are one template (`/for/:slug`) driven by `src/lib/niches.ts`; new niches also go in `scripts/generate-sitemap.ts`. Why: one page design, content edited in one place, and Google finds every page.
