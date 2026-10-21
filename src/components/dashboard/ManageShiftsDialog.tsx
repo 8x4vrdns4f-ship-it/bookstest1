@@ -1,3 +1,4 @@
+import { TimeField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
@@ -123,16 +124,16 @@ const ManageShiftsDialog = ({
                 <div key={r.employee_id} className="flex items-center gap-3 p-2 rounded border border-border">
                   <Checkbox checked={r.on} onCheckedChange={(v) => update(i, { on: !!v })} />
                   <span className="flex-1 text-foreground text-sm">{emp.name}</span>
-                  <Input
-                    type="time"
+                  <TimeField
+                   
                     value={r.start_time}
                     disabled={!r.on}
                     onChange={(e) => update(i, { start_time: e.target.value })}
                     className="w-28 bg-secondary border-border"
                   />
                   <span className="text-muted-foreground">–</span>
-                  <Input
-                    type="time"
+                  <TimeField
+                   
                     value={r.end_time}
                     disabled={!r.on}
                     onChange={(e) => update(i, { end_time: e.target.value })}

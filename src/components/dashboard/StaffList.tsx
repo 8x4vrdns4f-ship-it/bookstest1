@@ -1,3 +1,4 @@
+import { DateField } from "@/components/ui/date-time-fields";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -223,8 +224,8 @@ const StaffList = ({ userId }: { userId: string }) => {
           <p className="text-[13px] text-muted-foreground mt-1">Click a name to view their profile, or use the columns below to assign bookings.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Input
-            type="date"
+          <DateField
+           
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className="w-auto"

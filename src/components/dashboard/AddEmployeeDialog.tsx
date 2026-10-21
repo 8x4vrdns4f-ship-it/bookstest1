@@ -1,3 +1,4 @@
+import { NumberField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -211,9 +212,9 @@ const AddEmployeeDialog = ({ userId, onEmployeeAdded }: AddEmployeeDialogProps) 
             </div>
             <div className="space-y-2">
               <Label htmlFor="leave-days">Holiday days per year</Label>
-              <Input
+              <NumberField
                 id="leave-days"
-                type="number"
+               
                 min={0}
                 max={366}
                 value={leaveDays}

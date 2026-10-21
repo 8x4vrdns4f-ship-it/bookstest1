@@ -1,3 +1,4 @@
+import { NumberField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -100,8 +101,8 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
               />
               <div className="flex items-center gap-1">
                 <Label className="text-xs text-muted-foreground">Min</Label>
-                <Input
-                  type="number" min={5} max={600} step={5}
+                <NumberField
+                  min={5} max={600} step={5}
                   value={s.duration_minutes}
                   onChange={(e) => setItems((cur) => cur.map((i) => (i.id === s.id ? { ...i, duration_minutes: Number(e.target.value) } : i)))}
                   onBlur={(e) => update(s.id, { duration_minutes: Math.max(5, Math.floor(Number(e.target.value) || 30)) })}
@@ -110,8 +111,8 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
               </div>
               <div className="flex items-center gap-1">
                 <Label className="text-xs text-muted-foreground">{symbol || "Price"}</Label>
-                <Input
-                  type="number" min={0} step="0.01"
+                <NumberField
+                  min={0} step="0.01"
                   value={s.price ?? ""}
                   placeholder="—"
                   onChange={(e) => setItems((cur) => cur.map((i) => (i.id === s.id ? { ...i, price: e.target.value === "" ? null : Number(e.target.value) } : i)))}
@@ -138,11 +139,11 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
         </div>
         <div className="w-24">
           <Label className="text-xs text-muted-foreground">Minutes</Label>
-          <Input type="number" min={5} step={5} value={newDur} onChange={(e) => setNewDur(Number(e.target.value))} className="bg-background border-border mt-1" />
+          <NumberField min={5} step={5} value={newDur} onChange={(e) => setNewDur(Number(e.target.value))} className="bg-background border-border mt-1" />
         </div>
         <div className="w-24">
           <Label className="text-xs text-muted-foreground">Price {symbol}</Label>
-          <Input type="number" min={0} step="0.01" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} placeholder="Optional" className="bg-background border-border mt-1" />
+          <NumberField min={0} step="0.01" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} placeholder="Optional" className="bg-background border-border mt-1" />
         </div>
         <Button onClick={add} disabled={!newName.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90">
           <Plus size={16} className="mr-1" /> Add

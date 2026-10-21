@@ -1,3 +1,4 @@
+import { DateField, TimeField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -119,9 +120,9 @@ const WeeklyScheduleEditor = ({
       <div>
         <p className="text-xs text-muted-foreground mb-2">Hours (used for every one of those days)</p>
         <div className="flex items-center gap-2">
-          <Input type="time" value={start} onChange={(e) => setStart(e.target.value)} className="w-28 bg-secondary border-border" />
+          <TimeField value={start} onChange={(e) => setStart(e.target.value)} className="w-28 bg-secondary border-border" />
           <span className="text-muted-foreground">–</span>
-          <Input type="time" value={end} onChange={(e) => setEnd(e.target.value)} className="w-28 bg-secondary border-border" />
+          <TimeField value={end} onChange={(e) => setEnd(e.target.value)} className="w-28 bg-secondary border-border" />
         </div>
       </div>
       <div>
@@ -130,7 +131,7 @@ const WeeklyScheduleEditor = ({
           <Button type="button" size="sm" variant={when === "today" ? "default" : "outline"} onClick={() => setWhen("today")}>From today</Button>
           <Button type="button" size="sm" variant={when === "date" ? "default" : "outline"} onClick={() => setWhen("date")}>From a date</Button>
           {when === "date" && (
-            <Input type="date" min={today()} value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="w-auto bg-secondary border-border" />
+            <DateField min={today()} value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="w-auto bg-secondary border-border" />
           )}
         </div>
       </div>

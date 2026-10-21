@@ -1,3 +1,4 @@
+import { NumberField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -96,8 +97,8 @@ export default function ResourcesManager({ userId, label }: { userId: string; la
               />
               <div className="flex items-center gap-1">
                 <Label className="text-xs text-muted-foreground">Seats</Label>
-                <Input
-                  type="number" min={1} max={999}
+                <NumberField
+                  min={1} max={999}
                   value={r.capacity}
                   onChange={(e) => setItems((cur) => cur.map((i) => (i.id === r.id ? { ...i, capacity: Number(e.target.value) } : i)))}
                   onBlur={(e) => update(r.id, { capacity: Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
@@ -123,7 +124,7 @@ export default function ResourcesManager({ userId, label }: { userId: string; la
         </div>
         <div className="w-24">
           <Label className="text-xs text-muted-foreground">Seats</Label>
-          <Input type="number" min={1} value={newCap} onChange={(e) => setNewCap(Number(e.target.value))} className="bg-background border-border mt-1" />
+          <NumberField min={1} value={newCap} onChange={(e) => setNewCap(Number(e.target.value))} className="bg-background border-border mt-1" />
         </div>
         <Button onClick={add} disabled={!newName.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90">
           <Plus size={16} className="mr-1" /> Add
