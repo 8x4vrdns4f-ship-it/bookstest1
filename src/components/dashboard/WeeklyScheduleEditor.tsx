@@ -136,10 +136,10 @@ const WeeklyScheduleEditor = ({
         </div>
       </div>
       <p className="text-xs text-muted-foreground">
-        Shifts are filled in automatically about 12 weeks ahead. Days you've changed by hand are kept.
+        This repeats every week, with no end date, until you change it. Days you've changed by hand are kept.
       </p>
       <div className="flex gap-2">
-        <Button onClick={save} disabled={saving} className="flex-1">{saving ? "Saving…" : "Save usual week"}</Button>
+        <Button onClick={save} disabled={saving} className="flex-1">{saving ? "Saving…" : "Save as their usual week"}</Button>
         {existing && <Button variant="outline" onClick={remove} disabled={saving}>Remove</Button>}
       </div>
     </div>

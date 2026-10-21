@@ -30,6 +30,7 @@ import SectionCard from "@/components/app/SectionCard";
 import SEO from "@/components/SEO";
 import RolesManager from "@/components/dashboard/RolesManager";
 import HolidayAllowanceCard from "@/components/dashboard/HolidayAllowanceCard";
+import AutoAssignCard from "@/components/dashboard/AutoAssignCard";
 import PromoCodesManager from "@/components/dashboard/PromoCodesManager";
 import { useSubscription } from "@/hooks/useSubscription";
 import { TIER_LIMITS, tierAllowsResources } from "@/lib/tierLimits";
@@ -609,6 +610,23 @@ const Settings = () => {
               </AccordionTrigger>
             <AccordionContent className="pb-5">
               {userId && <RolesManager userId={userId} />}
+            </AccordionContent>
+          </AccordionItem>
+          </SectionCard>
+
+          {/* Automatic staff assigning */}
+          <SectionCard>
+            <AccordionItem value="autoassign" className="border-0">
+              <AccordionTrigger className="hover:no-underline py-2">
+                <span className="flex items-center gap-3 min-w-0">
+                  <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <CalendarCheck size={20} />
+                  </span>
+                  <span className="text-base font-semibold text-foreground leading-tight">Automatic staff assigning</span>
+                </span>
+              </AccordionTrigger>
+            <AccordionContent>
+              {userId && <AutoAssignCard userId={userId} resourceLabel={form.resource_label || "Chair"} />}
             </AccordionContent>
           </AccordionItem>
           </SectionCard>
