@@ -277,14 +277,21 @@ const BookingsList = ({ userId }: { userId: string }) => {
       }
     >
       {/* Search bar */}
-      <div className="relative mb-4">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by code, name, or email…"
-          className="pl-9 bg-secondary border-border h-9 text-sm"
-        />
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by code, name, or email…"
+            className="pl-9 bg-secondary border-border h-9 text-sm"
+          />
+        </div>
+        {employeesList.length > 0 && (
+          <Button type="button" size="sm" variant={onlyUnassigned ? "default" : "outline"} className="h-9" onClick={() => setOnlyUnassigned((v) => !v)}>
+            Unassigned ({bookings.filter((b) => !b.assigned_employee_id && !["cancelled", "declined", "completed"].includes(b.status)).length})
+          </Button>
+        )}
       </div>
 
       {filtered.length === 0 ? (
