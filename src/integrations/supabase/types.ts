@@ -181,6 +181,7 @@ export type Database = {
           accent_color: string
           allow_same_day: boolean
           assignment_mode: string
+          auto_assign_mode: string
           auto_confirm: boolean
           booking_mode: string
           buffer_minutes: number
@@ -238,6 +239,7 @@ export type Database = {
           accent_color?: string
           allow_same_day?: boolean
           assignment_mode?: string
+          auto_assign_mode?: string
           auto_confirm?: boolean
           booking_mode?: string
           buffer_minutes?: number
@@ -295,6 +297,7 @@ export type Database = {
           accent_color?: string
           allow_same_day?: boolean
           assignment_mode?: string
+          auto_assign_mode?: string
           auto_confirm?: boolean
           booking_mode?: string
           buffer_minutes?: number
@@ -1304,6 +1307,7 @@ export type Database = {
           active: boolean
           capacity: number
           created_at: string
+          default_employee_id: string | null
           id: string
           name: string
           sort_order: number
@@ -1314,6 +1318,7 @@ export type Database = {
           active?: boolean
           capacity?: number
           created_at?: string
+          default_employee_id?: string | null
           id?: string
           name: string
           sort_order?: number
@@ -1324,13 +1329,22 @@ export type Database = {
           active?: boolean
           capacity?: number
           created_at?: string
+          default_employee_id?: string | null
           id?: string
           name?: string
           sort_order?: number
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "resources_default_employee_id_fkey"
+            columns: ["default_employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -1369,6 +1383,45 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: true
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_employees: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          service_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          service_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          service_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_employees_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_employees_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -1762,6 +1815,15 @@ export type Database = {
           p_role_id: string
         }
         Returns: undefined
+      }
+      employee_available_at: {
+        Args: {
+          _date: string
+          _employee_id: string
+          _minutes: number
+          _time: string
+        }
+        Returns: boolean
       }
       extend_business_schedules: {
         Args: { _user_id: string }

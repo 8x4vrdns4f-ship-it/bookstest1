@@ -120,6 +120,13 @@
       "when": 1791458292317,
       "tag": "0016_assistant_usage_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792591465368,
+      "tag": "0017_auto_assign_staff",
+      "breakpoints": true
     }
   ]
 }
