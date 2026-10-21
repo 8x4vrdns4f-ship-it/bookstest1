@@ -1,3 +1,4 @@
+import { DateField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -105,11 +106,11 @@ export default function TimeOffCard({ employee, requests, onChanged }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="to-start">From</Label>
-                  <Input id="to-start" type="date" min={todayISO()} value={start} onChange={(e) => { setStart(e.target.value); if (end < e.target.value) setEnd(e.target.value); }} className="bg-secondary border-border" />
+                  <DateField id="to-start" min={todayISO()} value={start} onChange={(e) => { setStart(e.target.value); if (end < e.target.value) setEnd(e.target.value); }} className="bg-secondary border-border" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="to-end">To</Label>
-                  <Input id="to-end" type="date" min={start} value={end} onChange={(e) => setEnd(e.target.value)} className="bg-secondary border-border" />
+                  <DateField id="to-end" min={start} value={end} onChange={(e) => setEnd(e.target.value)} className="bg-secondary border-border" />
                 </div>
               </div>
               {requestDays !== null && (

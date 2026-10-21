@@ -1,3 +1,4 @@
+import { DateField, NumberField, TimeField } from "@/components/ui/date-time-fields";
 import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -230,17 +231,17 @@ const BookingsList = ({ userId }: { userId: string }) => {
                 </div>
                 <div className="space-y-1">
                   <Label>Date</Label>
-                  <Input type="date" required value={form.booking_date} onChange={(e) => setForm({ ...form, booking_date: e.target.value })} className="bg-secondary border-border" />
+                  <DateField required value={form.booking_date} onChange={(e) => setForm({ ...form, booking_date: e.target.value })} className="bg-secondary border-border" />
                 </div>
                 <div className="space-y-1">
                   <Label>Time</Label>
-                  <Input type="time" required value={form.booking_time} onChange={(e) => setForm({ ...form, booking_time: e.target.value })} className="bg-secondary border-border" />
+                  <TimeField required value={form.booking_time} onChange={(e) => setForm({ ...form, booking_time: e.target.value })} className="bg-secondary border-border" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label>Duration (min)</Label>
-                  <Input type="number" min={15} value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: Number(e.target.value) })} className="bg-secondary border-border" />
+                  <NumberField min={15} value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: Number(e.target.value) })} className="bg-secondary border-border" />
                 </div>
                 <div className="space-y-1">
                   <Label>Notes</Label>

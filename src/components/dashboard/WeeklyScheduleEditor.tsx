@@ -1,3 +1,4 @@
+import { DateField, TimeField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -79,7 +80,7 @@ const WeeklyScheduleEditor = ({
     }
     setSaving(false);
     if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
-    toast({ title: "Weekly schedule saved", description: `Shifts filled in from ${from}.` });
+    toast({ title: "Usual week saved", description: `Shifts filled in from ${from}.` });
     setExisting({ employee_id: employeeId, weekdays: days, start_time: start, end_time: end, effective_from: from });
     onSaved?.();
   };
@@ -90,14 +91,14 @@ const WeeklyScheduleEditor = ({
     await supabase.rpc("apply_employee_schedule", { _employee_id: employeeId, _from: today(), _replace: true });
     setSaving(false);
     setExisting(null);
-    toast({ title: "Weekly schedule removed", description: "Future automatic shifts were cleared." });
+    toast({ title: "Usual week removed", description: "Future automatic shifts were cleared." });
     onSaved?.();
   };
 
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-xs text-muted-foreground mb-2">Days they work</p>
+        <p className="text-sm font-medium text-foreground mb-2">1. Which days do they work?</p>
         <div className="flex flex-wrap gap-1.5">
           {WEEKDAYS.map((d) => (
             <button
@@ -117,20 +118,20 @@ const WeeklyScheduleEditor = ({
         </div>
       </div>
       <div>
-        <p className="text-xs text-muted-foreground mb-2">Hours (used for every one of those days)</p>
+        <p className="text-sm font-medium text-foreground mb-2">2. What hours? (same for each of those days)</p>
         <div className="flex items-center gap-2">
-          <Input type="time" value={start} onChange={(e) => setStart(e.target.value)} className="w-28 bg-secondary border-border" />
+          <TimeField value={start} onChange={(e) => setStart(e.target.value)} className="w-28 bg-secondary border-border" />
           <span className="text-muted-foreground">–</span>
-          <Input type="time" value={end} onChange={(e) => setEnd(e.target.value)} className="w-28 bg-secondary border-border" />
+          <TimeField value={end} onChange={(e) => setEnd(e.target.value)} className="w-28 bg-secondary border-border" />
         </div>
       </div>
       <div>
-        <p className="text-xs text-muted-foreground mb-2">Starts</p>
+        <p className="text-sm font-medium text-foreground mb-2">3. Starting when?</p>
         <div className="flex flex-wrap items-center gap-2">
           <Button type="button" size="sm" variant={when === "today" ? "default" : "outline"} onClick={() => setWhen("today")}>From today</Button>
           <Button type="button" size="sm" variant={when === "date" ? "default" : "outline"} onClick={() => setWhen("date")}>From a date</Button>
           {when === "date" && (
-            <Input type="date" min={today()} value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="w-auto bg-secondary border-border" />
+            <DateField min={today()} value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="w-auto bg-secondary border-border" />
           )}
         </div>
       </div>
@@ -138,7 +139,7 @@ const WeeklyScheduleEditor = ({
         Shifts are filled in automatically about 12 weeks ahead. Days you've changed by hand are kept.
       </p>
       <div className="flex gap-2">
-        <Button onClick={save} disabled={saving} className="flex-1">{saving ? "Saving…" : "Save weekly schedule"}</Button>
+        <Button onClick={save} disabled={saving} className="flex-1">{saving ? "Saving…" : "Save usual week"}</Button>
         {existing && <Button variant="outline" onClick={remove} disabled={saving}>Remove</Button>}
       </div>
     </div>

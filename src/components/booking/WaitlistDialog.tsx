@@ -1,3 +1,4 @@
+import { DateField, NumberField, TimeField } from "@/components/ui/date-time-fields";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -98,20 +99,20 @@ const WaitlistDialog = ({ userId, businessName }: Props) => {
           </div>
           <div className="space-y-1.5">
             <Label>Preferred date</Label>
-            <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+            <DateField value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <Label>From</Label>
-              <Input type="time" value={form.start} onChange={(e) => setForm({ ...form, start: e.target.value })} />
+              <TimeField value={form.start} onChange={(e) => setForm({ ...form, start: e.target.value })} />
             </div>
             <div className="space-y-1.5">
               <Label>To</Label>
-              <Input type="time" value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} />
+              <TimeField value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} />
             </div>
             <div className="space-y-1.5">
               <Label>Party</Label>
-              <Input type="number" min={1} value={form.partySize} onChange={(e) => setForm({ ...form, partySize: e.target.value })} />
+              <NumberField min={1} value={form.partySize} onChange={(e) => setForm({ ...form, partySize: e.target.value })} />
             </div>
           </div>
           <div className="space-y-1.5">

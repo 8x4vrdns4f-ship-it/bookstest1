@@ -1,3 +1,4 @@
+import { NumberField, TimeField } from "@/components/ui/date-time-fields";
 import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -337,9 +338,9 @@ const Settings = () => {
                         id={`day-${key}`}
                       />
                       <Label htmlFor={`day-${key}`} className="w-12 text-foreground">{label}</Label>
-                      <Input type="time" disabled={d.closed} value={d.open} onChange={(e) => updateDay(key, { open: e.target.value })} className="bg-background border-border max-w-[130px]" />
+                      <TimeField disabled={d.closed} value={d.open} onChange={(e) => updateDay(key, { open: e.target.value })} className="bg-background border-border max-w-[130px]" />
                       <span className="text-muted-foreground">–</span>
-                      <Input type="time" disabled={d.closed} value={d.close} onChange={(e) => updateDay(key, { close: e.target.value })} className="bg-background border-border max-w-[130px]" />
+                      <TimeField disabled={d.closed} value={d.close} onChange={(e) => updateDay(key, { close: e.target.value })} className="bg-background border-border max-w-[130px]" />
                       {d.closed && <span className="text-xs text-muted-foreground ml-auto">Closed</span>}
                     </div>
                   );
@@ -394,10 +395,10 @@ const Settings = () => {
                 {form.booking_mode === "daily" && (
                   <div className="grid grid-cols-2 gap-3 pt-1">
                     <Field label="Minimum days" hint="Shortest hire length.">
-                      <Input type="number" min={1} max={365} value={form.min_rental_days} onChange={(e) => setForm({ ...form, min_rental_days: Number(e.target.value) })} className="bg-secondary border-border" />
+                      <NumberField min={1} max={365} value={form.min_rental_days} onChange={(e) => setForm({ ...form, min_rental_days: Number(e.target.value) })} className="bg-secondary border-border" />
                     </Field>
                     <Field label="Maximum days" hint="Longest hire length.">
-                      <Input type="number" min={1} max={365} value={form.max_rental_days} onChange={(e) => setForm({ ...form, max_rental_days: Number(e.target.value) })} className="bg-secondary border-border" />
+                      <NumberField min={1} max={365} value={form.max_rental_days} onChange={(e) => setForm({ ...form, max_rental_days: Number(e.target.value) })} className="bg-secondary border-border" />
                     </Field>
                   </div>
                 )}
@@ -409,7 +410,7 @@ const Settings = () => {
               </div>
 
               <Field label={`Deposit per booking (${form.currency}) — min £10`} hint="Charged only when you accept a booking.">
-                <Input type="number" min={10} step="0.50" value={form.deposit_amount} onChange={(e) => setForm({ ...form, deposit_amount: Number(e.target.value) })} className="bg-secondary border-border" />
+                <NumberField min={10} step="0.50" value={form.deposit_amount} onChange={(e) => setForm({ ...form, deposit_amount: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
               <div className="rounded-2xl border border-border bg-secondary/40 p-4 space-y-3">
                 <div>
@@ -436,16 +437,16 @@ const Settings = () => {
               <ToggleRow label="Auto-confirm Bookings" hint="Skip manual approval." checked={form.auto_confirm} onChange={(v) => setForm({ ...form, auto_confirm: v })} />
               <ToggleRow label="Allow Same-day Booking" hint="Let clients book today." checked={form.allow_same_day} onChange={(v) => setForm({ ...form, allow_same_day: v })} />
               <Field label="Booking Buffer (minutes)" hint="Gap between back-to-back appointments.">
-                <Input type="number" min={0} max={120} value={form.buffer_minutes} onChange={(e) => setForm({ ...form, buffer_minutes: Number(e.target.value) })} className="bg-secondary border-border" />
+                <NumberField min={0} max={120} value={form.buffer_minutes} onChange={(e) => setForm({ ...form, buffer_minutes: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
               <Field label="Max Advance Booking (days)" hint="How far in advance clients can book.">
-                <Input type="number" min={1} max={365} value={form.max_advance_days} onChange={(e) => setForm({ ...form, max_advance_days: Number(e.target.value) })} className="bg-secondary border-border" />
+                <NumberField min={1} max={365} value={form.max_advance_days} onChange={(e) => setForm({ ...form, max_advance_days: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
               <Field label="Cancellation Policy (hours)" hint="Minimum notice required to cancel.">
-                <Input type="number" min={0} max={168} value={form.cancellation_hours} onChange={(e) => setForm({ ...form, cancellation_hours: Number(e.target.value) })} className="bg-secondary border-border" />
+                <NumberField min={0} max={168} value={form.cancellation_hours} onChange={(e) => setForm({ ...form, cancellation_hours: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
               <Field label="Pending request expiry (hours)" hint="How long a booking request stays open before it's auto-declined and the card released.">
-                <Input type="number" min={1} max={168} value={form.pending_request_ttl_hours} onChange={(e) => setForm({ ...form, pending_request_ttl_hours: Number(e.target.value) })} className="bg-secondary border-border" />
+                <NumberField min={1} max={168} value={form.pending_request_ttl_hours} onChange={(e) => setForm({ ...form, pending_request_ttl_hours: Number(e.target.value) })} className="bg-secondary border-border" />
               </Field>
             </AccordionContent>
           </AccordionItem>
@@ -579,9 +580,9 @@ const Settings = () => {
                   <label htmlFor="rebooking-days" className="text-sm text-muted-foreground">
                     Remind after this many quiet days
                   </label>
-                  <Input
+                  <NumberField
                     id="rebooking-days"
-                    type="number"
+                   
                     min={7}
                     max={365}
                     className="w-24"

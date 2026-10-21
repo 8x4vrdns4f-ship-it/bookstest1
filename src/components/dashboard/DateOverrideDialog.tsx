@@ -1,3 +1,4 @@
+import { TimeField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppDialog } from "@/components/app/AppDialog";
@@ -117,11 +118,11 @@ const DateOverrideDialog = ({ open, onOpenChange, date, userId, onSaved }: Props
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-muted-foreground text-xs">Open</Label>
-            <Input type="time" value={openTime} onChange={(e) => setOpenTime(e.target.value)} className="bg-secondary border-border" />
+            <TimeField value={openTime} onChange={(e) => setOpenTime(e.target.value)} className="bg-secondary border-border" />
           </div>
           <div>
             <Label className="text-muted-foreground text-xs">Close</Label>
-            <Input type="time" value={closeTime} onChange={(e) => setCloseTime(e.target.value)} className="bg-secondary border-border" />
+            <TimeField value={closeTime} onChange={(e) => setCloseTime(e.target.value)} className="bg-secondary border-border" />
           </div>
         </div>
       )}

@@ -9,7 +9,7 @@ export default function ShiftsPage() {
   return (
     <>
       <SEO title="Shifts — BookSuite" description="Plan and manage staff shifts." path="/dashboard/shifts" noIndex />
-      <PageHeader title="Shifts" description="Plan the week for your team." />
+      <PageHeader title="Shifts" description="See who works when. Set each person's usual week, then click any day for one-off changes." />
       <ShiftsView userId={ctx.businessUserId} />
     </>
   );

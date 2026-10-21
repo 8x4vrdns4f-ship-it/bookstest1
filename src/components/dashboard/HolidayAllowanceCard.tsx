@@ -1,3 +1,4 @@
+import { NumberField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -81,9 +82,9 @@ const HolidayAllowanceCard = ({ userId }: { userId: string }) => {
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="leave-days">Default holiday days per year</Label>
-          <Input
+          <NumberField
             id="leave-days"
-            type="number"
+           
             min={0}
             max={366}
             value={days}

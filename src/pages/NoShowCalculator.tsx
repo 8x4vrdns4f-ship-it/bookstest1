@@ -1,3 +1,4 @@
+import { NumberField } from "@/components/ui/date-time-fields";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
@@ -49,7 +50,7 @@ export default function NoShowCalculator() {
             <div className="rounded-2xl border border-border bg-card p-6 space-y-8">
               <div className="space-y-3">
                 <Label htmlFor="price">Average appointment price (£)</Label>
-                <Input id="price" type="number" min={0} inputMode="decimal" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
+                <NumberField id="price" min={0} inputMode="decimal" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between"><Label>No-shows per week</Label><span className="font-semibold text-foreground">{perWeek}</span></div>

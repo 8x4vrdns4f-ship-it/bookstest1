@@ -1,3 +1,4 @@
+import { DateField, NumberField } from "@/components/ui/date-time-fields";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -191,8 +192,8 @@ const PromoCodesManager = ({ userId, maxCodes }: Props) => {
               </div>
               <div>
                 <Label htmlFor="pc-value">{discountType === "percent" ? "Percent off" : "Amount off (£)"}</Label>
-                <Input
-                  id="pc-value" type="number" min={1} max={discountType === "percent" ? 100 : undefined}
+                <NumberField
+                  id="pc-value" min={1} max={discountType === "percent" ? 100 : undefined}
                   value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} className="mt-1.5"
                 />
               </div>
@@ -200,15 +201,15 @@ const PromoCodesManager = ({ userId, maxCodes }: Props) => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="pc-uses">Usage limit (optional)</Label>
-                <Input
-                  id="pc-uses" type="number" min={1} value={maxUses}
+                <NumberField
+                  id="pc-uses" min={1} value={maxUses}
                   onChange={(e) => setMaxUses(e.target.value)} placeholder="Unlimited" className="mt-1.5"
                 />
               </div>
               <div>
                 <Label htmlFor="pc-expires">Expiry date (optional)</Label>
-                <Input
-                  id="pc-expires" type="date" value={expiresAt}
+                <DateField
+                  id="pc-expires" value={expiresAt}
                   onChange={(e) => setExpiresAt(e.target.value)} className="mt-1.5"
                 />
               </div>
