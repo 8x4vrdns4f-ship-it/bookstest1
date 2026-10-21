@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import JoinCompanyDialog from "./JoinCompanyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
-import { Check, Play } from "lucide-react";
+import { Check } from "lucide-react";
+import promoVideo from "@/assets/booksuite-promo.mp4.asset.json";
 
 
 
