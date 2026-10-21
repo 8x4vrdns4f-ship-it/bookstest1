@@ -36,3 +36,7 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 ## SEO
 
 - Industry landing pages are one template (`/for/:slug`) driven by `src/lib/niches.ts`; new niches also go in `scripts/generate-sitemap.ts`. Why: one page design, content edited in one place, and Google finds every page.
+
+## Form fields
+
+- Use `DateField` / `TimeField` / `NumberField` from `src/components/ui/date-time-fields.tsx` instead of native `type="date|time|number"` inputs. Why: native boxes fire half-typed values that reset the field; these pickers only emit complete values.
