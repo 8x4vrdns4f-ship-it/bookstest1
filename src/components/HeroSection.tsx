@@ -54,12 +54,14 @@ const HeroSection = () => {
 
 
         <div className="flex-1 w-full">
-          <div className="aspect-video rounded-xl overflow-hidden border border-border bg-secondary shadow-2xl shadow-primary/5 flex flex-col items-center justify-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-              <Play size={22} className="text-primary ml-0.5" />
-            </div>
-            <p className="text-sm text-muted-foreground">Product walkthrough video coming soon</p>
-          </div>
+          <video
+            className="aspect-video w-full rounded-xl overflow-hidden border border-border bg-secondary shadow-2xl shadow-primary/5"
+            src={promoVideo.url}
+            controls
+            preload="metadata"
+            playsInline
+            aria-label="BookSuite product walkthrough video"
+          />
         </div>
 
 
