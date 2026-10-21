@@ -49,6 +49,9 @@ const BookingsList = ({ userId }: { userId: string }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [onlyUnassigned, setOnlyUnassigned] = useState(false);
+  const [shiftsAll, setShiftsAll] = useState<{ employee_id: string; shift_date: string; start_time: string; end_time: string }[]>([]);
+  const [leaves, setLeaves] = useState<{ employee_id: string; start_date: string; end_date: string }[]>([]);
   const [detail, setDetail] = useState<Booking | null>(null);
   const { toast } = useToast();
 
@@ -72,11 +75,18 @@ const BookingsList = ({ userId }: { userId: string }) => {
   };
 
   const fetchEmployees = async () => {
-    const { data } = await supabase.from("employees").select("id, name").eq("user_id", userId);
+    const since = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+    const [{ data }, sh, to] = await Promise.all([
+      supabase.from("employees").select("id, name").eq("user_id", userId),
+      supabase.from("employee_shifts").select("employee_id, shift_date, start_time, end_time").eq("user_id", userId).gte("shift_date", since).limit(5000),
+      supabase.from("time_off_requests").select("employee_id, start_date, end_date").eq("user_id", userId).eq("status", "approved").gte("end_date", since),
+    ]);
     const map: Record<string, string> = {};
     (data || []).forEach((e) => { map[e.id] = e.name; });
     setEmployeesMap(map);
     setEmployeesList((data || []).map((e) => ({ id: e.id, name: e.name })));
+    setShiftsAll(sh.data || []);
+    setLeaves(to.data || []);
   };
 
   useEffect(() => {
@@ -107,13 +117,23 @@ const BookingsList = ({ userId }: { userId: string }) => {
 
   const filtered = useMemo(() => {
     const q = search.trim().toUpperCase();
-    if (!q) return bookings;
-    return bookings.filter((b) =>
+    const base = onlyUnassigned
+      ? bookings.filter((b) => !b.assigned_employee_id && !["cancelled", "declined", "completed"].includes(b.status))
+      : bookings;
+    if (!q) return base;
+    return base.filter((b) =>
       (b.confirmation_code || "").toUpperCase().includes(q) ||
       b.client_name.toUpperCase().includes(q) ||
       (b.client_email || "").toUpperCase().includes(q)
     );
-  }, [bookings, search]);
+  }, [bookings, search, onlyUnassigned]);
+
+  const availability = (empId: string, b: Booking) => {
+    if (leaves.some((t) => t.employee_id === empId && t.start_date <= b.booking_date && t.end_date >= b.booking_date)) return "On holiday";
+    const t = b.booking_time.slice(0, 5);
+    const ok = shiftsAll.some((s) => s.employee_id === empId && s.shift_date === b.booking_date && s.start_time.slice(0, 5) <= t && s.end_time.slice(0, 5) > t);
+    return ok ? "" : "Off";
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -332,14 +352,17 @@ const BookingsList = ({ userId }: { userId: string }) => {
                 )}
                 {employeesList.length > 0 && (
                   <Select value={b.assigned_employee_id || "none"} onValueChange={(val) => handleAssign(b.id, val)}>
-                    <SelectTrigger className="w-[130px] h-8 text-xs bg-secondary border-border">
+                    <SelectTrigger className={`w-[150px] h-8 text-xs bg-secondary border-border ${!b.assigned_employee_id ? "text-amber-400 border-amber-400/40" : ""}`}>
                       <SelectValue placeholder="Assign staff" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
                       <SelectItem value="none">Unassigned</SelectItem>
-                      {employeesList.map((e) => (
-                        <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
-                      ))}
+                      {[...employeesList]
+                        .map((e) => ({ e, s: availability(e.id, b) }))
+                        .sort((x, y) => Number(y.s === "") - Number(x.s === ""))
+                        .map(({ e, s }) => (
+                          <SelectItem key={e.id} value={e.id}>{e.name}{s ? ` · ${s}` : " · Working"}</SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 )}

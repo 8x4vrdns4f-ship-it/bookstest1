@@ -114,6 +114,19 @@ const ShiftsView = ({ userId }: { userId: string }) => {
         </SectionCard>
       )}
 
+      <div className="grid gap-2 sm:grid-cols-3">
+        {[
+          { n: 1, t: "Set usual week", d: "Press “Set usual week” by a name, pick their days and hours, then Save." },
+          { n: 2, t: "It repeats every week", d: "Their shifts fill in automatically, with no end date." },
+          { n: 3, t: "Change just one day", d: "Click any day in the grid for a one-off change. Their usual week stays the same." },
+        ].map((s) => (
+          <div key={s.n} className="flex gap-3 p-3 rounded-lg border border-border bg-card">
+            <span className="shrink-0 h-6 w-6 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center">{s.n}</span>
+            <div><p className="text-sm font-medium text-foreground">{s.t}</p><p className="text-xs text-muted-foreground">{s.d}</p></div>
+          </div>
+        ))}
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="outline" size="icon" onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label="Previous week"><ChevronLeft size={16} /></Button>
         <Button variant={isThisWeek ? "default" : "outline"} size="sm" onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))}>This week</Button>
@@ -159,6 +172,9 @@ const ShiftsView = ({ userId }: { userId: string }) => {
                       <td className="sticky left-0 z-10 bg-card p-3 align-top">
                         <p className="text-foreground font-medium truncate">{e.name}</p>
                         <p className="text-[11px] text-muted-foreground leading-snug">{describeUsualWeek(schedules[e.id])}</p>
+                        {schedules[e.id] && (
+                          <p className="text-[11px] text-primary/80 leading-snug">Repeats weekly from {format(parseISO(schedules[e.id].effective_from), "d MMM")}</p>
+                        )}
                         <button type="button" onClick={() => setUsualFor(e)} className="text-[11px] text-primary hover:underline mt-1 inline-flex items-center gap-1">
                           <Repeat size={11} /> {schedules[e.id] ? "Change usual week" : "Set usual week"}
                         </button>
