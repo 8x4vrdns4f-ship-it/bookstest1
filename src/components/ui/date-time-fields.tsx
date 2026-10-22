@@ -141,7 +141,11 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
         onBlur={(e) => {
           focused.current = false;
           let n = Number(draft);
-          if (draft === "" || isNaN(n)) {
+          if (draft === "") {
+            // Empty means "no value" (e.g. Unlimited / Optional) unless the box is required.
+            if (rest.required && lo !== undefined) { n = lo; }
+            else { setDraft(""); onChange(fake("")); onBlur?.(e); return; }
+          } else if (isNaN(n)) {
             if (lo !== undefined) { n = lo; } else { setDraft(ext); onBlur?.(e); return; }
           }
           if (lo !== undefined && n < lo) n = lo;
