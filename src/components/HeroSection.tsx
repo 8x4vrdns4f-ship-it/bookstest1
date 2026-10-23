@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
 import { Check } from "lucide-react";
 import promoVideo from "@/assets/booksuite-promo.mp4.asset.json";
+import dashboardShot from "@/assets/shot-dashboard.jpg";
 
 
 
