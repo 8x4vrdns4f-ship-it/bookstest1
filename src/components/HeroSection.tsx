@@ -6,7 +6,7 @@ import JoinCompanyDialog from "./JoinCompanyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
 import { Check } from "lucide-react";
-import promoVideo from "@/assets/booksuite-promo.mp4.asset.json";
+import promoVideo from "@/assets/booksuite-film-16x9.mp4.asset.json";
 import heroPoster from "@/assets/booksuite-hero-poster.jpg.asset.json";
 
 
