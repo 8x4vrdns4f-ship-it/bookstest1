@@ -59,6 +59,7 @@ const HeroSection = () => {
           <video
             className="aspect-video w-full rounded-xl overflow-hidden border border-border bg-secondary shadow-2xl shadow-primary/5"
             src={promoVideo.url}
+            poster={dashboardShot}
             controls
             preload="metadata"
             playsInline
