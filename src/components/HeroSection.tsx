@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
 import { Check } from "lucide-react";
 import promoVideo from "@/assets/booksuite-promo.mp4.asset.json";
+import dashboardShot from "@/assets/shot-dashboard.jpg";
 
 
 
@@ -58,6 +59,7 @@ const HeroSection = () => {
           <video
             className="aspect-video w-full rounded-xl overflow-hidden border border-border bg-secondary shadow-2xl shadow-primary/5"
             src={promoVideo.url}
+            poster={dashboardShot}
             controls
             preload="metadata"
             playsInline
