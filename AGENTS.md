@@ -47,3 +47,8 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 - Staff cancel/decline only via the `cancel-booking-owner` Edge Function; Stripe refunds only via `_shared/booking-refund.ts`, with amount rules in `_shared/refund-rules.ts` (unit-tested). DB triggers block non-service-role cancels of paid bookings, edits to payment columns, and deletes of bookings with any payment record. Why: money must never be kept, lost or silently fail to refund because one UI path forgot.
 - Every refund first claims the booking atomically (`lockForRefund` → `payment_status='refund_processing'`, 409 if already claimed) and passes a Stripe idempotency key from `refundIdempotencyKey`. Why: double clicks or owner+client cancelling at once must never refund twice or send false failure emails.
 - Booking-payment costs (Stripe fees above the standard 1.5%+20p, refund/chargeback shortfalls, dispute fees) go on the business's tab in `business_ledger` (unique `stripe_object_id`), with money rules in `_shared/ledger-rules.ts` and webhook money handlers in `_shared/payment-events.ts` (both unit-tested). Why: BookSuite must never carry booking-payment costs, and every Stripe-driven write must be replay-safe.
+
+## Cancellation policy wording
+
+- Client-facing policy text comes from `src/lib/cancelPolicy.ts` (screens), `cancelPolicyLine` in `_shared/refund-rules.ts` (emails) and `renderPolicy` in `widgetTemplate.ts`; a test asserts the first two match. Why: clients must see identical terms before paying, in emails and when cancelling.
+- Connecting payments requires `business_settings.payments_terms_accepted_at`, enforced in `connect-create-account`. Why: owners must accept refund/fee/chargeback responsibility before taking money.
