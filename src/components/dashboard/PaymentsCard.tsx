@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { getConnectAuthHeaders, getConnectErrorMessage, getStripeEnvironment } from "@/lib/connectPayments";
 import SectionCard from "@/components/app/SectionCard";
 import LedgerBalance from "@/components/dashboard/LedgerBalance";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type Status = {
   connected: boolean;
@@ -20,6 +21,14 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
   const [status, setStatus] = useState<Status | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [acceptedAt, setAcceptedAt] = useState<string | null>(null);
+  const [agree, setAgree] = useState(false);
+
+  useEffect(() => {
+    supabase.from("business_settings").select("payments_terms_accepted_at").eq("user_id", userId).maybeSingle()
+      .then(({ data }) => setAcceptedAt((data as any)?.payments_terms_accepted_at ?? null));
+  }, [userId]);
+  const mustAgree = !acceptedAt && !agree;
 
   const refresh = async () => {
     try {
@@ -44,7 +53,7 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
     try {
       const headers = await getConnectAuthHeaders();
       const { data, error } = await supabase.functions.invoke("connect-create-account", {
-        body: { origin: window.location.origin, environment: getStripeEnvironment() },
+        body: { origin: window.location.origin, environment: getStripeEnvironment(), acceptResponsibility: agree || !!acceptedAt },
         headers,
       });
       if (error) throw error;
@@ -101,14 +110,20 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
       actions={statusBadge}
     >
       <div className="flex flex-wrap items-center gap-3">
+        {!ready && !loading && !acceptedAt && (
+          <label className="flex w-full items-start gap-2.5 text-sm text-foreground cursor-pointer">
+            <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5" aria-label="Accept payment responsibilities" />
+            <span>I understand I'm responsible for refunds, card fees and chargebacks on my bookings.</span>
+          </label>
+        )}
         {!status?.connected && (
-          <Button onClick={startOnboarding} disabled={actionLoading} variant="premium">
+          <Button onClick={startOnboarding} disabled={actionLoading || mustAgree} variant="premium">
             {actionLoading ? <Loader2 className="animate-spin" size={16} /> : null}
             Connect Stripe
           </Button>
         )}
         {status?.connected && !ready && (
-          <Button onClick={startOnboarding} disabled={actionLoading} variant="outline">
+          <Button onClick={startOnboarding} disabled={actionLoading || mustAgree} variant="outline">
             {actionLoading ? <Loader2 className="animate-spin" size={16} /> : null}
             Finish onboarding
           </Button>
