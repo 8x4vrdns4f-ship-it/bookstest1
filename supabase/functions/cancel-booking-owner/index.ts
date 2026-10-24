@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     let allowed = booking.user_id === uid;
     if (!allowed) {
       for (const perm of ["approve_requests", "manage_settings"]) {
-        const { data } = await userDb.rpc("has_company_permission", { _user_id: uid, _owner_id: booking.user_id, _permission: perm } as any);
+        const { data } = await userDb.rpc("has_company_permission", { _auth_uid: uid, _business_user_id: booking.user_id, _perm: perm });
         if (data === true) { allowed = true; break; }
       }
     }

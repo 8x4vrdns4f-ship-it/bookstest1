@@ -265,12 +265,17 @@ async function handleChargeRefunded(
     charge.refunds?.data?.[0]?.id ||
     charge.latest_refund ||
     null;
+  // Our own refund functions already recorded this refund (and emailed the client).
+  if (refundId && booking.refund_id === refundId && booking.payment_status === "partially_refunded") return;
+  const isPartial = typeof charge.amount_refunded === "number" && typeof charge.amount === "number"
+    && charge.amount_refunded < charge.amount;
 
   await admin
     .from("bookings")
     .update({
-      payment_status: "refunded",
+      payment_status: isPartial ? "partially_refunded" : "refunded",
       refund_id: refundId,
+      refund_error: null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", booking.id);
