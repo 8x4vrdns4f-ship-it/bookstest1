@@ -6,6 +6,7 @@ import { CreditCard, ExternalLink, CheckCircle2, AlertCircle, Loader2 } from "lu
 import { toast } from "sonner";
 import { getConnectAuthHeaders, getConnectErrorMessage, getStripeEnvironment } from "@/lib/connectPayments";
 import SectionCard from "@/components/app/SectionCard";
+import LedgerBalance from "@/components/dashboard/LedgerBalance";
 
 type Status = {
   connected: boolean;
@@ -122,6 +123,7 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
             </Button>
           </>
         )}
+        <LedgerBalance userId={userId} />
         {!ready && !loading && (
           <div className="flex gap-2.5 w-full rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning">
             <AlertCircle className="h-4 w-4 shrink-0 mt-px" />
