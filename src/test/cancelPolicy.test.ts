@@ -19,3 +19,10 @@ describe("cancel policy wording", () => {
     expect(cancelDeadlineText("2099-07-10T15:00:00Z", 2, "Europe/London")).toContain(", 14:00");
   });
 });
+
+import { cancelPolicyLine } from "../../supabase/functions/_shared/refund-rules";
+describe("email policy line matches the on-screen wording", () => {
+  it.each([[24, 10, false], [48, 15, true]])("hours %i deposit %i full %s", (h, d, full) => {
+    expect(cancelPolicyLine(h, d, "GBP", full)).toBe(cancelPolicyText({ hours: h, deposit: d, paidInFull: full }));
+  });
+});
