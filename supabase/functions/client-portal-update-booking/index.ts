@@ -1,12 +1,11 @@
 // PUBLIC endpoint (session-token protected) — cancel or reschedule one of the
 // customer's own bookings. Every rule is re-validated server side.
 import {
-import { cancelPolicyLine } from "../_shared/refund-rules.ts";
   adminClient, corsHeaders, formatDate, formatTime, json, resolveSession,
 } from "../_shared/portalSession.ts";
 import { availableSlots, bookableDateRange, loadAvailability } from "../_shared/portalSlots.ts";
 import { loadCancelSettings, performClientCancel, quoteFor } from "../_shared/client-cancel.ts";
-import { zonedTimeToUtcMs } from "../_shared/refund-rules.ts";
+import { cancelPolicyLine, zonedTimeToUtcMs } from "../_shared/refund-rules.ts";
 
 const CLOSED_STATUSES = ["cancelled_by_client", "cancelled", "completed", "no_show", "declined"];
 
