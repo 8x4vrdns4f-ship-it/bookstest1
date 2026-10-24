@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
           stripe_fee_included_minor: String(plan.stripeFeeIncludedMinor),
           ledger_collected_minor: String(plan.collectedMinor),
         },
-      }, { idempotencyKey: `charge-pending-${pending.id}` });
+      });
     } catch (err: any) {
       // Off-session charge failed (declined, insufficient funds, SCA required).
       const msg = err?.raw?.message || err?.message || "Charge failed";
