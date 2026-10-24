@@ -48,7 +48,7 @@ const ReceptionistView = ({ businessUserId }: { businessUserId: string }) => {
     const [bk, emps] = await Promise.all([
       supabase
         .from("bookings")
-        .select("id, client_name, service, booking_date, booking_time, duration_minutes, status, confirmation_code, assigned_employee_id")
+        .select("id, client_name, service, booking_date, booking_time, duration_minutes, status, confirmation_code, assigned_employee_id, payment_status, payment_option, charge_amount, deposit_amount")
         .eq("user_id", businessUserId)
         .gte("booking_date", today)
         .order("booking_date", { ascending: true })
