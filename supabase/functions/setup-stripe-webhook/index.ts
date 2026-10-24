@@ -29,7 +29,8 @@ Deno.serve(async (req) => {
     const PLATFORM_OWNER_EMAILS = (Deno.env.get("PLATFORM_OWNER_EMAILS") ?? "help@booksuite.online")
       .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
     const callerEmail = (userData.user.email ?? "").toLowerCase();
-    if (!callerEmail || !PLATFORM_OWNER_EMAILS.includes(callerEmail)) {
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
+    if (!isAdmin && (!callerEmail || !PLATFORM_OWNER_EMAILS.includes(callerEmail))) {
       return new Response(JSON.stringify({ error: "Forbidden: platform owner only" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
