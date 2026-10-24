@@ -41,6 +41,7 @@ export type Database = {
           platform_fee_amount: number | null
           promo_code_id: string | null
           refund_amount: number | null
+          refund_attempts: number
           refund_error: string | null
           refund_id: string | null
           rental_days: number | null
@@ -84,6 +85,7 @@ export type Database = {
           platform_fee_amount?: number | null
           promo_code_id?: string | null
           refund_amount?: number | null
+          refund_attempts?: number
           refund_error?: string | null
           refund_id?: string | null
           rental_days?: number | null
@@ -127,6 +129,7 @@ export type Database = {
           platform_fee_amount?: number | null
           promo_code_id?: string | null
           refund_amount?: number | null
+          refund_attempts?: number
           refund_error?: string | null
           refund_id?: string | null
           rental_days?: number | null

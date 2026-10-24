@@ -4,7 +4,7 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "./stripe.ts";
 import { notifyAdmin } from "./notify-admin.ts";
-import { chargedAmount, formatMoney } from "./refund-rules.ts";
+import { chargedAmount, formatMoney, refundIdempotencyKey } from "./refund-rules.ts";
 
 export function fmtDate(d: string): string {
   try { return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); }
@@ -21,6 +21,25 @@ export async function ownerEmail(admin: SupabaseClient, userId: string): Promise
     const { data } = await admin.rpc("get_owner_email", { _user_id: userId });
     return (data as string | null) || null;
   } catch { return null; }
+}
+
+export const OPEN_STATUSES = ["pending", "confirmed", "in_progress"];
+
+/**
+ * Atomically claims a booking for refunding: moves payment_status to
+ * 'refund_processing' only if it is still exactly what we read (paid /
+ * refund_failed). Returns false when another request got there first.
+ */
+export async function lockForRefund(admin: SupabaseClient, booking: any, opts: { requireOpen?: boolean } = {}): Promise<boolean> {
+  if (booking.payment_status !== "paid" && booking.payment_status !== "refund_failed") return false;
+  let q = admin.from("bookings")
+    .update({ payment_status: "refund_processing", updated_at: new Date().toISOString() })
+    .eq("id", booking.id)
+    .eq("payment_status", booking.payment_status);
+  if (opts.requireOpen) q = q.in("status", OPEN_STATUSES);
+  const { data, error } = await q.select("id");
+  if (error) { console.error("lockForRefund", error); return false; }
+  return (data?.length ?? 0) === 1;
 }
 
 /**
@@ -46,7 +65,7 @@ export async function refundBooking(
       ...(partial ? { amount: Math.round(amount * 100) } : {}),
       refund_application_fee: true,
       reverse_transfer: true,
-    });
+    }, { idempotencyKey: refundIdempotencyKey(booking.id, amount, Number(booking.refund_attempts ?? 0)) });
     await admin.from("bookings").update({
       payment_status: partial ? "partially_refunded" : "refunded",
       refund_id: refund.id,
@@ -58,12 +77,18 @@ export async function refundBooking(
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e);
     console.error(`refund failed (${opts.context})`, booking.id, error);
-    await admin.from("bookings").update({
+    // Never overwrite a booking that a parallel path / the webhook already marked refunded.
+    const { data: marked } = await admin.from("bookings").update({
       payment_status: "refund_failed",
       refund_amount: amount,
       refund_error: error.slice(0, 500),
+      refund_attempts: Number(booking.refund_attempts ?? 0) + 1,
       updated_at: new Date().toISOString(),
-    }).eq("id", booking.id);
+    }).eq("id", booking.id).not("payment_status", "in", "(refunded,partially_refunded)").select("id");
+    if (!marked?.length) {
+      const { data: cur } = await admin.from("bookings").select("refund_id, refund_amount").eq("id", booking.id).maybeSingle();
+      return { ok: true, refundId: cur?.refund_id || "", amount: Number(cur?.refund_amount ?? amount), partial };
+    }
 
     const when = `${fmtDate(booking.booking_date)} ${fmtTime(booking.booking_time)}`;
     const to = await ownerEmail(admin, booking.user_id);

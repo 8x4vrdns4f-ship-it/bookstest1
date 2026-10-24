@@ -347,6 +347,11 @@ const BookingsList = ({ userId }: { userId: string }) => {
                       Refund failed
                     </Badge>
                   )}
+                  {b.payment_status === "refund_processing" && (
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/25 text-[10px]">
+                      Refund processing…
+                    </Badge>
+                  )}
                   {b.assigned_employee_id && employeesMap[b.assigned_employee_id] && (
                     <Badge variant="outline" className="bg-secondary/60 text-muted-foreground border-border gap-1 text-[10px]">
                       <UserCheck size={10} /> {employeesMap[b.assigned_employee_id]}

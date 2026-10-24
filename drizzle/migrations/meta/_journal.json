@@ -134,6 +134,20 @@
       "when": 1792880303210,
       "tag": "0018_refund_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792880973638,
+      "tag": "0019_refund_lock_and_statuses",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792881225236,
+      "tag": "0020_booking_guard_allow_service_role",
+      "breakpoints": true
     }
   ]
 }

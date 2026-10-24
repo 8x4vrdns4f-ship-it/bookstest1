@@ -35,7 +35,9 @@ Deno.serve(async (req) => {
       return json({ ok: true, preview: true, late: q.late, cancellation_hours: q.cancellationHours, charged: q.charged, refund: q.refund, kept: q.kept, currency: q.currency });
     }
 
-    return json(await performClientCancel(admin, booking, "manage link"));
+    const r = await performClientCancel(admin, booking, "manage link");
+    if ("conflict" in r) return json({ error: "Already being processed", code: "already_processing" }, 409);
+    return json(r);
   } catch (e) {
     console.error("cancel-booking-client error", e);
     return json({ error: e instanceof Error ? e.message : String(e) }, 500);

@@ -260,6 +260,8 @@ async function handleChargeRefunded(
     return;
   }
   if (booking.payment_status === "refunded") return;
+  // One of our refund functions is mid-flight; it records the result and emails.
+  if (booking.payment_status === "refund_processing") return;
 
   const refundId =
     charge.refunds?.data?.[0]?.id ||

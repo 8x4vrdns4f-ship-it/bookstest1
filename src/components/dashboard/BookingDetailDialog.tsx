@@ -151,6 +151,9 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, currency = 
               </Button>
             </div>
           )}
+          {booking.payment_status === "refund_processing" && (
+            <div className="text-xs text-muted-foreground mr-auto">Refund processing…</div>
+          )}
           {booking.payment_status === "refunded" && (
             <div className="text-xs text-muted-foreground mr-auto">Payment was refunded.</div>
           )}

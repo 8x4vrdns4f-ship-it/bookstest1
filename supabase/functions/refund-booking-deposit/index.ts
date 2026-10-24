@@ -2,7 +2,7 @@
 // Fee/transfer handling unchanged. Customer refund email is idempotent with the
 // webhook via the refund id key.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { fmtDate, fmtTime, refundBooking } from "../_shared/booking-refund.ts";
+import { fmtDate, fmtTime, lockForRefund, refundBooking } from "../_shared/booking-refund.ts";
 import { notifyAdmin } from "../_shared/notify-admin.ts";
 import { chargedAmount, formatMoney } from "../_shared/refund-rules.ts";
 
@@ -42,6 +42,7 @@ Deno.serve(async (req) => {
 
     // A retry refunds the amount that was due last time (late cancels keep the deposit).
     const amount = retry && booking.refund_amount ? Number(booking.refund_amount) : chargedAmount(booking);
+    if (!(await lockForRefund(admin, booking))) return json({ error: "Already being processed", code: "already_processing" }, 409);
     const r = await refundBooking(admin, booking, { amount, context: retry ? "owner retry" : "owner refund button", businessName, currency });
     if (!r.ok) return json({ ok: false, refund_failed: true, error: r.error }, 502);
 

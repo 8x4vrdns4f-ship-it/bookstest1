@@ -45,3 +45,4 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 ## Refunds & cancellations
 
 - Staff cancel/decline only via the `cancel-booking-owner` Edge Function; Stripe refunds only via `_shared/booking-refund.ts`, with amount rules in `_shared/refund-rules.ts` (unit-tested). DB triggers block non-service-role cancels of paid bookings, edits to payment columns, and deletes of bookings with any payment record. Why: money must never be kept, lost or silently fail to refund because one UI path forgot.
+- Every refund first claims the booking atomically (`lockForRefund` → `payment_status='refund_processing'`, 409 if already claimed) and passes a Stripe idempotency key from `refundIdempotencyKey`. Why: double clicks or owner+client cancelling at once must never refund twice or send false failure emails.
