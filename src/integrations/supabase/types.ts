@@ -281,6 +281,7 @@ export type Database = {
           onboarding_completed_at: string | null
           party_size_enabled: boolean
           payment_mode: string
+          payments_terms_accepted_at: string | null
           pending_request_ttl_hours: number
           platform_fee_percent: number
           rebooking_reminder_days: number
@@ -339,6 +340,7 @@ export type Database = {
           onboarding_completed_at?: string | null
           party_size_enabled?: boolean
           payment_mode?: string
+          payments_terms_accepted_at?: string | null
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
           rebooking_reminder_days?: number
@@ -397,6 +399,7 @@ export type Database = {
           onboarding_completed_at?: string | null
           party_size_enabled?: boolean
           payment_mode?: string
+          payments_terms_accepted_at?: string | null
           pending_request_ttl_hours?: number
           platform_fee_percent?: number
           rebooking_reminder_days?: number
@@ -2055,6 +2058,7 @@ export type Database = {
           booking_mode: string
           buffer_minutes: number
           business_name: string
+          cancellation_hours: number
           currency: string
           deposit_amount: number
           max_advance_days: number
