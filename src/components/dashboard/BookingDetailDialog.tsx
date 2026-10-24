@@ -151,6 +151,13 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, currency = 
               </Button>
             </div>
           )}
+          {(booking.payment_status === "disputed" || booking.payment_status === "dispute_lost") && (
+            <div className="mr-auto">
+              <Badge variant="outline" className="bg-destructive/15 text-destructive border-destructive/40">
+                {booking.payment_status === "disputed" ? "Disputed" : "Chargeback lost"}
+              </Badge>
+            </div>
+          )}
           {booking.payment_status === "refund_processing" && (
             <div className="text-xs text-muted-foreground mr-auto">Refund processing…</div>
           )}
