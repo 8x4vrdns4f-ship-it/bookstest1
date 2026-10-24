@@ -33,6 +33,32 @@ interface BusinessInfo {
   currency?: string;
 }
 
+type CancelQuote = { late: boolean; cancellation_hours: number; charged: number; refund: number; kept: number; currency: string };
+
+const fmtMoney = (n: number, c: string) => {
+  try { return new Intl.NumberFormat("en-GB", { style: "currency", currency: c || "GBP" }).format(n); }
+  catch { return `${c} ${n.toFixed(2)}`; }
+};
+
+function quoteText(q: CancelQuote | null): string {
+  if (!q) return "Checking your cancellation terms…";
+  if (q.late && q.kept > 0) {
+    return `You're cancelling within ${q.cancellation_hours} hours of your appointment. Your ${fmtMoney(q.kept, q.currency)} deposit is non-refundable.` +
+      (q.refund > 0 ? ` The remaining ${fmtMoney(q.refund, q.currency)} will be refunded.` : "");
+  }
+  if (q.refund > 0) return `${fmtMoney(q.refund, q.currency)} will be refunded to your original payment method.`;
+  return "Your booking will be cancelled.";
+}
+
+function cancelResultText(d: { refunded?: number; refund_failed?: boolean; kept?: number; currency?: string }): string {
+  const c = d.currency || "GBP";
+  const parts: string[] = [];
+  if (d.refund_failed) parts.push("Your refund couldn't be processed automatically — the business has been told and will refund you directly.");
+  else if (d.refunded) parts.push(`${fmtMoney(d.refunded, c)} has been refunded. It can take 5–10 working days to appear.`);
+  if (d.kept) parts.push(`Your ${fmtMoney(d.kept, c)} deposit was non-refundable.`);
+  return parts.join(" ");
+}
+
 const ManageBooking = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -42,6 +68,15 @@ const ManageBooking = () => {
   const [business, setBusiness] = useState<BusinessInfo>({});
   const [cancelling, setCancelling] = useState(false);
   const [cancelled, setCancelled] = useState(false);
+  const [quote, setQuote] = useState<CancelQuote | null>(null);
+  const [resultNote, setResultNote] = useState<string>("");
+
+  const loadQuote = async () => {
+    if (!token) return;
+    setQuote(null);
+    const { data } = await supabase.functions.invoke("cancel-booking-client", { body: { token, preview: true } });
+    if (data?.ok) setQuote(data as CancelQuote);
+  };
 
   useEffect(() => {
     if (!token) {
@@ -78,6 +113,7 @@ const ManageBooking = () => {
       });
       if (data?.ok) {
         setCancelled(true);
+        setResultNote(cancelResultText(data));
         setBooking((prev) => prev ? { ...prev, status: "cancelled_by_client" } : prev);
       } else {
         setError(data?.error || "Could not cancel booking");
@@ -181,14 +217,12 @@ const ManageBooking = () => {
 
               {cancelled && (
                 <p className="text-sm text-muted-foreground">
-                  {booking.payment_status === "refunded"
-                    ? "Your deposit has been refunded."
-                    : "Your cancellation has been processed."}
+                  {resultNote || "Your cancellation has been processed."}
                 </p>
               )}
 
               {canCancel && (
-                <AlertDialog>
+                <AlertDialog onOpenChange={(o) => { if (o) loadQuote(); }}>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" className="w-full gap-2">
                       <XCircle className="h-4 w-4" />
@@ -198,9 +232,8 @@ const ManageBooking = () => {
                   <AlertDialogContent className="bg-card border-border">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
-                      <AlertDialogDescription className="text-muted-foreground">
-                        You must cancel at least {business.cancellation_hours ?? 24} hours before the appointment.
-                        If you are inside the window, the deposit may not be refunded automatically.
+                      <AlertDialogDescription className={quote?.late && quote.kept > 0 ? "text-destructive font-medium" : "text-muted-foreground"}>
+                        {quoteText(quote)}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -211,7 +244,7 @@ const ManageBooking = () => {
                         <Button
                           variant="destructive"
                           onClick={handleCancel}
-                          disabled={cancelling}
+                          disabled={cancelling || !quote}
                         >
                           {cancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : "Yes, cancel"}
                         </Button>
