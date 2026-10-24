@@ -23,6 +23,33 @@ export async function ownerEmail(admin: SupabaseClient, userId: string): Promise
   } catch { return null; }
 }
 
+export const OPEN_STATUSES = ["pending", "confirmed", "in_progress"];
+
+/** Stripe idempotency key: same booking + amount + attempt → same refund, so a
+ *  double click can never refund twice; a genuine retry after a failure bumps
+ *  the attempt count so it isn't blocked by the failed attempt's key. */
+export function refundIdempotencyKey(bookingId: string, amountMajor: number, failedAttempts: number): string {
+  const pence = Math.round(amountMajor * 100);
+  return failedAttempts > 0 ? `refund-${bookingId}-${pence}-retry${failedAttempts}` : `refund-${bookingId}-${pence}`;
+}
+
+/**
+ * Atomically claims a booking for refunding: moves payment_status to
+ * 'refund_processing' only if it is still exactly what we read (paid /
+ * refund_failed). Returns false when another request got there first.
+ */
+export async function lockForRefund(admin: SupabaseClient, booking: any, opts: { requireOpen?: boolean } = {}): Promise<boolean> {
+  if (booking.payment_status !== "paid" && booking.payment_status !== "refund_failed") return false;
+  let q = admin.from("bookings")
+    .update({ payment_status: "refund_processing", updated_at: new Date().toISOString() })
+    .eq("id", booking.id)
+    .eq("payment_status", booking.payment_status);
+  if (opts.requireOpen) q = q.in("status", OPEN_STATUSES);
+  const { data, error } = await q.select("id");
+  if (error) { console.error("lockForRefund", error); return false; }
+  return (data?.length ?? 0) === 1;
+}
+
 /**
  * Refunds `amount` (major units; defaults to the full charged amount).
  * `context` is a short label for alerts, e.g. "owner cancel".
@@ -46,7 +73,7 @@ export async function refundBooking(
       ...(partial ? { amount: Math.round(amount * 100) } : {}),
       refund_application_fee: true,
       reverse_transfer: true,
-    });
+    }, { idempotencyKey: refundIdempotencyKey(booking.id, amount, Number(booking.refund_attempts ?? 0)) });
     await admin.from("bookings").update({
       payment_status: partial ? "partially_refunded" : "refunded",
       refund_id: refund.id,
@@ -58,12 +85,18 @@ export async function refundBooking(
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e);
     console.error(`refund failed (${opts.context})`, booking.id, error);
-    await admin.from("bookings").update({
+    // Never overwrite a booking that a parallel path / the webhook already marked refunded.
+    const { data: marked } = await admin.from("bookings").update({
       payment_status: "refund_failed",
       refund_amount: amount,
       refund_error: error.slice(0, 500),
+      refund_attempts: Number(booking.refund_attempts ?? 0) + 1,
       updated_at: new Date().toISOString(),
-    }).eq("id", booking.id);
+    }).eq("id", booking.id).not("payment_status", "in", "(refunded,partially_refunded)").select("id");
+    if (!marked?.length) {
+      const { data: cur } = await admin.from("bookings").select("refund_id, refund_amount").eq("id", booking.id).maybeSingle();
+      return { ok: true, refundId: cur?.refund_id || "", amount: Number(cur?.refund_amount ?? amount), partial };
+    }
 
     const when = `${fmtDate(booking.booking_date)} ${fmtTime(booking.booking_time)}`;
     const to = await ownerEmail(admin, booking.user_id);
