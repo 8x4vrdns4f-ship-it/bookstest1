@@ -4,6 +4,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 import { notifyAdmin, money } from "../_shared/notify-admin.ts";
+import { addLedgerEntry, outstandingMinor } from "../_shared/ledger.ts";
+import { planApplicationFee, stripeFeeShortfallMinor } from "../_shared/ledger-rules.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -68,6 +70,11 @@ Deno.serve(async (req) => {
       .eq("user_id", pending.user_id)
       .maybeSingle();
 
+    // BookSuite fee + standard Stripe fee + collection of any outstanding tab
+    // (capped so the business keeps at least half of this charge).
+    const owed = await outstandingMinor(admin, pending.user_id, env, currency);
+    const plan = planApplicationFee({ chargeMinor: depositMinor, platformFeeMinor: feeMinor, outstandingMinor: owed });
+
     let intent;
     try {
       intent = await stripe.paymentIntents.create({
@@ -77,10 +84,15 @@ Deno.serve(async (req) => {
         payment_method: pending.stripe_payment_method_id,
         off_session: true,
         confirm: true,
-        application_fee_amount: feeMinor,
+        application_fee_amount: plan.applicationFeeMinor,
         transfer_data: { destination: pending.stripe_account_id },
         description: `${payOption === "full" ? "Payment" : "Deposit"} — ${settings?.business_name || "Booking"} (${pending.service})`,
-        metadata: { pending_booking_id: pending.id, user_id: pending.user_id },
+        metadata: {
+          pending_booking_id: pending.id, user_id: pending.user_id,
+          booksuite_fee_minor: String(plan.platformFeeMinor),
+          stripe_fee_included_minor: String(plan.stripeFeeIncludedMinor),
+          ledger_collected_minor: String(plan.collectedMinor),
+        },
       });
     } catch (err: any) {
       // Off-session charge failed (declined, insufficient funds, SCA required).
@@ -107,6 +119,17 @@ Deno.serve(async (req) => {
     }
 
     const chargeId = (intent as any).latest_charge as string | null;
+
+    // Stripe's ACTUAL processing fee for this charge.
+    let actualStripeFeeMinor: number | null = null;
+    let balanceTxnId: string | null = null;
+    try {
+      if (chargeId) {
+        const ch: any = await stripe.charges.retrieve(chargeId, { expand: ["balance_transaction"] });
+        const bt = ch.balance_transaction;
+        if (bt && typeof bt === "object") { actualStripeFeeMinor = Number(bt.fee); balanceTxnId = bt.id; }
+      }
+    } catch (e) { console.error("balance transaction lookup failed", e); }
     const { data: codeRow } = await admin.rpc("generate_booking_code");
 
     // Compute token expiry: 7 days after appointment ends
@@ -141,12 +164,33 @@ Deno.serve(async (req) => {
         end_date: (pending as any).end_date ?? null,
         rental_days: (pending as any).rental_days ?? null,
         promo_code_id: (pending as any).promo_code_id ?? null,
+        stripe_fee_amount: actualStripeFeeMinor != null ? actualStripeFeeMinor / 100 : null,
+        ledger_collected_amount: plan.collectedMinor ? plan.collectedMinor / 100 : null,
       })
       .select()
       .single();
     if (bErr) throw new Error(bErr.message);
 
     await admin.from("pending_bookings").delete().eq("id", pending.id);
+
+    // Ledger: tab collected from this charge, and any Stripe fee above the standard rate.
+    const ccy = String(pending.currency || "GBP").toUpperCase();
+    if (plan.collectedMinor > 0) {
+      await addLedgerEntry(admin, {
+        userId: pending.user_id, bookingId: booking.id, type: "collected", amountMinor: -plan.collectedMinor,
+        currency: ccy, environment: env, stripeObjectId: `collect-${intent.id}`, note: "Taken from booking payment",
+      });
+    }
+    if (actualStripeFeeMinor != null && balanceTxnId) {
+      const short = stripeFeeShortfallMinor(actualStripeFeeMinor, plan.stripeFeeIncludedMinor);
+      if (short > 0) {
+        await addLedgerEntry(admin, {
+          userId: pending.user_id, bookingId: booking.id, type: "stripe_fee_shortfall", amountMinor: short,
+          currency: ccy, environment: env, stripeObjectId: `fee-${balanceTxnId}`,
+          note: `Card fee was higher than standard (premium/international card)`,
+        });
+      }
+    }
 
     // Confirmation emails
     const businessName = settings?.business_name || "your business";

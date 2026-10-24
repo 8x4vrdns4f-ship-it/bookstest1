@@ -1,6 +1,8 @@
 // PUBLIC endpoint — receives Stripe webhooks. Verifies signature, then:
 //  - checkout.session.completed -> promote pending_bookings -> bookings, email customer + owner
-//  - charge.refunded            -> mark booking refunded, email customer
+//  - charge.refunded            -> reconcile refunds (incl. Stripe-dashboard ones), ledger, email customer
+//  - charge.dispute.*           -> chargebacks: reverse business transfer, ledger, emails
+//  - invoice.paid               -> tab collected via subscription invoice
 //  - account.updated            -> sync connect_accounts status
 //
 // Called via:
@@ -12,6 +14,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 import { notifyAdmin } from "../_shared/notify-admin.ts";
+import { addLedgerEntry } from "../_shared/ledger.ts";
+import { handleChargeRefunded, handleDisputeOpened, handleDisputeSettled, handleInvoicePaid, type PaymentDeps } from "../_shared/payment-events.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -243,67 +247,45 @@ async function handleCheckoutCompleted(
   }
 }
 
-async function handleChargeRefunded(
-  admin: ReturnType<typeof createClient>,
-  charge: any,
-) {
-  const piId = charge.payment_intent as string | null;
-  if (!piId) return;
-
-  const { data: booking } = await admin
-    .from("bookings")
-    .select("*")
-    .eq("stripe_payment_intent_id", piId)
-    .maybeSingle();
-  if (!booking) {
-    console.warn("no booking for refunded charge", piId);
-    return;
-  }
-  if (booking.payment_status === "refunded") return;
-  // One of our refund functions is mid-flight; it records the result and emails.
-  if (booking.payment_status === "refund_processing") return;
-
-  const refundId =
-    charge.refunds?.data?.[0]?.id ||
-    charge.latest_refund ||
-    null;
-  // Our own refund functions already recorded this refund (and emailed the client).
-  if (refundId && booking.refund_id === refundId && booking.payment_status === "partially_refunded") return;
-  const isPartial = typeof charge.amount_refunded === "number" && typeof charge.amount === "number"
-    && charge.amount_refunded < charge.amount;
-
-  await admin
-    .from("bookings")
-    .update({
-      payment_status: isPartial ? "partially_refunded" : "refunded",
-      refund_id: refundId,
-      refund_error: null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", booking.id);
-
-  // Owner's business name for email
-  const { data: settings } = await admin
-    .from("business_settings")
-    .select("business_name, currency")
-    .eq("user_id", booking.user_id)
-    .maybeSingle();
-
-  const refundedMinor =
-    charge.amount_refunded ?? (booking.deposit_amount ? Math.round(Number(booking.deposit_amount) * 100) : 0);
-  const currency = (charge.currency || settings?.currency || "GBP").toUpperCase();
-  const refundAmount = refundedMinor ? formatMoney(refundedMinor, currency) : undefined;
-
-  if (booking.client_email) {
-    await sendEmail(admin, "booking-refunded", booking.client_email, `refund-${booking.id}-${refundId || "x"}`, {
-      businessName: settings?.business_name || "the business",
-      clientName: booking.client_name,
-      service: booking.service,
-      date: formatDate(booking.booking_date),
-      time: formatTime(booking.booking_time),
-      refundAmount,
-    }, booking.user_id);
-  }
+function makeDeps(admin: ReturnType<typeof createClient>, env: StripeEnv): PaymentDeps {
+  const stripe: any = createStripeClient(env);
+  const one = async (q: any) => (await q.maybeSingle()).data ?? null;
+  return {
+    env,
+    stripe: {
+      listRefunds: async (charge) => (await stripe.refunds.list({ charge, limit: 100 })).data,
+      retrieveCharge: (id) => stripe.charges.retrieve(id),
+      retrieveTransferReversalAmount: async (r) => {
+        if (typeof r.transfer_reversal === "object" && r.transfer_reversal?.amount != null) return Number(r.transfer_reversal.amount);
+        const x = await stripe.refunds.retrieve(r.id, { expand: ["transfer_reversal"] });
+        return Number(x.transfer_reversal?.amount ?? 0);
+      },
+      createTransferReversal: (transferId, amount, idempotencyKey, metadata) =>
+        stripe.transfers.createReversal(transferId, { amount, metadata }, { idempotencyKey }),
+      createTransfer: (p) => stripe.transfers.create(
+        { amount: p.amountMinor, currency: p.currency, destination: p.destination, metadata: p.metadata },
+        { idempotencyKey: p.idempotencyKey }),
+      retrieveInvoiceItem: (id) => stripe.invoiceItems.retrieve(id),
+    },
+    db: {
+      bookingByPaymentIntent: (pi) => one(admin.from("bookings").select("*").eq("stripe_payment_intent_id", pi)),
+      bookingByCharge: (c) => one(admin.from("bookings").select("*").eq("stripe_charge_id", c)),
+      updateBooking: async (id, patch) => {
+        const { error } = await admin.from("bookings").update(patch as any).eq("id", id);
+        if (error) throw error;
+      },
+      addLedger: (e) => addLedgerEntry(admin as any, e as any),
+      ledgerHas: async (id) => !!(await one(admin.from("business_ledger").select("id").eq("stripe_object_id", id))),
+      connectAccountId: async (uid) => (await one(admin.from("connect_accounts").select("stripe_account_id").eq("user_id", uid).eq("environment", env)))?.stripe_account_id ?? null,
+      pendingInvoiceItems: async (cust) => ((await admin.from("ledger_invoice_items").select("*").eq("stripe_customer_id", cust).eq("environment", env).eq("status", "pending")).data ?? []) as any,
+      markInvoiceItemPaid: async (id) => { await admin.from("ledger_invoice_items").update({ status: "paid", updated_at: new Date().toISOString() }).eq("id", id); },
+      businessName: async (uid) => (await one(admin.from("business_settings").select("business_name").eq("user_id", uid)))?.business_name || "the business",
+      ownerEmail: async (uid) => { const { data } = await admin.rpc("get_owner_email", { _user_id: uid }); return (data as string | null) || null; },
+    },
+    sendEmail: (t, to, key, data, biz) => sendEmail(admin, t, to, key, data, biz),
+    notifyAdmin: (a) => notifyAdmin(admin as any, a),
+    formatMoney: (m, c) => formatMoney(m, c),
+  };
 }
 
 async function handleAccountUpdated(
@@ -370,7 +352,10 @@ Deno.serve(async (req) => {
 
   const secretName =
     env === "sandbox" ? "STRIPE_WEBHOOK_SECRET_SANDBOX" : "STRIPE_WEBHOOK_SECRET_LIVE";
-  const secret = Deno.env.get(secretName);
+  // Two endpoints per env: Connect (connected-account events) and platform
+  // (charges, refunds, disputes, invoices on BookSuite's own account).
+  const secrets = [Deno.env.get(secretName), Deno.env.get(`${secretName}_PLATFORM`)].filter(Boolean) as string[];
+  const secret = secrets[0];
   if (!secret) {
     console.error(`${secretName} not configured`);
     return new Response("Webhook secret not configured", { status: 500, headers: corsHeaders });
@@ -378,7 +363,8 @@ Deno.serve(async (req) => {
 
   const body = await req.text();
   const sigHeader = req.headers.get("stripe-signature");
-  const valid = await verifyStripeSignature(body, sigHeader, secret);
+  let valid = false;
+  for (const sec of secrets) { if (await verifyStripeSignature(body, sigHeader, sec)) { valid = true; break; } }
   if (!valid) {
     console.error("invalid stripe signature");
     return new Response("invalid signature", { status: 400, headers: corsHeaders });
@@ -400,7 +386,18 @@ Deno.serve(async (req) => {
         await handleCheckoutCompleted(admin, env, event.data.object);
         break;
       case "charge.refunded":
-        await handleChargeRefunded(admin, event.data.object);
+        await handleChargeRefunded(makeDeps(admin, env), event.data.object);
+        break;
+      case "charge.dispute.created":
+      case "charge.dispute.funds_withdrawn":
+        await handleDisputeOpened(makeDeps(admin, env), event.data.object, event.type);
+        break;
+      case "charge.dispute.funds_reinstated":
+      case "charge.dispute.closed":
+        await handleDisputeSettled(makeDeps(admin, env), event.data.object, event.type);
+        break;
+      case "invoice.paid":
+        await handleInvoicePaid(makeDeps(admin, env), event.data.object);
         break;
       case "account.updated":
         await handleAccountUpdated(admin, event.data.object);

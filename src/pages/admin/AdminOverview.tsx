@@ -38,6 +38,7 @@ export default function AdminOverview() {
   const [signups, setSignups] = useState<Signup[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBusiness, setSelectedBusiness] = useState<string | null>(null);
+  const [owed, setOwed] = useState<{ live: number; sandbox: number; businesses: number }>({ live: 0, sandbox: 0, businesses: 0 });
 
   const load = async () => {
     setLoading(true);
@@ -55,6 +56,13 @@ export default function AdminOverview() {
     } else {
       setSignups((signupsRes.data as unknown as Signup[]) ?? []);
     }
+    const { data: bal } = await supabase.from("business_ledger_balances").select("user_id, environment, balance_minor");
+    const pos = (bal ?? []).filter((b) => Number(b.balance_minor) > 0);
+    setOwed({
+      live: pos.filter((b) => b.environment === "live").reduce((s, b) => s + Number(b.balance_minor), 0),
+      sandbox: pos.filter((b) => b.environment === "sandbox").reduce((s, b) => s + Number(b.balance_minor), 0),
+      businesses: new Set(pos.map((b) => b.user_id)).size,
+    });
     setLoading(false);
   };
 
@@ -70,6 +78,7 @@ export default function AdminOverview() {
     { label: "Active subscriptions", value: stats.active_subscriptions, icon: <CreditCard className="h-4 w-4" />, hint: `${silver} silver · ${stats.gold_subscriptions} gold · ${stats.platinum_subscriptions} platinum`, action: () => navigate("/admin/businesses") },
     { label: "Estimated MRR", value: `£${Number(stats.mrr_estimate).toLocaleString("en-GB")}`, icon: <CreditCard className="h-4 w-4" />, action: () => navigate("/admin/businesses") },
     { label: "Bookings (all time)", value: stats.bookings_total, icon: <CalendarCheck className="h-4 w-4" />, hint: `${stats.bookings_last_30d} in the last 30 days`, action: () => navigate("/admin/businesses") },
+    { label: "Owed by businesses", value: `£${(owed.live / 100).toLocaleString("en-GB", { minimumFractionDigits: 2 })}`, icon: <CreditCard className="h-4 w-4" />, hint: `${owed.businesses} business${owed.businesses === 1 ? "" : "es"}${owed.sandbox ? ` · £${(owed.sandbox / 100).toFixed(2)} test` : ""}`, action: () => navigate("/admin/businesses") },
     { label: "Messages to reply", value: stats.open_messages, icon: <Mail className="h-4 w-4" />, action: () => navigate("/admin/inbox") },
     { label: "Gift codes", value: stats.gift_codes_total, icon: <Gift className="h-4 w-4" />, action: () => navigate("/admin/gift-codes") },
   ];

@@ -148,6 +148,20 @@
       "when": 1792881225236,
       "tag": "0020_booking_guard_allow_service_role",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792881720598,
+      "tag": "0021_business_ledger",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792881736064,
+      "tag": "0022_guard_new_payment_columns",
+      "breakpoints": true
     }
   ]
 }

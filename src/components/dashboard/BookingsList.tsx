@@ -347,6 +347,11 @@ const BookingsList = ({ userId }: { userId: string }) => {
                       Refund failed
                     </Badge>
                   )}
+                  {(b.payment_status === "disputed" || b.payment_status === "dispute_lost") && (
+                    <Badge variant="outline" className="bg-destructive/15 text-destructive border-destructive/40 text-[10px]">
+                      {b.payment_status === "disputed" ? "Disputed" : "Chargeback lost"}
+                    </Badge>
+                  )}
                   {b.payment_status === "refund_processing" && (
                     <Badge variant="outline" className="bg-primary/10 text-primary border-primary/25 text-[10px]">
                       Refund processing…

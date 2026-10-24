@@ -4,6 +4,8 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "./stripe.ts";
 import { notifyAdmin } from "./notify-admin.ts";
+import { addLedgerEntry } from "./ledger.ts";
+import { refundShortfallMinor } from "./ledger-rules.ts";
 import { chargedAmount, formatMoney, refundIdempotencyKey } from "./refund-rules.ts";
 
 export function fmtDate(d: string): string {
@@ -58,14 +60,37 @@ export async function refundBooking(
 
   try {
     if (!booking.stripe_payment_intent_id) throw new Error("No Stripe payment is linked to this booking");
-    const stripe = createStripeClient(resolveEnv(booking.payment_environment));
-    // Fee/transfer handling deliberately unchanged (see Part 2).
-    const refund = await stripe.refunds.create({
-      payment_intent: booking.stripe_payment_intent_id,
-      ...(partial ? { amount: Math.round(amount * 100) } : {}),
-      refund_application_fee: true,
-      reverse_transfer: true,
-    }, { idempotencyKey: refundIdempotencyKey(booking.id, amount, Number(booking.refund_attempts ?? 0)) });
+    const env = resolveEnv(booking.payment_environment);
+    const stripe = createStripeClient(env);
+    const key = refundIdempotencyKey(booking.id, amount, Number(booking.refund_attempts ?? 0));
+    const amountMinor = Math.round(amount * 100);
+    const meta = { booksuite_booking_id: booking.id, booksuite_context: opts.context };
+    // BookSuite keeps its application fee; the business returns what it was paid.
+    let refund: any;
+    let reverseFailed: string | null = null;
+    try {
+      refund = await stripe.refunds.create({
+        payment_intent: booking.stripe_payment_intent_id,
+        ...(partial ? { amount: amountMinor } : {}),
+        refund_application_fee: false,
+        reverse_transfer: true,
+        metadata: meta,
+      }, { idempotencyKey: key });
+    } catch (e: any) {
+      const msg = String(e?.raw?.message || e?.message || "");
+      // The business's Stripe balance can't cover the reversal: refund the client
+      // anyway and put the whole amount on the business's tab.
+      if (!/insufficient/i.test(msg)) throw e;
+      reverseFailed = msg;
+      refund = await stripe.refunds.create({
+        payment_intent: booking.stripe_payment_intent_id,
+        ...(partial ? { amount: amountMinor } : {}),
+        refund_application_fee: false,
+        reverse_transfer: false,
+        metadata: { ...meta, booksuite_reversal_failed: "1" },
+      }, { idempotencyKey: `${key}-norev` });
+    }
+    await recordRefundLedger(admin, stripe, booking, refund, env, reverseFailed);
     await admin.from("bookings").update({
       payment_status: partial ? "partially_refunded" : "refunded",
       refund_id: refund.id,
@@ -126,6 +151,37 @@ export async function refundBooking(
     });
     return { ok: false, error, amount };
   }
+}
+
+/**
+ * Ledger after a refund, from Stripe's real objects: shortfall = refund amount
+ * − transfer reversal amount. No reversal at all → whole refund is unreversed.
+ */
+export async function recordRefundLedger(admin: SupabaseClient, stripe: any, booking: any, refund: any, env: string, reverseFailed: string | null = null) {
+  const currency = String(refund.currency || "gbp").toUpperCase();
+  let reversedMinor = 0;
+  try {
+    const revId = typeof refund.transfer_reversal === "string" ? refund.transfer_reversal : refund.transfer_reversal?.id;
+    if (revId) {
+      const r = typeof refund.transfer_reversal === "object" && refund.transfer_reversal?.amount != null
+        ? refund.transfer_reversal
+        : await stripe.refunds.retrieve(refund.id, { expand: ["transfer_reversal"] }).then((x: any) => x.transfer_reversal);
+      reversedMinor = Number(r?.amount ?? 0);
+    }
+  } catch (e) { console.error("transfer reversal lookup failed", e); }
+  if (reversedMinor === 0) {
+    await addLedgerEntry(admin, {
+      userId: booking.user_id, bookingId: booking.id, type: "unreversed_refund", amountMinor: Number(refund.amount),
+      currency, environment: env, stripeObjectId: `unrev-${refund.id}`,
+      note: reverseFailed ? `Refund not recovered from business balance: ${reverseFailed.slice(0, 200)}` : "Refund not recovered from business balance",
+    });
+    return;
+  }
+  const short = refundShortfallMinor(Number(refund.amount), reversedMinor);
+  await addLedgerEntry(admin, {
+    userId: booking.user_id, bookingId: booking.id, type: "refund_shortfall", amountMinor: short,
+    currency, environment: env, stripeObjectId: refund.id, note: "Refund larger than amount recovered from business",
+  });
 }
 
 /** Client-facing sentence about money for the cancellation email. */
