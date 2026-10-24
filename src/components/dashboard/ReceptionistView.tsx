@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cancelBookingAsOwner, cancelToastText } from "@/lib/bookingCancel";
 import { useToast } from "@/hooks/use-toast";
 import { Search, ScanLine, UserCheck, Clock, Camera, X } from "lucide-react";
 import CameraScanner from "@/components/CameraScanner";
@@ -68,6 +69,16 @@ const ReceptionistView = ({ businessUserId }: { businessUserId: string }) => {
   }, [businessUserId, load]);
 
   const updateStatus = async (id: string, status: string) => {
+    if (status === "cancelled") {
+      const b = bookings.find((x) => x.id === id);
+      if (!b) return;
+      const r = await cancelBookingAsOwner(b as any);
+      if (r.cancelledByUser) return;
+      const t = cancelToastText(r);
+      toast({ title: t.title, description: t.description, variant: t.destructive ? "destructive" : undefined });
+      load();
+      return;
+    }
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
     if (error) { toast({ title: "Could not update", description: error.message, variant: "destructive" }); return; }
     toast({ title: `Marked ${status.replace("_", " ")}` });
