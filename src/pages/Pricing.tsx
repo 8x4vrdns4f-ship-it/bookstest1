@@ -129,6 +129,9 @@ const Pricing = () => {
           <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto">
             {t("pricing.note", { currency })}
           </p>
+          <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto -mt-6">
+            Card processing fees are charged by Stripe and deducted from each payment.
+          </p>
           {signedIn && (
             <div className="text-center mb-10">
               <Button

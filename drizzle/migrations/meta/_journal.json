@@ -162,6 +162,13 @@
       "when": 1792881736064,
       "tag": "0022_guard_new_payment_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792882414744,
+      "tag": "0023_refund_policy_wording",
+      "breakpoints": true
     }
   ]
 }

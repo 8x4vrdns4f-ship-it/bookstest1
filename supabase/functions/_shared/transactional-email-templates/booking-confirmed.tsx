@@ -16,6 +16,7 @@ interface Props {
   checkInUrl?: string
   depositAmount?: string
   manageUrl?: string
+  policyText?: string
 }
 
 const BookingConfirmedEmail = ({
@@ -28,6 +29,7 @@ const BookingConfirmedEmail = ({
   checkInUrl = '',
   depositAmount,
   manageUrl = '',
+  policyText = '',
 }: Props) => {
   const qrSrc = checkInUrl
     ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(checkInUrl)}`
@@ -66,9 +68,12 @@ const BookingConfirmedEmail = ({
               <Button href={checkInUrl} style={btn}>Self check-in</Button>
             </Section>
           )}
+          {policyText && (
+            <Text style={text}><strong>Cancellation policy:</strong> {policyText}</Text>
+          )}
           {manageUrl && (
             <Section style={{ textAlign: 'center', margin: '16px 0' }}>
-              <Button href={manageUrl} style={btnSecondary}>Manage your booking</Button>
+              <Button href={manageUrl} style={btnSecondary}>Cancel or reschedule</Button>
             </Section>
           )}
           <Text style={footer}>See you soon — {businessName}</Text>
@@ -93,6 +98,7 @@ export const template = {
     confirmationCode: 'X7K2P9',
     checkInUrl: 'https://booksuite.online/kiosk/BS-ABCDEF?code=X7K2P9',
     depositAmount: '£10.00',
+    policyText: 'Free cancellation up to 24 hours before your appointment. Cancel later than that and your £10.00 deposit is non-refundable.',
     manageUrl: 'https://booksuite.online/booking/manage/abc123',
   },
 } satisfies TemplateEntry

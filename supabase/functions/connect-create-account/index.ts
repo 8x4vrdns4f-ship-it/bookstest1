@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     // Get business settings for country / business name
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, currency, business_email")
+      .select("business_name, currency, business_email, payments_terms_accepted_at")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -47,6 +47,20 @@ Deno.serve(async (req) => {
       .eq("user_id", user.id)
       .eq("environment", env)
       .maybeSingle();
+
+    // Owners must accept responsibility for refunds, card fees and chargebacks
+    // before connecting payments. Stored once; existing accounts are grandfathered.
+    if (!(settings as any)?.payments_terms_accepted_at) {
+      if (body.acceptResponsibility === true) {
+        await admin.from("business_settings")
+          .update({ payments_terms_accepted_at: new Date().toISOString() })
+          .eq("user_id", user.id);
+      } else if (!existing) {
+        return new Response(JSON.stringify({ error: "Please confirm you're responsible for refunds, card fees and chargebacks before connecting payments." }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     let accountId = existing?.stripe_account_id;
 

@@ -194,5 +194,6 @@ export function refundNote(r: { refunded: number; kept: number; failed: boolean;
     parts.push(`${formatMoney(r.refunded, r.currency)} has been refunded to your original payment method. It can take 5–10 working days to appear.`);
   }
   if (r.kept > 0) parts.push(`Your ${formatMoney(r.kept, r.currency)} deposit is non-refundable because the booking was cancelled inside the cancellation window.`);
+  else if (!r.failed && r.refunded > 0) parts.push("Nothing has been kept.");
   return parts.join(" ");
 }

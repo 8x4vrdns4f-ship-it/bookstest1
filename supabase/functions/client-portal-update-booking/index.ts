@@ -5,7 +5,7 @@ import {
 } from "../_shared/portalSession.ts";
 import { availableSlots, bookableDateRange, loadAvailability } from "../_shared/portalSlots.ts";
 import { loadCancelSettings, performClientCancel, quoteFor } from "../_shared/client-cancel.ts";
-import { zonedTimeToUtcMs } from "../_shared/refund-rules.ts";
+import { cancelPolicyLine, zonedTimeToUtcMs } from "../_shared/refund-rules.ts";
 
 const CLOSED_STATUSES = ["cancelled_by_client", "cancelled", "completed", "no_show", "declined"];
 
@@ -108,6 +108,8 @@ Deno.serve(async (req) => {
             date: formatDate(date),
             time,
             confirmationCode: booking.confirmation_code,
+            manageUrl: booking.client_access_token ? `https://booksuite.online/booking/manage/${booking.client_access_token}` : undefined,
+            policyText: cancelPolicyLine(settings?.cancellation_hours, booking.deposit_amount, String(settings?.currency || "GBP").toUpperCase(), booking.payment_option === "full"),
           },
         },
       });

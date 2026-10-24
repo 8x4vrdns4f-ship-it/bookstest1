@@ -89,3 +89,15 @@ export function refundIdempotencyKey(bookingId: string, amountMajor: number, fai
   return failedAttempts > 0 ? `refund-${bookingId}-${pence}-retry${failedAttempts}` : `refund-${bookingId}-${pence}`;
 }
 
+
+/** Client-facing cancellation policy line. Keep in sync with src/lib/cancelPolicy.ts and the widget. */
+export function cancelPolicyLine(hours: number | null | undefined, deposit: number | string | null | undefined, currency = "GBP", paidInFull = false): string {
+  const h = hours ?? 24;
+  const dep = Number(deposit ?? 0) || 0;
+  const head = `Free cancellation up to ${h} hours before your appointment.`;
+  if (dep <= 0) return head;
+  const d = formatMoney(dep, currency);
+  return paidInFull
+    ? `${head} Cancel later than that and you'll be refunded everything except the ${d} deposit.`
+    : `${head} Cancel later than that and your ${d} deposit is non-refundable.`;
+}

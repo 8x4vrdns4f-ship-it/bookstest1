@@ -1,4 +1,5 @@
 import { NumberField, TimeField } from "@/components/ui/date-time-fields";
+import { cancelPolicyText } from "@/lib/cancelPolicy";
 import { publicOrigin } from "@/lib/publicUrl";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -412,6 +413,7 @@ const Settings = () => {
 
               <Field label={`Deposit per booking (${form.currency}) — min £10`} hint="Charged only when you accept a booking.">
                 <NumberField min={10} step="0.50" value={form.deposit_amount} onChange={(e) => setForm({ ...form, deposit_amount: Number(e.target.value) })} className="bg-secondary border-border" />
+                <p className="mt-2 text-xs text-muted-foreground"><span className="font-medium text-foreground">Clients will see:</span> “{cancelPolicyText({ hours: form.cancellation_hours, deposit: form.deposit_amount, currency: form.currency, paidInFull: form.payment_mode === "full" })}”</p>
               </Field>
               <div className="rounded-2xl border border-border bg-secondary/40 p-4 space-y-3">
                 <div>
@@ -445,6 +447,7 @@ const Settings = () => {
               </Field>
               <Field label="Cancellation Policy (hours)" hint="Minimum notice required to cancel.">
                 <NumberField min={0} max={168} value={form.cancellation_hours} onChange={(e) => setForm({ ...form, cancellation_hours: Number(e.target.value) })} className="bg-secondary border-border" />
+                <p className="mt-2 text-xs text-muted-foreground"><span className="font-medium text-foreground">Clients will see:</span> “{cancelPolicyText({ hours: form.cancellation_hours, deposit: form.deposit_amount, currency: form.currency, paidInFull: form.payment_mode === "full" })}”</p>
               </Field>
               <Field label="Pending request expiry (hours)" hint="How long a booking request stays open before it's auto-declined and the card released.">
                 <NumberField min={1} max={168} value={form.pending_request_ttl_hours} onChange={(e) => setForm({ ...form, pending_request_ttl_hours: Number(e.target.value) })} className="bg-secondary border-border" />

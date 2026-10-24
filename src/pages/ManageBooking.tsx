@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { cancelPolicyText, cancelDeadlineText } from "@/lib/cancelPolicy";
 import { type CancelQuote, quoteText, cancelResultText } from "@/lib/cancelQuote";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,8 @@ interface BookingInfo {
   deposit_amount: number | null;
   payment_status: string;
   confirmation_code: string | null;
+  payment_option?: string | null;
+  start_utc?: string;
 }
 
 interface BusinessInfo {
@@ -32,6 +35,7 @@ interface BusinessInfo {
   business_phone?: string;
   cancellation_hours?: number;
   currency?: string;
+  timezone?: string;
 }
 
 const ManageBooking = () => {
@@ -189,6 +193,17 @@ const ManageBooking = () => {
                   </div>
                 )}
               </div>
+
+              {canCancel && (
+                <div className="rounded-lg border border-border bg-secondary/40 p-3 text-sm space-y-1">
+                  {booking.start_utc && (
+                    <p className="font-medium text-foreground">{cancelDeadlineText(booking.start_utc, business.cancellation_hours, business.timezone)}</p>
+                  )}
+                  <p className="text-muted-foreground">
+                    {cancelPolicyText({ hours: business.cancellation_hours, deposit: booking.deposit_amount, currency: business.currency, paidInFull: booking.payment_option === "full" })}
+                  </p>
+                </div>
+              )}
 
               {cancelled && (
                 <p className="text-sm text-muted-foreground">

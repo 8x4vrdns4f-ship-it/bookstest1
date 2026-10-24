@@ -159,7 +159,7 @@ const en: Dict = {
   "faq.q1": "How much does BookSuite cost?",
   "faq.a1": "We offer a free tier to get started and paid tiers as you grow. Check the pricing page for the full breakdown of features per tier.",
   "faq.q2": "Are there transaction fees on bookings?",
-  "faq.a2": "Lower tiers include a small per-transaction fee on top of Stripe's standard processing fee. Higher tiers reduce or remove the BookSuite fee entirely.",
+  "faq.a2": "BookSuite charges a platform fee on each booking payment: 12.5% on Silver, 5% on Gold and 2% on Platinum. Card processing fees are charged by Stripe and deducted from each payment.",
   "faq.q3": "Can I cancel any time?",
   "faq.a3": "Yes. Subscriptions can be cancelled from your dashboard at any time and remain active until the end of your billing period.",
   "faq.q4": "Who is BookSuite for?",

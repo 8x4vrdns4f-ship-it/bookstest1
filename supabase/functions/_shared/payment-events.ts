@@ -98,6 +98,7 @@ export async function handleChargeRefunded(d: PaymentDeps, charge: any): Promise
         clientName: booking.client_name, service: booking.service,
         date: booking.booking_date, time: String(booking.booking_time || "").slice(0, 5),
         refundAmount: d.formatMoney(Number(r.amount), currency),
+        keptAmount: d.formatMoney(Math.max(0, (Number(charge.amount ?? 0) - Number(charge.amount_refunded ?? 0)) / 100), currency),
       }, booking.user_id);
     }
   }

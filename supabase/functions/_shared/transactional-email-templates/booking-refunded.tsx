@@ -13,6 +13,7 @@ interface Props {
   date?: string
   time?: string
   refundAmount?: string
+  keptAmount?: string
 }
 
 const BookingRefundedEmail = ({
@@ -22,6 +23,7 @@ const BookingRefundedEmail = ({
   date = '',
   time = '',
   refundAmount,
+  keptAmount,
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -40,9 +42,12 @@ const BookingRefundedEmail = ({
           {refundAmount && (
             <Text style={detail}><strong>Refunded:</strong> {refundAmount}</Text>
           )}
+          {keptAmount && (
+            <Text style={detail}><strong>Kept by {businessName}:</strong> {keptAmount}</Text>
+          )}
         </Section>
         <Text style={text}>
-          The funds should appear on your original payment method within 5–10 business days,
+          The funds should appear on your original payment method within 5–10 working days,
           depending on your bank.
         </Text>
         <Text style={footer}>— {businessName}</Text>
@@ -64,6 +69,7 @@ export const template = {
     date: '15 Jun 2026',
     time: '14:30',
     refundAmount: '£10.00',
+    keptAmount: '£0.00',
   },
 } satisfies TemplateEntry
 

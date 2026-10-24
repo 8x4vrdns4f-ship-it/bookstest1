@@ -9,6 +9,8 @@ import PublicBookingTrustStrip from "@/components/booking/PublicBookingTrustStri
 import PoweredByBookSuite from "@/components/booking/PoweredByBookSuite";
 import WaitlistDialog from "@/components/booking/WaitlistDialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { cancelPolicyText } from "@/lib/cancelPolicy";
 
 
 interface PublicInfo {
@@ -29,6 +31,7 @@ const PublicBooking = () => {
   const [info, setInfo] = useState<PublicInfo | null>(null);
   const [waitlistEnabled, setWaitlistEnabled] = useState(false);
   const [showBranding, setShowBranding] = useState(true);
+  const [policy, setPolicy] = useState<{ deposit: number; currency: string; hours: number | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [widgetHeight, setWidgetHeight] = useState(760);
 
@@ -54,7 +57,9 @@ const PublicBooking = () => {
       if (!active) return;
       setInfo((pub as PublicInfo[] | null)?.[0] ?? null);
       setWaitlistEnabled(!!(ws as any[] | null)?.[0]?.waitlist_enabled);
-      setShowBranding((ws as any[] | null)?.[0]?.show_branding !== false);
+      const w = (ws as any[] | null)?.[0];
+      setShowBranding(w?.show_branding !== false);
+      if (w) setPolicy({ deposit: Number(w.deposit_amount || 0), currency: w.currency || "GBP", hours: w.cancellation_hours ?? null });
       setLoading(false);
     })();
     return () => { active = false; };
@@ -146,6 +151,30 @@ const PublicBooking = () => {
         )}
 
         <PublicBookingTrustStrip cancellationHours={info?.cancellation_hours} />
+
+        {policy && (
+          <div className="flex justify-center">
+            <Dialog>
+              <DialogTrigger asChild>
+                <button type="button" className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground">
+                  Cancellation policy
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Cancellation policy</DialogTitle>
+                  <DialogDescription className="space-y-2 pt-2 text-left">
+                    <span className="block">{cancelPolicyText({ hours: policy.hours ?? info?.cancellation_hours, deposit: policy.deposit, currency: policy.currency })}</span>
+                    {policy.deposit > 0 && (
+                      <span className="block">{cancelPolicyText({ hours: policy.hours ?? info?.cancellation_hours, deposit: policy.deposit, currency: policy.currency, paidInFull: true }).replace(/^Free cancellation[^.]*\. Cancel later than that and /, "If you paid in full and cancel late, ")}</span>
+                    )}
+                    <span className="block">Refunds go back to your original payment method and take 5–10 working days to show. For anything else, contact {businessName === "Book an appointment" ? "the business" : businessName} directly.</span>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
 
 
         {showBranding && <PoweredByBookSuite className="pt-2" source="booking-page" />}

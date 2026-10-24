@@ -12,6 +12,7 @@
 // verify_jwt = false (Stripe does not send a Supabase JWT).
 
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { cancelPolicyLine } from "../_shared/refund-rules.ts";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 import { notifyAdmin } from "../_shared/notify-admin.ts";
 import { addLedgerEntry } from "../_shared/ledger.ts";
@@ -155,7 +156,7 @@ async function handleCheckoutCompleted(
   // Owner settings (auto_confirm, notify_new_booking, business email, name)
   const { data: settings } = await admin
     .from("business_settings")
-    .select("auto_confirm, notify_new_booking, business_email, business_name")
+    .select("auto_confirm, notify_new_booking, business_email, business_name, cancellation_hours")
     .eq("user_id", pending.user_id)
     .maybeSingle();
 
@@ -229,6 +230,8 @@ async function handleCheckoutCompleted(
       confirmationCode: booking.confirmation_code,
       checkInUrl,
       depositAmount,
+      manageUrl: booking.client_access_token ? `https://booksuite.online/booking/manage/${booking.client_access_token}` : undefined,
+      policyText: cancelPolicyLine(settings?.cancellation_hours, booking.deposit_amount, String(pending.currency || "GBP").toUpperCase(), booking.payment_option === "full"),
     }, booking.user_id);
   }
 
