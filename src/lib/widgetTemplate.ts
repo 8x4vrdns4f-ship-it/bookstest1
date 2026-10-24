@@ -133,6 +133,7 @@ export const WIDGET_MARKUP = `
     <span>Your card is only charged if the business accepts your request.</span>
   </div>
 
+  <div class="paynote" id="bw-policy" style="display:none"></div>
   <div id="bw-err"></div>
   <button class="submit" id="bw-submit" disabled>Request Booking</button>
 </div>
@@ -679,8 +680,23 @@ export const buildWidgetScript = (opts: {
     }
     box.innerHTML = lines;
   }
+  function renderPolicy(){
+    var el = document.getElementById('bw-policy');
+    if (!el) return;
+    if (settings.payments_enabled === false) { el.style.display = 'none'; return; }
+    var hrs = (settings.cancellation_hours === null || settings.cancellation_hours === undefined) ? 24 : Number(settings.cancellation_hours);
+    var dep = Number(settings.deposit_amount || 0);
+    var t = 'Free cancellation up to ' + hrs + ' hours before your appointment.';
+    if (dep > 0) {
+      t += (selPayOption === 'full' && fullAmount() !== null)
+        ? " Cancel later than that and you'll be refunded everything except the " + money(dep) + ' deposit.'
+        : ' Cancel later than that and your ' + money(dep) + ' deposit is non-refundable.';
+    }
+    el.textContent = t;
+    el.style.display = '';
+  }
   function renderAll(){
-    renderDates(); renderSlots(); renderServices(); renderDurs(); renderParty(); renderResources(); renderPayOptions(); renderSummary();
+    renderDates(); renderSlots(); renderServices(); renderDurs(); renderParty(); renderResources(); renderPayOptions(); renderSummary(); renderPolicy();
     var btn = document.getElementById('bw-submit');
     var name = document.getElementById('bw-name').value.trim();
     var email = document.getElementById('bw-email').value.trim();
