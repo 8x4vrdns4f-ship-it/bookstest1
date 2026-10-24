@@ -4,7 +4,8 @@ import {
   adminClient, corsHeaders, formatDate, formatTime, json, resolveSession,
 } from "../_shared/portalSession.ts";
 import { availableSlots, bookableDateRange, loadAvailability } from "../_shared/portalSlots.ts";
-import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
+import { loadCancelSettings, performClientCancel, quoteFor } from "../_shared/client-cancel.ts";
+import { zonedTimeToUtcMs } from "../_shared/refund-rules.ts";
 
 const CLOSED_STATUSES = ["cancelled_by_client", "cancelled", "completed", "no_show", "declined"];
 
@@ -12,7 +13,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { session_token, booking_id, action, date, time } = await req.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({}));
+    const { session_token, booking_id, action, date, time } = body;
     const admin = adminClient();
     const email = await resolveSession(admin, session_token);
     if (!email) return json({ error: "Session expired", code: "no_session" }, 401);
