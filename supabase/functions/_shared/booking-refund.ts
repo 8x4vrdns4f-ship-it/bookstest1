@@ -4,7 +4,7 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createStripeClient, resolveEnv } from "./stripe.ts";
 import { notifyAdmin } from "./notify-admin.ts";
-import { chargedAmount, formatMoney } from "./refund-rules.ts";
+import { chargedAmount, formatMoney, refundIdempotencyKey } from "./refund-rules.ts";
 
 export function fmtDate(d: string): string {
   try { return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); }
@@ -24,14 +24,6 @@ export async function ownerEmail(admin: SupabaseClient, userId: string): Promise
 }
 
 export const OPEN_STATUSES = ["pending", "confirmed", "in_progress"];
-
-/** Stripe idempotency key: same booking + amount + attempt → same refund, so a
- *  double click can never refund twice; a genuine retry after a failure bumps
- *  the attempt count so it isn't blocked by the failed attempt's key. */
-export function refundIdempotencyKey(bookingId: string, amountMajor: number, failedAttempts: number): string {
-  const pence = Math.round(amountMajor * 100);
-  return failedAttempts > 0 ? `refund-${bookingId}-${pence}-retry${failedAttempts}` : `refund-${bookingId}-${pence}`;
-}
 
 /**
  * Atomically claims a booking for refunding: moves payment_status to

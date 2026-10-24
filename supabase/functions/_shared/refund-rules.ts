@@ -80,3 +80,12 @@ export function formatMoney(amount: number, currency = "GBP"): string {
     return `${(currency || "GBP").toUpperCase()} ${amount.toFixed(2)}`;
   }
 }
+
+/** Stripe idempotency key: same booking + amount + attempt → same refund, so a
+ *  double click can never refund twice; a genuine retry after a failure bumps
+ *  the attempt count so it isn't blocked by the failed attempt's key. */
+export function refundIdempotencyKey(bookingId: string, amountMajor: number, failedAttempts: number): string {
+  const pence = Math.round(amountMajor * 100);
+  return failedAttempts > 0 ? `refund-${bookingId}-${pence}-retry${failedAttempts}` : `refund-${bookingId}-${pence}`;
+}
+
