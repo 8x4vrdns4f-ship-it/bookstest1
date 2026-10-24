@@ -1,7 +1,7 @@
 // The ONLY way staff cancel or decline a booking. Owner (or staff with
 // approve_requests / manage_settings) only. Paid bookings are refunded in full.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { fmtDate, fmtTime, refundBooking, refundNote } from "../_shared/booking-refund.ts";
+import { fmtDate, fmtTime, lockForRefund, OPEN_STATUSES, refundBooking, refundNote } from "../_shared/booking-refund.ts";
 import { chargedAmount, hasRefundablePayment } from "../_shared/refund-rules.ts";
 
 const corsHeaders = {
@@ -57,16 +57,23 @@ Deno.serve(async (req) => {
     let refunded = 0;
     let failed = false;
     let refundError: string | null = null;
+    const busy = () => json({ error: "Already being processed", code: "already_processing" }, 409);
     if (paid) {
+      // Atomic claim — a second click / retry / parallel client cancel gets 409.
+      if (!(await lockForRefund(admin, booking, { requireOpen: true }))) return busy();
       const r = await refundBooking(admin, booking, { context: isDecline ? "owner decline" : "owner cancel", businessName, currency });
       refunded = r.amount;
       if (!r.ok) { failed = true; refundError = r.error; }
     }
 
-    const { error: uErr } = await admin.from("bookings").update({
+    let upd = admin.from("bookings").update({
       status: "cancelled", decline_reason: cleanReason, updated_at: new Date().toISOString(),
     }).eq("id", booking.id);
+    // Unpaid: the status change itself is the atomic claim.
+    if (!paid) upd = upd.in("status", OPEN_STATUSES).eq("payment_status", booking.payment_status);
+    const { data: done, error: uErr } = await upd.select("id");
     if (uErr) return json({ error: uErr.message }, 500);
+    if (!done?.length) return busy();
 
     if (booking.client_email) {
       const base = {

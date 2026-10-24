@@ -2,7 +2,7 @@
 // Outside the window: full refund. Inside: deposit kept, any extra refunded.
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
 import { quoteClientCancel, formatMoney, type ClientCancelQuote } from "./refund-rules.ts";
-import { fmtDate, fmtTime, ownerEmail, refundBooking, refundNote } from "./booking-refund.ts";
+import { fmtDate, fmtTime, lockForRefund, OPEN_STATUSES, ownerEmail, refundBooking, refundNote } from "./booking-refund.ts";
 
 export const CLIENT_CLOSED = ["cancelled_by_client", "cancelled", "completed", "no_show", "declined"];
 
@@ -31,16 +31,22 @@ export async function performClientCancel(admin: SupabaseClient, booking: any, s
   let refunded = 0;
   let failed = false;
   if (q.refund > 0) {
+    if (!(await lockForRefund(admin, booking, { requireOpen: true }))) return { conflict: true as const };
     const r = await refundBooking(admin, booking, {
       amount: q.refund, context: `client cancel (${source})`, businessName, currency: q.currency,
     });
     if (r.ok) refunded = r.amount; else { failed = true; refunded = r.amount; }
   }
 
-  await admin.from("bookings").update({
+  let upd = admin.from("bookings").update({
     status: "cancelled_by_client",
     updated_at: new Date().toISOString(),
   }).eq("id", booking.id);
+  // No refund (unpaid or late deposit-only): the status change is the atomic claim.
+  if (!(q.refund > 0)) upd = upd.in("status", OPEN_STATUSES).eq("payment_status", booking.payment_status);
+  const { data: done, error: uErr } = await upd.select("id");
+  if (uErr) throw uErr;
+  if (!done?.length) return { conflict: true as const };
 
   const paid = q.charged > 0;
   const note = refundNote({ refunded, kept: q.kept, failed, currency: q.currency, paid });
