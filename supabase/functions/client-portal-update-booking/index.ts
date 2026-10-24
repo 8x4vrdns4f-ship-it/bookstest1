@@ -31,70 +31,30 @@ Deno.serve(async (req) => {
       return json({ error: `This booking is already ${booking.status.replace(/_/g, " ")}` }, 409);
     }
 
+    if (action === "cancel") {
+      if (body.preview) {
+        const q = quoteFor(booking, await loadCancelSettings(admin, booking.user_id));
+        return json({ ok: true, preview: true, late: q.late, cancellation_hours: q.cancellationHours, charged: q.charged, refund: q.refund, kept: q.kept, currency: q.currency });
+      }
+      const r = await performClientCancel(admin, booking, "customer portal");
+      return json({ ...r, status: "cancelled_by_client" });
+    }
+
     const { data: settings } = await admin
       .from("business_settings")
-      .select("cancellation_hours, business_name, business_email, currency")
+      .select("cancellation_hours, business_name, business_email, currency, timezone")
       .eq("user_id", booking.user_id)
       .maybeSingle();
 
+    // Reschedules still have to happen outside the cancellation window.
     const cancellationHours = settings?.cancellation_hours ?? 24;
-    const appointment = new Date(`${booking.booking_date}T${booking.booking_time}`).getTime();
+    const appointment = zonedTimeToUtcMs(booking.booking_date, booking.booking_time, settings?.timezone || "Europe/London");
     const hoursUntil = (appointment - Date.now()) / 3_600_000;
     if (hoursUntil < cancellationHours) {
       return json({
         error: `Changes must be made at least ${cancellationHours} hours before the appointment. Please contact ${settings?.business_name || "the business"} directly.`,
         code: "past_cancellation_window",
       }, 403);
-    }
-
-    if (action === "cancel") {
-      let refundId: string | null = null;
-      if (booking.payment_status === "paid" && booking.stripe_payment_intent_id) {
-        try {
-          const stripe = createStripeClient(resolveEnv(booking.payment_environment));
-          const refund = await stripe.refunds.create({
-            payment_intent: booking.stripe_payment_intent_id,
-            refund_application_fee: true,
-            reverse_transfer: true,
-          });
-          refundId = refund.id;
-        } catch (e) {
-          console.error("portal refund failed", e);
-        }
-      }
-
-      const updates: Record<string, unknown> = {
-        status: "cancelled_by_client",
-        updated_at: new Date().toISOString(),
-      };
-      if (refundId) { updates.payment_status = "refunded"; updates.refund_id = refundId; }
-      await admin.from("bookings").update(updates).eq("id", booking.id);
-
-      try {
-        await admin.functions.invoke("app-email", {
-          body: {
-            templateName: "booking-cancelled-client",
-            businessUserId: booking.user_id,
-            recipientEmail: booking.client_email,
-            idempotencyKey: `portal-cancel-${booking.id}`,
-            templateData: {
-              businessName: settings?.business_name || "the business",
-              clientName: booking.client_name,
-              service: booking.service,
-              date: formatDate(booking.booking_date),
-              time: formatTime(booking.booking_time),
-            },
-          },
-        });
-      } catch (e) { console.error("cancel email failed", e); }
-
-      try {
-        await admin.functions.invoke("notify-waitlist", {
-          body: { user_id: booking.user_id, date: booking.booking_date },
-        });
-      } catch (e) { console.error("waitlist notify failed", e); }
-
-      return json({ ok: true, refunded: !!refundId, status: "cancelled_by_client" });
     }
 
     // ---- reschedule ----
