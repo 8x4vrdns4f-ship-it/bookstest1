@@ -3,6 +3,7 @@
 // Idempotent: safe to call multiple times AND safe to race with stripe-connect-webhook.
 // Also fires customer + owner confirmation emails (idempotent via Lovable Email idempotency_key).
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { cancelPolicyLine } from "../_shared/refund-rules.ts";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
@@ -83,7 +84,7 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("auto_confirm, notify_new_booking, business_email, business_name")
+      .select("auto_confirm, notify_new_booking, business_email, business_name, cancellation_hours")
       .eq("user_id", pending.user_id)
       .maybeSingle();
 
@@ -158,6 +159,8 @@ Deno.serve(async (req) => {
         confirmationCode: booking.confirmation_code,
         checkInUrl,
         depositAmount,
+        manageUrl: booking.client_access_token ? `https://booksuite.online/booking/manage/${booking.client_access_token}` : undefined,
+        policyText: cancelPolicyLine(settings?.cancellation_hours, booking.deposit_amount, String(pending.currency || "GBP").toUpperCase(), booking.payment_option === "full"),
       }, pending.user_id);
     }
     if (ownerEmail && settings?.notify_new_booking !== false) {

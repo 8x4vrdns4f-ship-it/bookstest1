@@ -1,6 +1,7 @@
 // PUBLIC endpoint (session-token protected) — cancel or reschedule one of the
 // customer's own bookings. Every rule is re-validated server side.
 import {
+import { cancelPolicyLine } from "../_shared/refund-rules.ts";
   adminClient, corsHeaders, formatDate, formatTime, json, resolveSession,
 } from "../_shared/portalSession.ts";
 import { availableSlots, bookableDateRange, loadAvailability } from "../_shared/portalSlots.ts";
@@ -108,6 +109,8 @@ Deno.serve(async (req) => {
             date: formatDate(date),
             time,
             confirmationCode: booking.confirmation_code,
+            manageUrl: booking.client_access_token ? `https://booksuite.online/booking/manage/${booking.client_access_token}` : undefined,
+            policyText: cancelPolicyLine(settings?.cancellation_hours, booking.deposit_amount, String(settings?.currency || "GBP").toUpperCase(), booking.payment_option === "full"),
           },
         },
       });

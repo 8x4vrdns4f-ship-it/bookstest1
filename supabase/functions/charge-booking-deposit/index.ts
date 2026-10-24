@@ -2,6 +2,7 @@
 // Creates an off-session PaymentIntent against the saved card, then promotes
 // pending_bookings -> bookings on success.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { cancelPolicyLine } from "../_shared/refund-rules.ts";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 import { addLedgerEntry, outstandingMinor } from "../_shared/ledger.ts";
@@ -66,7 +67,7 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, auto_confirm, business_email, notify_new_booking, company_code")
+      .select("business_name, auto_confirm, business_email, notify_new_booking, company_code, cancellation_hours")
       .eq("user_id", pending.user_id)
       .maybeSingle();
 
@@ -218,6 +219,7 @@ Deno.serve(async (req) => {
               date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
               confirmationCode: booking.confirmation_code, checkInUrl, depositAmount: depositLabel,
               manageUrl,
+              policyText: cancelPolicyLine((settings as any)?.cancellation_hours, booking.deposit_amount ?? (pending as any).deposit_amount, ccyLabel, payOption === "full"),
             },
           },
         });
