@@ -40,3 +40,6 @@ project_id = "rehafgjaqbdeuatnfiyk"
 
 [functions.handle-email-events]
   verify_jwt = false
+
+[functions.collect-ledger-balances]
+  verify_jwt = false

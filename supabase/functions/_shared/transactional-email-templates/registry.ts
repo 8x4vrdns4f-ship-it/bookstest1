@@ -37,6 +37,8 @@ import { template as rebookingReminder } from './rebooking-reminder.tsx'
 import { template as campaignEmail } from './campaign-email.tsx'
 import { template as clientPortalLink } from './client-portal-link.tsx'
 import { template as refundFailedOwner } from './refund-failed-owner.tsx'
+import { template as disputeOpenedOwner } from './dispute-opened-owner.tsx'
+import { template as disputeClosedOwner } from './dispute-closed-owner.tsx'
 import { template as bookingCancelledOwner } from './booking-cancelled-owner.tsx'
 
 
@@ -50,6 +52,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-refunded': bookingRefunded,
   'booking-cancelled-client': bookingCancelledClient,
   'refund-failed-owner': refundFailedOwner,
+  'dispute-opened-owner': disputeOpenedOwner,
+  'dispute-closed-owner': disputeClosedOwner,
   'booking-cancelled-owner': bookingCancelledOwner,
   'join-request-approved': joinRequestApproved,
   'join-request-declined': joinRequestDeclined,
