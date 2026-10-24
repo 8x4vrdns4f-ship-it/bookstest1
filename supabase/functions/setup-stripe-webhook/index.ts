@@ -41,45 +41,44 @@ Deno.serve(async (req) => {
     if (env !== "sandbox" && env !== "live") throw new Error("env must be sandbox or live");
 
     const projectRef = "rehafgjaqbdeuatnfiyk";
-    const url = `https://${projectRef}.functions.supabase.co/stripe-connect-webhook?env=${env}`;
-    const events = ["checkout.session.completed", "charge.refunded", "account.updated"];
-
+    const events = [
+      "checkout.session.completed", "charge.refunded", "account.updated", "invoice.paid",
+      "charge.dispute.created", "charge.dispute.closed", "charge.dispute.funds_withdrawn", "charge.dispute.funds_reinstated",
+    ];
     const stripe = createStripeClient(env);
-
-    // Find existing endpoint with the same URL
     const list = await stripe.webhookEndpoints.list({ limit: 100 });
-    const existing = list.data.find((w: any) => w.url === url);
 
-    let endpoint: any;
-    let signingSecret: string | null = null;
-    if (existing) {
-      endpoint = await stripe.webhookEndpoints.update(existing.id, {
-        enabled_events: events as any,
+    // Destination charges, refunds, disputes and subscription invoices are
+    // events on BookSuite's own (platform) account; account.updated comes from
+    // connected accounts. Stripe needs a separate endpoint for each.
+    const results: any[] = [];
+    for (const scope of ["connect", "platform"] as const) {
+      const url = `https://${projectRef}.functions.supabase.co/stripe-connect-webhook?env=${env}${scope === "platform" ? "&scope=platform" : ""}`;
+      const existing = list.data.find((w: any) => w.url === url);
+      let endpoint: any;
+      let signingSecret: string | null = null;
+      if (existing) {
+        endpoint = await stripe.webhookEndpoints.update(existing.id, { enabled_events: events as any });
+      } else {
+        endpoint = await stripe.webhookEndpoints.create({
+          url,
+          enabled_events: events as any,
+          ...(scope === "connect" ? { connect: true } : {}),
+          description: scope === "connect" ? "BookSuite — Connect accounts" : "BookSuite — platform payments, disputes, invoices",
+        });
+        signingSecret = endpoint.secret || null;
+      }
+      const base = env === "sandbox" ? "STRIPE_WEBHOOK_SECRET_SANDBOX" : "STRIPE_WEBHOOK_SECRET_LIVE";
+      results.push({
+        scope, endpoint_id: endpoint.id, url, created: !existing, signing_secret: signingSecret,
+        secret_env_var: scope === "platform" ? `${base}_PLATFORM` : base,
       });
-      // Stripe only returns the secret on CREATE, not update. Tell caller to delete + recreate if they need it.
-      signingSecret = null;
-    } else {
-      endpoint = await stripe.webhookEndpoints.create({
-        url,
-        enabled_events: events as any,
-        connect: true, // receive both platform and connected-account events
-        description: "BookSuite — bookings + Connect",
-      });
-      signingSecret = endpoint.secret || null;
     }
 
     return new Response(
       JSON.stringify({
-        ok: true,
-        endpoint_id: endpoint.id,
-        url,
-        events,
-        created: !existing,
-        signing_secret: signingSecret,
-        secret_env_var: env === "sandbox" ? "STRIPE_WEBHOOK_SECRET_SANDBOX" : "STRIPE_WEBHOOK_SECRET_LIVE",
-        note: signingSecret
-          ? "Save signing_secret as the named env var, then redeploy stripe-connect-webhook."
-          : "Endpoint already existed; signing secret is only returned on create. Delete it in Stripe dashboard and call this again if needed.",
+        ok: true, events, endpoints: results,
+        note: "Save each returned signing_secret as its secret_env_var, then redeploy stripe-connect-webhook. Secrets are only returned when an endpoint is created.",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
