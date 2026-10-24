@@ -1,4 +1,5 @@
 // PUBLIC endpoint — called by the embed widget. No JWT required.
+import { planApplicationFee } from "../_shared/ledger-rules.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { resolveFeePercent } from "../_shared/tier-fees.ts";
 import { createStripeClient, resolveEnv, sanitizeOrigin } from "../_shared/stripe.ts";
@@ -146,7 +147,7 @@ Deno.serve(async (req) => {
         },
       ],
       payment_intent_data: {
-        application_fee_amount: feeMinor,
+        application_fee_amount: planApplicationFee({ chargeMinor: depositMinor, platformFeeMinor: feeMinor, outstandingMinor: 0 }).applicationFeeMinor,
         transfer_data: { destination: connect.stripe_account_id },
         metadata: { pending_booking_id: pending.id, user_id: userId },
       },
