@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { cancelBookingAsOwner, cancelToastText, chargedAmount, money, type PaymentFields } from "@/lib/bookingCancel";
 import { Calendar, Clock, Mail, User, FileText, UserCheck } from "lucide-react";
 
 type Booking = {
@@ -22,7 +23,9 @@ type Booking = {
   payment_status?: string | null;
   deposit_amount?: number | null;
   stripe_payment_intent_id?: string | null;
-};
+  refund_error?: string | null;
+  refund_amount?: number | null;
+} & PaymentFields;
 
 type Employee = { id: string; name: string; position: string | null };
 
@@ -39,10 +42,11 @@ type Props = {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   ownerId: string;
+  currency?: string;
   onChanged?: () => void;
 };
 
-const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, onChanged }: Props) => {
+const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, currency = "GBP", onChanged }: Props) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [assigning, setAssigning] = useState(false);
   const { toast } = useToast();
@@ -75,31 +79,37 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, onChanged }
   };
 
   const handleStatus = async (status: string) => {
-    const prevStatus = booking.status;
+    if (status === "cancelled") {
+      const r = await cancelBookingAsOwner(booking, { currency });
+      if (r.cancelledByUser) return;
+      const t = cancelToastText(r, currency);
+      toast({ title: t.title, description: t.description, variant: t.destructive ? "destructive" : undefined });
+      if (r.ok) onChanged?.();
+      return;
+    }
     const { error } = await supabase.from("bookings").update({ status }).eq("id", booking.id);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
     }
-    if (status === "cancelled" && prevStatus !== "cancelled") {
-      if (booking.client_email) {
-        const { sendEmail, formatDate, formatTime } = await import("@/lib/sendEmail");
-        const { data: bs } = await supabase.from("business_settings").select("business_name").eq("user_id", ownerId).maybeSingle();
-        sendEmail("booking-cancelled-client", booking.client_email, `booking-cancel-${booking.id}`, {
-          businessName: bs?.business_name || "the business",
-          clientName: booking.client_name, service: booking.service,
-          date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
-        }, ownerId);
-      }
-      // Notify waitlist for that date (non-fatal).
-      try {
-        await supabase.functions.invoke("notify-waitlist", {
-          body: { user_id: ownerId, date: booking.booking_date },
-        });
-      } catch { /* ignore */ }
-    }
-
     onChanged?.();
+  };
+
+  const charged = chargedAmount(booking);
+  const paidInFull = booking.payment_option === "full";
+  const refundLabel = paidInFull ? "Refund payment" : "Refund deposit";
+  const runRefund = async (retry: boolean) => {
+    const amt = retry && booking.refund_amount ? Number(booking.refund_amount) : charged;
+    if (!confirm(`${retry ? "Retry refund" : refundLabel}: refund ${money(amt, currency)} to the client?`)) return;
+    const { data, error } = await supabase.functions.invoke("refund-booking-deposit", { body: { booking_id: booking.id } });
+    if (error || !data?.ok) {
+      toast({ title: "Refund failed", description: "The booking is marked \"Refund failed\". You can retry or refund manually.", variant: "destructive" });
+      onChanged?.();
+      return;
+    }
+    toast({ title: "Refund sent", description: `${money(Number(data.amount ?? amt), currency)} refunded.` });
+    onChanged?.();
+    onOpenChange(false);
   };
 
   const assignedName = employees.find((e) => e.id === booking.assigned_employee_id)?.name;
@@ -125,24 +135,32 @@ const BookingDetailDialog = ({ booking, open, onOpenChange, ownerId, onChanged }
       size="md"
       footer={
         <>
-          {booking.payment_status === "paid" && booking.stripe_payment_intent_id && (
+          {booking.payment_status === "paid" && booking.stripe_payment_intent_id && charged > 0 && (
             <Button
               variant="outline"
               className="border-destructive/40 text-destructive hover:bg-destructive/10"
-              onClick={async () => {
-                if (!confirm(`Refund £${Number(booking.deposit_amount || 0).toFixed(2)} deposit to the customer?`)) return;
-                const { error } = await supabase.functions.invoke("refund-booking-deposit", { body: { booking_id: booking.id } });
-                if (error) { toast({ title: "Refund failed", description: error.message, variant: "destructive" }); return; }
-                toast({ title: "Deposit refunded" });
-                onChanged?.();
-                onOpenChange(false);
-              }}
+              onClick={() => runRefund(false)}
             >
-              Refund deposit (£{Number(booking.deposit_amount || 0).toFixed(2)})
+              {refundLabel} ({money(charged, currency)})
             </Button>
           )}
+          {booking.payment_status === "refund_failed" && (
+            <div className="mr-auto flex items-center gap-2">
+              <Badge variant="outline" className="bg-destructive/15 text-destructive border-destructive/40" title={booking.refund_error || undefined}>
+                Refund failed
+              </Badge>
+              <Button variant="outline" className="border-destructive/40 text-destructive hover:bg-destructive/10" onClick={() => runRefund(true)}>
+                Retry refund
+              </Button>
+            </div>
+          )}
           {booking.payment_status === "refunded" && (
-            <div className="text-xs text-muted-foreground mr-auto">Deposit was refunded.</div>
+            <div className="text-xs text-muted-foreground mr-auto">Payment was refunded.</div>
+          )}
+          {booking.payment_status === "partially_refunded" && (
+            <div className="text-xs text-muted-foreground mr-auto">
+              Partly refunded{booking.refund_amount ? ` (${money(Number(booking.refund_amount), currency)})` : ""}; deposit kept.
+            </div>
           )}
           <Button variant="outline" onClick={() => onOpenChange(false)} className="border-border">Close</Button>
         </>
