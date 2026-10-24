@@ -14,6 +14,7 @@ import { Plus, Trash2, Check, X, Search, UserCheck, ChevronRight, Calendar } fro
 import BookingDetailDialog from "./BookingDetailDialog";
 import { handleTierError } from "@/lib/tierError";
 import { sendEmail, formatDate, formatTime } from "@/lib/sendEmail";
+import { cancelBookingAsOwner, cancelToastText, hasPaymentRecord, chargedAmount, money, type PaymentFields } from "@/lib/bookingCancel";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
 
@@ -30,7 +31,8 @@ type Booking = {
   notes: string | null;
   confirmation_code: string | null;
   assigned_employee_id: string | null;
-};
+  refund_error?: string | null;
+} & PaymentFields;
 
 const statusStyle: Record<string, { pill: string; dot: string; label: string }> = {
   pending:    { pill: "text-warning bg-warning/10 border-warning/25",           dot: "bg-warning",     label: "Pending" },
@@ -46,6 +48,8 @@ const BookingsList = ({ userId }: { userId: string }) => {
   const [employeesList, setEmployeesList] = useState<{ id: string; name: string }[]>([]);
   const [businessName, setBusinessName] = useState<string>("");
   const [companyCode, setCompanyCode] = useState<string>("");
+  const [currency, setCurrency] = useState<string>("GBP");
+  const [retrying, setRetrying] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -92,9 +96,9 @@ const BookingsList = ({ userId }: { userId: string }) => {
   useEffect(() => {
     fetchBookings();
     fetchEmployees();
-    supabase.from("business_settings").select("business_name, company_code").eq("user_id", userId).maybeSingle()
+    supabase.from("business_settings").select("business_name, company_code, currency").eq("user_id", userId).maybeSingle()
       .then(({ data }) => {
-        if (data) { setBusinessName(data.business_name || ""); setCompanyCode(data.company_code || ""); }
+        if (data) { setBusinessName(data.business_name || ""); setCompanyCode(data.company_code || ""); setCurrency((data.currency || "GBP").toUpperCase()); }
       });
 
     const channel = supabase
@@ -164,7 +168,30 @@ const BookingsList = ({ userId }: { userId: string }) => {
   };
 
   const handleStatusChange = async (id: string, status: string) => {
-    await supabase.from("bookings").update({ status }).eq("id", id);
+    if (status === "cancelled") {
+      const b = bookings.find((x) => x.id === id);
+      if (!b) return;
+      const r = await cancelBookingAsOwner(b, { currency });
+      if (r.cancelledByUser) return;
+      const t = cancelToastText(r, currency);
+      toast({ title: t.title, description: t.description, variant: t.destructive ? "destructive" : undefined });
+      fetchBookings();
+      return;
+    }
+    const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+    if (error) toast({ title: "Couldn't update", description: error.message, variant: "destructive" });
+  };
+
+  const handleRetryRefund = async (b: Booking) => {
+    setRetrying(b.id);
+    const { data, error } = await supabase.functions.invoke("refund-booking-deposit", { body: { booking_id: b.id } });
+    setRetrying(null);
+    if (error || !data?.ok) {
+      toast({ title: "Refund failed again", description: "Please refund the client manually from your payments account.", variant: "destructive" });
+    } else {
+      toast({ title: "Refund sent", description: `${money(Number(data.amount ?? chargedAmount(b)), currency)} refunded.` });
+    }
+    fetchBookings();
   };
 
   const handleAccept = async (b: Booking) => {
@@ -195,26 +222,19 @@ const BookingsList = ({ userId }: { userId: string }) => {
   };
 
   const handleDecline = async (b: Booking) => {
-    const reason = "Declined by business";
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status: "cancelled", decline_reason: reason })
-      .eq("id", b.id);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      return;
-    }
-    if (b.client_email) {
-      sendEmail("booking-declined", b.client_email, `booking-decline-${b.id}`, {
-        businessName, clientName: b.client_name, service: b.service,
-        date: formatDate(b.booking_date), time: formatTime(b.booking_time), reason,
-      }, userId);
-    }
-    toast({ title: "Booking declined" });
+    const r = await cancelBookingAsOwner(b, { mode: "decline", reason: "Declined by business", currency });
+    if (r.cancelledByUser) return;
+    const t = cancelToastText(r, currency);
+    toast({ title: r.ok && !r.refunded && !r.refund_failed ? "Booking declined" : t.title, description: t.description, variant: t.destructive ? "destructive" : undefined });
+    fetchBookings();
   };
 
-  const handleDelete = async (id: string) => {
-    await supabase.from("bookings").delete().eq("id", id);
+  const handleDelete = async (b: Booking) => {
+    if (hasPaymentRecord(b)) return;
+    if (!window.confirm(`Are you sure? This permanently deletes ${b.client_name}'s booking.`)) return;
+    const { error } = await supabase.from("bookings").delete().eq("id", b.id);
+    if (error) toast({ title: "Couldn't delete", description: error.message, variant: "destructive" });
+    else { toast({ title: "Booking deleted" }); fetchBookings(); }
   };
 
   return (
@@ -322,6 +342,11 @@ const BookingsList = ({ userId }: { userId: string }) => {
                       {b.confirmation_code}
                     </Badge>
                   )}
+                  {b.payment_status === "refund_failed" && (
+                    <Badge variant="outline" className="bg-destructive/15 text-destructive border-destructive/40 text-[10px]" title={b.refund_error || undefined}>
+                      Refund failed
+                    </Badge>
+                  )}
                   {b.assigned_employee_id && employeesMap[b.assigned_employee_id] && (
                     <Badge variant="outline" className="bg-secondary/60 text-muted-foreground border-border gap-1 text-[10px]">
                       <UserCheck size={10} /> {employeesMap[b.assigned_employee_id]}
@@ -373,9 +398,16 @@ const BookingsList = ({ userId }: { userId: string }) => {
                     </SelectContent>
                   </Select>
                 )}
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(b.id)}>
-                  <Trash2 size={14} />
-                </Button>
+                {b.payment_status === "refund_failed" && (
+                  <Button size="sm" variant="outline" disabled={retrying === b.id} onClick={() => handleRetryRefund(b)} className="h-8 border-destructive/40 text-destructive hover:bg-destructive/10">
+                    {retrying === b.id ? "Retrying…" : "Retry refund"}
+                  </Button>
+                )}
+                {!hasPaymentRecord(b) && (
+                  <Button variant="ghost" size="icon" aria-label="Delete booking" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(b)}>
+                    <Trash2 size={14} />
+                  </Button>
+                )}
                 <ChevronRight size={14} className="text-muted-foreground hidden sm:block" />
               </div>
             </div>
@@ -389,7 +421,8 @@ const BookingsList = ({ userId }: { userId: string }) => {
         open={!!detail}
         onOpenChange={(o) => !o && setDetail(null)}
         ownerId={userId}
-        onChanged={() => { /* realtime will refresh */ }}
+        currency={currency}
+        onChanged={() => { fetchBookings(); setDetail(null); }}
       />
     </SectionCard>
   );

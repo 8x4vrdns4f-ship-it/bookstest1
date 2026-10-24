@@ -36,6 +36,8 @@ import { template as platformDailySummary } from './platform-daily-summary.tsx'
 import { template as rebookingReminder } from './rebooking-reminder.tsx'
 import { template as campaignEmail } from './campaign-email.tsx'
 import { template as clientPortalLink } from './client-portal-link.tsx'
+import { template as refundFailedOwner } from './refund-failed-owner.tsx'
+import { template as bookingCancelledOwner } from './booking-cancelled-owner.tsx'
 
 
 
@@ -47,6 +49,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-paid-owner': bookingPaidOwner,
   'booking-refunded': bookingRefunded,
   'booking-cancelled-client': bookingCancelledClient,
+  'refund-failed-owner': refundFailedOwner,
+  'booking-cancelled-owner': bookingCancelledOwner,
   'join-request-approved': joinRequestApproved,
   'join-request-declined': joinRequestDeclined,
   'join-request-received-owner': joinRequestReceivedOwner,

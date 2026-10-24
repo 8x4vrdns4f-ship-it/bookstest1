@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
-  PortalBooking, cancelPortalBooking, currencySymbol, isClosedStatus, isPastBooking, statusLabel,
+  PortalBooking, cancelPortalBooking, previewPortalCancel, currencySymbol, isClosedStatus, isPastBooking, statusLabel,
 } from "@/lib/clientPortal";
 import { downloadIcs, googleCalendarUrl } from "@/lib/ics";
 import RescheduleDialog from "./RescheduleDialog";
@@ -28,9 +28,16 @@ const prettyDate = (d: string) =>
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
 
+import { type CancelQuote, quoteText, cancelResultText } from "@/lib/cancelQuote";
+
 const PortalBookingCard = ({ booking, sessionToken, onChanged }: Props) => {
   const { toast } = useToast();
   const [cancelling, setCancelling] = useState(false);
+  const [quote, setQuote] = useState<CancelQuote | null>(null);
+  const loadQuote = async () => {
+    setQuote(null);
+    try { setQuote(await previewPortalCancel(sessionToken, booking.id)); } catch { /* shown as loading */ }
+  };
 
   const past = isPastBooking(booking);
   const closed = isClosedStatus(booking.status);
@@ -54,7 +61,7 @@ const PortalBookingCard = ({ booking, sessionToken, onChanged }: Props) => {
       const res = await cancelPortalBooking(sessionToken, booking.id);
       toast({
         title: "Booking cancelled",
-        description: res.refunded ? "Your deposit has been refunded." : undefined,
+        description: cancelResultText(res) || undefined,
       });
       onChanged();
     } catch (e) {
@@ -115,7 +122,7 @@ const PortalBookingCard = ({ booking, sessionToken, onChanged }: Props) => {
           {canChange && (
             <>
               <RescheduleDialog booking={booking} sessionToken={sessionToken} onDone={onChanged} />
-              <AlertDialog>
+              <AlertDialog onOpenChange={(o) => { if (o) loadQuote(); }}>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive">
                     <XCircle className="h-3.5 w-3.5" />
@@ -125,14 +132,13 @@ const PortalBookingCard = ({ booking, sessionToken, onChanged }: Props) => {
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Cancellations must be made at least {biz.cancellation_hours ?? 24} hours before
-                      the appointment. Any deposit is refunded automatically where the business allows it.
+                    <AlertDialogDescription className={quote?.late && quote.kept > 0 ? "text-destructive font-medium" : undefined}>
+                      {quoteText(quote)}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Keep booking</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCancel} disabled={cancelling}>
+                    <AlertDialogAction onClick={handleCancel} disabled={cancelling || !quote}>
                       {cancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : "Yes, cancel"}
                     </AlertDialogAction>
                   </AlertDialogFooter>

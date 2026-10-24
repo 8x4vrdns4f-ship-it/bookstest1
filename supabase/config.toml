@@ -35,6 +35,8 @@ project_id = "rehafgjaqbdeuatnfiyk"
     verify_jwt = false
   [functions.confirm-waitlist-join]
     verify_jwt = false
+  [functions.cancel-booking-owner]
+    verify_jwt = false
 
 [functions.handle-email-events]
   verify_jwt = false

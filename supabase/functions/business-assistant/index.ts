@@ -278,10 +278,14 @@ Deno.serve(async (req) => {
             if (b.client_email) emails.push({ template: "booking-confirmed", to: b.client_email, key: `booking-confirm-${b.id}`, data: { ...base, confirmationCode: code } });
           } else if (op.action === "decline") {
             if (b.status !== "pending") return json({ error: `${b.client_name}'s booking isn't waiting for approval.` }, 400);
-            const reason = "Declined by business";
-            const { error } = await db.from("bookings").update({ status: "cancelled", decline_reason: reason }).eq("id", b.id);
-            if (error) return fail(error);
-            if (b.client_email) emails.push({ template: "booking-declined", to: b.client_email, key: `booking-decline-${b.id}`, data: { ...base, reason } });
+            // Goes through cancel-booking-owner so any payment is refunded and the client is emailed there.
+            const res = await fetch(`${supabaseUrl}/functions/v1/cancel-booking-owner`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}`, apikey: anonKey, "Content-Type": "application/json" },
+              body: JSON.stringify({ booking_id: b.id, mode: "decline", reason: "Declined by business" }),
+            });
+            const out = await res.json().catch(() => ({}));
+            if (!res.ok || !out?.ok) return json({ error: out?.error || "I couldn't decline that booking." }, 400);
           } else {
             const { error } = await db.from("bookings").update({ status: op.action === "complete" ? "completed" : "no_show" }).eq("id", b.id);
             if (error) return fail(error);

@@ -98,8 +98,13 @@ export const fetchPortalSlots = (token: string, bookingId: string, date?: string
   );
 
 export const cancelPortalBooking = (token: string, bookingId: string) =>
-  call<{ ok: true; refunded: boolean }>(
+  call<{ ok: true; refunded: number; refund_failed: boolean; kept: number; currency: string }>(
     "client-portal-update-booking", { session_token: token, booking_id: bookingId, action: "cancel" },
+  );
+
+export const previewPortalCancel = (token: string, bookingId: string) =>
+  call<{ ok: true; late: boolean; cancellation_hours: number; charged: number; refund: number; kept: number; currency: string }>(
+    "client-portal-update-booking", { session_token: token, booking_id: bookingId, action: "cancel", preview: true },
   );
 
 export const reschedulePortalBooking = (

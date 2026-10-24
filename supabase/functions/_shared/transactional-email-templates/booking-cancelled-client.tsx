@@ -11,10 +11,11 @@ interface Props {
   date?: string
   time?: string
   reason?: string
+  refundNote?: string
 }
 
 const BookingCancelledClientEmail = ({
-  businessName = 'the business', clientName, service = 'your booking', date = '', time = '', reason,
+  businessName = 'the business', clientName, service = 'your booking', date = '', time = '', reason, refundNote,
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -31,6 +32,7 @@ const BookingCancelledClientEmail = ({
           <Text style={detail}><strong>Time:</strong> {time}</Text>
           {reason && <Text style={detail}><strong>Reason:</strong> {reason}</Text>}
         </Section>
+        {refundNote && <Text style={text}><strong>{refundNote}</strong></Text>}
         <Text style={text}>If this was unexpected, please contact {businessName} directly.</Text>
         <Text style={footer}>— {businessName}</Text>
         <PoweredByFooter source="cancellation-email" />
@@ -43,7 +45,7 @@ export const template = {
   component: BookingCancelledClientEmail,
   subject: (d: Record<string, any>) => `Your booking with ${d?.businessName ?? 'us'} has been cancelled`,
   displayName: 'Booking cancelled (client)',
-  previewData: { businessName: 'Sample Salon', clientName: 'Jane', service: 'Haircut', date: '15 Jun 2026', time: '14:30', reason: 'Stylist sick' },
+  previewData: { businessName: 'Sample Salon', clientName: 'Jane', service: 'Haircut', date: '15 Jun 2026', time: '14:30', reason: 'Stylist sick', refundNote: '£25.00 has been refunded to your original payment method. It can take 5–10 working days to appear.' },
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }

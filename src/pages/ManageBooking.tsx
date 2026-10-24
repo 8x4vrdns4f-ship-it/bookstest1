@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { type CancelQuote, quoteText, cancelResultText } from "@/lib/cancelQuote";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -42,6 +43,15 @@ const ManageBooking = () => {
   const [business, setBusiness] = useState<BusinessInfo>({});
   const [cancelling, setCancelling] = useState(false);
   const [cancelled, setCancelled] = useState(false);
+  const [quote, setQuote] = useState<CancelQuote | null>(null);
+  const [resultNote, setResultNote] = useState<string>("");
+
+  const loadQuote = async () => {
+    if (!token) return;
+    setQuote(null);
+    const { data } = await supabase.functions.invoke("cancel-booking-client", { body: { token, preview: true } });
+    if (data?.ok) setQuote(data as CancelQuote);
+  };
 
   useEffect(() => {
     if (!token) {
@@ -78,6 +88,7 @@ const ManageBooking = () => {
       });
       if (data?.ok) {
         setCancelled(true);
+        setResultNote(cancelResultText(data));
         setBooking((prev) => prev ? { ...prev, status: "cancelled_by_client" } : prev);
       } else {
         setError(data?.error || "Could not cancel booking");
@@ -181,14 +192,12 @@ const ManageBooking = () => {
 
               {cancelled && (
                 <p className="text-sm text-muted-foreground">
-                  {booking.payment_status === "refunded"
-                    ? "Your deposit has been refunded."
-                    : "Your cancellation has been processed."}
+                  {resultNote || "Your cancellation has been processed."}
                 </p>
               )}
 
               {canCancel && (
-                <AlertDialog>
+                <AlertDialog onOpenChange={(o) => { if (o) loadQuote(); }}>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" className="w-full gap-2">
                       <XCircle className="h-4 w-4" />
@@ -198,9 +207,8 @@ const ManageBooking = () => {
                   <AlertDialogContent className="bg-card border-border">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
-                      <AlertDialogDescription className="text-muted-foreground">
-                        You must cancel at least {business.cancellation_hours ?? 24} hours before the appointment.
-                        If you are inside the window, the deposit may not be refunded automatically.
+                      <AlertDialogDescription className={quote?.late && quote.kept > 0 ? "text-destructive font-medium" : "text-muted-foreground"}>
+                        {quoteText(quote)}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -211,7 +219,7 @@ const ManageBooking = () => {
                         <Button
                           variant="destructive"
                           onClick={handleCancel}
-                          disabled={cancelling}
+                          disabled={cancelling || !quote}
                         >
                           {cancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : "Yes, cancel"}
                         </Button>
