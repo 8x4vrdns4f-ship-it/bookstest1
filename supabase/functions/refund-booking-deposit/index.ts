@@ -58,6 +58,7 @@ Deno.serve(async (req) => {
             templateData: {
               businessName, clientName: booking.client_name, service: booking.service,
               date: fmtDate(booking.booking_date), time: fmtTime(booking.booking_time), refundAmount,
+              keptAmount: formatMoney(Math.max(0, chargedAmount(booking) - r.amount), currency),
             },
           },
         });
