@@ -1,6 +1,7 @@
 // PUBLIC endpoint — looks up a booking by its client access token.
 // Returns booking details and business info for the self-service portal.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { zonedTimeToUtcMs } from "../_shared/refund-rules.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -44,7 +45,7 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, business_address, business_phone, cancellation_hours, currency")
+      .select("business_name, business_address, business_phone, cancellation_hours, currency, timezone")
       .eq("user_id", booking.user_id)
       .maybeSingle();
 
@@ -61,6 +62,8 @@ Deno.serve(async (req) => {
         deposit_amount: booking.deposit_amount,
         payment_status: booking.payment_status,
         confirmation_code: booking.confirmation_code,
+        payment_option: booking.payment_option ?? null,
+        start_utc: new Date(zonedTimeToUtcMs(booking.booking_date, booking.booking_time, settings?.timezone || "Europe/London")).toISOString(),
       },
       business: settings || {},
     }), {
