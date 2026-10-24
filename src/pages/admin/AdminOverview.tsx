@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import StatCard from "@/components/app/StatCard";
 import SectionCard from "@/components/app/SectionCard";
 import BusinessDetailSheet from "@/components/admin/BusinessDetailSheet";
+import LiveWebhookSetup from "@/components/admin/LiveWebhookSetup";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Building2, CalendarCheck, CreditCard, Gift, Mail, RefreshCw, Users } from "lucide-react";
@@ -85,6 +86,7 @@ export default function AdminOverview() {
 
   return (
     <div className="space-y-6">
+      <LiveWebhookSetup />
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm text-muted-foreground">Platform health at a glance</p>
