@@ -30,9 +30,12 @@ export type Database = {
           created_at: string
           decline_reason: string | null
           deposit_amount: number | null
+          dispute_id: string | null
+          dispute_reversed_minor: number | null
           duration_minutes: number
           end_date: string | null
           id: string
+          ledger_collected_amount: number | null
           notes: string | null
           party_size: number | null
           payment_environment: string
@@ -55,6 +58,7 @@ export type Database = {
           status: string
           stripe_charge_id: string | null
           stripe_checkout_session_id: string | null
+          stripe_fee_amount: number | null
           stripe_payment_intent_id: string | null
           updated_at: string
           user_id: string
@@ -74,9 +78,12 @@ export type Database = {
           created_at?: string
           decline_reason?: string | null
           deposit_amount?: number | null
+          dispute_id?: string | null
+          dispute_reversed_minor?: number | null
           duration_minutes?: number
           end_date?: string | null
           id?: string
+          ledger_collected_amount?: number | null
           notes?: string | null
           party_size?: number | null
           payment_environment?: string
@@ -99,6 +106,7 @@ export type Database = {
           status?: string
           stripe_charge_id?: string | null
           stripe_checkout_session_id?: string | null
+          stripe_fee_amount?: number | null
           stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id: string
@@ -118,9 +126,12 @@ export type Database = {
           created_at?: string
           decline_reason?: string | null
           deposit_amount?: number | null
+          dispute_id?: string | null
+          dispute_reversed_minor?: number | null
           duration_minutes?: number
           end_date?: string | null
           id?: string
+          ledger_collected_amount?: number | null
           notes?: string | null
           party_size?: number | null
           payment_environment?: string
@@ -143,6 +154,7 @@ export type Database = {
           status?: string
           stripe_charge_id?: string | null
           stripe_checkout_session_id?: string | null
+          stripe_fee_amount?: number | null
           stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id?: string
@@ -181,6 +193,53 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_ledger: {
+        Row: {
+          amount_minor: number
+          booking_id: string | null
+          created_at: string
+          currency: string
+          environment: string
+          id: string
+          note: string | null
+          stripe_object_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount_minor: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          id?: string
+          note?: string | null
+          stripe_object_id: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount_minor?: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          id?: string
+          note?: string | null
+          stripe_object_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_ledger_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -1026,6 +1085,45 @@ export type Database = {
         }
         Relationships: []
       }
+      ledger_invoice_items: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          currency: string
+          environment: string
+          id: string
+          status: string
+          stripe_customer_id: string
+          stripe_invoice_item_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          currency: string
+          environment: string
+          id?: string
+          status?: string
+          stripe_customer_id: string
+          stripe_invoice_item_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_invoice_item_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pending_bookings: {
         Row: {
           booking_date: string
@@ -1697,7 +1795,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      business_ledger_balances: {
+        Row: {
+          balance_minor: number | null
+          currency: string | null
+          entries: number | null
+          environment: string | null
+          oldest_entry_at: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_business_detail: { Args: { p_user_id: string }; Returns: Json }
