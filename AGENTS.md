@@ -41,3 +41,7 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 ## Form fields
 
 - Use `DateField` / `TimeField` / `NumberField` from `src/components/ui/date-time-fields.tsx` instead of native `type="date|time|number"` inputs. Why: native boxes fire half-typed values that reset the field; these pickers only emit complete values.
+
+## Refunds & cancellations
+
+- Staff cancel/decline only via the `cancel-booking-owner` Edge Function; Stripe refunds only via `_shared/booking-refund.ts`, with amount rules in `_shared/refund-rules.ts` (unit-tested). DB triggers block non-service-role cancels of paid bookings, edits to payment columns, and deletes of bookings with any payment record. Why: money must never be kept, lost or silently fail to refund because one UI path forgot.
