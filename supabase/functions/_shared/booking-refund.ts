@@ -80,7 +80,7 @@ export async function refundBooking(
       const msg = String(e?.raw?.message || e?.message || "");
       // The business's Stripe balance can't cover the reversal: refund the client
       // anyway and put the whole amount on the business's tab.
-      if (!/insufficient|balance/i.test(msg) || /charge .* has already been refunded/i.test(msg)) throw e;
+      if (!/insufficient/i.test(msg)) throw e;
       reverseFailed = msg;
       refund = await stripe.refunds.create({
         payment_intent: booking.stripe_payment_intent_id,
