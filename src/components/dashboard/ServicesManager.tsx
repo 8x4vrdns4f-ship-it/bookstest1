@@ -114,7 +114,7 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
                 <NumberField
                   min={0} step="0.01"
                   value={s.price ?? ""}
-                  placeholder="—"
+                  optional placeholder="—"
                   onChange={(e) => setItems((cur) => cur.map((i) => (i.id === s.id ? { ...i, price: e.target.value === "" ? null : Number(e.target.value) } : i)))}
                   onBlur={(e) => update(s.id, { price: e.target.value === "" ? null : Number(e.target.value) })}
                   className="bg-background border-border w-24"
