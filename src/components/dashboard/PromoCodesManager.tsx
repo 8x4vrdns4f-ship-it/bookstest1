@@ -203,7 +203,7 @@ const PromoCodesManager = ({ userId, maxCodes }: Props) => {
                 <Label htmlFor="pc-uses">Usage limit (optional)</Label>
                 <NumberField
                   id="pc-uses" min={1} value={maxUses}
-                  onChange={(e) => setMaxUses(e.target.value)} placeholder="Unlimited" className="mt-1.5"
+                  onChange={(e) => setMaxUses(e.target.value)} optional placeholder="Unlimited" className="mt-1.5"
                 />
               </div>
               <div>

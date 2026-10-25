@@ -114,7 +114,7 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
                 <NumberField
                   min={0} step="0.01"
                   value={s.price ?? ""}
-                  placeholder="—"
+                  optional placeholder="—"
                   onChange={(e) => setItems((cur) => cur.map((i) => (i.id === s.id ? { ...i, price: e.target.value === "" ? null : Number(e.target.value) } : i)))}
                   onBlur={(e) => update(s.id, { price: e.target.value === "" ? null : Number(e.target.value) })}
                   className="bg-background border-border w-24"
@@ -143,7 +143,7 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
         </div>
         <div className="w-24">
           <Label className="text-xs text-muted-foreground">Price {symbol}</Label>
-          <NumberField min={0} step="0.01" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} placeholder="Optional" className="bg-background border-border mt-1" />
+          <NumberField optional min={0} step="0.01" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} placeholder="Optional" className="bg-background border-border mt-1" />
         </div>
         <Button onClick={add} disabled={!newName.trim()} className="bg-primary text-primary-foreground hover:bg-primary/90">
           <Plus size={16} className="mr-1" /> Add
