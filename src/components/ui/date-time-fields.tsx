@@ -107,6 +107,8 @@ export function TimeField({ id, value, onChange, disabled, className }: TimeFiel
 type NumberFieldProps = Omit<React.ComponentProps<typeof Input>, "type" | "onChange" | "value"> & {
   value: number | string | null | undefined;
   onChange: (e: FakeChange) => void;
+  /** Leaving the box empty keeps it empty (e.g. "Unlimited" / no price). Otherwise empty snaps to min. */
+  optional?: boolean;
 };
 
 /**
@@ -114,7 +116,7 @@ type NumberFieldProps = Omit<React.ComponentProps<typeof Input>, "type" | "onCha
  * complete numbers; out-of-range values are clamped when you leave the box.
  */
 export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
-  ({ value, onChange, min, max, onBlur, ...rest }, ref) => {
+  ({ value, onChange, min, max, onBlur, optional, ...rest }, ref) => {
     const ext = value === null || value === undefined ? "" : String(value);
     const [draft, setDraft] = React.useState(ext);
     const focused = React.useRef(false);
@@ -142,8 +144,8 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
           focused.current = false;
           let n = Number(draft);
           if (draft === "") {
-            // Empty means "no value" (e.g. Unlimited / Optional) unless the box is required.
-            if (rest.required && lo !== undefined) { n = lo; }
+            // Empty snaps to the minimum unless the box is explicitly optional.
+            if (!optional && lo !== undefined) { n = lo; }
             else { setDraft(""); onChange(fake("")); onBlur?.(e); return; }
           } else if (isNaN(n)) {
             if (lo !== undefined) { n = lo; } else { setDraft(ext); onBlur?.(e); return; }
