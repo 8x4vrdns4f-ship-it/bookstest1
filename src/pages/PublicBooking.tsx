@@ -156,7 +156,7 @@ const PublicBooking = () => {
           <div className="flex justify-center">
             <Dialog>
               <DialogTrigger asChild>
-                <button type="button" className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground">
+                <button type="button" className="inline-flex items-center min-h-10 px-2 text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground">
                   Cancellation policy
                 </button>
               </DialogTrigger>
