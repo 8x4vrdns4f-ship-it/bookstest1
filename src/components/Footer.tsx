@@ -16,16 +16,16 @@ const Footer = () => {
     <footer className="border-t border-border px-6 md:px-12 py-10 mt-12">
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <BrandLogo size="sm" />
-        <nav className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
-          <Link to="/pricing" className="hover:text-primary transition-colors">Pricing</Link>
-          <Link to="/tools/no-show-calculator" className="hover:text-primary transition-colors">No-show calculator</Link>
-          <Link to="/about" className="hover:text-primary transition-colors">About</Link>
-          <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
-          <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
-          <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
-          <Link to="/cookies" className="hover:text-primary transition-colors">Cookies</Link>
-          <Link to="/security" className="hover:text-primary transition-colors">Security</Link>
-          <a href="mailto:help@booksuite.online" className="hover:text-primary transition-colors">Support</a>
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-0 md:gap-5 text-sm text-muted-foreground">
+          <Link to="/pricing" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Pricing</Link>
+          <Link to="/tools/no-show-calculator" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">No-show calculator</Link>
+          <Link to="/about" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">About</Link>
+          <Link to="/contact" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Contact</Link>
+          <Link to="/privacy" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Privacy</Link>
+          <Link to="/terms" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Terms</Link>
+          <Link to="/cookies" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Cookies</Link>
+          <Link to="/security" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Security</Link>
+          <a href="mailto:help@booksuite.online" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Support</a>
         </nav>
 
         <div className="flex items-center gap-5">
@@ -36,17 +36,17 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="inline-flex items-center justify-center min-h-10 min-w-10 md:min-h-0 md:min-w-0 text-muted-foreground hover:text-primary transition-colors"
             >
               <Icon size={20} />
             </a>
           ))}
         </div>
       </div>
-      <nav aria-label="Industries" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground mt-8">
+      <nav aria-label="Industries" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-0 md:gap-y-2 text-xs text-muted-foreground mt-8">
         <span className="font-semibold text-foreground">Built for:</span>
         {NICHES.map((n) => (
-          <Link key={n.slug} to={`/for/${n.slug}`} className="hover:text-primary transition-colors">{n.name}</Link>
+          <Link key={n.slug} to={`/for/${n.slug}`} className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">{n.name}</Link>
         ))}
       </nav>
       <p className="text-center text-muted-foreground text-xs mt-6">
