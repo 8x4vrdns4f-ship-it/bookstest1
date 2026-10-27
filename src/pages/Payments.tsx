@@ -50,7 +50,7 @@ const Payments = () => {
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>1. Connect Stripe — takes ~3 minutes (name, bank details, ID check).</p>
             <p>2. Customers pay the deposit you set in Settings when they book.</p>
-            <p>3. Money lands in your Stripe balance and pays out to your bank.</p>
+            <p>3. Money lands in your Stripe balance and pays out to your bank weekly, every Monday.</p>
           </CardContent>
         </Card>
 
@@ -59,6 +59,7 @@ const Payments = () => {
             <CardTitle className="text-foreground text-lg">How payouts and fees work</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p><span className="text-foreground font-medium">Payouts:</span> your earnings are paid to your bank weekly, every Monday (after Stripe's standard processing delay).</p>
             <p><span className="text-foreground font-medium">BookSuite's platform fee:</span> {feePct !== null ? `${feePct}% of each booking payment on your ${tier!.charAt(0).toUpperCase() + tier!.slice(1)} plan.` : "a percentage of each booking payment, set by your plan."}</p>
             <p><span className="text-foreground font-medium">Stripe's card fee:</span> from 1.5% + 20p for UK cards (more for premium, EU and international cards) is deducted from each payment.</p>
             <p><span className="text-foreground font-medium">Refunds:</span> when a booking is refunded, you return what you received for it. The card fees and BookSuite's platform fee aren't returned.</p>
