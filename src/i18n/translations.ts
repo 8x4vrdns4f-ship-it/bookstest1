@@ -167,7 +167,7 @@ const en: Dict = {
   "faq.q5": "Can I embed the booking widget on my own website?",
   "faq.a5": "Yes. Copy one snippet of HTML/JS from your dashboard and paste it into any site. Bookings flow straight back into BookSuite.",
   "faq.q6": "How do payouts work?",
-  "faq.a6": "Payments go through Stripe Connect. Once you connect your Stripe account, payouts go directly to your bank on Stripe's standard schedule.",
+  "faq.a6": "Payments go through Stripe Connect. Once you connect your Stripe account, payouts go to your bank weekly, every Monday (after Stripe's standard processing delay).",
   "faq.q7": "Do customers actually receive the emails?",
   "faq.a7": "Yes. Emails leave from a domain BookSuite has verified and authenticated, so they land in inboxes rather than spam folders. Your business name appears as the sender, and you can have replies come straight to your own inbox.",
   "faq.q8": "How do I get support?",

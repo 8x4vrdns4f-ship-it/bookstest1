@@ -77,6 +77,9 @@ Deno.serve(async (req) => {
         business_profile: {
           name: settings?.business_name || undefined,
         },
+        settings: {
+          payouts: { schedule: { interval: "weekly", weekly_anchor: "monday" } },
+        },
         metadata: { user_id: user.id },
       });
       accountId = account.id;
