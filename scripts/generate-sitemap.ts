@@ -20,6 +20,7 @@ const entries: SitemapEntry[] = [
   { path: "/guides/online-booking-system-for-small-business", lastmod: today, changefreq: "monthly", priority: "0.8" },
   { path: "/guides/how-to-take-deposits-for-appointments",    lastmod: today, changefreq: "monthly", priority: "0.8" },
   { path: "/guides/reduce-no-shows-appointment-reminders",    lastmod: today, changefreq: "monthly", priority: "0.8" },
+  { path: "/guides/how-to-stop-no-shows-at-a-barber-shop",    lastmod: "2026-10-28", changefreq: "monthly" as const, priority: "0.8" },
   ...["barbers","hair-salons","personal-trainers","tattoo-artists","nail-technicians","dog-groomers","massage-therapists","lash-brow-artists","photographers","car-detailing","driving-instructors","piercing-studios","rentals"].map((s) => ({ path: `/for/${s}`, lastmod: today, changefreq: "monthly" as const, priority: "0.8" })),
   { path: "/tools/no-show-calculator", lastmod: today, changefreq: "monthly" as const, priority: "0.7" },
   { path: "/about",    lastmod: today, changefreq: "monthly", priority: "0.7" },
