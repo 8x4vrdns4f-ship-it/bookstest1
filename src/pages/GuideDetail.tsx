@@ -210,6 +210,114 @@ const GUIDES: Guide[] = [
       </>
     ),
   },
+  {
+    slug: "how-to-stop-no-shows-at-a-barber-shop",
+    title: "How to stop no-shows at a barber shop (and take deposits that work)",
+    description:
+      "Saturday no-shows cost barbers real money. How to cut them with a sensible deposit, timely reminders and a booking page that does the chasing for you.",
+    datePublished: "2026-10-28",
+    readTime: "5 min read",
+    body: (
+      <>
+        <p>
+          A barber's day runs on tight slots. A 45-minute skin fade that doesn't turn up
+          isn't just a gap — it's a chair that sat empty while someone else could have been
+          in it. On a Saturday, that's the most expensive gap you'll have all week. No-shows
+          are something a better booking process can reduce, and a few simple changes do
+          most of the work.
+        </p>
+
+        <h2>Why barbers feel no-shows more than most</h2>
+        <p>
+          Barbers sell short appointments back to back, so one missed slot is hard to make
+          up. Many shops still take bookings through Instagram messages, which means
+          there's no commitment from the client and no clear record of what was agreed. And
+          the busiest days are exactly when an empty chair costs you the most.
+        </p>
+
+        <h2>1. Get bookings out of your DMs</h2>
+        <p>
+          Replying to messages between cuts slows everything down, and a message thread
+          isn't a commitment. Give clients one booking link instead. Put it in your
+          Instagram bio and print a QR code poster for the shop window, so a client can
+          choose their barber, pick a time and book without waiting for you to reply.
+        </p>
+
+        <h2>2. Take a deposit</h2>
+        <p>
+          A deposit is the clearest way to turn "I'll probably come" into "I'm coming". Aim
+          for roughly 15% to 25% of the service price: small enough that a genuine client
+          won't think twice, big enough that a time-waster will. On a £25 skin fade, a £5
+          deposit sits right in that range.
+        </p>
+        <p>
+          Be clear about how it works. Tell clients that the deposit secures their slot and
+          comes off their final price, and say so on your booking page. For more on amounts
+          and wording, see our guide to{" "}
+          <Link to="/guides/how-to-take-deposits-for-appointments" className="text-primary underline">
+            taking deposits for appointments
+          </Link>
+          .
+        </p>
+        <p>
+          With BookSuite, clients pay a deposit (or the full price, if you prefer) online
+          when they book, through Stripe, and payouts go to your own Stripe account.
+        </p>
+
+        <h2>3. Remind clients before the cut</h2>
+        <p>
+          Many no-shows aren't people who decided not to come — they just forgot. A
+          confirmation straight after booking, a reminder the day before and a final one two
+          hours before the appointment catches a lot of those. BookSuite sends all three
+          automatically. There's more on timing in our guide to{" "}
+          <Link to="/guides/reduce-no-shows-appointment-reminders" className="text-primary underline">
+            appointment reminders that actually work
+          </Link>
+          .
+        </p>
+
+        <h2>4. Make it easy to move a booking, and keep a waitlist</h2>
+        <p>
+          Clients who can reschedule in a few taps will often move a booking rather than
+          skip it. BookSuite sends clients a secure link by email so they can cancel,
+          reschedule or rebook themselves, without messaging you in the middle of a fade.
+        </p>
+        <p>
+          If you're fully booked, a waitlist means clients who can't get a slot join the
+          queue instead of going to another shop, and you have people to offer a freed-up
+          slot to.
+        </p>
+
+        <h2>5. Know what no-shows cost you</h2>
+        <p>
+          Work out what your missed appointments cost over a month. Our{" "}
+          <Link to="/tools/no-show-calculator" className="text-primary underline">
+            no-show calculator
+          </Link>{" "}
+          does the sums for you.
+        </p>
+
+        <h2>Putting it together in BookSuite</h2>
+        <p>
+          BookSuite is built for exactly this: an online booking page with a link for your
+          bio and a QR code poster, deposits or full payment at booking, automatic
+          reminders, a waitlist, and a separate schedule for each barber. See{" "}
+          <Link to="/for/barbers" className="text-primary underline">
+            BookSuite for barbers
+          </Link>{" "}
+          for the full picture, or{" "}
+          <Link to="/pricing" className="text-primary underline">
+            see pricing
+          </Link>
+          .
+        </p>
+        <p>
+          Every plan starts with a 30-day free trial. A card is required, you can cancel
+          before it ends, and there are no setup fees.
+        </p>
+      </>
+    ),
+  },
 ];
 
 const GuideDetail = () => {
