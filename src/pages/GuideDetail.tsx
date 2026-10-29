@@ -385,7 +385,7 @@ const GuideDetail = () => {
 
         <div className="mt-16 p-8 rounded-2xl border border-primary/30 bg-primary/5 text-center">
           <h2 className="text-2xl font-bold mb-3">Try BookSuite free for 30 days</h2>
-          <p className="text-muted-foreground mb-6">All the features above, no card required to start.</p>
+          <p className="text-muted-foreground mb-6">All the features above. 30-day free trial; card required, cancel before it ends.</p>
           <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
             <Link to="/auth?mode=signup">Start free trial</Link>
           </Button>

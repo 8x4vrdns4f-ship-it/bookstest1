@@ -28,7 +28,7 @@ const Fallback = () => <div className="h-40" aria-hidden />;
 
 
 const FAQS: { q: string; a: string }[] = [
-  { q: "How much does BookSuite cost?", a: "We offer a free tier to get started and paid tiers as you grow. Check the pricing page for the full breakdown of features per tier." },
+  { q: "How much does BookSuite cost?", a: "Every plan starts with a 30-day free trial (card required, cancel before it ends). After that, plans start from £20 a month. Check the pricing page for the full breakdown of features per plan." },
   { q: "Are there transaction fees on bookings?", a: "BookSuite charges a platform fee on each booking payment: 12.5% on Silver, 5% on Gold and 2% on Platinum. Card processing fees are charged by Stripe and deducted from each payment." },
   { q: "Can I cancel any time?", a: "Yes. Subscriptions can be cancelled from your dashboard at any time and remain active until the end of your billing period." },
   { q: "Who is BookSuite for?", a: "Service businesses that take bookings — beauty, fitness, health, trades, tutors, consultants, mobile services, and more." },
