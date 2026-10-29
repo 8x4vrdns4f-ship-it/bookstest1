@@ -20,6 +20,12 @@ export const GUIDES = [
     excerpt: "Automated reminders reduce no-shows dramatically, but the timing and channel matter. Here's the sequence we recommend for service businesses running BookSuite.",
     readTime: "4 min read",
   },
+  {
+    slug: "how-to-stop-no-shows-at-a-barber-shop",
+    title: "How to stop no-shows at a barber shop (and take deposits that work)",
+    excerpt: "Saturday no-shows cost barbers real money. Five simple changes — a booking link, a sensible deposit, reminders, easy rescheduling and a waitlist — to reduce them.",
+    readTime: "5 min read",
+  },
 ];
 
 const GuidesSection = () => {
