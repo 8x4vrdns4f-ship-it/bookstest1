@@ -11,7 +11,7 @@ export const GUIDES = [
   {
     slug: "how-to-take-deposits-for-appointments",
     title: "How to take deposits for appointments (without losing customers)",
-    excerpt: "Deposits cut no-shows by up to 70%. Here's how to introduce them without scaring off first-time clients — the amount, the wording, and the refund policy that works.",
+    excerpt: "Deposits help cut no-shows. Here's how to introduce them without scaring off first-time clients — the amount, the wording, and the refund policy that works.",
     readTime: "5 min read",
   },
   {
@@ -37,7 +37,7 @@ const GuidesSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {GUIDES.map((g) => (
             <Link
               key={g.slug}
