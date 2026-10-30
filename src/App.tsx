@@ -14,6 +14,7 @@ import About from "./pages/About.tsx";
 import Contact from "./pages/Contact.tsx";
 import Cookies from "./pages/Cookies.tsx";
 import GuideDetail from "./pages/GuideDetail.tsx";
+import Guides from "./pages/Guides.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import { SubscriptionProvider } from "./hooks/useSubscription.tsx";
 
@@ -113,6 +114,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/cookies" element={<Cookies />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/guides" element={<Guides />} />
           <Route path="/guides/:slug" element={<GuideDetail />} />
           <Route path="/for/:slug" element={<NicheLanding />} />
           <Route path="/tools/no-show-calculator" element={<NoShowCalculator />} />
