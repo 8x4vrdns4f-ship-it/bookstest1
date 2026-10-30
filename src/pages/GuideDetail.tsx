@@ -199,8 +199,9 @@ const GUIDES: Guide[] = [
 
         <h2>Reminders in BookSuite</h2>
         <p>
-          BookSuite sends the confirmation, 24-hour, and 2-hour reminders automatically from a
-          verified, authenticated sending domain — so they reach inboxes rather than spam folders.
+          BookSuite automatically sends a confirmation email when you accept a booking and a
+          reminder email the day before, from a verified, authenticated sending domain — so
+          they reach inboxes rather than spam folders.
           Your business name shows as the sender, and replies can land straight in your own inbox.{" "}
           <Link to="/pricing" className="text-primary underline">
             See pricing
@@ -267,9 +268,9 @@ const GUIDES: Guide[] = [
         <h2>3. Remind clients before the cut</h2>
         <p>
           Many no-shows aren't people who decided not to come — they just forgot. A
-          confirmation straight after booking, a reminder the day before and a final one two
-          hours before the appointment catches a lot of those. BookSuite sends all three
-          automatically. There's more on timing in our guide to{" "}
+          confirmation as soon as you accept the booking and a reminder email the day before
+          catch a lot of those, and BookSuite sends both automatically. There's more on timing
+          in our guide to{" "}
           <Link to="/guides/reduce-no-shows-appointment-reminders" className="text-primary underline">
             appointment reminders that actually work
           </Link>
