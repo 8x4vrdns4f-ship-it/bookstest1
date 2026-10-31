@@ -108,6 +108,9 @@ const HeroSection = () => {
             </DialogContent>
           </Dialog>
         </div>
+
+
+      </div>
     </section>
   );
 };
