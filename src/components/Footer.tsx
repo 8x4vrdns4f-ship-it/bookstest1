@@ -19,6 +19,7 @@ const Footer = () => {
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-0 md:gap-5 text-sm text-muted-foreground">
           <Link to="/pricing" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Pricing</Link>
           <Link to="/tools/no-show-calculator" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">No-show calculator</Link>
+          <Link to="/guides" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Guides</Link>
           <Link to="/about" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">About</Link>
           <Link to="/contact" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Contact</Link>
           <Link to="/privacy" className="inline-flex items-center min-h-10 md:min-h-0 hover:text-primary transition-colors">Privacy</Link>
