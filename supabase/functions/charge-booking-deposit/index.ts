@@ -7,6 +7,7 @@ import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 import { addLedgerEntry, outstandingMinor } from "../_shared/ledger.ts";
 import { planApplicationFee, stripeFeeShortfallMinor } from "../_shared/ledger-rules.ts";
+import { confirmBookingFee, releaseBookingFee, reserveBookingFee } from "../_shared/tier-fees.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -108,6 +109,7 @@ Deno.serve(async (req) => {
     } catch (err: any) {
       // Off-session charge failed (declined, insufficient funds, SCA required).
       const msg = err?.raw?.message || err?.message || "Charge failed";
+      await releaseBookingFee(admin, feeRef);
       await admin
         .from("pending_bookings")
         .update({ status: "charge_failed", charge_error: msg })
@@ -119,6 +121,7 @@ Deno.serve(async (req) => {
     }
 
     if (intent.status !== "succeeded") {
+      await releaseBookingFee(admin, feeRef);
       await admin
         .from("pending_bookings")
         .update({ status: "charge_failed", charge_error: `PaymentIntent status ${intent.status}` })
@@ -128,6 +131,9 @@ Deno.serve(async (req) => {
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+
+    // Charge succeeded: the booking fee is final (kept and counted even if refunded later).
+    await confirmBookingFee(admin, feeRef);
 
     const chargeId = (intent as any).latest_charge as string | null;
 
@@ -163,7 +169,7 @@ Deno.serve(async (req) => {
         stripe_payment_intent_id: intent.id,
         stripe_charge_id: chargeId,
         deposit_amount: pending.deposit_amount,
-        platform_fee_amount: pending.platform_fee_amount,
+        platform_fee_amount: bookingFeeAmount,
         payment_environment: env,
         payment_status: "paid",
         client_token_expires_at: tokenExpires.toISOString(),
@@ -245,7 +251,7 @@ Deno.serve(async (req) => {
         { label: "Service", value: booking.service },
         { label: "Appointment", value: `${formatDate(booking.booking_date)} at ${formatTime(booking.booking_time)}` },
         { label: "Amount charged", value: money(chargeTotal, pending.currency) },
-        { label: "Platform fee", value: money(Number(pending.platform_fee_amount), pending.currency) },
+        { label: "Booking fee", value: money(bookingFeeAmount, pending.currency) },
         { label: "Environment", value: env },
       ],
       idempotencyKey: `booking-paid-${booking.id}`,
