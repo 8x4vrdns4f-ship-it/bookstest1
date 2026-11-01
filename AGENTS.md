@@ -28,6 +28,8 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 - Weekly schedules live in `employee_schedules` (one per employee) and are expanded into `employee_shifts` ~12 weeks ahead by `apply_employee_schedule`; `extend_business_schedules` tops up on Shifts page load. Why: the rest of the app (staff view, holiday counting) only reads concrete shifts.
 - Hand edits set `employee_shifts.is_override`, and days switched off are stored in `employee_shift_skips`. Why: re-applying a schedule must never undo one-off changes.
 - Plan allowances (incl. AI assistant monthly requests) live in tier_* SQL functions and are enforced in the database; `src/lib/tierLimits.ts` mirrors them for display. Why: limits must hold even if the UI is bypassed.
+- Booking fees are flat per booking with a monthly cap: every charge path calls `reserveBookingFee` (DB `reserve_booking_fee`, one row lock per business+UK month, unique per booking ref) before charging, then `confirmBookingFee` on success or `releaseBookingFee` on failure; pure rules in `_shared/booking-fee-rules.ts` (unit-tested). Why: two charges at once must never exceed the cap or charge one booking twice.
+- Subscription price lookup keys and their tier live only in `_shared/plan-prices.ts` (used by create-checkout and check-subscription). Why: monthly and annual prices must always map to the same plan.
 - Automatic staff assigning happens only in the `auto_assign_booking` BEFORE INSERT trigger on `bookings` (mode on `business_settings.auto_assign_mode`, links in `resources.default_employee_id` / `service_employees`), and only picks staff on shift and not on leave. Why: every booking path (widget, manual, assistant, approvals) gets the same rule in one place.
 
 ## AI assistant

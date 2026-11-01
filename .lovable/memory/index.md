@@ -14,7 +14,7 @@ Two dashboards: owners → /dashboard, employees → /employee-dashboard. Route 
 - [Design System](mem://style/design-system) — Dark theme, light blue accent, typography, and BookSuite logo branding
 - [Landing Page Layout](mem://features/landing-page) — Hero section, feature cards, emoji strip, and pricing table
 - [Global Navigation Rules](mem://features/navigation) — Logo routing and back button visibility
-- [Pricing Tiers](mem://features/pricing-tiers) — BookSuite subscription plans and transaction fees
+- [Pricing Tiers](mem://features/pricing-tiers) — £25/£59/£199 plans, annual 10-for-12, 30p booking fee capped £25/month, founding offer
 - [Supabase Auth & Profiles](mem://auth/user-profiles) — Supabase authentication and automated profile creation via DB trigger
 - [Dashboard Overview](mem://features/dashboard-overview) — Layout and core components of the central management interface
 - [External Calendar Widget](mem://features/external-calendar-widget) — Embeddable HTML/JS snippet for external booking synchronization
