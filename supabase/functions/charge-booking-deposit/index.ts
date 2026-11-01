@@ -63,18 +63,28 @@ Deno.serve(async (req) => {
     const chargeTotal = Number((pending as any).charge_amount ?? pending.deposit_amount);
     const payOption = String((pending as any).payment_option || "deposit");
     const depositMinor = Math.round(chargeTotal * 100);
-    const feeMinor = Math.round(Number(pending.platform_fee_amount) * 100);
-
     const { data: settings } = await admin
       .from("business_settings")
       .select("business_name, auto_confirm, business_email, notify_new_booking, company_code, cancellation_hours")
       .eq("user_id", pending.user_id)
       .maybeSingle();
 
+    // Flat booking fee (30p, or what's left of this month's cap), reserved
+    // atomically once per booking. Released again if the charge fails.
+    const feeRef = `pending-${pending.id}`;
+    let feeMinor: number;
+    try {
+      feeMinor = await reserveBookingFee(admin, { userId: pending.user_id, environment: env, bookingRef: feeRef, chargeMinor: depositMinor });
+    } catch (err) {
+      await admin.from("pending_bookings").update({ status: "awaiting_owner" }).eq("id", pending.id);
+      throw err;
+    }
+
     // BookSuite fee + standard Stripe fee + collection of any outstanding tab
     // (capped so the business keeps at least half of this charge).
     const owed = await outstandingMinor(admin, pending.user_id, env, currency);
     const plan = planApplicationFee({ chargeMinor: depositMinor, platformFeeMinor: feeMinor, outstandingMinor: owed });
+    const bookingFeeAmount = plan.platformFeeMinor / 100;
 
     let intent;
     try {
