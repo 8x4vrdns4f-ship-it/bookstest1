@@ -138,6 +138,9 @@ async function handleCheckoutCompleted(
     return;
   }
 
+  // Paid: the booking fee reserved at checkout is now final.
+  await confirmBookingFee(admin as any, `pending-${pending.id}`);
+
   // Resolve payment intent + charge
   const stripe = createStripeClient(env);
   let piId: string | null = null;

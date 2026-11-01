@@ -79,6 +79,9 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Paid: the booking fee reserved at checkout is now final.
+    await confirmBookingFee(admin, `pending-${pending.id}`);
+
     const pi: any = session.payment_intent;
     const piId = typeof pi === "string" ? pi : pi?.id || null;
     const chargeId = typeof pi === "object" ? pi?.latest_charge || null : null;
