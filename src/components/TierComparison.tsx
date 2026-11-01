@@ -14,11 +14,11 @@ interface Feature {
 
 const features: Feature[] = [
   { name: "Monthly Bookings", silver: "Up to 100", gold: "Up to 500", platinum: "Unlimited" },
-  { name: "Team Members", silver: "2", gold: "Up to 10", platinum: "Unlimited" },
-  { name: "Services", silver: "Up to 5", gold: "Unlimited", platinum: "Unlimited" },
+  { name: "Team Members", silver: "3", gold: "Up to 10", platinum: "Unlimited" },
+  { name: "Services", silver: "Unlimited", gold: "Unlimited", platinum: "Unlimited" },
   { name: "Bookable Resources", silver: false, gold: "Up to 10", platinum: "Unlimited" },
-  { name: "Transaction Fee", silver: "12.5%", gold: "5%", platinum: "2%" },
-  { name: "Automated Reminders", silver: "Email", gold: "Email & SMS", platinum: "Email & SMS" },
+  { name: "Booking Fee", silver: "30p, max £25/mo", gold: "30p, max £25/mo", platinum: "None" },
+  { name: "Automated Reminders", silver: "Email", gold: "Email", platinum: "Email" },
   { name: "Reviews & Ratings", silver: false, gold: true, platinum: true },
   { name: "Waitlist", silver: false, gold: true, platinum: true },
   { name: "Day & Rental Bookings", silver: false, gold: true, platinum: true },
@@ -33,9 +33,9 @@ const features: Feature[] = [
 ];
 
 
-// Monthly prices in GBP; annual = monthly * 12 * 0.8 (20% off).
+// Monthly prices in GBP; annual = 10 months' price for 12 months.
 const tiers = [
-  { key: "silver",   name: "Silver",   monthly: 20,  popular: false },
+  { key: "silver",   name: "Silver",   monthly: 25,  popular: false },
   { key: "gold",     name: "Gold",     monthly: 59,  popular: true  },
   { key: "platinum", name: "Platinum", monthly: 199, popular: false },
 ];
@@ -54,7 +54,7 @@ const TierComparison = () => {
   const priceFor = (monthly: number) =>
     billing === "monthly"
       ? { primary: `${fmt(monthly)}/mo`, sub: "billed monthly" }
-      : { primary: `${fmt(monthly * 0.8)}/mo`, sub: `${fmt(monthly * 12 * 0.8)} billed yearly` };
+      : { primary: `${fmt(monthly * 10)}/yr`, sub: "12 months for the price of 10" };
 
   return (
     <section className="px-6 md:px-16 py-16">
@@ -82,7 +82,7 @@ const TierComparison = () => {
             Annual
             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
               billing === "annual" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/10 text-primary"
-            }`}>Save 20%</span>
+            }`}>2 months free</span>
           </button>
         </div>
       </div>

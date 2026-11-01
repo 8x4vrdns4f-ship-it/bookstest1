@@ -10,7 +10,7 @@ type Partner = { quote: string; name: string; business: string; town: string };
 const PARTNERS: Partner[] = [];
 
 const PERKS = [
-  { icon: Handshake, title: "Half-price booking fees", text: "Founding partners pay half the booking fee for their first 30 days." },
+  { icon: Handshake, title: "Keep your launch price", text: "The first 100 businesses keep their launch price for as long as they stay subscribed." },
   { icon: Store, title: "Your shop featured here", text: "Your business name, town and photo shown to every visitor." },
   { icon: MessageSquareQuote, title: "A say in what we build", text: "Direct line to the team — your requests jump the queue." },
 ];

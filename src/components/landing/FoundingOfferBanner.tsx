@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Founding-member offer. Shows only while fewer than 100 businesses have
- * signed up — the count comes from the server, so it disappears on its own.
+ * started a subscription (founding_members) — the count comes from the
+ * server, so it disappears on its own.
  */
 const FoundingOfferBanner = () => {
   const [remaining, setRemaining] = useState<number | null>(null);
@@ -24,7 +25,7 @@ const FoundingOfferBanner = () => {
         <span className="flex items-center gap-2 text-foreground">
           <Sparkles className="h-4 w-4 text-primary" aria-hidden />
           <span>
-            <strong>Founding member offer:</strong> half-price booking fees for your first 30 days.{" "}
+            <strong>Founding member offer:</strong> The first 100 businesses keep their launch price for as long as they stay subscribed.{" "}
             <span className="font-semibold text-primary">Only {remaining} of 100 spots left.</span>
           </span>
         </span>
