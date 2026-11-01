@@ -3,6 +3,7 @@
 // Idempotent: safe to call multiple times AND safe to race with stripe-connect-webhook.
 // Also fires customer + owner confirmation emails (idempotent via Lovable Email idempotency_key).
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { confirmBookingFee } from "../_shared/tier-fees.ts";
 import { cancelPolicyLine } from "../_shared/refund-rules.ts";
 import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 

@@ -12,6 +12,7 @@
 // verify_jwt = false (Stripe does not send a Supabase JWT).
 
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { confirmBookingFee } from "../_shared/tier-fees.ts";
 import { cancelPolicyLine } from "../_shared/refund-rules.ts";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 import { notifyAdmin } from "../_shared/notify-admin.ts";

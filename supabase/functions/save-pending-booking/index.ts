@@ -1,7 +1,7 @@
 // PUBLIC endpoint — called by the widget after stripe.confirmSetup succeeds.
 // Persists a pending_bookings row with the saved PaymentMethod and notifies the owner.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { resolveFeePercent } from "../_shared/tier-fees.ts";
+import { expectedBookingFeeMinor } from "../_shared/tier-fees.ts";
 import { resolveEnv } from "../_shared/stripe.ts";
 import { checkRateLimits, getClientIp, rateLimited, RATE_RULES } from "../_shared/rate-limit.ts";
 
@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, deposit_amount, platform_fee_percent, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes, services_enabled, payment_mode, timezone, booking_mode, min_rental_days, max_rental_days")
+      .select("business_name, deposit_amount, currency, business_email, notify_new_booking, resources_enabled, assignment_mode, buffer_minutes, services_enabled, payment_mode, timezone, booking_mode, min_rental_days, max_rental_days")
       .eq("user_id", userId)
       .maybeSingle();
     if (!settings) return bad("Business not found");
@@ -193,7 +193,8 @@ Deno.serve(async (req) => {
     }
 
     const deposit = Number(settings.deposit_amount);
-    const feePct = await resolveFeePercent(admin, userId);
+    // Estimate only: the real booking fee (cap-aware) is reserved when the charge is taken.
+    const expectedFeeMinor = await expectedBookingFeeMinor(admin, userId);
 
     // --- Payment option resolution (never trust the browser for amounts) ---
     const paymentMode = String((settings as any).payment_mode || "deposit");
@@ -272,7 +273,7 @@ Deno.serve(async (req) => {
         duration_minutes: dur,
         notes: notes || null,
         deposit_amount: deposit,
-        platform_fee_amount: (chargeAmount * feePct) / 100,
+        platform_fee_amount: Math.min(expectedFeeMinor, Math.round(chargeAmount * 100)) / 100,
         payment_option: finalOption,
         service_price: totalPrice,
         charge_amount: chargeAmount,

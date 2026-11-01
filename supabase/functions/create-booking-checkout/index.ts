@@ -1,7 +1,7 @@
 // PUBLIC endpoint — called by the embed widget. No JWT required.
 import { planApplicationFee } from "../_shared/ledger-rules.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { resolveFeePercent } from "../_shared/tier-fees.ts";
+import { releaseBookingFee, reserveBookingFee } from "../_shared/tier-fees.ts";
 import { createStripeClient, resolveEnv, sanitizeOrigin } from "../_shared/stripe.ts";
 import { checkRateLimits, getClientIp, rateLimited, RATE_RULES } from "../_shared/rate-limit.ts";
 
@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
 
     const { data: settings, error: sErr } = await admin
       .from("business_settings")
-      .select("business_name, deposit_amount, platform_fee_percent, currency, require_deposit")
+      .select("business_name, deposit_amount, currency, require_deposit")
       .eq("user_id", userId)
       .maybeSingle();
     if (sErr || !settings) throw new Error("Business not found");
@@ -100,10 +100,8 @@ Deno.serve(async (req) => {
     }
 
     const deposit = Number(settings.deposit_amount);
-    const feePct = await resolveFeePercent(admin, userId);
     const currency = (settings.currency || "GBP").toLowerCase();
     const depositMinor = Math.round(deposit * 100);
-    const feeMinor = Math.round((deposit * feePct) / 100 * 100);
 
     // Reserve pending booking row
     const { data: pending, error: pErr } = await admin
@@ -119,7 +117,7 @@ Deno.serve(async (req) => {
         duration_minutes: dur,
         notes: notes || null,
         deposit_amount: deposit,
-        platform_fee_amount: (deposit * feePct) / 100,
+        platform_fee_amount: 0,
         currency: settings.currency || "GBP",
         payment_environment: env,
       })
@@ -127,11 +125,21 @@ Deno.serve(async (req) => {
       .single();
     if (pErr || !pending) throw new Error(pErr?.message || "Failed to reserve booking");
 
+    // Flat booking fee (30p, or what's left of this month's cap), reserved
+    // atomically once per booking. Confirmed when the checkout is paid;
+    // released by expire-pending-bookings if it never is (session lasts 1h).
+    const feeRef = `pending-${pending.id}`;
+    const feeMinor = await reserveBookingFee(admin, { userId, environment: env, bookingRef: feeRef, chargeMinor: depositMinor });
+    await admin.from("pending_bookings").update({ platform_fee_amount: feeMinor / 100 }).eq("id", pending.id);
+
     const stripe = createStripeClient(env);
     const baseOrigin = sanitizeOrigin(origin || req.headers.get("origin"), "https://booksuite.online");
 
-    const session = await stripe.checkout.sessions.create({
+    let session;
+    try {
+    session = await stripe.checkout.sessions.create({
       mode: "payment",
+      expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
       customer_email: client_email,
       line_items: [
         {
@@ -155,6 +163,10 @@ Deno.serve(async (req) => {
       success_url: `${baseOrigin}/book/${userId}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseOrigin}/book/${userId}/cancelled`,
     });
+    } catch (err) {
+      await releaseBookingFee(admin, feeRef);
+      throw err;
+    }
 
     await admin
       .from("pending_bookings")
