@@ -1,46 +1,48 @@
-// Platform transaction fee per subscription tier.
-// Must stay in sync with public.tier_fee_percent() in the database and with
-// the fee figures advertised on the pricing page (src/pages/Pricing.tsx).
-export const TIER_FEE_PERCENT: Record<string, number> = {
-  silver: 12.5,
-  gold: 5.0,
-  platinum: 2.0,
-};
+// Flat booking fee per paid booking, capped per calendar month (UK time).
+// The rules live in ./booking-fee-rules.ts (unit-tested) and in the database
+// (reserve_booking_fee & friends), which does the atomic counting.
+import { bookingFeeTerms } from "./booking-fee-rules.ts";
 
-export const DEFAULT_FEE_PERCENT = 12.5;
+type Admin = { from: (t: string) => any; rpc: (fn: string, args: any) => any };
 
-/**
- * Resolve the platform fee percentage for a business owner from their active
- * subscription tier. Falls back to the highest (Silver) rate when no active
- * tier is found, so the platform is never under-charged by accident.
- */
-export async function resolveFeePercent(
-  admin: { from: (t: string) => any; rpc?: (fn: string, args: any) => any },
-  userId: string,
-): Promise<number> {
-  const base = await resolveBaseFeePercent(admin, userId);
-  // Founding members (first 100 businesses) pay half fees for their first 30 days.
-  try {
-    const { data } = await admin.rpc!("is_founding_discount_active", { _user_id: userId });
-    if (data === true) return base / 2;
-  } catch (_) { /* fall back to full fee */ }
-  return base;
-}
-
-async function resolveBaseFeePercent(
-  admin: { from: (t: string) => any },
-  userId: string,
-): Promise<number> {
+/** Expected fee for display/estimates only (no cap reservation). */
+export async function expectedBookingFeeMinor(admin: Admin, userId: string): Promise<number> {
   const { data } = await admin
     .from("subscriptions")
-    .select("tier, current_period_end")
+    .select("tier, status")
     .eq("user_id", userId)
     .eq("subscribed", true)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  return bookingFeeTerms(data?.tier ?? null, data?.status ?? null).feeMinor;
+}
 
-  const tier = data?.tier ? String(data.tier).toLowerCase() : null;
-  if (!tier) return DEFAULT_FEE_PERCENT;
-  return TIER_FEE_PERCENT[tier] ?? DEFAULT_FEE_PERCENT;
+/**
+ * Atomically reserve this booking's fee against the business's monthly cap.
+ * Returns the fee in pence (30p, the cap remainder, or 0). Call once per
+ * booking before charging; confirm on success, release on failure.
+ */
+export async function reserveBookingFee(
+  admin: Admin,
+  opts: { userId: string; environment: string; bookingRef: string; chargeMinor: number },
+): Promise<number> {
+  const { data, error } = await admin.rpc("reserve_booking_fee", {
+    _user_id: opts.userId,
+    _environment: opts.environment,
+    _booking_ref: opts.bookingRef,
+    _charge_minor: opts.chargeMinor,
+  });
+  if (error) throw new Error(`Could not work out the booking fee: ${error.message}`);
+  return Math.max(0, Number(data) || 0);
+}
+
+export async function confirmBookingFee(admin: Admin, bookingRef: string): Promise<void> {
+  const { error } = await admin.rpc("confirm_booking_fee", { _booking_ref: bookingRef });
+  if (error) console.error("confirm_booking_fee failed", bookingRef, error);
+}
+
+export async function releaseBookingFee(admin: Admin, bookingRef: string): Promise<void> {
+  const { error } = await admin.rpc("release_booking_fee", { _booking_ref: bookingRef });
+  if (error) console.error("release_booking_fee failed", bookingRef, error);
 }
