@@ -17,7 +17,7 @@ const features: Feature[] = [
   { name: "Team Members", silver: "3", gold: "Up to 10", platinum: "Unlimited" },
   { name: "Services", silver: "Unlimited", gold: "Unlimited", platinum: "Unlimited" },
   { name: "Bookable Resources", silver: false, gold: "Up to 10", platinum: "Unlimited" },
-  { name: "Booking Fee", silver: "30p, max £25/mo", gold: "30p, max £25/mo", platinum: "None" },
+  { name: "Booking Fee", silver: "30p, max £25/mo + Stripe fees", gold: "30p, max £25/mo + Stripe fees", platinum: "None" },
   { name: "Automated Reminders", silver: "Email", gold: "Email", platinum: "Email" },
   { name: "Reviews & Ratings", silver: false, gold: true, platinum: true },
   { name: "Waitlist", silver: false, gold: true, platinum: true },
@@ -139,6 +139,11 @@ const TierComparison = () => {
           </tbody>
         </table>
       </div>
+
+      <p className="text-center text-xs text-muted-foreground mt-4 max-w-2xl mx-auto">
+        No commission on your clients. Just 30p a booking — never more than £25 a month, plus Stripe card fees.
+        The 30p applies only to bookings paid online through BookSuite. Platinum has no booking fees.
+      </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
         <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-8" asChild>
