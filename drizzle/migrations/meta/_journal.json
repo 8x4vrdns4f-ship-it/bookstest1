@@ -176,6 +176,13 @@
       "when": 1793549869736,
       "tag": "0024_booking_fee_flat_cap_and_founding",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793551567644,
+      "tag": "0025_admin_mrr_new_prices",
+      "breakpoints": true
     }
   ]
 }
