@@ -7,11 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const LOOKUP_KEYS: Record<string, string> = {
-  silver: "silver_monthly",
-  gold: "gold_monthly",
-  platinum: "platinum_monthly",
-};
+import { planLookupKey } from "../_shared/plan-prices.ts";
 
 const TRIAL_DAYS = 30;
 
@@ -19,8 +15,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { tier, mode = "paid", environment } = await req.json();
-    const lookupKey = LOOKUP_KEYS[tier];
+    const { tier, mode = "paid", environment, billing = "monthly" } = await req.json();
+    const lookupKey = planLookupKey(tier, billing);
     if (!lookupKey) throw new Error("Invalid tier");
     const wantsTrial = mode === "trial";
     const env = resolveEnv(environment);

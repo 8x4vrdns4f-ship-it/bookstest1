@@ -8,12 +8,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Map lookup keys to tier names. Falls back to subscription metadata.tier when lookup_key absent.
-const TIER_BY_LOOKUP: Record<string, string> = {
-  silver_monthly: "silver",
-  gold_monthly: "gold",
-  platinum_monthly: "platinum",
-};
+import { tierForPrice } from "../_shared/plan-prices.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -64,7 +59,11 @@ serve(async (req) => {
         const item = live.items.data[0];
         priceId = item.price.id;
         const lookupKey = (item.price as any).lookup_key as string | undefined;
-        tier = (lookupKey && TIER_BY_LOOKUP[lookupKey]) || (live.metadata?.tier as string) || null;
+        tier = tierForPrice({
+          lookupKey,
+          externalId: (item.price as any).metadata?.lovable_external_id,
+          subscriptionTier: live.metadata?.tier as string | undefined,
+        });
         periodEnd = new Date((live as any).current_period_end * 1000).toISOString();
         status = live.status;
         trialEnd = live.trial_end ? new Date(live.trial_end * 1000).toISOString() : null;
