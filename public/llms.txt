@@ -7,7 +7,7 @@ BookSuite gives service businesses a hosted booking page, an embeddable booking 
 ## Pages
 
 - [Home](/): Product overview, features, and call to action.
-- [Pricing](/pricing): Subscription tiers, transaction fees, and plan comparison.
+- [Pricing](/pricing): Subscription plans (from £25/month), the 30p booking fee capped at £25 a month (none on Platinum), and plan comparison.
 
 ## Optional
 

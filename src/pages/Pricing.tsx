@@ -41,7 +41,7 @@ const Pricing = () => {
         "Unlimited services",
         t("pricing.f.email_support"),
         t("pricing.f.basic_analytics"),
-        "30p booking fee per paid booking, max £25 a month",
+        "30p per booking paid online, max £25 a month plus Stripe card fees",
       ],
       badge: "bg-zinc-400/20 text-zinc-300",
     },
@@ -56,7 +56,7 @@ const Pricing = () => {
         t("pricing.f.advanced_analytics"),
         t("pricing.f.custom_branding"),
         t("pricing.f.priority_support"),
-        "30p booking fee per paid booking, max £25 a month",
+        "30p per booking paid online, max £25 a month plus Stripe card fees",
       ],
       badge: "bg-yellow-500/20 text-yellow-300", popular: true,
     },
@@ -132,6 +132,15 @@ const Pricing = () => {
           </p>
           <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto -mt-6">
             Card processing fees are charged by Stripe and deducted from each payment.
+          </p>
+          <p className="text-center text-base font-semibold text-foreground mb-2 max-w-xl mx-auto">
+            No commission on your clients. Just 30p a booking — never more than £25 a month.
+          </p>
+          <p className="text-center text-sm text-muted-foreground mb-2 max-w-xl mx-auto">
+            The 30p applies only to bookings paid online through BookSuite. Platinum has no booking fees.
+          </p>
+          <p className="text-center text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
+            No contract. Your clients stay yours. 30 days free (card required, cancel before it ends).
           </p>
           <div className="flex justify-center mb-10">
             <div className="inline-flex items-center gap-1 p-1 rounded-xl border border-border bg-card/60" role="group" aria-label="Billing period">

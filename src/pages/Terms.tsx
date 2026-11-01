@@ -53,8 +53,11 @@ const Terms = () => (
           <h2 className="text-xl font-semibold mb-2 text-foreground">Payments</h2>
           <p>
             Subscription fees are billed in advance and non-refundable except where
-            required by law. Transaction fees on bookings are collected via Stripe
-            Connect at the rate shown on the Pricing page for your plan.
+            required by law. On Silver and Gold (and during a free trial), BookSuite charges a
+            booking fee of 30p per booking paid online through BookSuite, capped at £25 per
+            calendar month, collected via Stripe Connect. Platinum has no booking fees. Bookings
+            not paid online through BookSuite have no booking fee. Stripe's card processing fees
+            are separate.
           </p>
         </div>
 
@@ -63,7 +66,7 @@ const Terms = () => (
           <ul className="list-disc pl-5 space-y-1.5">
             <li>You set your own cancellation policy (cancellation window and deposit) using BookSuite's tools, and it is shown to your clients before they pay.</li>
             <li>Stripe's card processing fees are passed through to you and deducted from each booking payment.</li>
-            <li>When a booking payment is refunded, the refunded amount is recovered from you. BookSuite's platform fee is not refunded.</li>
+            <li>When a booking payment is refunded, the refunded amount is recovered from you. BookSuite's booking fee is not refunded.</li>
             <li>Chargebacks, Stripe's dispute fees and any shortfall from refunds are owed by you. BookSuite may recover them from your future booking payouts or add them to your subscription invoice.</li>
             <li>Refunds of your BookSuite subscription are handled separately, at BookSuite's discretion.</li>
           </ul>

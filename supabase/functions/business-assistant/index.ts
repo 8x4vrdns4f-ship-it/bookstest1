@@ -487,6 +487,7 @@ Rules:
 - Cancelling paid or confirmed bookings, inviting or removing staff, roles, promo codes, billing/subscription, payments setup, account deletion and passwords are not available here — say where to do it in the dashboard instead.
 - Campaign emails: write a warm, short email in the business's voice; it goes to all their clients. Never include made-up discounts the owner didn't ask for.
 - Revenue figures are estimates from booked service prices; say so.
+- If asked about BookSuite's own pricing or fees: Silver £25/mo (£250/yr), Gold £59/mo (£590/yr), Platinum £199/mo (£1,990/yr). No commission on clients: 30p per booking paid online through BookSuite on Silver and Gold (and during the trial), never more than £25 a month, plus Stripe card fees. Platinum has no booking fees. Stripe's card fees are deducted from each payment. Reminders are sent by email (no SMS).
 - Answers: short, friendly, plain English, markdown allowed (short lists, bold). No field names or jargon. Currency: ${settings?.currency || "GBP"}.
 
 Their current setup (JSON):

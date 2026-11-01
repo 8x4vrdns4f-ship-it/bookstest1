@@ -62,9 +62,9 @@ const Payments = () => {
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <BookingFeesThisMonth userId={userId} tier={tier} isTrialing={isTrialing} />
             <p><span className="text-foreground font-medium">Payouts:</span> your earnings are paid to your bank weekly, every Monday (after Stripe's standard processing delay).</p>
-            <p><span className="text-foreground font-medium">BookSuite's booking fee:</span> {feeTerms.bookingFeeCapMinor === 0 ? "none on the Platinum plan." : "30p per booking paid online (deposit or full payment), charged once per booking and capped at £25 per calendar month. The cap resets on the 1st of each month. Bookings with no online payment have no fee."}</p>
+            <p><span className="text-foreground font-medium">BookSuite's booking fee:</span> {feeTerms.bookingFeeCapMinor === 0 ? "none on the Platinum plan." : "30p per booking paid online through BookSuite (deposit or full payment), charged once per booking and capped at £25 per calendar month — the most you'll pay is £25 a month, plus Stripe card fees. The cap resets on the 1st of each month. Bookings with no online payment have no fee, and Platinum has no booking fees."}</p>
             <p><span className="text-foreground font-medium">Stripe's card fee:</span> from 1.5% + 20p for UK cards (more for premium, EU and international cards) is deducted from each payment.</p>
-            <p><span className="text-foreground font-medium">Refunds:</span> when a booking is refunded, you return what you received for it. The card fees and BookSuite's platform fee aren't returned.</p>
+            <p><span className="text-foreground font-medium">Refunds:</span> when a booking is refunded, you return what you received for it. The card fees and BookSuite's booking fee aren't returned.</p>
             <p><span className="text-foreground font-medium">Chargebacks:</span> if a client disputes a payment with their bank, the disputed amount and Stripe's dispute fee (currently £20) are your responsibility.</p>
             <p><span className="text-foreground font-medium">Anything you owe</span> is taken from your future booking payments or added to your next subscription invoice. You'll see it in the "Owed to BookSuite" box above whenever there's a balance.</p>
           </CardContent>
