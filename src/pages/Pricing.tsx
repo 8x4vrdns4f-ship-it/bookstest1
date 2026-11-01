@@ -17,6 +17,7 @@ const Pricing = () => {
   const [signedIn, setSignedIn] = useState(false);
   const navigate = useNavigate();
   const { t, formatPrice, currency } = useLocale();
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSignedIn(!!session));
@@ -33,34 +34,34 @@ const Pricing = () => {
 
   const tiers = [
     {
-      name: "Silver", tier: "silver" as const, gbp: 20,
+      name: "Silver", tier: "silver" as const, gbp: 25, gbpYear: 250,
       features: [
         t("pricing.f.silver_bookings"),
         t("pricing.f.silver_staff"),
-        "Up to 5 services",
+        "Unlimited services",
         t("pricing.f.email_support"),
         t("pricing.f.basic_analytics"),
-        `12.5% ${t("pricing.fee")}`,
+        "30p booking fee per paid booking, max £25 a month",
       ],
       badge: "bg-zinc-400/20 text-zinc-300",
     },
     {
-      name: "Gold", tier: "gold" as const, gbp: 59,
+      name: "Gold", tier: "gold" as const, gbp: 59, gbpYear: 590,
       features: [
         t("pricing.f.gold_bookings"),
         t("pricing.f.gold_staff"),
         "Unlimited services + up to 10 bookable resources",
-        "Reviews, waitlist & SMS reminders",
+        "Reviews & waitlist",
         "Day & rental bookings",
         t("pricing.f.advanced_analytics"),
         t("pricing.f.custom_branding"),
         t("pricing.f.priority_support"),
-        `5% ${t("pricing.fee")}`,
+        "30p booking fee per paid booking, max £25 a month",
       ],
       badge: "bg-yellow-500/20 text-yellow-300", popular: true,
     },
     {
-      name: "Platinum", tier: "platinum" as const, gbp: 199,
+      name: "Platinum", tier: "platinum" as const, gbp: 199, gbpYear: 1990,
       features: [
         t("pricing.f.unlimited_bookings"),
         t("pricing.f.unlimited_staff"),
@@ -71,7 +72,7 @@ const Pricing = () => {
         t("pricing.f.api"),
         t("pricing.f.full_analytics"),
         t("pricing.f.dedicated_support"),
-        `2% ${t("pricing.fee")}`,
+        "No booking fees",
       ],
       badge: "bg-cyan-400/20 text-cyan-200",
     },
@@ -88,7 +89,7 @@ const Pricing = () => {
         navigate("/auth");
         return;
       }
-      const { data, error } = await supabase.functions.invoke("create-checkout", { body: { tier, mode } });
+      const { data, error } = await supabase.functions.invoke("create-checkout", { body: { tier, mode, billing } });
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
       else throw new Error("No checkout URL returned");
@@ -103,7 +104,7 @@ const Pricing = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="Pricing — BookSuite"
-        description="BookSuite pricing plans for service businesses. Silver, Gold, and Platinum tiers with transparent transaction fees and staff limits."
+        description="BookSuite pricing plans for service businesses. Silver, Gold, and Platinum tiers with a flat booking fee capped each month, and annual billing."
         path="/pricing"
       />
       <JsonLd data={{
@@ -132,6 +133,26 @@ const Pricing = () => {
           <p className="text-center text-xs text-muted-foreground mb-8 max-w-xl mx-auto -mt-6">
             Card processing fees are charged by Stripe and deducted from each payment.
           </p>
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl border border-border bg-card/60" role="group" aria-label="Billing period">
+              <button
+                type="button"
+                onClick={() => setBilling("monthly")}
+                aria-pressed={billing === "monthly"}
+                className={`text-sm font-medium px-4 min-h-10 rounded-lg transition-colors ${billing === "monthly" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                onClick={() => setBilling("yearly")}
+                aria-pressed={billing === "yearly"}
+                className={`text-sm font-medium px-4 min-h-10 rounded-lg transition-colors ${billing === "yearly" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Annual · 12 months for the price of 10
+              </button>
+            </div>
+          </div>
           {signedIn && (
             <div className="text-center mb-10">
               <Button
@@ -160,8 +181,8 @@ const Pricing = () => {
                     {tier.name}
                   </div>
                   <CardTitle className="text-4xl font-bold text-foreground">
-                    {formatPrice(tier.gbp)}
-                    <span className="text-sm font-normal text-muted-foreground">{t("pricing.per_month")}</span>
+                    {formatPrice(billing === "yearly" ? tier.gbpYear : tier.gbp)}
+                    <span className="text-sm font-normal text-muted-foreground">{billing === "yearly" ? "/yr" : t("pricing.per_month")}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">

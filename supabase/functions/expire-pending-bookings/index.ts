@@ -49,6 +49,13 @@ Deno.serve(async (req) => {
       .limit(500);
     if (error) throw error;
 
+    // Give back booking-fee reservations for checkouts that were never paid
+    // (checkout sessions expire after 1 hour; this waits 26 hours to be safe).
+    try {
+      const { error: relErr } = await admin.rpc("release_stale_booking_fees");
+      if (relErr) console.error("release_stale_booking_fees failed", relErr);
+    } catch (e) { console.error("release_stale_booking_fees threw", e); }
+
     // Also grab anything older than the max window — those are always expired.
     const { data: ancient } = await admin
       .from("pending_bookings")

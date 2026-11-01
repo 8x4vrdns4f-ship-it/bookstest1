@@ -14,3 +14,6 @@
 - [x] Fix www.booksuite.online DNS at Cloudflare — verified 2026-09-26: A + TXT correct, status active, redirects to booksuite.online over HTTPS
 - [x] Custom booking widget design (logo, colours, font, corners, live preview, save)
 - [x] Holiday allowance: owner sets default days + bank-holiday country in Settings, per-employee override in Add Employee & profile; employees see days left with progress bar; only scheduled shift days count (verified: Mon-Thu worker loses 4 days for a Mon-Fri week, bank holidays skipped)
+- [x] Pricing Part 1: new plans (£25/£59/£199, annual 10-for-12), 30p booking fee capped £25/month (UK time, atomic counter), founding-member flag, Silver 3 staff + unlimited services, SMS removed
+- [ ] Pricing Part 2 (owner to send)
+- [ ] After publish: archive the 3 old live prices with no lookup key (£199, £589, £1,149)

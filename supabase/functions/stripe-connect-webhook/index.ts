@@ -12,6 +12,7 @@
 // verify_jwt = false (Stripe does not send a Supabase JWT).
 
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { confirmBookingFee } from "../_shared/tier-fees.ts";
 import { cancelPolicyLine } from "../_shared/refund-rules.ts";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 import { notifyAdmin } from "../_shared/notify-admin.ts";
@@ -136,6 +137,9 @@ async function handleCheckoutCompleted(
     console.warn("no pending_booking for session", sessionId);
     return;
   }
+
+  // Paid: the booking fee reserved at checkout is now final.
+  await confirmBookingFee(admin as any, `pending-${pending.id}`);
 
   // Resolve payment intent + charge
   const stripe = createStripeClient(env);

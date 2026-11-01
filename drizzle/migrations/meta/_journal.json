@@ -169,6 +169,13 @@
       "when": 1792882414744,
       "tag": "0023_refund_policy_wording",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793549869736,
+      "tag": "0024_booking_fee_flat_cap_and_founding",
+      "breakpoints": true
     }
   ]
 }

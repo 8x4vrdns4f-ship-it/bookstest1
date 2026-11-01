@@ -51,7 +51,7 @@ const INDUSTRIES: Industry[] = [
     benefits: [
       "Room and practitioner as bookable resources with real availability",
       "Pre-appointment forms and consent capture on the booking page",
-      "SMS and email reminders to cut cancellations",
+      "Automatic email reminders to cut cancellations",
     ],
   },
   {

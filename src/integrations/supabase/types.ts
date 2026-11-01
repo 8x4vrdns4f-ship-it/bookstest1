@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_fee_charges: {
+        Row: {
+          booking_ref: string
+          created_at: string
+          environment: string
+          fee_minor: number
+          month: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_ref: string
+          created_at?: string
+          environment: string
+          fee_minor?: number
+          month: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_ref?: string
+          created_at?: string
+          environment?: string
+          fee_minor?: number
+          month?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      booking_fee_months: {
+        Row: {
+          cap_minor: number
+          environment: string
+          month: string
+          updated_at: string
+          used_minor: number
+          user_id: string
+        }
+        Insert: {
+          cap_minor?: number
+          environment: string
+          month: string
+          updated_at?: string
+          used_minor?: number
+          user_id: string
+        }
+        Update: {
+          cap_minor?: number
+          environment?: string
+          month?: string
+          updated_at?: string
+          used_minor?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           assigned_employee_id: string | null
@@ -1055,6 +1115,30 @@ export type Database = {
           },
         ]
       }
+      founding_members: {
+        Row: {
+          founding_member: boolean
+          founding_member_since: string
+          price_id_at_join: string | null
+          tier_at_join: string | null
+          user_id: string
+        }
+        Insert: {
+          founding_member?: boolean
+          founding_member_since?: string
+          price_id_at_join?: string | null
+          tier_at_join?: string | null
+          user_id: string
+        }
+        Update: {
+          founding_member?: boolean
+          founding_member_since?: string
+          price_id_at_join?: string | null
+          tier_at_join?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       gift_codes: {
         Row: {
           code: string
@@ -1889,6 +1973,8 @@ export type Database = {
         Args: { _employee_id: string; _from?: string; _replace?: boolean }
         Returns: number
       }
+      booking_fee_month: { Args: { _at: string }; Returns: string }
+      booking_fee_tier: { Args: { _user_id: string }; Returns: string }
       can_create_gift_code: { Args: never; Returns: boolean }
       check_in_by_code: {
         Args: { p_company_code: string; p_confirmation_code: string }
@@ -1925,6 +2011,10 @@ export type Database = {
           employee_id: string
           role_name: string
         }[]
+      }
+      confirm_booking_fee: {
+        Args: { _booking_ref: string }
+        Returns: undefined
       }
       consume_assistant_request: { Args: never; Returns: number }
       decide_join_request: {
@@ -2094,10 +2184,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_founding_discount_active: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
       join_waitlist: {
         Args: {
           p_client_email: string
@@ -2132,7 +2218,15 @@ export type Database = {
           out_tier: string
         }[]
       }
+      release_booking_fee: {
+        Args: { _booking_ref: string }
+        Returns: undefined
+      }
       release_promo_code_use: { Args: { p_id: string }; Returns: undefined }
+      release_stale_booking_fees: {
+        Args: { _older_than?: string }
+        Returns: number
+      }
       request_to_join_company: {
         Args: { p_company_code: string; p_name: string; p_phone: string }
         Returns: {
@@ -2140,13 +2234,24 @@ export type Database = {
           request_id: string
         }[]
       }
+      reserve_booking_fee: {
+        Args: {
+          _at?: string
+          _booking_ref: string
+          _charge_minor: number
+          _environment: string
+          _user_id: string
+        }
+        Returns: number
+      }
       tier_allows: {
         Args: { _feature: string; _tier: string }
         Returns: boolean
       }
       tier_assistant_limit: { Args: { _tier: string }; Returns: number }
+      tier_booking_fee_cap_minor: { Args: { _tier: string }; Returns: number }
+      tier_booking_fee_minor: { Args: { _tier: string }; Returns: number }
       tier_booking_limit: { Args: { _tier: string }; Returns: number }
-      tier_fee_percent: { Args: { _tier: string }; Returns: number }
       tier_promo_codes_limit: { Args: { _tier: string }; Returns: number }
       tier_resources_limit: { Args: { _tier: string }; Returns: number }
       tier_retention_months: { Args: { _tier: string }; Returns: number }

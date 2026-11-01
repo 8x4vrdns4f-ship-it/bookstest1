@@ -6,7 +6,13 @@ export interface TierConfig {
   staff: number | null;
   services: number | null;
   resources: number | null; // 0 = feature not available
-  feePercent: number;
+  /** Booking fee per paid booking, in pence (mirrors tier_booking_fee_minor()). */
+  bookingFeeMinor: number;
+  /** Monthly cap on booking fees, in pence; resets on the 1st, UK time (mirrors tier_booking_fee_cap_minor()). */
+  bookingFeeCapMinor: number;
+  /** Subscription price in GBP. Annual = 10 months' price for 12 months. */
+  monthlyPriceGbp: number;
+  yearlyPriceGbp: number;
   retentionMonths: number | null;
   supportLabel: string;
   // Feature flags
@@ -31,10 +37,13 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
   silver: {
     name: "Silver",
     bookingsPerMonth: 100,
-    staff: 2,
-    services: 5,
+    staff: 3,
+    services: null,
     resources: 0,
-    feePercent: 12.5,
+    bookingFeeMinor: 30,
+    bookingFeeCapMinor: 2500,
+    monthlyPriceGbp: 25,
+    yearlyPriceGbp: 250,
     retentionMonths: 6,
     supportLabel: "Email support",
     customBranding: false,
@@ -43,7 +52,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     prioritySupport: false,
     reviews: false,
     waitlist: false,
-    smsReminders: false,
+    smsReminders: false, // no SMS sending exists
     dayMode: false,
     csvExport: false,
     giftCodes: false,
@@ -59,7 +68,10 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     staff: 10,
     services: null,
     resources: 10,
-    feePercent: 5,
+    bookingFeeMinor: 30,
+    bookingFeeCapMinor: 2500,
+    monthlyPriceGbp: 59,
+    yearlyPriceGbp: 590,
     retentionMonths: 24,
     supportLabel: "Priority support (24h)",
     customBranding: true,
@@ -68,7 +80,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     prioritySupport: true,
     reviews: true,
     waitlist: true,
-    smsReminders: true,
+    smsReminders: false, // no SMS sending exists
     dayMode: true,
     csvExport: false,
     giftCodes: false,
@@ -84,7 +96,10 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     staff: null,
     services: null,
     resources: null,
-    feePercent: 2,
+    bookingFeeMinor: 0,
+    bookingFeeCapMinor: 0,
+    monthlyPriceGbp: 199,
+    yearlyPriceGbp: 1990,
     retentionMonths: null,
     supportLabel: "Priority support (1h)",
     customBranding: true,
@@ -93,7 +108,7 @@ export const TIER_LIMITS: Record<Tier, TierConfig> = {
     prioritySupport: true,
     reviews: true,
     waitlist: true,
-    smsReminders: true,
+    smsReminders: false, // no SMS sending exists
     dayMode: true,
     csvExport: true,
     giftCodes: true,
@@ -163,7 +178,6 @@ export const topLockedFeature = (tier: Tier | null): TierFeature | null => {
     "waitlist",
     "customBranding",
     "advancedAnalytics",
-    "smsReminders",
     "dayMode",
     "csvExport",
     "apiAccess",

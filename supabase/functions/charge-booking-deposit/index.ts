@@ -7,6 +7,7 @@ import { createStripeClient, resolveEnv } from "../_shared/stripe.ts";
 import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 import { addLedgerEntry, outstandingMinor } from "../_shared/ledger.ts";
 import { planApplicationFee, stripeFeeShortfallMinor } from "../_shared/ledger-rules.ts";
+import { confirmBookingFee, releaseBookingFee, reserveBookingFee } from "../_shared/tier-fees.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -63,18 +64,28 @@ Deno.serve(async (req) => {
     const chargeTotal = Number((pending as any).charge_amount ?? pending.deposit_amount);
     const payOption = String((pending as any).payment_option || "deposit");
     const depositMinor = Math.round(chargeTotal * 100);
-    const feeMinor = Math.round(Number(pending.platform_fee_amount) * 100);
-
     const { data: settings } = await admin
       .from("business_settings")
       .select("business_name, auto_confirm, business_email, notify_new_booking, company_code, cancellation_hours")
       .eq("user_id", pending.user_id)
       .maybeSingle();
 
+    // Flat booking fee (30p, or what's left of this month's cap), reserved
+    // atomically once per booking. Released again if the charge fails.
+    const feeRef = `pending-${pending.id}`;
+    let feeMinor: number;
+    try {
+      feeMinor = await reserveBookingFee(admin, { userId: pending.user_id, environment: env, bookingRef: feeRef, chargeMinor: depositMinor });
+    } catch (err) {
+      await admin.from("pending_bookings").update({ status: "awaiting_owner" }).eq("id", pending.id);
+      throw err;
+    }
+
     // BookSuite fee + standard Stripe fee + collection of any outstanding tab
     // (capped so the business keeps at least half of this charge).
     const owed = await outstandingMinor(admin, pending.user_id, env, currency);
     const plan = planApplicationFee({ chargeMinor: depositMinor, platformFeeMinor: feeMinor, outstandingMinor: owed });
+    const bookingFeeAmount = plan.platformFeeMinor / 100;
 
     let intent;
     try {
@@ -98,6 +109,7 @@ Deno.serve(async (req) => {
     } catch (err: any) {
       // Off-session charge failed (declined, insufficient funds, SCA required).
       const msg = err?.raw?.message || err?.message || "Charge failed";
+      await releaseBookingFee(admin, feeRef);
       await admin
         .from("pending_bookings")
         .update({ status: "charge_failed", charge_error: msg })
@@ -109,6 +121,7 @@ Deno.serve(async (req) => {
     }
 
     if (intent.status !== "succeeded") {
+      await releaseBookingFee(admin, feeRef);
       await admin
         .from("pending_bookings")
         .update({ status: "charge_failed", charge_error: `PaymentIntent status ${intent.status}` })
@@ -118,6 +131,9 @@ Deno.serve(async (req) => {
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+
+    // Charge succeeded: the booking fee is final (kept and counted even if refunded later).
+    await confirmBookingFee(admin, feeRef);
 
     const chargeId = (intent as any).latest_charge as string | null;
 
@@ -153,7 +169,7 @@ Deno.serve(async (req) => {
         stripe_payment_intent_id: intent.id,
         stripe_charge_id: chargeId,
         deposit_amount: pending.deposit_amount,
-        platform_fee_amount: pending.platform_fee_amount,
+        platform_fee_amount: bookingFeeAmount,
         payment_environment: env,
         payment_status: "paid",
         client_token_expires_at: tokenExpires.toISOString(),
@@ -235,7 +251,7 @@ Deno.serve(async (req) => {
         { label: "Service", value: booking.service },
         { label: "Appointment", value: `${formatDate(booking.booking_date)} at ${formatTime(booking.booking_time)}` },
         { label: "Amount charged", value: money(chargeTotal, pending.currency) },
-        { label: "Platform fee", value: money(Number(pending.platform_fee_amount), pending.currency) },
+        { label: "Booking fee", value: money(bookingFeeAmount, pending.currency) },
         { label: "Environment", value: env },
       ],
       idempotencyKey: `booking-paid-${booking.id}`,
