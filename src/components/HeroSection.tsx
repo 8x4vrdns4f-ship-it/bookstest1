@@ -40,7 +40,7 @@ const HeroSection = () => {
 
   return (
     <section className="px-8 md:px-16 pt-6 md:pt-32 pb-16 md:pb-24">
-      <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-16">
+      <div className="flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-16">
         <div className="contents md:block md:flex-1 md:space-y-5">
           <div className="order-1 md:order-none"><BrandLogo size="sm" /></div>
           <h1 className="order-1 md:order-none text-3xl md:text-5xl font-bold leading-tight tracking-tight max-w-xl">
