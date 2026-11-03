@@ -1,6 +1,7 @@
 // Sends review request emails to clients after their appointment has passed.
 // Triggered by pg_cron daily.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { REVIEW_REQUEST_STATUSES } from "./status-rules.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,11 +34,11 @@ Deno.serve(async (req) => {
 
     const now = new Date().toISOString();
 
-    // Find confirmed bookings where the appointment has ended, review not yet sent or submitted
+    // Find confirmed/completed bookings where the appointment has ended, review not yet sent or submitted
     const { data: bookings, error } = await admin
       .from("bookings")
       .select("*, user_id")
-      .eq("status", "confirmed")
+      .in("status", [...REVIEW_REQUEST_STATUSES])
       .lt("booking_date", now.split("T")[0])
       .is("review_sent_at", null)
       .is("review_submitted_at", null)
