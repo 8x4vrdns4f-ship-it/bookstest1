@@ -40,16 +40,16 @@ const HeroSection = () => {
 
   return (
     <section className="px-8 md:px-16 pt-6 md:pt-32 pb-16 md:pb-24">
-      <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-16">
-        <div className="flex-1 space-y-5">
-          <BrandLogo size="sm" />
-          <h1 className="text-3xl md:text-5xl font-bold leading-tight tracking-tight max-w-xl">
+      <div className="flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-16">
+        <div className="contents md:block md:flex-1 md:space-y-5">
+          <div className="order-1 md:order-none"><BrandLogo size="sm" /></div>
+          <h1 className="order-1 md:order-none text-3xl md:text-5xl font-bold leading-tight tracking-tight max-w-xl">
             {t("hero.headline")}
           </h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl">
+          <p className="order-1 md:order-none text-muted-foreground text-base md:text-lg max-w-xl">
             {t("hero.tagline")}
           </p>
-          <div className="flex gap-3 pt-1 flex-wrap items-center">
+          <div className="order-1 md:order-none flex gap-3 pt-1 flex-wrap items-center">
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-7 py-3 text-base rounded-lg" asChild>
               <Link to="/auth?mode=signup">{t("hero.try")}</Link>
             </Button>
@@ -57,8 +57,8 @@ const HeroSection = () => {
               <Link to="/pricing">{t("hero.pricing")}</Link>
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">{t("hero.support")}</p>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-foreground/80 pt-2 max-w-xl">
+          <p className="order-1 md:order-none text-xs text-muted-foreground">{t("hero.support")}</p>
+          <ul className="order-3 md:order-none grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-foreground/80 pt-2 max-w-xl">
             {[t("hero.trust.1"), t("hero.trust.2"), t("hero.trust.3"), t("hero.trust.4")].map((x) => (
               <li key={x} className="flex items-start gap-2">
                 <Check size={16} className="text-primary shrink-0 mt-0.5" />
@@ -66,14 +66,14 @@ const HeroSection = () => {
               </li>
             ))}
           </ul>
-          <div className="pt-1 text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+          <div className="order-3 md:order-none pt-1 text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
             <span>{t("hero.join")}</span>
             <JoinCompanyDialog />
           </div>
         </div>
 
 
-        <div className="flex-1 w-full">
+        <div className="order-2 md:order-none flex-1 w-full">
           <button
             type="button"
             onClick={() => setFilmOpen(true)}
