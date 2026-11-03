@@ -9,7 +9,7 @@ import { Check } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import loopVideo from "@/assets/booksuite-homepage-loop-web.mp4.asset.json";
 import loopPoster from "@/assets/booksuite-homepage-loop-poster.jpg.asset.json";
-import filmVideo from "@/assets/booksuite-homepage-film-v4-2.mp4.asset.json";
+import filmVideo from "@/assets/booksuite-homepage-film-journey.mp4.asset.json";
 import filmPoster from "@/assets/booksuite-homepage-film-v4-poster.jpg.asset.json";
 
 
