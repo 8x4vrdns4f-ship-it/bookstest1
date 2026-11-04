@@ -319,6 +319,88 @@ const GUIDES: Guide[] = [
       </>
     ),
   },
+  {
+    slug: "take-bookings-from-instagram",
+    title: "How to take bookings from Instagram (link in bio + QR code)",
+    description:
+      "Still taking bookings by DM? How UK salons, barbers, beauty and fitness businesses can use one booking link in their bio, stories and WhatsApp, plus a QR code on the counter.",
+    datePublished: "2026-11-04",
+    readTime: "5 min read",
+    body: (
+      <>
+        <p>
+          If most of your bookings arrive as Instagram DMs, you already know the routine:
+          "Have you got anything Saturday?", a back-and-forth about times, and a reply typed
+          between clients. It works, but it ties you to your phone and a message isn't a
+          commitment. The fix is simple: give people one link where they can book
+          themselves.
+        </p>
+
+        <h2>1. Get your booking link</h2>
+        <p>
+          Every BookSuite business gets its own booking page link. In your dashboard, open
+          the Share kit. From there you can:
+        </p>
+        <ul>
+          <li><strong>Copy link</strong> — to paste anywhere you like.</li>
+          <li><strong>Share to socials</strong> — to post it straight to your accounts.</li>
+          <li><strong>Download QR</strong> — a QR code that opens your booking page.</li>
+          <li>
+            <strong>Print counter poster</strong> — a ready-made poster that says "Book
+            with" your business name and "Scan to book your appointment online".
+          </li>
+        </ul>
+
+        <h2>2. Put the link where your clients already look</h2>
+        <ul>
+          <li><strong>Instagram or TikTok bio</strong> — the first place people check.</li>
+          <li><strong>Story link stickers</strong> — add it whenever you post a free slot or new work.</li>
+          <li><strong>WhatsApp status</strong> — handy for regulars who message you there.</li>
+          <li><strong>The QR poster</strong> — on the counter, by the mirror or wherever people wait.</li>
+        </ul>
+        <p>
+          A couple of habits help it stick. Pin a post that says "Book via the link in bio",
+          and when someone DMs asking for a slot, reply with the link instead of a list of
+          times. Clients waiting in the chair can scan the QR and book their next visit
+          before they leave.
+        </p>
+
+        <h2>3. What your clients see</h2>
+        <p>
+          Booking takes seconds, with no app to download and no account to create. Clients
+          pick a time, add their details and save a card. Their card is only charged if you
+          accept the request — if you take a deposit, that's charged when you accept. For
+          help choosing an amount and the wording, see our guide to{" "}
+          <Link to="/guides/how-to-take-deposits-for-appointments" className="text-primary underline">
+            taking deposits for appointments
+          </Link>
+          .
+        </p>
+        <p>
+          Once a booking is confirmed, the client gets a confirmation email with a check-in
+          code, and a reminder email the day before. There's more on cutting missed
+          appointments in{" "}
+          <Link to="/guides/reduce-no-shows-appointment-reminders" className="text-primary underline">
+            the no-show playbook
+          </Link>
+          .
+        </p>
+
+        <h2>4. Add it to your website too</h2>
+        <p>
+          If you have your own website, you can embed the same booking widget there with one
+          snippet, so clients get the same booking experience wherever they find you.
+        </p>
+
+        <h2>Putting it together</h2>
+        <p>
+          One link in your bio, stories and WhatsApp status, a QR poster where people wait,
+          and a quick reply with the link whenever a DM comes in. Your clients book
+          themselves, and you get back to the work in front of you.
+        </p>
+      </>
+    ),
+  },
 ];
 
 const GuideDetail = () => {
