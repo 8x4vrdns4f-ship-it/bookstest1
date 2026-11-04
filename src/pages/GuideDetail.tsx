@@ -343,7 +343,7 @@ const GUIDES: Guide[] = [
         </p>
         <ul>
           <li><strong>Copy link</strong> — to paste anywhere you like.</li>
-          <li><strong>Share to socials</strong> — to post it straight to your accounts.</li>
+          <li><strong>Share to socials</strong> — opens your phone's share options so you can send it to Instagram, WhatsApp and more (or copies the link).</li>
           <li><strong>Download QR</strong> — a QR code that opens your booking page.</li>
           <li>
             <strong>Print counter poster</strong> — a ready-made poster that says "Book
