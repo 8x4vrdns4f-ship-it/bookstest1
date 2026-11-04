@@ -26,6 +26,12 @@ export const GUIDES = [
     excerpt: "Saturday no-shows cost barbers real money. Five simple changes — a booking link, a sensible deposit, reminders, easy rescheduling and a waitlist — to reduce them.",
     readTime: "5 min read",
   },
+  {
+    slug: "take-bookings-from-instagram",
+    title: "How to take bookings from Instagram (link in bio + QR code)",
+    excerpt: "Still taking bookings by DM? Put one booking link in your bio, stories and WhatsApp status, and a QR code on the counter, so clients book themselves in seconds.",
+    readTime: "5 min read",
+  },
 ];
 
 const GuidesSection = () => {
