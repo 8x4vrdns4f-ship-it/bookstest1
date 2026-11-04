@@ -50,7 +50,7 @@ const GuidesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {GUIDES.map((g) => (
+          {GUIDES.slice(-4).map((g) => (
             <Link
               key={g.slug}
               to={`/guides/${g.slug}`}
