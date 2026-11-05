@@ -226,7 +226,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Can I set different lengths for small and large dogs?", a: "Yes. Create a separate service for each size, each with its own time and price." },
-      { q: "Can I take a deposit?", a: "Yes. Owners pay a deposit or the full price online when they book." },
+      { q: "Can I take a deposit?", a: "Yes. Owners save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Can owners tell me about their dog when booking?", a: "Yes. They can add notes to the booking so you know what to expect." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -236,7 +236,7 @@ export const NICHES: Niche[] = [
     name: "Massage Therapists",
     seoTitle: "Massage & Holistic Therapist Booking Software — BookSuite",
     seoDescription:
-      "Booking software for massage, reflexology and holistic therapists: online booking, payment upfront, reminders and treatment rooms. 30-day free trial.",
+      "Booking software for massage, reflexology and holistic therapists: online booking, card deposits, reminders and treatment rooms. 30-day free trial.",
     headline: "Calm, simple booking for massage and holistic therapists",
     subheadline:
       "Clients book and pay online, get a reminder before their treatment, and you never double-book a treatment room again.",
@@ -246,7 +246,7 @@ export const NICHES: Niche[] = [
       { title: "Sharing treatment rooms", body: "Several therapists and limited rooms make double-bookings easy." },
     ],
     features: [
-      { title: "Pay when booking", body: "Take a deposit or full payment so cancellations don't cost you." },
+      { title: "Deposits or full payment", body: "Take a deposit or full payment so cancellations don't cost you." },
       { title: "Treatment rooms", body: "Set up rooms as bookable resources so they're never double-booked." },
       { title: "Reminders", body: "Clients get a reminder email before every treatment." },
       { title: "Gift codes", body: "Sell gift codes — a popular present for massages and treatments." },
@@ -282,7 +282,7 @@ export const NICHES: Niche[] = [
     ],
     features: [
       { title: "Booking link for Instagram", body: "One link in your bio, plus a QR poster for your studio." },
-      { title: "Deposits", body: "A deposit at booking means clients take the slot seriously." },
+      { title: "Deposits", body: "A deposit on the client's saved card means clients take the slot seriously." },
       { title: "Rebook in seconds", body: "Clients book their next infill from their bookings page." },
       { title: "Reminders", body: "Automatic reminder emails before every appointment." },
       { title: "Your own look", body: "Add your logo, colours and font to your booking page on paid plans." },
@@ -296,7 +296,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Does it work if I rent a chair in someone else's studio?", a: "Yes. BookSuite works for solo artists with their own booking page." },
-      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online when they book." },
+      { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Can my booking page match my brand?", a: "Yes. On paid plans you can add your logo, colours and font." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -306,7 +306,7 @@ export const NICHES: Niche[] = [
     name: "Photographers",
     seoTitle: "Booking Software for Photographers & Photo Studios — BookSuite",
     seoDescription:
-      "Online booking for photographers and studios: book shoots 24/7, take deposits upfront, reserve studio space and send reminders. 30-day free trial.",
+      "Online booking for photographers and studios: book shoots 24/7, take card deposits, reserve studio space and send reminders. 30-day free trial.",
     headline: "Booking software for photographers and photo studios",
     subheadline:
       "Let clients pick a shoot and pay their deposit online, reserve your studio automatically, and stop losing evenings to booking emails.",
