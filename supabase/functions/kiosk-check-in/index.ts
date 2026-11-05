@@ -1,6 +1,6 @@
 // Public self check-in for the kiosk page. No sign-in; runs with server rights,
 // rate-limited (fail closed), and reveals nothing about why a check-in failed.
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import {
   RATE_RULES, checkRateLimitStrict, getClientIp, peekRateLimitStrict,
