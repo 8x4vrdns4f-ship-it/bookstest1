@@ -113,6 +113,19 @@ const NicheLanding = () => {
           </div>
         </section>
 
+        {niche.relatedGuide && (
+          <section className="mb-16">
+            <Link
+              to={`/guides/${niche.relatedGuide.slug}`}
+              className="block rounded-2xl border border-border bg-card p-6 hover:border-primary/40"
+            >
+              <p className="text-sm font-semibold text-primary mb-2 uppercase tracking-wide">Related guide</p>
+              <h2 className="font-semibold mb-2">{niche.relatedGuide.title}</h2>
+              <p className="text-sm text-muted-foreground">{niche.relatedGuide.excerpt}</p>
+            </Link>
+          </section>
+        )}
+
         <section className="p-8 rounded-2xl border border-primary/30 bg-primary/5 text-center mb-12">
           <h2 className="text-2xl font-bold mb-3">Ready to fill your diary?</h2>
           <p className="text-muted-foreground mb-6">Set up in minutes. 30 days free.</p>

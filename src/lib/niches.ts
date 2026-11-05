@@ -11,6 +11,7 @@ export type Niche = {
   features: { title: string; body: string }[];
   exampleServices: { name: string; duration: string }[];
   faqs: { q: string; a: string }[];
+  relatedGuide?: { slug: string; title: string; excerpt: string };
 };
 
 export const NICHES: Niche[] = [
@@ -48,6 +49,12 @@ export const NICHES: Niche[] = [
       { q: "Can I put the booking link on Instagram?", a: "Yes. Every shop gets its own booking page link, plus a QR code and printable poster." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "how-to-stop-no-shows-at-a-barber-shop",
+      title: "How to stop no-shows at a barber shop (and take deposits that work)",
+      excerpt:
+        "Saturday no-shows cost barbers real money. Five simple changes — a booking link, a sensible deposit, reminders, easy rescheduling and a waitlist — to reduce them.",
+    },
   },
   {
     slug: "hair-salons",
