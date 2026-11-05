@@ -63,11 +63,6 @@ const BookingConfirmedEmail = ({
             </Section>
           )}
           <Text style={codeBox}>{confirmationCode}</Text>
-          {checkInUrl && (
-            <Section style={{ textAlign: 'center', margin: '24px 0' }}>
-              <Button href={checkInUrl} style={btn}>Self check-in</Button>
-            </Section>
-          )}
           {policyText && (
             <Text style={text}><strong>Cancellation policy:</strong> {policyText}</Text>
           )}
