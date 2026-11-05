@@ -131,7 +131,7 @@ export const NICHES: Niche[] = [
     name: "Tattoo Studios",
     seoTitle: "Tattoo Studio Booking Software with Deposits — BookSuite",
     seoDescription:
-      "Booking software for tattoo and piercing studios: take deposits upfront, manage long sessions, artist schedules and waitlists. 30-day free trial.",
+      "Booking software for tattoo and piercing studios: take card deposits, manage long sessions, artist schedules and waitlists. 30-day free trial.",
     headline: "Tattoo studio booking with deposits built in",
     subheadline:
       "Secure every session with a deposit, block out long sittings properly, and keep each artist's diary organised.",
@@ -141,7 +141,7 @@ export const NICHES: Niche[] = [
       { title: "Busy artists, full diaries", body: "Popular artists get booked out and clients drift away." },
     ],
     features: [
-      { title: "Deposits taken online", body: "Clients pay their deposit when they book — no more chasing transfers." },
+      { title: "Deposits taken online", body: "Clients save their card when they book and the deposit is taken when you confirm — no more chasing transfers." },
       { title: "Long or full-day bookings", body: "Set services from short piercings to all-day sessions." },
       { title: "Artist schedules", body: "Each artist has their own working pattern and time off." },
       { title: "Waitlist", body: "Fully booked? Clients join the waitlist and you fill cancellations fast." },
@@ -155,7 +155,7 @@ export const NICHES: Niche[] = [
       { name: "Ear piercing", duration: "20 min" },
     ],
     faqs: [
-      { q: "Can I require a deposit for every tattoo?", a: "Yes. Deposits are paid online when the client books." },
+      { q: "Can I require a deposit for every tattoo?", a: "Yes. The client saves their card online when they book, and the deposit is charged when you confirm." },
       { q: "Can I approve bookings before they're confirmed?", a: "Yes. You can review booking requests, and BookSuite reminds you if one's waiting too long." },
       { q: "Can each artist have their own diary?", a: "Yes. Every artist has their own schedule, shifts and holidays." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
@@ -177,7 +177,7 @@ export const NICHES: Niche[] = [
     ],
     features: [
       { title: "Instagram booking link", body: "One link in your bio takes followers straight to booking." },
-      { title: "Deposits", body: "A small deposit at booking means clients actually show up." },
+      { title: "Deposits", body: "A small deposit on the client's saved card means clients actually show up." },
       { title: "One-tap rebooking", body: "Clients rebook their infill or refill from their bookings page." },
       { title: "Reminders", body: "Automatic reminder emails before each appointment." },
       { title: "Reviews", body: "Collect reviews from happy clients to win new ones." },
@@ -191,7 +191,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Can I use it if I work alone?", a: "Yes. BookSuite works just as well for one person as for a team." },
-      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online when they book." },
+      { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "How do clients find my booking page?", a: "Share your booking link in your Instagram bio, or print the QR code poster for your studio." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -211,7 +211,7 @@ export const NICHES: Niche[] = [
       { title: "Clients forgetting the next groom", body: "Coats get matted when owners leave it too long between visits." },
     ],
     features: [
-      { title: "Deposits for long grooms", body: "Take a deposit or full payment upfront for full grooms and hand-strips." },
+      { title: "Deposits for long grooms", body: "Take a deposit or full payment for full grooms and hand-strips — the card is saved at booking and charged when you confirm." },
       { title: "Booking notes", body: "Owners can share their dog's name, breed and anything you should know." },
       { title: "Automatic reminders", body: "Owners get a reminder email before the appointment." },
       { title: "Easy rebooking", body: "Owners can book the next groom in a few taps from their bookings page." },
