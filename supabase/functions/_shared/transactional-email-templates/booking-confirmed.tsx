@@ -63,11 +63,6 @@ const BookingConfirmedEmail = ({
             </Section>
           )}
           <Text style={codeBox}>{confirmationCode}</Text>
-          {checkInUrl && (
-            <Section style={{ textAlign: 'center', margin: '24px 0' }}>
-              <Button href={checkInUrl} style={btn}>Self check-in</Button>
-            </Section>
-          )}
           {policyText && (
             <Text style={text}><strong>Cancellation policy:</strong> {policyText}</Text>
           )}
@@ -115,10 +110,6 @@ const codeBox = {
   fontFamily: 'monospace', fontSize: '28px', letterSpacing: '6px',
   textAlign: 'center' as const, padding: '14px', backgroundColor: '#0F172A',
   color: '#ffffff', borderRadius: '8px', margin: '8px 0 16px',
-}
-const btn = {
-  backgroundColor: '#3B82F6', color: '#ffffff', padding: '12px 24px',
-  borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px',
 }
 const btnSecondary = {
   backgroundColor: '#F1F5F9', color: '#0F172A', padding: '12px 24px',

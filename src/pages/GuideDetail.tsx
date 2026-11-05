@@ -139,8 +139,9 @@ const GUIDES: Guide[] = [
 
         <h2>Automating it in BookSuite</h2>
         <p>
-          BookSuite takes deposits via Stripe at the moment of booking, and refunds them
-          automatically when a customer cancels inside your policy window.{" "}
+          BookSuite saves the customer's card via Stripe when they book, takes the deposit
+          when you confirm, and refunds it automatically when a customer cancels inside
+          your policy window.{" "}
           <Link to="/auth?mode=signup" className="text-primary underline">
             Start a free trial
           </Link>{" "}
@@ -261,8 +262,9 @@ const GUIDES: Guide[] = [
           .
         </p>
         <p>
-          With BookSuite, clients pay a deposit (or the full price, if you prefer) online
-          when they book, through Stripe, and payouts go to your own Stripe account.
+          With BookSuite, clients save their card online when they book, through Stripe,
+          and the deposit (or the full price, if you prefer) is taken when you confirm —
+          payouts go to your own Stripe account.
         </p>
 
         <h2>3. Remind clients before the cut</h2>
@@ -301,7 +303,7 @@ const GUIDES: Guide[] = [
         <h2>Putting it together in BookSuite</h2>
         <p>
           BookSuite is built for exactly this: an online booking page with a link for your
-          bio and a QR code poster, deposits or full payment at booking, automatic
+          bio and a QR code poster, deposits or full payment charged when you confirm, automatic
           reminders, a waitlist, and a separate schedule for each barber. See{" "}
           <Link to="/for/barbers" className="text-primary underline">
             BookSuite for barbers

@@ -30,7 +30,7 @@ export const NICHES: Niche[] = [
       { title: "Juggling several barbers", body: "Keeping track of who's in, who's off and who's free is a full-time job." },
     ],
     features: [
-      { title: "Deposits or pay in full", body: "Clients pay upfront when they book, so no-shows don't leave you out of pocket." },
+      { title: "Deposits or pay in full", body: "Clients save their card when they book, and the deposit or full price is taken when you confirm — so no-shows don't leave you out of pocket." },
       { title: "Automatic reminders", body: "Clients get a reminder email before their cut — fewer forgotten appointments." },
       { title: "Book with a chosen barber", body: "Each barber has their own schedule and weekly shift pattern." },
       { title: "Link in bio & QR code", body: "Share your booking page on Instagram or print a QR poster for the window." },
@@ -45,7 +45,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Can clients choose which barber they book with?", a: "Yes. Each barber on your team has their own working hours, and bookings are matched to who's actually on shift." },
-      { q: "Can I take a deposit for every booking?", a: "Yes. You can ask for a deposit or full payment at the time of booking, paid securely online." },
+      { q: "Can I take a deposit for every booking?", a: "Yes. Clients save their card securely online when they book, and the deposit or full payment is taken when you confirm the booking." },
       { q: "Can I put the booking link on Instagram?", a: "Yes. Every shop gets its own booking page link, plus a QR code and printable poster." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -71,7 +71,7 @@ export const NICHES: Niche[] = [
       { title: "Messy rotas and holidays", body: "Spreadsheets and group chats make staff planning painful." },
     ],
     features: [
-      { title: "Deposits for long services", body: "Take a deposit or full payment upfront for colour, extensions and treatments." },
+      { title: "Deposits for long services", body: "Take a deposit or full payment for colour, extensions and treatments — the client's card is saved at booking and charged when you confirm." },
       { title: "Stylist schedules", body: "Set each stylist's permanent weekly pattern and change single days as needed." },
       { title: "Holiday allowance tracking", body: "Staff can see how many holiday days they have left; you approve requests." },
       { title: "Automatic reminders", body: "Clients get reminded before their appointment, so fewer forget." },
@@ -96,7 +96,7 @@ export const NICHES: Niche[] = [
     name: "Personal Trainers",
     seoTitle: "Booking Software for Personal Trainers & Fitness Coaches — BookSuite",
     seoDescription:
-      "Online booking for personal trainers: clients book sessions 24/7, pay upfront, get reminders and rebook in one tap. Try BookSuite free for 30 days.",
+      "Online booking for personal trainers: clients book sessions 24/7, save their card, get reminders and rebook in one tap. Try BookSuite free for 30 days.",
     headline: "Booking software for personal trainers who'd rather be training",
     subheadline:
       "Stop chasing clients over text. Let them book, pay and rebook sessions themselves while you focus on coaching.",
@@ -106,7 +106,7 @@ export const NICHES: Niche[] = [
       { title: "Chasing payments", body: "Asking clients to pay after the session is awkward and slow." },
     ],
     features: [
-      { title: "Pay when booking", body: "Clients pay a deposit or the full session price online when they book." },
+      { title: "Deposits or full payment", body: "Clients save their card when they book, and the deposit or full session price is taken when you confirm." },
       { title: "Easy rebooking", body: "Clients can rebook their next session from their bookings page in seconds." },
       { title: "Reminders", body: "Automatic reminder emails before every session." },
       { title: "Bookable spaces", body: "Manage studios, rooms or equipment as bookable resources." },
@@ -120,7 +120,7 @@ export const NICHES: Niche[] = [
       { name: "Online check-in call", duration: "20 min" },
     ],
     faqs: [
-      { q: "Can clients pay before the session?", a: "Yes. You can ask for a deposit or full payment at the time of booking." },
+      { q: "Can clients pay before the session?", a: "Yes. Clients save their card at booking, and the deposit or full payment is charged when you confirm." },
       { q: "Can I offer a free consultation?", a: "Yes. Add it as its own service so new clients can book a first chat." },
       { q: "Does it work if I train in different places?", a: "You can set up studios or spaces as bookable resources so the right one is reserved." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
@@ -131,7 +131,7 @@ export const NICHES: Niche[] = [
     name: "Tattoo Studios",
     seoTitle: "Tattoo Studio Booking Software with Deposits — BookSuite",
     seoDescription:
-      "Booking software for tattoo and piercing studios: take deposits upfront, manage long sessions, artist schedules and waitlists. 30-day free trial.",
+      "Booking software for tattoo and piercing studios: take card deposits, manage long sessions, artist schedules and waitlists. 30-day free trial.",
     headline: "Tattoo studio booking with deposits built in",
     subheadline:
       "Secure every session with a deposit, block out long sittings properly, and keep each artist's diary organised.",
@@ -141,7 +141,7 @@ export const NICHES: Niche[] = [
       { title: "Busy artists, full diaries", body: "Popular artists get booked out and clients drift away." },
     ],
     features: [
-      { title: "Deposits taken online", body: "Clients pay their deposit when they book — no more chasing transfers." },
+      { title: "Deposits taken online", body: "Clients save their card when they book and the deposit is taken when you confirm — no more chasing transfers." },
       { title: "Long or full-day bookings", body: "Set services from short piercings to all-day sessions." },
       { title: "Artist schedules", body: "Each artist has their own working pattern and time off." },
       { title: "Waitlist", body: "Fully booked? Clients join the waitlist and you fill cancellations fast." },
@@ -155,7 +155,7 @@ export const NICHES: Niche[] = [
       { name: "Ear piercing", duration: "20 min" },
     ],
     faqs: [
-      { q: "Can I require a deposit for every tattoo?", a: "Yes. Deposits are paid online when the client books." },
+      { q: "Can I require a deposit for every tattoo?", a: "Yes. The client saves their card online when they book, and the deposit is charged when you confirm." },
       { q: "Can I approve bookings before they're confirmed?", a: "Yes. You can review booking requests, and BookSuite reminds you if one's waiting too long." },
       { q: "Can each artist have their own diary?", a: "Yes. Every artist has their own schedule, shifts and holidays." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
@@ -177,7 +177,7 @@ export const NICHES: Niche[] = [
     ],
     features: [
       { title: "Instagram booking link", body: "One link in your bio takes followers straight to booking." },
-      { title: "Deposits", body: "A small deposit at booking means clients actually show up." },
+      { title: "Deposits", body: "A small deposit on the client's saved card means clients actually show up." },
       { title: "One-tap rebooking", body: "Clients rebook their infill or refill from their bookings page." },
       { title: "Reminders", body: "Automatic reminder emails before each appointment." },
       { title: "Reviews", body: "Collect reviews from happy clients to win new ones." },
@@ -191,7 +191,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Can I use it if I work alone?", a: "Yes. BookSuite works just as well for one person as for a team." },
-      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online when they book." },
+      { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "How do clients find my booking page?", a: "Share your booking link in your Instagram bio, or print the QR code poster for your studio." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -211,7 +211,7 @@ export const NICHES: Niche[] = [
       { title: "Clients forgetting the next groom", body: "Coats get matted when owners leave it too long between visits." },
     ],
     features: [
-      { title: "Deposits for long grooms", body: "Take a deposit or full payment upfront for full grooms and hand-strips." },
+      { title: "Deposits for long grooms", body: "Take a deposit or full payment for full grooms and hand-strips — the card is saved at booking and charged when you confirm." },
       { title: "Booking notes", body: "Owners can share their dog's name, breed and anything you should know." },
       { title: "Automatic reminders", body: "Owners get a reminder email before the appointment." },
       { title: "Easy rebooking", body: "Owners can book the next groom in a few taps from their bookings page." },
@@ -226,7 +226,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Can I set different lengths for small and large dogs?", a: "Yes. Create a separate service for each size, each with its own time and price." },
-      { q: "Can I take a deposit?", a: "Yes. Owners pay a deposit or the full price online when they book." },
+      { q: "Can I take a deposit?", a: "Yes. Owners save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Can owners tell me about their dog when booking?", a: "Yes. They can add notes to the booking so you know what to expect." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -236,7 +236,7 @@ export const NICHES: Niche[] = [
     name: "Massage Therapists",
     seoTitle: "Massage & Holistic Therapist Booking Software — BookSuite",
     seoDescription:
-      "Booking software for massage, reflexology and holistic therapists: online booking, payment upfront, reminders and treatment rooms. 30-day free trial.",
+      "Booking software for massage, reflexology and holistic therapists: online booking, card deposits, reminders and treatment rooms. 30-day free trial.",
     headline: "Calm, simple booking for massage and holistic therapists",
     subheadline:
       "Clients book and pay online, get a reminder before their treatment, and you never double-book a treatment room again.",
@@ -246,7 +246,7 @@ export const NICHES: Niche[] = [
       { title: "Sharing treatment rooms", body: "Several therapists and limited rooms make double-bookings easy." },
     ],
     features: [
-      { title: "Pay when booking", body: "Take a deposit or full payment so cancellations don't cost you." },
+      { title: "Deposits or full payment", body: "Take a deposit or full payment so cancellations don't cost you." },
       { title: "Treatment rooms", body: "Set up rooms as bookable resources so they're never double-booked." },
       { title: "Reminders", body: "Clients get a reminder email before every treatment." },
       { title: "Gift codes", body: "Sell gift codes — a popular present for massages and treatments." },
@@ -282,7 +282,7 @@ export const NICHES: Niche[] = [
     ],
     features: [
       { title: "Booking link for Instagram", body: "One link in your bio, plus a QR poster for your studio." },
-      { title: "Deposits", body: "A deposit at booking means clients take the slot seriously." },
+      { title: "Deposits", body: "A deposit on the client's saved card means clients take the slot seriously." },
       { title: "Rebook in seconds", body: "Clients book their next infill from their bookings page." },
       { title: "Reminders", body: "Automatic reminder emails before every appointment." },
       { title: "Your own look", body: "Add your logo, colours and font to your booking page on paid plans." },
@@ -296,7 +296,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Does it work if I rent a chair in someone else's studio?", a: "Yes. BookSuite works for solo artists with their own booking page." },
-      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online when they book." },
+      { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Can my booking page match my brand?", a: "Yes. On paid plans you can add your logo, colours and font." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -306,7 +306,7 @@ export const NICHES: Niche[] = [
     name: "Photographers",
     seoTitle: "Booking Software for Photographers & Photo Studios — BookSuite",
     seoDescription:
-      "Online booking for photographers and studios: book shoots 24/7, take deposits upfront, reserve studio space and send reminders. 30-day free trial.",
+      "Online booking for photographers and studios: book shoots 24/7, take card deposits, reserve studio space and send reminders. 30-day free trial.",
     headline: "Booking software for photographers and photo studios",
     subheadline:
       "Let clients pick a shoot and pay their deposit online, reserve your studio automatically, and stop losing evenings to booking emails.",
@@ -316,7 +316,7 @@ export const NICHES: Niche[] = [
       { title: "Email ping-pong", body: "Agreeing a date for a shoot takes far too many messages." },
     ],
     features: [
-      { title: "Deposits taken online", body: "Clients pay a deposit or the full fee when they book a shoot." },
+      { title: "Deposits taken online", body: "Clients save their card when they book a shoot, and the deposit or full fee is taken when you confirm." },
       { title: "Studios & equipment", body: "Book studios, sets or kit as resources so nothing clashes." },
       { title: "Long sessions", body: "Set shoots from 30-minute headshots to full-day sessions." },
       { title: "Booking requests", body: "Review requests before you confirm a date." },
@@ -332,7 +332,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { q: "Can I approve shoots before they're confirmed?", a: "Yes. Turn on booking requests and confirm each one yourself." },
       { q: "Can I hire out my studio too?", a: "Yes. Add the studio as a bookable resource so it can't be double-booked." },
-      { q: "Can I take a deposit for a shoot?", a: "Yes. Deposits are paid online when the client books." },
+      { q: "Can I take a deposit for a shoot?", a: "Yes. The client saves their card online when they book, and the deposit is charged when you confirm." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
   },
@@ -341,7 +341,7 @@ export const NICHES: Niche[] = [
     name: "Car Detailing",
     seoTitle: "Car Detailing & Mobile Valeting Booking Software — BookSuite",
     seoDescription:
-      "Online booking for car detailers and mobile valeters: customers book 24/7, pay a deposit upfront, get reminders and reschedule easily. 30-day free trial.",
+      "Online booking for car detailers and mobile valeters: customers book 24/7, save their card for a deposit, get reminders and reschedule easily. 30-day free trial.",
     headline: "Booking software for car detailers and mobile valeters",
     subheadline:
       "Customers pick their valet, pay a deposit and get reminded — while you stay focused on the car in front of you.",
@@ -351,7 +351,7 @@ export const NICHES: Niche[] = [
       { title: "Weather reschedules", body: "Rain means moving bookings, and that means a lot of messages." },
     ],
     features: [
-      { title: "Deposits upfront", body: "Take a deposit or full payment for big jobs like ceramic coatings." },
+      { title: "Deposits or full payment", body: "Take a deposit or full payment for big jobs like ceramic coatings." },
       { title: "Self-service reschedules", body: "Customers move their booking themselves from a secure link." },
       { title: "Booking notes", body: "Customers can add their car model and address when they book." },
       { title: "Reminders", body: "Automatic reminder emails before every job." },
@@ -367,7 +367,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { q: "Does it work for mobile valeting?", a: "Yes. Customers can add their address and car details in the booking notes." },
       { q: "Can customers reschedule if the weather's bad?", a: "Yes. They can move their booking themselves from a secure link." },
-      { q: "Can I take a deposit for ceramic coatings?", a: "Yes. Deposits or full payment are taken online at booking." },
+      { q: "Can I take a deposit for ceramic coatings?", a: "Yes. The customer saves their card online at booking, and the deposit or full payment is taken when you confirm." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
   },
@@ -376,7 +376,7 @@ export const NICHES: Niche[] = [
     name: "Driving Instructors & Tutors",
     seoTitle: "Booking Software for Driving Instructors & Tutors — BookSuite",
     seoDescription:
-      "Online lesson booking for driving instructors and tutors: students book 24/7, pay upfront, get reminders and rebook their next lesson easily. 30-day free trial.",
+      "Online lesson booking for driving instructors and tutors: students book 24/7, save their card, get reminders and rebook their next lesson easily. 30-day free trial.",
     headline: "Lesson booking for driving instructors and tutors",
     subheadline:
       "Students book and pay for lessons online, get reminded beforehand, and book their next lesson without a single text.",
@@ -386,7 +386,7 @@ export const NICHES: Niche[] = [
       { title: "Chasing lesson payments", body: "Collecting money after lessons is slow and awkward." },
     ],
     features: [
-      { title: "Pay when booking", body: "Students pay for the lesson, or a deposit, when they book." },
+      { title: "Deposits or full payment", body: "Students save their card when they book, and the lesson price or deposit is taken when you confirm." },
       { title: "Easy rebooking", body: "Students book their next lesson from their bookings page." },
       { title: "Reminders", body: "Automatic reminder emails before every lesson." },
       { title: "Your weekly hours", body: "Set your regular teaching pattern and block off days as needed." },
@@ -400,7 +400,7 @@ export const NICHES: Niche[] = [
       { name: "Trial lesson", duration: "30 min" },
     ],
     faqs: [
-      { q: "Can students pay before the lesson?", a: "Yes. You can take full payment or a deposit when they book." },
+      { q: "Can students pay before the lesson?", a: "Yes. Students save their card when they book, and you take full payment or a deposit when you confirm." },
       { q: "Can parents book lessons for their children?", a: "Yes. Anyone can book and add the student's name in the notes." },
       { q: "Can I offer a cheaper first lesson?", a: "Yes. Add a trial lesson as its own service with its own price." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
@@ -437,7 +437,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { q: "Can I set very short appointments?", a: "Yes. Each service can have its own length, even a few minutes." },
       { q: "Can clients choose their piercer?", a: "Yes. Bookings are matched to piercers who are actually on shift." },
-      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online." },
+      { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
   },
@@ -446,19 +446,19 @@ export const NICHES: Niche[] = [
     name: "Car & Tool Rental",
     seoTitle: "Rental Booking Software for Car, Van & Tool Hire — BookSuite",
     seoDescription:
-      "Booking software for car hire, van hire and tool rental: customers book by the day, pay upfront, and every item is tracked so nothing is double-booked. 30-day free trial.",
+      "Booking software for car hire, van hire and tool rental: customers book by the day, save their card, and every item is tracked so nothing is double-booked. 30-day free trial.",
     headline: "Rental booking software for car, van and tool hire",
     subheadline:
       "Customers pick what they want, choose their days and pay online — and BookSuite makes sure the same car or tool is never booked twice.",
     pains: [
       { title: "Double-booked items", body: "Two customers turning up for the same van is a nightmare." },
       { title: "Tracking who has what", body: "Paper diaries and spreadsheets lose track of what's out and when it's back." },
-      { title: "Unpaid hires", body: "Customers who don't pay upfront are more likely to cancel or not turn up." },
+      { title: "Unpaid hires", body: "Customers with no card on file are more likely to cancel or not turn up." },
     ],
     features: [
       { title: "Book by the day", body: "Customers choose start and end days for multi-day hires." },
       { title: "Every item tracked", body: "Add each car, van or tool as a resource so it can't be double-booked." },
-      { title: "Pay upfront", body: "Take a deposit or the full hire cost when they book." },
+      { title: "Deposits or full payment", body: "Customers save their card when they book, and the deposit or full hire cost is taken when you confirm." },
       { title: "Reminders", body: "Customers are reminded before their pick-up." },
       { title: "Self-service changes", body: "Customers cancel or change dates from a secure link." },
       { title: "Your own look", body: "Brand your booking page with your logo and colours on paid plans." },
