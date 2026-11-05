@@ -111,10 +111,6 @@ const codeBox = {
   textAlign: 'center' as const, padding: '14px', backgroundColor: '#0F172A',
   color: '#ffffff', borderRadius: '8px', margin: '8px 0 16px',
 }
-const btn = {
-  backgroundColor: '#3B82F6', color: '#ffffff', padding: '12px 24px',
-  borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px',
-}
 const btnSecondary = {
   backgroundColor: '#F1F5F9', color: '#0F172A', padding: '12px 24px',
   borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold', fontSize: '14px',
