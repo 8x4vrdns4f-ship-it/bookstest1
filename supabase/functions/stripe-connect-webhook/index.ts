@@ -160,7 +160,7 @@ async function handleCheckoutCompleted(
   // Owner settings (auto_confirm, notify_new_booking, business email, name)
   const { data: settings } = await admin
     .from("business_settings")
-    .select("auto_confirm, notify_new_booking, business_email, business_name, cancellation_hours")
+    .select("auto_confirm, notify_new_booking, business_email, business_name, cancellation_hours, company_code, self_checkin_enabled")
     .eq("user_id", pending.user_id)
     .maybeSingle();
 
@@ -219,8 +219,8 @@ async function handleCheckoutCompleted(
     ? `${pending.currency || "GBP"} ${Number(booking.deposit_amount).toFixed(2)}`
     : undefined;
   const businessName = settings?.business_name || "your business";
-  const checkInUrl = booking.confirmation_code
-    ? `https://booksuite.online/checkin?code=${booking.confirmation_code}`
+  const checkInUrl = settings?.company_code && booking.confirmation_code
+    ? `https://booksuite.online/kiosk/${settings.company_code}?code=${booking.confirmation_code}`
     : undefined;
 
   // 1) Customer confirmation
@@ -233,6 +233,7 @@ async function handleCheckoutCompleted(
       time: formatTime(booking.booking_time),
       confirmationCode: booking.confirmation_code,
       checkInUrl,
+      selfCheckIn: !!settings?.self_checkin_enabled,
       depositAmount,
       manageUrl: booking.client_access_token ? `https://booksuite.online/booking/manage/${booking.client_access_token}` : undefined,
       policyText: cancelPolicyLine(settings?.cancellation_hours, booking.deposit_amount, String(pending.currency || "GBP").toUpperCase(), booking.payment_option === "full"),

@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     const depositMinor = Math.round(chargeTotal * 100);
     const { data: settings } = await admin
       .from("business_settings")
-      .select("business_name, auto_confirm, business_email, notify_new_booking, company_code, cancellation_hours")
+      .select("business_name, auto_confirm, business_email, notify_new_booking, company_code, cancellation_hours, self_checkin_enabled")
       .eq("user_id", pending.user_id)
       .maybeSingle();
 
@@ -234,6 +234,7 @@ Deno.serve(async (req) => {
               businessName, clientName: booking.client_name, service: booking.service,
               date: formatDate(booking.booking_date), time: formatTime(booking.booking_time),
               confirmationCode: booking.confirmation_code, checkInUrl, depositAmount: depositLabel,
+              selfCheckIn: !!(settings as any)?.self_checkin_enabled,
               manageUrl,
               policyText: cancelPolicyLine((settings as any)?.cancellation_hours, booking.deposit_amount ?? (pending as any).deposit_amount, ccyLabel, payOption === "full"),
             },
