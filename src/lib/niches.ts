@@ -386,7 +386,7 @@ export const NICHES: Niche[] = [
       { title: "Chasing lesson payments", body: "Collecting money after lessons is slow and awkward." },
     ],
     features: [
-      { title: "Pay when booking", body: "Students pay for the lesson, or a deposit, when they book." },
+      { title: "Deposits or full payment", body: "Students save their card when they book, and the lesson price or deposit is taken when you confirm." },
       { title: "Easy rebooking", body: "Students book their next lesson from their bookings page." },
       { title: "Reminders", body: "Automatic reminder emails before every lesson." },
       { title: "Your weekly hours", body: "Set your regular teaching pattern and block off days as needed." },
@@ -400,7 +400,7 @@ export const NICHES: Niche[] = [
       { name: "Trial lesson", duration: "30 min" },
     ],
     faqs: [
-      { q: "Can students pay before the lesson?", a: "Yes. You can take full payment or a deposit when they book." },
+      { q: "Can students pay before the lesson?", a: "Yes. Students save their card when they book, and you take full payment or a deposit when you confirm." },
       { q: "Can parents book lessons for their children?", a: "Yes. Anyone can book and add the student's name in the notes." },
       { q: "Can I offer a cheaper first lesson?", a: "Yes. Add a trial lesson as its own service with its own price." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
@@ -437,7 +437,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { q: "Can I set very short appointments?", a: "Yes. Each service can have its own length, even a few minutes." },
       { q: "Can clients choose their piercer?", a: "Yes. Bookings are matched to piercers who are actually on shift." },
-      { q: "Can I take a deposit?", a: "Yes. Clients pay a deposit or the full price online." },
+      { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
   },
@@ -446,19 +446,19 @@ export const NICHES: Niche[] = [
     name: "Car & Tool Rental",
     seoTitle: "Rental Booking Software for Car, Van & Tool Hire — BookSuite",
     seoDescription:
-      "Booking software for car hire, van hire and tool rental: customers book by the day, pay upfront, and every item is tracked so nothing is double-booked. 30-day free trial.",
+      "Booking software for car hire, van hire and tool rental: customers book by the day, save their card, and every item is tracked so nothing is double-booked. 30-day free trial.",
     headline: "Rental booking software for car, van and tool hire",
     subheadline:
       "Customers pick what they want, choose their days and pay online — and BookSuite makes sure the same car or tool is never booked twice.",
     pains: [
       { title: "Double-booked items", body: "Two customers turning up for the same van is a nightmare." },
       { title: "Tracking who has what", body: "Paper diaries and spreadsheets lose track of what's out and when it's back." },
-      { title: "Unpaid hires", body: "Customers who don't pay upfront are more likely to cancel or not turn up." },
+      { title: "Unpaid hires", body: "Customers with no card on file are more likely to cancel or not turn up." },
     ],
     features: [
       { title: "Book by the day", body: "Customers choose start and end days for multi-day hires." },
       { title: "Every item tracked", body: "Add each car, van or tool as a resource so it can't be double-booked." },
-      { title: "Pay upfront", body: "Take a deposit or the full hire cost when they book." },
+      { title: "Deposits or full payment", body: "Customers save their card when they book, and the deposit or full hire cost is taken when you confirm." },
       { title: "Reminders", body: "Customers are reminded before their pick-up." },
       { title: "Self-service changes", body: "Customers cancel or change dates from a secure link." },
       { title: "Your own look", body: "Brand your booking page with your logo and colours on paid plans." },
