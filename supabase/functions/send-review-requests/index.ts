@@ -1,7 +1,7 @@
 // Sends review request emails to clients after their appointment has passed.
 // Triggered by pg_cron daily.
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { REVIEW_REQUEST_STATUSES, reviewDateWindow } from "./status-rules.ts";
+import { planAllowsReviews, REVIEW_REQUEST_STATUSES, reviewDateWindow } from "./status-rules.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -58,9 +58,19 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Review requests are a Gold/Platinum feature: look up each owner's active plan
+    // (trials included) and keep only owners whose plan allows reviews.
+    const tierMap = new Map<string, string | null>();
+    await Promise.all(ownerIds.map(async (ownerId) => {
+      const { data: tier, error: tierErr } = await admin.rpc("get_active_tier", { _user_id: ownerId });
+      if (tierErr) console.error("get_active_tier error", ownerId, tierErr);
+      tierMap.set(ownerId, tierErr ? null : (tier as string | null));
+    }));
+
     let sent = 0;
     for (const booking of bookings || []) {
       if (!booking.client_email || !booking.review_token) continue;
+      if (!planAllowsReviews(tierMap.get(booking.user_id))) continue;
 
       const settings = settingsMap.get(booking.user_id);
       if (settings?.notify_client_review_request === false) continue;
