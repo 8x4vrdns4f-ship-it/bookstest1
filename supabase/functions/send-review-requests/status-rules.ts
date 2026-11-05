@@ -27,3 +27,9 @@ export function isInReviewWindow(bookingDate: string, now: Date): boolean {
   const { from, before } = reviewDateWindow(now);
   return bookingDate >= from && bookingDate < before;
 }
+
+// Mirrors the database rule tier_allows(tier, 'reviews'): Gold and Platinum only.
+// tier comes from get_active_tier, so an active Gold/Platinum trial counts too.
+export function planAllowsReviews(tier: string | null | undefined): boolean {
+  return tier === "gold" || tier === "platinum";
+}

@@ -179,7 +179,7 @@ export default function ReviewsPage() {
         <LockedFeature
           requiredTier="gold"
           title="Reviews are a Gold feature"
-          description="Upgrade to Gold to collect star ratings, publish feedback on your booking page and reply to clients."
+          description="Upgrade to Gold to collect star ratings after each appointment, see them by staff member and reply to clients."
         >
           <div className="h-72 rounded-2xl border border-border bg-card" />
         </LockedFeature>

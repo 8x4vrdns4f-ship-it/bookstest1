@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
-import { isInReviewWindow, isReviewRequestStatus, REVIEW_REQUEST_STATUSES } from "./status-rules.ts";
+import { isInReviewWindow, isReviewRequestStatus, planAllowsReviews, REVIEW_REQUEST_STATUSES } from "./status-rules.ts";
 
 Deno.test("confirmed and completed bookings get a review request", () => {
   assertEquals(isReviewRequestStatus("confirmed"), true);
@@ -26,4 +26,13 @@ Deno.test("UK date is used, not UTC, around midnight in summer time", () => {
   const now = new Date("2026-07-14T23:30:00Z"); // already 15 July in London
   assertEquals(isInReviewWindow("2026-07-14", now), true);
   assertEquals(isInReviewWindow("2026-07-07", now), false);
+});
+
+Deno.test("only Gold and Platinum plans get review requests", () => {
+  assertEquals(planAllowsReviews("gold"), true);
+  assertEquals(planAllowsReviews("platinum"), true);
+  assertEquals(planAllowsReviews("silver"), false);
+  assertEquals(planAllowsReviews(null), false);
+  assertEquals(planAllowsReviews(undefined), false);
+  assertEquals(planAllowsReviews(""), false);
 });
