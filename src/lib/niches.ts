@@ -30,7 +30,7 @@ export const NICHES: Niche[] = [
       { title: "Juggling several barbers", body: "Keeping track of who's in, who's off and who's free is a full-time job." },
     ],
     features: [
-      { title: "Deposits or pay in full", body: "Clients pay upfront when they book, so no-shows don't leave you out of pocket." },
+      { title: "Deposits or pay in full", body: "Clients save their card when they book, and the deposit or full price is taken when you confirm — so no-shows don't leave you out of pocket." },
       { title: "Automatic reminders", body: "Clients get a reminder email before their cut — fewer forgotten appointments." },
       { title: "Book with a chosen barber", body: "Each barber has their own schedule and weekly shift pattern." },
       { title: "Link in bio & QR code", body: "Share your booking page on Instagram or print a QR poster for the window." },
@@ -45,7 +45,7 @@ export const NICHES: Niche[] = [
     ],
     faqs: [
       { q: "Can clients choose which barber they book with?", a: "Yes. Each barber on your team has their own working hours, and bookings are matched to who's actually on shift." },
-      { q: "Can I take a deposit for every booking?", a: "Yes. You can ask for a deposit or full payment at the time of booking, paid securely online." },
+      { q: "Can I take a deposit for every booking?", a: "Yes. Clients save their card securely online when they book, and the deposit or full payment is taken when you confirm the booking." },
       { q: "Can I put the booking link on Instagram?", a: "Yes. Every shop gets its own booking page link, plus a QR code and printable poster." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
@@ -71,7 +71,7 @@ export const NICHES: Niche[] = [
       { title: "Messy rotas and holidays", body: "Spreadsheets and group chats make staff planning painful." },
     ],
     features: [
-      { title: "Deposits for long services", body: "Take a deposit or full payment upfront for colour, extensions and treatments." },
+      { title: "Deposits for long services", body: "Take a deposit or full payment for colour, extensions and treatments — the client's card is saved at booking and charged when you confirm." },
       { title: "Stylist schedules", body: "Set each stylist's permanent weekly pattern and change single days as needed." },
       { title: "Holiday allowance tracking", body: "Staff can see how many holiday days they have left; you approve requests." },
       { title: "Automatic reminders", body: "Clients get reminded before their appointment, so fewer forget." },
@@ -96,7 +96,7 @@ export const NICHES: Niche[] = [
     name: "Personal Trainers",
     seoTitle: "Booking Software for Personal Trainers & Fitness Coaches — BookSuite",
     seoDescription:
-      "Online booking for personal trainers: clients book sessions 24/7, pay upfront, get reminders and rebook in one tap. Try BookSuite free for 30 days.",
+      "Online booking for personal trainers: clients book sessions 24/7, save their card, get reminders and rebook in one tap. Try BookSuite free for 30 days.",
     headline: "Booking software for personal trainers who'd rather be training",
     subheadline:
       "Stop chasing clients over text. Let them book, pay and rebook sessions themselves while you focus on coaching.",
@@ -106,7 +106,7 @@ export const NICHES: Niche[] = [
       { title: "Chasing payments", body: "Asking clients to pay after the session is awkward and slow." },
     ],
     features: [
-      { title: "Pay when booking", body: "Clients pay a deposit or the full session price online when they book." },
+      { title: "Deposits or full payment", body: "Clients save their card when they book, and the deposit or full session price is taken when you confirm." },
       { title: "Easy rebooking", body: "Clients can rebook their next session from their bookings page in seconds." },
       { title: "Reminders", body: "Automatic reminder emails before every session." },
       { title: "Bookable spaces", body: "Manage studios, rooms or equipment as bookable resources." },
@@ -120,7 +120,7 @@ export const NICHES: Niche[] = [
       { name: "Online check-in call", duration: "20 min" },
     ],
     faqs: [
-      { q: "Can clients pay before the session?", a: "Yes. You can ask for a deposit or full payment at the time of booking." },
+      { q: "Can clients pay before the session?", a: "Yes. Clients save their card at booking, and the deposit or full payment is charged when you confirm." },
       { q: "Can I offer a free consultation?", a: "Yes. Add it as its own service so new clients can book a first chat." },
       { q: "Does it work if I train in different places?", a: "You can set up studios or spaces as bookable resources so the right one is reserved." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
