@@ -86,4 +86,46 @@ export const RATE_RULES = {
   waitlist: { bucket: "waitlist", max: 8, windowSeconds: 3600 } as RateLimitRule,
   review: { bucket: "review", max: 10, windowSeconds: 3600 } as RateLimitRule,
   assistant: { bucket: "assistant", max: 20, windowSeconds: 3600 } as RateLimitRule,
+  checkinIp: { bucket: "checkin_ip", max: 30, windowSeconds: 600 } as RateLimitRule,
+  checkinCompany: { bucket: "checkin_company", max: 150, windowSeconds: 600 } as RateLimitRule,
+  checkinFailIp: { bucket: "checkin_fail_ip", max: 10, windowSeconds: 600 } as RateLimitRule,
+};
+
+/** Like checkRateLimit but FAILS CLOSED: limiter errors count as "not allowed". Counts this hit. */
+export const checkRateLimitStrict = async (
+  rule: RateLimitRule, identifier: string, admin: SupabaseClient,
+): Promise<boolean> => {
+  try {
+    const { data, error } = await admin.rpc("check_rate_limit", {
+      p_bucket: rule.bucket,
+      p_identifier: String(identifier).slice(0, 200).toLowerCase(),
+      p_max_hits: rule.max,
+      p_window_seconds: rule.windowSeconds,
+    });
+    if (error) { console.error("strict rate limit failed", error.message); return false; }
+    return data === true;
+  } catch (e) {
+    console.error("strict rate limit threw", e);
+    return false;
+  }
+};
+
+/** Reads a bucket WITHOUT counting a hit. Fails closed (returns false on error). */
+export const peekRateLimitStrict = async (
+  rule: RateLimitRule, identifier: string, admin: SupabaseClient,
+): Promise<boolean> => {
+  try {
+    const { data, error } = await admin.from("rate_limits")
+      .select("hit_count, window_start")
+      .eq("bucket", rule.bucket)
+      .eq("identifier", String(identifier).slice(0, 200).toLowerCase())
+      .maybeSingle();
+    if (error) { console.error("rate limit peek failed", error.message); return false; }
+    if (!data) return true;
+    const expired = new Date(data.window_start).getTime() < Date.now() - rule.windowSeconds * 1000;
+    return expired || data.hit_count < rule.max;
+  } catch (e) {
+    console.error("rate limit peek threw", e);
+    return false;
+  }
 };
