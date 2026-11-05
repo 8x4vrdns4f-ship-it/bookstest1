@@ -32,6 +32,10 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 - Subscription price lookup keys and their tier live only in `_shared/plan-prices.ts` (used by create-checkout and check-subscription). Why: monthly and annual prices must always map to the same plan.
 - Automatic staff assigning happens only in the `auto_assign_booking` BEFORE INSERT trigger on `bookings` (mode on `business_settings.auto_assign_mode`, links in `resources.default_employee_id` / `service_employees`), and only picks staff on shift and not on leave. Why: every booking path (widget, manual, assistant, approvals) gets the same rule in one place.
 
+## Self check-in
+
+- Signed-out kiosk check-in goes only through the `kiosk-check-in` Edge Function (rate-limited, fail closed, generic errors, confirmed bookings within ±30 min in the business timezone); `check_in_by_code` is service-role only. Why: public callers must not be able to guess codes, check in from home, or learn client details.
+
 ## AI assistant
 
 - One owner-only assistant (`business-assistant` Edge Function, opened from every dashboard page) answers via read tools and only writes through a proposed change set the owner Applies/Sends. Why: owners must approve every change or email, and limits/validation live server-side.
