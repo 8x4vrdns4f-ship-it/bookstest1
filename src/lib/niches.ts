@@ -316,7 +316,7 @@ export const NICHES: Niche[] = [
       { title: "Email ping-pong", body: "Agreeing a date for a shoot takes far too many messages." },
     ],
     features: [
-      { title: "Deposits taken online", body: "Clients pay a deposit or the full fee when they book a shoot." },
+      { title: "Deposits taken online", body: "Clients save their card when they book a shoot, and the deposit or full fee is taken when you confirm." },
       { title: "Studios & equipment", body: "Book studios, sets or kit as resources so nothing clashes." },
       { title: "Long sessions", body: "Set shoots from 30-minute headshots to full-day sessions." },
       { title: "Booking requests", body: "Review requests before you confirm a date." },
@@ -332,7 +332,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { q: "Can I approve shoots before they're confirmed?", a: "Yes. Turn on booking requests and confirm each one yourself." },
       { q: "Can I hire out my studio too?", a: "Yes. Add the studio as a bookable resource so it can't be double-booked." },
-      { q: "Can I take a deposit for a shoot?", a: "Yes. Deposits are paid online when the client books." },
+      { q: "Can I take a deposit for a shoot?", a: "Yes. The client saves their card online when they book, and the deposit is charged when you confirm." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
   },
@@ -341,7 +341,7 @@ export const NICHES: Niche[] = [
     name: "Car Detailing",
     seoTitle: "Car Detailing & Mobile Valeting Booking Software — BookSuite",
     seoDescription:
-      "Online booking for car detailers and mobile valeters: customers book 24/7, pay a deposit upfront, get reminders and reschedule easily. 30-day free trial.",
+      "Online booking for car detailers and mobile valeters: customers book 24/7, save their card for a deposit, get reminders and reschedule easily. 30-day free trial.",
     headline: "Booking software for car detailers and mobile valeters",
     subheadline:
       "Customers pick their valet, pay a deposit and get reminded — while you stay focused on the car in front of you.",
@@ -351,7 +351,7 @@ export const NICHES: Niche[] = [
       { title: "Weather reschedules", body: "Rain means moving bookings, and that means a lot of messages." },
     ],
     features: [
-      { title: "Deposits upfront", body: "Take a deposit or full payment for big jobs like ceramic coatings." },
+      { title: "Deposits or full payment", body: "Take a deposit or full payment for big jobs like ceramic coatings." },
       { title: "Self-service reschedules", body: "Customers move their booking themselves from a secure link." },
       { title: "Booking notes", body: "Customers can add their car model and address when they book." },
       { title: "Reminders", body: "Automatic reminder emails before every job." },
@@ -367,7 +367,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { q: "Does it work for mobile valeting?", a: "Yes. Customers can add their address and car details in the booking notes." },
       { q: "Can customers reschedule if the weather's bad?", a: "Yes. They can move their booking themselves from a secure link." },
-      { q: "Can I take a deposit for ceramic coatings?", a: "Yes. Deposits or full payment are taken online at booking." },
+      { q: "Can I take a deposit for ceramic coatings?", a: "Yes. The customer saves their card online at booking, and the deposit or full payment is taken when you confirm." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
   },
@@ -376,7 +376,7 @@ export const NICHES: Niche[] = [
     name: "Driving Instructors & Tutors",
     seoTitle: "Booking Software for Driving Instructors & Tutors — BookSuite",
     seoDescription:
-      "Online lesson booking for driving instructors and tutors: students book 24/7, pay upfront, get reminders and rebook their next lesson easily. 30-day free trial.",
+      "Online lesson booking for driving instructors and tutors: students book 24/7, save their card, get reminders and rebook their next lesson easily. 30-day free trial.",
     headline: "Lesson booking for driving instructors and tutors",
     subheadline:
       "Students book and pay for lessons online, get reminded beforehand, and book their next lesson without a single text.",
