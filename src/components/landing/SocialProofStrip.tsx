@@ -2,7 +2,7 @@ import { Code2, CreditCard, Globe, MailCheck, Scissors, Dumbbell, Stethoscope, U
 
 const metrics = [
   { Icon: CreditCard, label: "Deposits and payouts via Stripe" },
-  { Icon: Globe, label: "38 languages, auto currency" },
+  { Icon: Globe, label: "Prices shown in your currency" },
   { Icon: Code2, label: "Embeddable widget for any website" },
   { Icon: MailCheck, label: "Automatic confirmations and reminders" },
 ];
@@ -32,7 +32,7 @@ const SocialProofStrip = () => (
         ))}
       </div>
       <div className="flex flex-wrap items-center justify-center gap-2 pt-2 border-t border-border/60">
-        <span className="text-[11px] uppercase tracking-wider text-muted-foreground/70 mr-2">Trusted across</span>
+        <span className="text-[11px] uppercase tracking-wider text-muted-foreground/70 mr-2">Built for</span>
         {industries.map(({ Icon, label }) => (
           <span
             key={label}

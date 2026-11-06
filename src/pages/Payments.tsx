@@ -50,7 +50,7 @@ const Payments = () => {
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>1. Connect Stripe — takes ~3 minutes (name, bank details, ID check).</p>
-            <p>2. Customers pay the deposit you set in Settings when they book.</p>
+            <p>2. Clients save a card when they book. The deposit you set in Settings (or the full price) is charged when you accept the booking.</p>
             <p>3. Money lands in your Stripe balance and pays out to your bank weekly, every Monday.</p>
           </CardContent>
         </Card>
