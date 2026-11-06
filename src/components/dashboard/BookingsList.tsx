@@ -1,5 +1,5 @@
 import { DateField, NumberField, TimeField } from "@/components/ui/date-time-fields";
-import { publicOrigin } from "@/lib/publicUrl";
+import { PUBLIC_SITE_URL } from "@/lib/publicUrl";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -209,13 +209,16 @@ const BookingsList = ({ userId }: { userId: string }) => {
       return;
     }
     if (b.client_email) {
-      const checkInUrl = companyCode
-        ? `${publicOrigin()}/kiosk/${companyCode}?code=${codeData}`
+      const { data: checkInSettings } = await supabase.from("business_settings")
+        .select("self_checkin_enabled, company_code").eq("user_id", userId).maybeSingle();
+      const checkInUrl = checkInSettings?.company_code
+        ? `${PUBLIC_SITE_URL}/kiosk/${checkInSettings.company_code}?code=${codeData}`
         : undefined;
       sendEmail("booking-confirmed", b.client_email, `booking-confirm-${b.id}`, {
         businessName, clientName: b.client_name, service: b.service,
         date: formatDate(b.booking_date), time: formatTime(b.booking_time),
         confirmationCode: codeData, checkInUrl,
+        selfCheckIn: !!checkInSettings?.self_checkin_enabled,
       }, userId);
     }
     toast({ title: `Accepted — code ${codeData}`, description: `Share with ${b.client_name}` });

@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
 
     const { data: settings } = await admin
       .from("business_settings")
-      .select("cancellation_hours, business_name, business_email, currency, timezone")
+      .select("cancellation_hours, business_name, business_email, currency, timezone, self_checkin_enabled, company_code")
       .eq("user_id", booking.user_id)
       .maybeSingle();
 
@@ -108,6 +108,10 @@ Deno.serve(async (req) => {
             date: formatDate(date),
             time,
             confirmationCode: booking.confirmation_code,
+            selfCheckIn: !!settings?.self_checkin_enabled,
+            checkInUrl: settings?.company_code && booking.confirmation_code
+              ? `https://booksuite.online/kiosk/${settings.company_code}?code=${booking.confirmation_code}`
+              : undefined,
             manageUrl: booking.client_access_token ? `https://booksuite.online/booking/manage/${booking.client_access_token}` : undefined,
             policyText: cancelPolicyLine(settings?.cancellation_hours, booking.deposit_amount, String(settings?.currency || "GBP").toUpperCase(), booking.payment_option === "full"),
           },
