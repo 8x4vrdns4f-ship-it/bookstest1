@@ -40,7 +40,7 @@ const INDUSTRIES: Industry[] = [
     benefits: [
       "Time-slot booking with travel buffers between jobs",
       "Take a deposit before a van leaves the yard",
-      "Reminders and easy client cancellation from one link",
+      "Reminders, plus clients can cancel or reschedule themselves",
     ],
   },
   {
