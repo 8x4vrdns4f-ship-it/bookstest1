@@ -17,7 +17,7 @@ const INDUSTRIES: Industry[] = [
     pitch: "Cut no-shows, fill last-minute slots, and keep every stylist's day booked.",
     benefits: [
       "Take deposits automatically — no more empty chairs",
-      "Per-stylist calendars, services, and commission-ready reports",
+      "Per-stylist calendars, services and shifts",
       "Automated reminders, review requests, and rebooking prompts",
     ],
   },
@@ -36,11 +36,11 @@ const INDUSTRIES: Industry[] = [
     id: "trades",
     label: "Trades",
     icon: Wrench,
-    pitch: "Quote, schedule, and get paid — all from one link you send to the customer.",
+    pitch: "Schedule jobs and get paid — all from one link you send to the customer.",
     benefits: [
       "Time-slot booking with travel buffers between jobs",
       "Take a deposit before a van leaves the yard",
-      "Reminders, cancellations, and rescheduling by the client themselves",
+      "Reminders and easy client cancellation from one link",
     ],
   },
   {
@@ -50,7 +50,7 @@ const INDUSTRIES: Industry[] = [
     pitch: "GDPR-friendly appointment booking with the practitioner and room picker.",
     benefits: [
       "Room and practitioner as bookable resources with real availability",
-      "Pre-appointment forms and consent capture on the booking page",
+      "Booking notes for injuries or preferences on every appointment",
       "Automatic email reminders to cut cancellations",
     ],
   },
@@ -58,11 +58,11 @@ const INDUSTRIES: Industry[] = [
     id: "coaches",
     label: "Tutors & Coaches",
     icon: GraduationCap,
-    pitch: "Package sessions, sell blocks, and let students book the times you're free.",
+    pitch: "Let students book the times you're free, and fill gaps with gift codes.",
     benefits: [
       "Recurring availability and one-off overrides for holidays",
-      "Gift codes and referral perks to fill your roster",
-      "In-person or online — pick per service and share a link",
+      "Gift codes to fill your roster",
+      "One link for your booking page — share it anywhere",
     ],
   },
   {

@@ -417,11 +417,11 @@ const Settings = () => {
               </Field>
               <div className="rounded-2xl border border-border bg-secondary/40 p-4 space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-foreground">Payment at booking</p>
+                  <p className="text-sm font-medium text-foreground">What clients pay</p>
                   <p className="text-xs text-muted-foreground">Applies when a service has a price set. Without a price, only the deposit is taken.</p>
                 </div>
                 {[
-                  { key: "deposit", label: "Deposit only", hint: "Client pays the deposit; the rest is paid on the day." },
+                  { key: "deposit", label: "Deposit only", hint: "Client pays the deposit when you accept; the rest is paid on the day." },
                   { key: "full", label: "Pay in full", hint: "Client pays the full service price when you accept." },
                   { key: "client_choice", label: "Let the client choose", hint: "Client picks deposit only or pay in full in the booking widget." },
                 ].map((opt) => (
@@ -575,7 +575,7 @@ const Settings = () => {
               <ToggleRow label="New Booking Email" hint="Get an email on every new booking." checked={form.notify_new_booking} onChange={(v) => setForm({ ...form, notify_new_booking: v })} />
               <ToggleRow label="Daily Summary Email" hint="Recap of tomorrow's appointments." checked={form.notify_daily_summary} onChange={(v) => setForm({ ...form, notify_daily_summary: v })} />
               <ToggleRow label="Client Booking Confirmation" hint="Email clients when their booking is confirmed." checked={form.notify_client_confirmation} onChange={(v) => setForm({ ...form, notify_client_confirmation: v })} />
-              <ToggleRow label="Client Reminder" hint="Send clients a reminder 24 hours before their appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
+              <ToggleRow label="Client Reminder" hint="Send clients a reminder email the day before their appointment." checked={form.notify_client_reminder} onChange={(v) => setForm({ ...form, notify_client_reminder: v })} />
               <ToggleRow label="Client Review Request" hint="Ask clients for a review after their appointment." checked={form.notify_client_review_request} onChange={(v) => setForm({ ...form, notify_client_review_request: v })} lockedTier={lockLabel(canReviews, "Gold")} />
               <ToggleRow label="Waitlist" hint="Let clients join a waitlist for fully-booked dates, and auto-email them when a slot opens." checked={form.waitlist_enabled} onChange={(v) => setForm({ ...form, waitlist_enabled: v })} lockedTier={lockLabel(canWaitlist, "Gold")} />
               <ToggleRow label="Rebooking Reminders" hint="Automatically email clients who haven't booked in a while." checked={form.rebooking_reminder_enabled} onChange={(v) => setForm({ ...form, rebooking_reminder_enabled: v })} />
