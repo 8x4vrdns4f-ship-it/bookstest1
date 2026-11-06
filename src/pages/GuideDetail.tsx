@@ -45,8 +45,7 @@ const GUIDES: Guide[] = [
         <h2>Features that pay for themselves</h2>
         <ul>
           <li>
-            <strong>Deposits at booking.</strong> The single biggest lever against no-shows.
-            A 20% deposit typically cuts them by more than half.
+            <strong>Deposits.</strong> The single biggest lever against no-shows.
           </li>
           <li>
             <strong>Embeddable booking widget.</strong> If you already have a website, you
@@ -54,8 +53,8 @@ const GUIDES: Guide[] = [
             where you lose the customer.
           </li>
           <li>
-            <strong>Automated reminders.</strong> A reminder 24 hours before and one 2 hours
-            before is the industry standard for a reason.
+            <strong>Automated reminders.</strong> A reminder the day before catches most
+            people who would otherwise forget.
           </li>
           <li>
             <strong>Staff scheduling.</strong> The moment you have two people taking
@@ -118,8 +117,7 @@ const GUIDES: Guide[] = [
           Don't call it a "deposit" if you can avoid it — the word triggers hesitation.
           Instead, use "booking fee" or "reservation payment", and make clear it comes off
           the final price. On the booking page: "A £10 booking fee secures your slot and
-          comes off your final bill." That framing converts significantly better than
-          "deposit required".
+          comes off your final bill."
         </p>
 
         <h2>Your refund policy</h2>
@@ -140,8 +138,8 @@ const GUIDES: Guide[] = [
         <h2>Automating it in BookSuite</h2>
         <p>
           BookSuite saves the customer's card via Stripe when they book, takes the deposit
-          when you confirm, and refunds it automatically when a customer cancels inside
-          your policy window.{" "}
+          when you confirm, and refunds it automatically when a customer cancels outside
+          your policy window — inside it, the deposit is kept.{" "}
           <Link to="/auth?mode=signup" className="text-primary underline">
             Start a free trial
           </Link>{" "}
@@ -169,17 +167,13 @@ const GUIDES: Guide[] = [
         <h2>The reminder sequence that works</h2>
         <ol>
           <li>
-            <strong>Confirmation, sent immediately.</strong> The moment they book, they get
-            a confirmation with the date, time, and a way to reschedule.
+            <strong>Confirmation, as soon as the booking is accepted.</strong> The date,
+            time, service and address in one place.
           </li>
           <li>
             <strong>24-hour reminder.</strong> Sent the day before. This is the reminder
             that saves the most appointments — it catches people while they can still
             reschedule if something's come up.
-          </li>
-          <li>
-            <strong>2-hour reminder.</strong> Sent the morning of. Purely a memory-jog for
-            people whose day has run away with them.
           </li>
         </ol>
 
@@ -187,8 +181,8 @@ const GUIDES: Guide[] = [
         <p>
           SMS has higher open rates but is more expensive and easier to opt out of. Email is
           free, universal, and — with a good subject line ("Your appointment tomorrow at 2
-          PM") — nearly as effective. Start with email; add SMS only if no-shows are still a
-          problem after deposits + email reminders.
+          PM") — nearly as effective. Start with email reminders — that's what BookSuite
+          sends.
         </p>
 
         <h2>What to put in the reminder</h2>
@@ -204,10 +198,11 @@ const GUIDES: Guide[] = [
           reminder email the day before, from a verified, authenticated sending domain — so
           they reach inboxes rather than spam folders.
           Your business name shows as the sender, and replies can land straight in your own inbox.{" "}
+          Reminders are included on every plan —{" "}
           <Link to="/pricing" className="text-primary underline">
-            See pricing
-          </Link>{" "}
-          for the tiers that include automated reminders.
+            see pricing
+          </Link>
+          .
         </p>
       </>
     ),
