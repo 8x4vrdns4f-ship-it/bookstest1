@@ -263,7 +263,7 @@ Deno.serve(async (req) => {
       }
 
       if ((cs.booking_ops || []).length) {
-        const { data: s } = await db.from("business_settings").select("business_name").eq("user_id", uid).maybeSingle();
+        const { data: s } = await db.from("business_settings").select("business_name, self_checkin_enabled, company_code").eq("user_id", uid).maybeSingle();
         const businessName = s?.business_name || "";
         for (const op of cs.booking_ops || []) {
           const { data: b, error: be } = await db.from("bookings").select("id, status, client_name, client_email, service, booking_date, booking_time").eq("id", op.id).eq("user_id", uid).maybeSingle();
@@ -275,7 +275,11 @@ Deno.serve(async (req) => {
             if (ce || !code) return fail(ce);
             const { error } = await db.from("bookings").update({ status: "confirmed", confirmation_code: code }).eq("id", b.id);
             if (error) return fail(error);
-            if (b.client_email) emails.push({ template: "booking-confirmed", to: b.client_email, key: `booking-confirm-${b.id}`, data: { ...base, confirmationCode: code } });
+            if (b.client_email) emails.push({ template: "booking-confirmed", to: b.client_email, key: `booking-confirm-${b.id}`, data: {
+              ...base, confirmationCode: code,
+              selfCheckIn: !!s?.self_checkin_enabled,
+              checkInUrl: s?.company_code ? `https://booksuite.online/kiosk/${s.company_code}?code=${code}` : undefined,
+            } });
           } else if (op.action === "decline") {
             if (b.status !== "pending") return json({ error: `${b.client_name}'s booking isn't waiting for approval.` }, 400);
             // Goes through cancel-booking-owner so any payment is refunded and the client is emailed there.
