@@ -1216,6 +1216,7 @@ export type Database = {
           booking_date: string
           booking_time: string
           charge_amount: number | null
+          charge_attempts: number
           charge_error: string | null
           client_email: string
           client_name: string
@@ -1252,6 +1253,7 @@ export type Database = {
           booking_date: string
           booking_time: string
           charge_amount?: number | null
+          charge_attempts?: number
           charge_error?: string | null
           client_email: string
           client_name: string
@@ -1288,6 +1290,7 @@ export type Database = {
           booking_date?: string
           booking_time?: string
           charge_amount?: number | null
+          charge_attempts?: number
           charge_error?: string | null
           client_email?: string
           client_name?: string
@@ -2011,6 +2014,52 @@ export type Database = {
           employee_id: string
           role_name: string
         }[]
+      }
+      claim_pending_booking_charge: {
+        Args: { _pending_id: string; _user_id: string }
+        Returns: {
+          booking_date: string
+          booking_time: string
+          charge_amount: number | null
+          charge_attempts: number
+          charge_error: string | null
+          client_email: string
+          client_name: string
+          created_at: string
+          currency: string
+          decline_reason: string | null
+          deposit_amount: number
+          duration_minutes: number
+          end_date: string | null
+          expired_at: string | null
+          expires_at: string
+          id: string
+          notes: string | null
+          party_size: number | null
+          payment_environment: string
+          payment_option: string
+          platform_fee_amount: number
+          promo_code_id: string | null
+          reminder_sent_at: string | null
+          rental_days: number | null
+          resource_id: string | null
+          service: string
+          service_id: string | null
+          service_price: number | null
+          status: string
+          stripe_account_id: string
+          stripe_checkout_session_id: string | null
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
+          stripe_setup_intent_id: string | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "pending_bookings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       confirm_booking_fee: {
         Args: { _booking_ref: string }

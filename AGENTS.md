@@ -59,3 +59,5 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 
 - Client-facing policy text comes from `src/lib/cancelPolicy.ts` (screens), `cancelPolicyLine` in `_shared/refund-rules.ts` (emails) and `renderPolicy` in `widgetTemplate.ts`; a test asserts the first two match. Why: clients must see identical terms before paying, in emails and when cancelling.
 - Connecting payments requires `business_settings.payments_terms_accepted_at`, enforced in `connect-create-account`. Why: owners must accept refund/fee/chargeback responsibility before taking money.
+- Accept charges use the service-only atomic `claim_pending_booking_charge` RPC to increment `charge_attempts`, and Stripe keys include that attempt. Why: concurrent acceptance has one winner while a declined-card retry is a new attempt.
+- Browser booking inserts reset payment details; updates protect money fields on recorded payments, treating the non-null `unpaid` default as no payment record. Why: manual bookings remain editable without allowing forged payment records.
