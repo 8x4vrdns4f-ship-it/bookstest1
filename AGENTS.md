@@ -17,6 +17,7 @@ Structural decisions and conventions for this codebase. Keep each rule to one li
 
 - Route-level `React.lazy` in `src/App.tsx` with a delayed `PageFallback`. Why: keeps the landing bundle small without a loading-flicker.
 - Colours, shadows and radii come from the tokens in `src/index.css`; never hardcode colour utilities. Why: dark mode and theming depend on them.
+- Booking calendar-date display uses a dedicated formatter, separate from email formatting. Why: presentation changes must not alter stored dates or email payloads.
 
 ## Booking widget
 

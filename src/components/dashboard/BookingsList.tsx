@@ -1,6 +1,6 @@
 import { DateField, NumberField, TimeField } from "@/components/ui/date-time-fields";
 import { PUBLIC_SITE_URL } from "@/lib/publicUrl";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { sendEmail, formatDate, formatTime } from "@/lib/sendEmail";
 import { cancelBookingAsOwner, cancelToastText, hasPaymentRecord, chargedAmount, money, type PaymentFields } from "@/lib/bookingCancel";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
+import { bookingDisplayDate } from "@/lib/bookingDisplayDate";
 
 
 type Booking = {
@@ -50,6 +51,8 @@ const BookingsList = ({ userId }: { userId: string }) => {
   const [companyCode, setCompanyCode] = useState<string>("");
   const [currency, setCurrency] = useState<string>("GBP");
   const [retrying, setRetrying] = useState<string | null>(null);
+  const [busyBookings, setBusyBookings] = useState<Set<string>>(new Set());
+  const busyBookingsRef = useRef(new Set<string>());
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -195,26 +198,33 @@ const BookingsList = ({ userId }: { userId: string }) => {
   };
 
   const handleAccept = async (b: Booking) => {
+    if (busyBookingsRef.current.has(b.id)) return;
+    busyBookingsRef.current.add(b.id);
+    setBusyBookings(new Set(busyBookingsRef.current));
+    try {
     const { data: codeData, error: codeErr } = await supabase.rpc("generate_booking_code");
     if (codeErr || !codeData) {
       toast({ title: "Could not generate code", description: codeErr?.message, variant: "destructive" });
       return;
     }
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from("bookings")
       .update({ status: "confirmed", confirmation_code: codeData })
-      .eq("id", b.id);
+      .eq("id", b.id)
+      .eq("status", "pending")
+      .select("id");
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
     }
+    if (!updated?.length) return;
     if (b.client_email) {
       const { data: checkInSettings } = await supabase.from("business_settings")
         .select("self_checkin_enabled, company_code").eq("user_id", userId).maybeSingle();
       const checkInUrl = checkInSettings?.company_code
         ? `${PUBLIC_SITE_URL}/kiosk/${checkInSettings.company_code}?code=${codeData}`
         : undefined;
-      sendEmail("booking-confirmed", b.client_email, `booking-confirm-${b.id}`, {
+      await sendEmail("booking-confirmed", b.client_email, `booking-confirm-${b.id}`, {
         businessName, clientName: b.client_name, service: b.service,
         date: formatDate(b.booking_date), time: formatTime(b.booking_time),
         confirmationCode: codeData, checkInUrl,
@@ -222,14 +232,26 @@ const BookingsList = ({ userId }: { userId: string }) => {
       }, userId);
     }
     toast({ title: `Accepted — code ${codeData}`, description: `Share with ${b.client_name}` });
+    } finally {
+      busyBookingsRef.current.delete(b.id);
+      setBusyBookings(new Set(busyBookingsRef.current));
+    }
   };
 
   const handleDecline = async (b: Booking) => {
+    if (busyBookingsRef.current.has(b.id)) return;
+    busyBookingsRef.current.add(b.id);
+    setBusyBookings(new Set(busyBookingsRef.current));
+    try {
     const r = await cancelBookingAsOwner(b, { mode: "decline", reason: "Declined by business", currency });
     if (r.cancelledByUser) return;
     const t = cancelToastText(r, currency);
     toast({ title: r.ok && !r.refunded && !r.refund_failed ? "Booking declined" : t.title, description: t.description, variant: t.destructive ? "destructive" : undefined });
     fetchBookings();
+    } finally {
+      busyBookingsRef.current.delete(b.id);
+      setBusyBookings(new Set(busyBookingsRef.current));
+    }
   };
 
   const handleDelete = async (b: Booking) => {
@@ -367,17 +389,17 @@ const BookingsList = ({ userId }: { userId: string }) => {
                   )}
                 </div>
                 <p className="text-[12px] text-muted-foreground">
-                  {b.service} · {b.booking_date} at {b.booking_time.slice(0, 5)} · {b.duration_minutes}min
+                  {b.service} · {bookingDisplayDate(b.booking_date)} at {b.booking_time.slice(0, 5)} · {b.duration_minutes}min
                   {b.client_email && <> · {b.client_email}</>}
                 </p>
               </div>
               <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                 {b.status === "pending" ? (
                   <>
-                    <Button size="sm" onClick={() => handleAccept(b)} className="h-8 gap-1 bg-success text-success-foreground hover:bg-success/90">
+                    <Button size="sm" disabled={busyBookings.has(b.id)} onClick={() => handleAccept(b)} className="h-8 gap-1 bg-success text-success-foreground hover:bg-success/90">
                       <Check size={14} /> Accept
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleDecline(b)} className="h-8 gap-1 border-destructive/40 text-destructive hover:bg-destructive/10">
+                    <Button size="sm" variant="outline" disabled={busyBookings.has(b.id)} onClick={() => handleDecline(b)} className="h-8 gap-1 border-destructive/40 text-destructive hover:bg-destructive/10">
                       <X size={14} /> Decline
                     </Button>
                   </>
