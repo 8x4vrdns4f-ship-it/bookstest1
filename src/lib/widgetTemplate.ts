@@ -256,6 +256,7 @@ export const buildWidgetScript = (opts: {
   var selDate = null, selEndDate = null, selSlot = null, selDur = null, selResource = null, selService = null, selPayOption = 'deposit';
   var DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
   var stripe = null, elements = null, paymentEl = null, elementsReady = false;
+  var submitting = false;
 
   function api(path, opts){
     opts = opts || {};
@@ -705,7 +706,7 @@ export const buildWidgetScript = (opts: {
     var days = rentalDays();
     var rangeOk = !dailyOn() || (!!days && days >= minDays() && days <= maxDays());
     var payOk = elementsReady;
-    btn.disabled = !(selDate && rangeOk && selSlot !== null && selDur && name && email && payOk && resourceOk);
+    btn.disabled = submitting || !(selDate && rangeOk && selSlot !== null && selDur && name && email && payOk && resourceOk);
   }
   document.getElementById('bw-name').addEventListener('input', renderAll);
   document.getElementById('bw-email').addEventListener('input', renderAll);
@@ -809,6 +810,8 @@ export const buildWidgetScript = (opts: {
 
   document.getElementById('bw-submit').addEventListener('click', async function(){
     var btn = this;
+    if (submitting || btn.disabled) return;
+    submitting = true;
     btn.disabled = true; btn.textContent = 'Saving card...';
     document.getElementById('bw-err').innerHTML = '';
     try {
@@ -878,7 +881,10 @@ export const buildWidgetScript = (opts: {
       document.getElementById('bw-done').style.display = 'block';
     } catch(e){
       showErr((e && e.message) ? String(e.message) : 'Something went wrong');
-      btn.disabled = false; btn.textContent = 'Request Booking';
+      btn.textContent = 'Request Booking';
+    } finally {
+      submitting = false;
+      renderAll();
     }
   });
 
