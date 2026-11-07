@@ -8,6 +8,7 @@ import { notifyAdmin, money } from "../_shared/notify-admin.ts";
 import { addLedgerEntry, outstandingMinor } from "../_shared/ledger.ts";
 import { planApplicationFee, stripeFeeShortfallMinor } from "../_shared/ledger-rules.ts";
 import { confirmBookingFee, releaseBookingFee, reserveBookingFee } from "../_shared/tier-fees.ts";
+import { claimDecision } from "./claim-rules.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,20 +44,29 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { data: pending, error: pErr } = await admin
+    const { data: request, error: pErr } = await admin
       .from("pending_bookings")
       .select("*")
       .eq("id", pending_id)
       .eq("user_id", userData.user.id)
       .maybeSingle();
-    if (pErr || !pending) throw new Error("Booking request not found");
-    if (pending.status !== "awaiting_owner") throw new Error(`Already ${pending.status}`);
-    if (!pending.stripe_payment_method_id || !pending.stripe_customer_id) {
+    if (pErr || !request) throw new Error("Booking request not found");
+    if (!request.stripe_payment_method_id || !request.stripe_customer_id) {
       throw new Error("No saved payment method on this request");
     }
 
-    // Mark as charging (advisory — prevents accidental double-accept from parallel UI).
-    await admin.from("pending_bookings").update({ status: "charging" }).eq("id", pending.id);
+    // One row-locked claim: only its winner may reserve a fee or call Stripe.
+    const { data: claimedRows, error: claimError } = await admin.rpc("claim_pending_booking_charge", {
+      _pending_id: request.id, _user_id: userData.user.id,
+    });
+    if (claimError) throw new Error(claimError.message);
+    const decision = claimDecision(claimedRows?.[0] ?? null);
+    if (!decision.claimed) {
+      return new Response(JSON.stringify({ error: decision.message }), {
+        status: decision.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const pending = decision.row;
 
     const env = resolveEnv((pending as any).payment_environment);
     const stripe = createStripeClient(env);
@@ -105,7 +115,7 @@ Deno.serve(async (req) => {
           stripe_fee_included_minor: String(plan.stripeFeeIncludedMinor),
           ledger_collected_minor: String(plan.collectedMinor),
         },
-      });
+      }, { idempotencyKey: decision.idempotencyKey });
     } catch (err: any) {
       // Off-session charge failed (declined, insufficient funds, SCA required).
       const msg = err?.raw?.message || err?.message || "Charge failed";

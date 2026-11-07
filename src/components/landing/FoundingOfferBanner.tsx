@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -23,10 +22,9 @@ const FoundingOfferBanner = () => {
     <div className="border-b border-primary/20 bg-primary/10">
       <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4 py-2.5 text-center text-sm sm:flex-row sm:gap-3">
         <span className="flex items-center gap-2 text-foreground">
-          <Sparkles className="h-4 w-4 text-primary" aria-hidden />
           <span>
             <strong>Founding member offer:</strong> The first 100 businesses keep their launch price for as long as they stay subscribed.{" "}
-            <span className="font-semibold text-primary">Only {remaining} of 100 spots left.</span>
+            {remaining < 100 && <span className="font-semibold text-primary">Only {remaining} of 100 spots left.</span>}
           </span>
         </span>
         <Link
