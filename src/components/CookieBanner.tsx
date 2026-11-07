@@ -40,7 +40,7 @@ const CookieBanner = () => {
       role="dialog"
       aria-live="polite"
       aria-label="Cookie consent"
-      className="fixed inset-x-2 bottom-2 z-50 md:inset-x-auto md:right-4 md:bottom-4 md:max-w-[340px]"
+      className="fixed inset-x-2 bottom-24 z-50 md:inset-x-auto md:right-4 md:bottom-4 md:max-w-[340px]"
     >
       <div className="rounded-xl border border-border bg-card/95 backdrop-blur px-3 py-2.5 shadow-md">
         <div className="flex items-center gap-2.5">

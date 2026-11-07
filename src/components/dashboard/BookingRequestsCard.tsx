@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, X, Inbox, Clock, ChevronDown, ChevronRight, History } from "lucide-react";
 import SectionCard from "@/components/app/SectionCard";
 import EmptyState from "@/components/app/EmptyState";
+import { bookingDisplayDate } from "@/lib/bookingDisplayDate";
 
 type PendingRow = {
   id: string;
@@ -151,7 +152,7 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
                           <p className="font-semibold text-sm truncate">{r.client_name}</p>
                           <Badge variant="outline" className="text-[10px]">
                             <Clock size={10} className="mr-1" />
-                            {r.booking_date} · {r.booking_time.slice(0, 5)} · {r.duration_minutes}m
+                            {bookingDisplayDate(r.booking_date)} · {r.booking_time.slice(0, 5)} · {r.duration_minutes}m
                           </Badge>
                           {failed && <Badge variant="destructive" className="text-[10px]">Charge failed</Badge>}
                           {charging && <Badge className="text-[10px]">Charging…</Badge>}
@@ -204,7 +205,7 @@ const BookingRequestsCard = ({ userId }: { userId: string }) => {
                           <p className="font-semibold text-sm truncate">{r.client_name}</p>
                           <Badge variant="outline" className="text-[10px]">
                             <Clock size={10} className="mr-1" />
-                            {r.booking_date} · {r.booking_time.slice(0, 5)} · {r.duration_minutes}m
+                            {bookingDisplayDate(r.booking_date)} · {r.booking_time.slice(0, 5)} · {r.duration_minutes}m
                           </Badge>
                           <Badge variant="destructive" className="text-[10px]">Expired</Badge>
                         </div>

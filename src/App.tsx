@@ -6,15 +6,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
-import Pricing from "./pages/Pricing.tsx";
-import Privacy from "./pages/Privacy.tsx";
-import Terms from "./pages/Terms.tsx";
-import Security from "./pages/Security.tsx";
-import About from "./pages/About.tsx";
-import Contact from "./pages/Contact.tsx";
-import Cookies from "./pages/Cookies.tsx";
-import GuideDetail from "./pages/GuideDetail.tsx";
-import Guides from "./pages/Guides.tsx";
 import RequireSubscription from "./components/RequireSubscription.tsx";
 import { SubscriptionProvider } from "./hooks/useSubscription.tsx";
 
@@ -22,6 +13,16 @@ import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
 import AppLayout from "./components/app/AppLayout.tsx";
 import { LocaleProvider } from "./contexts/LocaleContext.tsx";
 import CookieBanner from "./components/CookieBanner.tsx";
+
+const Pricing = lazy(() => import("./pages/Pricing.tsx"));
+const Privacy = lazy(() => import("./pages/Privacy.tsx"));
+const Terms = lazy(() => import("./pages/Terms.tsx"));
+const Security = lazy(() => import("./pages/Security.tsx"));
+const About = lazy(() => import("./pages/About.tsx"));
+const Contact = lazy(() => import("./pages/Contact.tsx"));
+const Cookies = lazy(() => import("./pages/Cookies.tsx"));
+const GuideDetail = lazy(() => import("./pages/GuideDetail.tsx"));
+const Guides = lazy(() => import("./pages/Guides.tsx"));
 
 const Auth = lazy(() => import("./pages/Auth.tsx"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail.tsx"));
