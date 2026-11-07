@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocale } from "@/contexts/LocaleContext";
-import { CURRENCIES, LANGUAGES } from "@/i18n/translations";
+import { CURRENCIES, LANGUAGES, TRANSLATIONS } from "@/i18n/translations";
 
 const LanguageSwitcher = () => {
   const { language, currency, setLanguage, setCurrency, t } = useLocale();
@@ -25,7 +25,7 @@ const LanguageSwitcher = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 bg-popover max-h-[70vh] overflow-y-auto">
         <DropdownMenuLabel className="text-xs uppercase tracking-wide opacity-60">{t("nav.language")}</DropdownMenuLabel>
-        {LANGUAGES.map(l => (
+        {LANGUAGES.filter(l => Object.hasOwn(TRANSLATIONS, l.code)).map(l => (
           <DropdownMenuItem key={l.code} onClick={() => setLanguage(l.code)} className="cursor-pointer">
             <span className="mr-2 text-[10px] font-semibold tracking-wide text-muted-foreground w-9 shrink-0">{l.code.toUpperCase()}</span>
             <span className="flex-1">{l.label}</span>
