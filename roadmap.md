@@ -18,3 +18,6 @@
 - [ ] Pricing Part 2 (owner to send)
 - [ ] After publish: archive the 3 old live prices with no lookup key (£199, £589, £1,149)
 - [x] Front-end quality pass: duplicate Accept protection, request-button audit, navigation, cookie spacing, readable dates, translated-language picker, unused copy, JSON-LD, lazy pages, and logging scan.
+- [ ] Approved A: atomic charge claim, per-attempt idempotency, unit tests and sandbox parallel-claim proof with cleanup.
+- [ ] Approved B: audit browser writes/refund ownership, protect money fields, rolled-back authenticated tests.
+- [ ] Approved C: hide untouched founding count and remove Sparkles; verify banner.
