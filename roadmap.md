@@ -17,4 +17,4 @@
 - [x] Pricing Part 1: new plans (£25/£59/£199, annual 10-for-12), 30p booking fee capped £25/month (UK time, atomic counter), founding-member flag, Silver 3 staff + unlimited services, SMS removed
 - [ ] Pricing Part 2 (owner to send)
 - [ ] After publish: archive the 3 old live prices with no lookup key (£199, £589, £1,149)
-- [ ] Front-end quality pass: duplicate Accept protection, request-button audit, navigation, cookie spacing, readable dates, translated-language picker, unused copy, JSON-LD, lazy pages, and logging scan.
+- [x] Front-end quality pass: duplicate Accept protection, request-button audit, navigation, cookie spacing, readable dates, translated-language picker, unused copy, JSON-LD, lazy pages, and logging scan.
