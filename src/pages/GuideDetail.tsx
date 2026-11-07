@@ -125,7 +125,11 @@ const GUIDES: Guide[] = [
           Be explicit and generous inside your cancellation window, strict outside it. A
           typical policy: <em>fully refundable if cancelled 24 hours before your
           appointment; non-refundable inside 24 hours</em>. Publish it on the booking page
-          so nobody feels tricked.
+          so nobody feels tricked. For wording you can copy, see our guide to{" "}
+          <Link to="/guides/cancellation-policy-for-appointments" className="text-primary underline">
+            writing a cancellation policy
+          </Link>
+          .
         </p>
 
         <h2>Rolling it out to existing customers</h2>
@@ -394,6 +398,113 @@ const GUIDES: Guide[] = [
           One link in your bio, stories and WhatsApp status, a QR poster where people wait,
           and a quick reply with the link whenever a DM comes in. Your clients book
           themselves, and you get back to the work in front of you.
+        </p>
+      </>
+    ),
+  },
+  {
+    slug: "cancellation-policy-for-appointments",
+    title: "How to write a cancellation policy for appointments (with examples)",
+    description:
+      "A clear cancellation policy protects your time without putting clients off. How to choose the notice period, what to do with deposits, wording you can copy, and how BookSuite applies it automatically.",
+    datePublished: "2026-11-07",
+    readTime: "5 min read",
+    body: (
+      <>
+        <p>
+          Every appointment business needs a cancellation policy, even a one-person one.
+          Without one, a late cancellation is an awkward conversation. With one, it's just
+          the rule everyone agreed to when they booked. A good policy is short, fair and
+          shown before the client books.
+        </p>
+
+        <h2>1. Pick a notice period</h2>
+        <p>
+          The notice period is how far ahead a client can cancel without losing anything.
+          To choose it, ask how long you need to fill a slot that comes free.
+        </p>
+        <ul>
+          <li>
+            <strong>Short appointments you can easily refill</strong> (a trim, a nail
+            infill): 24 hours is common.
+          </li>
+          <li>
+            <strong>Long or high-value appointments</strong> (a colour, a tattoo session,
+            a full groom): 48 hours gives you a realistic chance to rebook the time.
+          </li>
+          <li>
+            <strong>Keep one rule for everyone.</strong> Different rules for different
+            services are hard to explain and easy to forget.
+          </li>
+        </ul>
+
+        <h2>2. Decide what happens to the deposit</h2>
+        <p>
+          A policy only has teeth if there's money involved, which is why most businesses
+          pair it with a deposit. A simple, common approach: cancel in good time and get
+          everything back; cancel late and the deposit is kept. Keep the deposit small
+          enough that genuine clients don't hesitate. Roughly 15% to 25% of the price is a
+          sensible range. For more on amounts and wording, see our guide to{" "}
+          <Link to="/guides/how-to-take-deposits-for-appointments" className="text-primary underline">
+            taking deposits for appointments
+          </Link>
+          .
+        </p>
+
+        <h2>3. Write it in one or two sentences</h2>
+        <p>Clients read policies on a phone, in a hurry. Two sentences are enough:</p>
+        <p>
+          <em>"Free cancellation up to 24 hours before your appointment. Cancel later than that and your £10 deposit is non-refundable."</em>
+        </p>
+        <p>If you take full payment up front, say what's kept:</p>
+        <p>
+          <em>"Free cancellation up to 48 hours before your appointment. Cancel later than that and you'll be refunded everything except the £20 deposit."</em>
+        </p>
+
+        <h2>4. Show it before they book, and again after</h2>
+        <p>
+          A policy nobody saw before booking feels like a trap. Put it on your booking page
+          next to the payment step, and repeat it in the confirmation email so there's no
+          argument later.
+        </p>
+
+        <h2>5. Make cancelling and rescheduling easy</h2>
+        <p>
+          It sounds backwards, but making cancellation easy protects you. A client who can
+          cancel in two taps a day early gives you time to refill the slot. One who has to
+          ring you often just doesn't turn up. Let clients move a booking themselves, and
+          you keep the appointment instead of losing it. There's more on cutting missed
+          appointments in{" "}
+          <Link to="/guides/reduce-no-shows-appointment-reminders" className="text-primary underline">
+            the no-show playbook
+          </Link>
+          .
+        </p>
+
+        <h2>6. Be human about exceptions</h2>
+        <p>
+          Illness and emergencies happen. Waiving the fee for a regular client once in a
+          while costs little and earns loyalty. The policy is there for the people who
+          repeatedly cancel late, not to punish everyone else.
+        </p>
+
+        <h2>How BookSuite handles it</h2>
+        <p>
+          In BookSuite you set your notice period once: Settings → Booking Preferences →
+          Cancellation Policy. BookSuite then writes the policy line for you. Clients see
+          it when they book and again in their confirmation email. They can cancel from
+          the secure link in that email, or cancel and reschedule from My bookings. Before
+          they confirm a cancellation, they see exactly what will be refunded. Refunds
+          happen automatically: cancel before the cut-off and they get everything back;
+          cancel later and the deposit is kept, with anything paid above it refunded.{" "}
+          <Link to="/pricing" className="text-primary underline">
+            See pricing
+          </Link>{" "}
+          or{" "}
+          <Link to="/auth?mode=signup" className="text-primary underline">
+            start a 30-day free trial
+          </Link>
+          .
         </p>
       </>
     ),
