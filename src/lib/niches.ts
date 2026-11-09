@@ -90,6 +90,12 @@ export const NICHES: Niche[] = [
       { q: "Can clients reschedule without calling?", a: "Yes. Clients can manage their own bookings from a secure link sent by email." },
       { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "staff-rota-for-salons-and-barbershops",
+      title: "How to plan a staff rota for a small salon or barbershop",
+      excerpt:
+        "Set a regular week, change single days, keep holidays in one place, and make sure clients only book people who are working.",
+    },
   },
   {
     slug: "personal-trainers",

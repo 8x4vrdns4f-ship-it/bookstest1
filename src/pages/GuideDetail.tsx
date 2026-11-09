@@ -509,6 +509,86 @@ const GUIDES: Guide[] = [
       </>
     ),
   },
+  {
+    slug: "staff-rota-for-salons-and-barbershops",
+    title: "How to plan a staff rota for a small salon or barbershop",
+    description:
+      "A simple way to plan a weekly rota for a small salon or barbershop: set a regular week, handle one-off changes and holidays, and make sure bookings only go to people who are working.",
+    datePublished: "2026-11-09",
+    readTime: "5 min read",
+    body: (
+      <>
+        <p>
+          Once more than one person takes appointments, the rota stops fitting in your
+          head. A group chat and a spreadsheet work for a while, until a client books
+          with someone who's on holiday. Here's a simple way to plan a rota that stays
+          right without daily admin.
+        </p>
+
+        <h2>1. Start with a regular week</h2>
+        <p>
+          Most small teams work roughly the same pattern every week. Write that down
+          first: which days each person works and their usual hours. Treat it as the
+          default that repeats until you change it, instead of building every week from
+          scratch.
+        </p>
+
+        <h2>2. Change single days, not the pattern</h2>
+        <p>
+          Swaps, a late start, an extra Saturday: change that one day and leave the
+          regular week alone. Next week goes back to normal on its own, and nobody has
+          to remember to undo anything.
+        </p>
+
+        <h2>3. Cover your busiest times first</h2>
+        <p>
+          Look at when bookings actually come in. For most salons and barbers that's
+          evenings and Saturdays. Cover those first, then fill quieter weekday mornings,
+          and stagger breaks so a chair is never empty at the busiest hour.
+        </p>
+
+        <h2>4. Keep holidays in one place</h2>
+        <p>
+          Holidays cause most rota problems. Agree how many days each person gets. Ask
+          for requests in writing, not in passing. Approve them in one place, so
+          everyone can see who's off and how many days they have left.
+        </p>
+
+        <h2>5. Only let clients book people who are working</h2>
+        <p>
+          Your rota and your booking system should agree. If a client can book a stylist
+          on their day off, the rota is only half done. Bookings should follow who is
+          actually on shift.
+        </p>
+
+        <h2>6. Let the team see their own week</h2>
+        <p>
+          Everyone should be able to see their upcoming shifts and holiday balance
+          without asking you. It saves messages and avoids "I didn't know I was in".
+        </p>
+
+        <h2>How BookSuite handles it</h2>
+        <p>
+          In BookSuite you set each person's usual week once, on the Shifts page: the
+          days they work and their hours. It repeats with no end date, and you click a
+          single day to make a one-off change. Staff join your business with your
+          company code. Each gets their own view of today's bookings, their upcoming
+          shifts and their holiday balance, and they request time off for you to
+          approve. When you assign a booking, BookSuite shows who is working, off or on
+          holiday, and it can also assign bookings automatically. Silver includes 3
+          staff, Gold 10 and Platinum unlimited.{" "}
+          <Link to="/pricing" className="text-primary underline">
+            See pricing
+          </Link>{" "}
+          or{" "}
+          <Link to="/auth?mode=signup" className="text-primary underline">
+            start a 30-day free trial
+          </Link>
+          .
+        </p>
+      </>
+    ),
+  },
 ];
 
 const GuideDetail = () => {
