@@ -32,6 +32,18 @@ export const GUIDES = [
     excerpt: "Still taking bookings by DM? Put one booking link in your bio, stories and WhatsApp status, and a QR code on the counter, so clients book themselves in seconds.",
     readTime: "5 min read",
   },
+  {
+    slug: "cancellation-policy-for-appointments",
+    title: "How to write a cancellation policy for appointments (with examples)",
+    excerpt: "How to choose the notice period, what happens to the deposit, two-sentence wording you can copy, and how to show it so nobody feels tricked.",
+    readTime: "5 min read",
+  },
+  {
+    slug: "staff-rota-for-salons-and-barbershops",
+    title: "How to plan a staff rota for a small salon or barbershop",
+    excerpt: "Set a regular week, change single days, keep holidays in one place, and make sure clients only book people who are working.",
+    readTime: "5 min read",
+  },
 ];
 
 const GuidesSection = () => {
