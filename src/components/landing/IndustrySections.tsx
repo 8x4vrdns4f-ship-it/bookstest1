@@ -16,7 +16,7 @@ const INDUSTRIES: Industry[] = [
     icon: Scissors,
     pitch: "Cut no-shows, fill last-minute slots, and keep every stylist's day booked.",
     benefits: [
-      "Take deposits automatically — no more empty chairs",
+      "Take deposits automatically. No more empty chairs",
       "Per-stylist calendars, services and shifts",
       "Automated reminders, review requests, and rebooking prompts",
     ],
@@ -25,9 +25,9 @@ const INDUSTRIES: Industry[] = [
     id: "restaurants",
     label: "Restaurants",
     icon: UtensilsCrossed,
-    pitch: "Let guests reserve tables that actually exist — with party size and deposits built in.",
+    pitch: "Let guests reserve tables that actually exist, with party size and deposits built in.",
     benefits: [
-      "Bookable tables with capacity — auto-match party size to seats",
+      "Bookable tables with capacity that auto-match party size to seats",
       "Deposits for large parties to protect against no-shows",
       "Guest notes, allergies, and repeat-visitor history in one place",
     ],
@@ -36,7 +36,7 @@ const INDUSTRIES: Industry[] = [
     id: "trades",
     label: "Trades",
     icon: Wrench,
-    pitch: "Schedule jobs and get paid — all from one link you send to the customer.",
+    pitch: "Schedule jobs and get paid, all from one link you send to the customer.",
     benefits: [
       "Time-slot booking with travel buffers between jobs",
       "Take a deposit before a van leaves the yard",
@@ -62,14 +62,14 @@ const INDUSTRIES: Industry[] = [
     benefits: [
       "Recurring availability and one-off overrides for holidays",
       "Gift codes to fill your roster",
-      "One link for your booking page — share it anywhere",
+      "One link for your booking page. Share it anywhere",
     ],
   },
   {
     id: "rentals",
     label: "Rentals & Hire",
     icon: Car,
-    pitch: "Hire out cars, vans, tools or venues by the day — with availability that actually blocks the whole booking.",
+    pitch: "Hire out cars, vans, tools or venues by the day, with availability that actually blocks the whole booking.",
     benefits: [
       "Switch your calendar to day-based booking instead of hourly slots",
       "Per-day rates with the total calculated across the hire period",

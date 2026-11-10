@@ -45,12 +45,12 @@ export default function DemoBookingWidget() {
       <div className="max-w-6xl mx-auto grid gap-10 lg:grid-cols-2 lg:items-center">
         <div>
           <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-3">Try it yourself</span>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-4">Book a pretend haircut — see what your customers see</h2>
+          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-4">Book a pretend haircut and see what your customers see</h2>
           <p className="text-muted-foreground mb-6">
-            This is a sample barber shop. Pick a service, choose your barber, grab a time and confirm. It takes about 20 seconds — and nothing is saved.
+            This is a sample barber shop. Pick a service, choose your barber, grab a time and confirm. It takes about 20 seconds, and nothing is saved.
           </p>
           <ul className="space-y-2 text-sm text-foreground/90 mb-8">
-            {["Customers choose the service and the person they want", "Only real free slots are shown — no double-bookings", "Works on any phone, no app or account needed"].map((p) => (
+            {["Customers choose the service and the person they want", "Only real free slots are shown, no double-bookings", "Works on any phone, no app or account needed"].map((p) => (
               <li key={p} className="flex gap-2"><Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />{p}</li>
             ))}
           </ul>
@@ -155,9 +155,9 @@ export default function DemoBookingWidget() {
                     <div className="flex items-center gap-2"><CalendarDays className="h-3.5 w-3.5 text-primary" />{days[day].toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}<Clock className="h-3.5 w-3.5 text-primary ml-2" />{time}</div>
                   </div>
                   <Input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} />
-                  <Input placeholder="Email (demo — not used)" type="email" disabled />
+                  <Input placeholder="Email (demo, not used)" type="email" disabled />
                   <Button type="submit" className="w-full">Confirm booking</Button>
-                  <p className="text-[11px] text-center text-muted-foreground">Demo only — nothing is saved or sent.</p>
+                  <p className="text-[11px] text-center text-muted-foreground">Demo only. Nothing is saved or sent.</p>
                 </form>
               )}
             </div>

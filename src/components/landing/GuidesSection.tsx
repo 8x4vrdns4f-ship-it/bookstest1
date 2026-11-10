@@ -5,13 +5,13 @@ export const GUIDES = [
   {
     slug: "online-booking-system-for-small-business",
     title: "How to choose an online booking system for your small business",
-    excerpt: "A plain-English walkthrough of what matters when you pick booking software — deposits, no-shows, staff scheduling, and embedding the widget on your own site.",
+    excerpt: "A plain-English walkthrough of what matters when you pick booking software: deposits, no-shows, staff scheduling, and embedding the widget on your own site.",
     readTime: "6 min read",
   },
   {
     slug: "how-to-take-deposits-for-appointments",
     title: "How to take deposits for appointments (without losing customers)",
-    excerpt: "Deposits help cut no-shows. Here's how to introduce them without scaring off first-time clients — the amount, the wording, and the refund policy that works.",
+    excerpt: "Deposits help cut no-shows. Here's how to introduce them without scaring off first-time clients: the amount, the wording, and the refund policy that works.",
     readTime: "5 min read",
   },
   {
@@ -23,7 +23,7 @@ export const GUIDES = [
   {
     slug: "how-to-stop-no-shows-at-a-barber-shop",
     title: "How to stop no-shows at a barber shop (and take deposits that work)",
-    excerpt: "Saturday no-shows cost barbers real money. Five simple changes — a booking link, a sensible deposit, reminders, easy rescheduling and a waitlist — to reduce them.",
+    excerpt: "Saturday no-shows cost barbers real money. Five simple changes (a booking link, a sensible deposit, reminders, easy rescheduling and a waitlist) to reduce them.",
     readTime: "5 min read",
   },
   {
@@ -56,7 +56,7 @@ const GuidesSection = () => {
             Guides for growing a booking-based business
           </h2>
           <p className="text-muted-foreground max-w-2xl">
-            Short, practical guides on running a service business — from taking deposits to
+            Short, practical guides on running a service business, from taking deposits to
             cutting no-shows to embedding a booking widget on your own site.
           </p>
         </div>

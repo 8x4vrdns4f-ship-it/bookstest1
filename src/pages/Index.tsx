@@ -29,13 +29,13 @@ const Fallback = () => <div className="h-40" aria-hidden />;
 
 const FAQS: { q: string; a: string }[] = [
   { q: "How much does BookSuite cost?", a: "Every plan starts with a 30-day free trial (card required, cancel before it ends). After that, plans start from £25 a month. Check the pricing page for the full breakdown of features per plan." },
-  { q: "Are there fees on bookings?", a: "No commission on your clients. Just 30p a booking — never more than £25 a month, plus Stripe card fees. The 30p applies only to bookings paid online through BookSuite, on Silver and Gold (and during the free trial). Platinum has no booking fees. Card processing fees are charged by Stripe and deducted from each payment." },
+  { q: "Are there fees on bookings?", a: "No commission on your clients. Just 30p a booking, never more than £25 a month, plus Stripe card fees. The 30p applies only to bookings paid online through BookSuite, on Silver and Gold (and during the free trial). Platinum has no booking fees. Card processing fees are charged by Stripe and deducted from each payment." },
   { q: "Can I cancel any time?", a: "Yes. Subscriptions can be cancelled from your dashboard at any time and remain active until the end of your billing period." },
-  { q: "Who is BookSuite for?", a: "Service businesses that take bookings — beauty, fitness, health, trades, tutors, consultants, mobile services, and more." },
+  { q: "Who is BookSuite for?", a: "Service businesses that take bookings: beauty, fitness, health, trades, tutors, consultants, mobile services, and more." },
   { q: "Can I embed the booking widget on my own website?", a: "Yes. Copy one snippet of HTML/JS from your dashboard and paste it into any site. Bookings flow straight back into BookSuite." },
   { q: "How do payouts work?", a: "Payments go through Stripe Connect. Once you connect your Stripe account, payouts go to your bank weekly, every Monday (after Stripe's standard processing delay)." },
   { q: "Do customers actually receive the emails?", a: "Yes. Emails leave from a domain BookSuite has verified and authenticated, so they land in inboxes rather than spam folders. Your business name appears as the sender, and you can have replies come straight to your own inbox." },
-  { q: "How do I get support?", a: "Reach our team at help@booksuite.online — we typically respond within one business day." },
+  { q: "How do I get support?", a: "Reach our team at help@booksuite.online. We typically respond within one business day." },
 ];
 
 const softwareApplicationLd = {

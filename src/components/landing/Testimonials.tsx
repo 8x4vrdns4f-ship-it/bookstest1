@@ -12,7 +12,7 @@ const PARTNERS: Partner[] = [];
 const PERKS = [
   { icon: Handshake, title: "Keep your launch price", text: "The first 100 businesses keep their launch price for as long as they stay subscribed." },
   { icon: Store, title: "Your shop featured here", text: "Your business name, town and photo shown to every visitor." },
-  { icon: MessageSquareQuote, title: "A say in what we build", text: "Direct line to the team — your requests jump the queue." },
+  { icon: MessageSquareQuote, title: "A say in what we build", text: "Direct line to the team. Your requests jump the queue." },
 ];
 
 const Testimonials = () => (
@@ -23,7 +23,7 @@ const Testimonials = () => (
         {PARTNERS.length ? "Our founding partners" : "Become one of our founding partners"}
       </h2>
       <p className="text-muted-foreground mb-12 max-w-2xl">
-        We're a new, independent UK booking platform. We're looking for our first shops to grow with us — and we'll make it worth your while.
+        We're a new, independent UK booking platform. We're looking for our first shops to grow with us, and we'll make it worth your while.
       </p>
       <div className="grid md:grid-cols-3 gap-6">
         {PARTNERS.length

@@ -141,7 +141,7 @@ const TierComparison = () => {
       </div>
 
       <p className="text-center text-xs text-muted-foreground mt-4 max-w-2xl mx-auto">
-        No commission on your clients. Just 30p a booking — never more than £25 a month, plus Stripe card fees.
+        No commission on your clients. Just 30p a booking, never more than £25 a month, plus Stripe card fees.
         The 30p applies only to bookings paid online through BookSuite. Platinum has no booking fees.
       </p>
 
