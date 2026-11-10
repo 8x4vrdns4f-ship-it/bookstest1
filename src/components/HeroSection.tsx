@@ -9,8 +9,8 @@ import { Check } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import loopVideo from "@/assets/booksuite-homepage-loop-web.mp4.asset.json";
 import loopPoster from "@/assets/booksuite-homepage-loop-poster.jpg.asset.json";
-import filmVideo from "@/assets/booksuite-homepage-film-journey.mp4.asset.json";
-import filmPoster from "@/assets/booksuite-homepage-film-v4-poster.jpg.asset.json";
+import filmVideo from "@/assets/booksuite-homepage-film-two-sides.mp4.asset.json";
+import filmPoster from "@/assets/booksuite-homepage-film-two-sides-poster.jpg.asset.json";
 
 
 
@@ -77,7 +77,7 @@ const HeroSection = () => {
           <button
             type="button"
             onClick={() => setFilmOpen(true)}
-            aria-label="Watch the BookSuite film, 30 seconds"
+            aria-label="Watch the BookSuite film, 1 minute"
             className="relative block w-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <video
