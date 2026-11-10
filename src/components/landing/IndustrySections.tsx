@@ -27,7 +27,7 @@ const INDUSTRIES: Industry[] = [
     icon: UtensilsCrossed,
     pitch: "Let guests reserve tables that actually exist, with party size and deposits built in.",
     benefits: [
-      "Bookable tables with capacity that auto-match party size to seats",
+      "Bookable tables with capacity: auto-match party size to seats",
       "Deposits for large parties to protect against no-shows",
       "Guest notes, allergies, and repeat-visitor history in one place",
     ],
