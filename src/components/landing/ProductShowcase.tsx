@@ -26,7 +26,7 @@ const TABS: {
     blurb: "Run the whole business",
     icon: LayoutDashboard,
     caption:
-      "Every booking, client, payment, and team member in one place — with the numbers that actually matter surfaced up top.",
+      "Every booking, client, payment, and team member in one place, with the numbers that actually matter surfaced up top.",
     points: ["Revenue and no-show stats at a glance", "Clients, staff and payouts in one view", "Setup checklist for new businesses"],
     img: dashboardShot,
     w: 1600,
@@ -52,7 +52,7 @@ const TABS: {
     blurb: "Take bookings 24/7",
     icon: Smartphone,
     caption:
-      "One snippet of code and your customers can book on your site 24/7 — with deposits, party size, and resource picking built in.",
+      "One snippet of code and your customers can book on your site 24/7, with deposits, party size, and resource picking built in.",
     points: ["Embed on any website in one line", "Takes deposits or full payment", "Pick a service, staff member or table"],
     img: widgetShot,
     w: 905,

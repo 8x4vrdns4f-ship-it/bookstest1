@@ -1,7 +1,7 @@
 import { BadgePercent, FileX, Users } from "lucide-react";
 
 const POINTS = [
-  { icon: BadgePercent, title: "No marketplace commission", text: "BookSuite doesn't take a cut of your clients. Just 30p a booking paid online — never more than £25 a month, plus Stripe card fees. Platinum has no booking fees." },
+  { icon: BadgePercent, title: "No marketplace commission", text: "BookSuite doesn't take a cut of your clients. Just 30p a booking paid online, never more than £25 a month, plus Stripe card fees. Platinum has no booking fees." },
   { icon: FileX, title: "No contract", text: "Pay monthly or yearly and cancel from your dashboard whenever you like." },
   { icon: Users, title: "Your clients stay yours", text: "Clients book with your business, not a marketplace. Their details belong to you." },
 ];
