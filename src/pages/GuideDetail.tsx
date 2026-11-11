@@ -347,7 +347,7 @@ const GUIDES: Guide[] = [
           <li><strong>Share to socials:</strong> opens your phone's share options so you can send it to Instagram, WhatsApp and more (or copies the link).</li>
           <li><strong>Download QR:</strong> a QR code that opens your booking page.</li>
           <li>
-            <strong>Print counter poster:</strong> a ready-made poster that says "Book
+            <strong>Print counter poster</strong> — a ready-made poster that says "Book
             with" your business name and "Scan to book your appointment online".
           </li>
         </ul>
