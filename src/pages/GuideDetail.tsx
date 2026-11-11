@@ -20,7 +20,7 @@ const GUIDES: Guide[] = [
     slug: "online-booking-system-for-small-business",
     title: "How to choose an online booking system for your small business",
     description:
-      "A practical guide to picking an online booking system for a small service business — what to look for, what to avoid, and the features that actually matter day-to-day.",
+      "A practical guide to picking an online booking system for a small service business: what to look for, what to avoid, and the features that actually matter day-to-day.",
     datePublished: "2026-07-07",
     readTime: "6 min read",
     body: (
@@ -49,7 +49,7 @@ const GUIDES: Guide[] = [
           </li>
           <li>
             <strong>Embeddable booking widget.</strong> If you already have a website, you
-            want a snippet of HTML you can paste in — not a redirect to some other domain
+            want a snippet of HTML you can paste in, not a redirect to some other domain
             where you lose the customer.
           </li>
           <li>
@@ -99,7 +99,7 @@ const GUIDES: Guide[] = [
       <>
         <p>
           Every service business that has ever taken bookings has been burnt by a no-show.
-          The customer forgets, gets busy, or just changes their mind — and you've lost a
+          The customer forgets, gets busy, or just changes their mind, and you've lost a
           slot you could have sold twice over. Deposits fix this. The trick is introducing
           them without scaring off first-time customers.
         </p>
@@ -109,12 +109,12 @@ const GUIDES: Guide[] = [
           A deposit between <strong>15% and 25%</strong> of the booking price is the sweet
           spot. Small enough that a genuine customer won't hesitate, big enough that a
           time-waster will hesitate. For a £50 appointment, £10 is ideal. For a £200
-          appointment, £30–£40.
+          appointment, £30 to £40.
         </p>
 
         <h2>What to call it</h2>
         <p>
-          Don't call it a "deposit" if you can avoid it — the word triggers hesitation.
+          Don't call it a "deposit" if you can avoid it. The word triggers hesitation.
           Instead, use "booking fee" or "reservation payment", and make clear it comes off
           the final price. On the booking page: "A £10 booking fee secures your slot and
           comes off your final bill."
@@ -164,7 +164,7 @@ const GUIDES: Guide[] = [
         <p>
           Reminders are the second-biggest lever against no-shows, right after deposits. But
           most businesses either send too few (one email the morning of, which people miss)
-          or too many (three emails and a text — customers unsubscribe and you lose the
+          or too many (three emails and a text, so customers unsubscribe and you lose the
           channel entirely).
         </p>
 
@@ -176,7 +176,7 @@ const GUIDES: Guide[] = [
           </li>
           <li>
             <strong>24-hour reminder.</strong> Sent the day before. This is the reminder
-            that saves the most appointments — it catches people while they can still
+            that saves the most appointments. It catches people while they can still
             reschedule if something's come up.
           </li>
         </ol>
@@ -192,7 +192,7 @@ const GUIDES: Guide[] = [
         <h2>What to put in the reminder</h2>
         <p>
           Keep it short: date, time, service, address, and a single button to reschedule or
-          cancel. Don't upsell in a reminder — that's what marketing emails are for.
+          cancel. Don't upsell in a reminder. That's what marketing emails are for.
           Reminders should feel like a favour, not a sales pitch.
         </p>
 
@@ -222,7 +222,7 @@ const GUIDES: Guide[] = [
       <>
         <p>
           A barber's day runs on tight slots. A 45-minute skin fade that doesn't turn up
-          isn't just a gap — it's a chair that sat empty while someone else could have been
+          isn't just a gap. It's a chair that sat empty while someone else could have been
           in it. On a Saturday, that's the most expensive gap you'll have all week. No-shows
           are something a better booking process can reduce, and a few simple changes do
           most of the work.
@@ -268,7 +268,7 @@ const GUIDES: Guide[] = [
 
         <h2>3. Remind clients before the cut</h2>
         <p>
-          Many no-shows aren't people who decided not to come — they just forgot. A
+          Many no-shows aren't people who decided not to come. They just forgot. A
           confirmation as soon as you accept the booking and a reminder email the day before
           catch a lot of those, and BookSuite sends both automatically. There's more on timing
           in our guide to{" "}

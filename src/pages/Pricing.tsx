@@ -134,7 +134,7 @@ const Pricing = () => {
             Card processing fees are charged by Stripe and deducted from each payment.
           </p>
           <p className="text-center text-base font-semibold text-foreground mb-2 max-w-xl mx-auto">
-            No commission on your clients. Just 30p a booking — never more than £25 a month.
+            No commission on your clients. Just 30p a booking, never more than £25 a month.
           </p>
           <p className="text-center text-sm text-muted-foreground mb-2 max-w-xl mx-auto">
             The 30p applies only to bookings paid online through BookSuite. Platinum has no booking fees.
