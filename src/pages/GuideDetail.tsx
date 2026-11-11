@@ -20,14 +20,14 @@ const GUIDES: Guide[] = [
     slug: "online-booking-system-for-small-business",
     title: "How to choose an online booking system for your small business",
     description:
-      "A practical guide to picking an online booking system for a small service business — what to look for, what to avoid, and the features that actually matter day-to-day.",
+      "A practical guide to picking an online booking system for a small service business: what to look for, what to avoid, and the features that actually matter day-to-day.",
     datePublished: "2026-07-07",
     readTime: "6 min read",
     body: (
       <>
         <p>
-          If you run a small service business — a salon, a gym, a mobile trade, a tutoring
-          practice — the booking system you pick has an outsized effect on how much time you
+          If you run a small service business (a salon, a gym, a mobile trade, a tutoring
+          practice), the booking system you pick has an outsized effect on how much time you
           spend on admin versus doing the work. This guide walks through what actually
           matters when you're comparing an online booking system for small business use, and
           the traps to avoid.
@@ -38,7 +38,7 @@ const GUIDES: Guide[] = [
           A good booking system does four jobs well: it takes bookings 24/7 without you
           being involved, it collects a deposit so people don't ghost, it reminds customers
           before their appointment, and it gives you a single view of your day. Anything
-          beyond that (staff scheduling, gift cards, reviews, analytics) is a bonus — but
+          beyond that (staff scheduling, gift cards, reviews, analytics) is a bonus, but
           if the core four aren't rock-solid, none of the extras matter.
         </p>
 
@@ -49,7 +49,7 @@ const GUIDES: Guide[] = [
           </li>
           <li>
             <strong>Embeddable booking widget.</strong> If you already have a website, you
-            want a snippet of HTML you can paste in — not a redirect to some other domain
+            want a snippet of HTML you can paste in, not a redirect to some other domain
             where you lose the customer.
           </li>
           <li>
@@ -64,7 +64,7 @@ const GUIDES: Guide[] = [
 
         <h2>Traps to avoid</h2>
         <p>
-          Watch out for booking platforms that own the relationship with your customer —
+          Watch out for booking platforms that own the relationship with your customer:
           the ones that list you in their own marketplace and email your clients under their
           brand. That's fine if you want the marketing lift, but you don't own the
           audience. For a business with its own website and existing customers, you almost
@@ -99,7 +99,7 @@ const GUIDES: Guide[] = [
       <>
         <p>
           Every service business that has ever taken bookings has been burnt by a no-show.
-          The customer forgets, gets busy, or just changes their mind — and you've lost a
+          The customer forgets, gets busy, or just changes their mind, and you've lost a
           slot you could have sold twice over. Deposits fix this. The trick is introducing
           them without scaring off first-time customers.
         </p>
@@ -109,12 +109,12 @@ const GUIDES: Guide[] = [
           A deposit between <strong>15% and 25%</strong> of the booking price is the sweet
           spot. Small enough that a genuine customer won't hesitate, big enough that a
           time-waster will hesitate. For a £50 appointment, £10 is ideal. For a £200
-          appointment, £30–£40.
+          appointment, £30 to £40.
         </p>
 
         <h2>What to call it</h2>
         <p>
-          Don't call it a "deposit" if you can avoid it — the word triggers hesitation.
+          Don't call it a "deposit" if you can avoid it. The word triggers hesitation.
           Instead, use "booking fee" or "reservation payment", and make clear it comes off
           the final price. On the booking page: "A £10 booking fee secures your slot and
           comes off your final bill."
@@ -143,7 +143,7 @@ const GUIDES: Guide[] = [
         <p>
           BookSuite saves the customer's card via Stripe when they book, takes the deposit
           when you confirm, and refunds it automatically when a customer cancels outside
-          your policy window — inside it, the deposit is kept.{" "}
+          your policy window. Inside it, the deposit is kept.{" "}
           <Link to="/auth?mode=signup" className="text-primary underline">
             Start a free trial
           </Link>{" "}
@@ -164,7 +164,7 @@ const GUIDES: Guide[] = [
         <p>
           Reminders are the second-biggest lever against no-shows, right after deposits. But
           most businesses either send too few (one email the morning of, which people miss)
-          or too many (three emails and a text — customers unsubscribe and you lose the
+          or too many (three emails and a text, so customers unsubscribe and you lose the
           channel entirely).
         </p>
 
@@ -176,7 +176,7 @@ const GUIDES: Guide[] = [
           </li>
           <li>
             <strong>24-hour reminder.</strong> Sent the day before. This is the reminder
-            that saves the most appointments — it catches people while they can still
+            that saves the most appointments. It catches people while they can still
             reschedule if something's come up.
           </li>
         </ol>
@@ -184,27 +184,27 @@ const GUIDES: Guide[] = [
         <h2>Channel: email vs SMS</h2>
         <p>
           SMS has higher open rates but is more expensive and easier to opt out of. Email is
-          free, universal, and — with a good subject line ("Your appointment tomorrow at 2
-          PM") — nearly as effective. Start with email reminders — that's what BookSuite
+          free, universal and, with a good subject line ("Your appointment tomorrow at 2
+          PM"), nearly as effective. Start with email reminders. That's what BookSuite
           sends.
         </p>
 
         <h2>What to put in the reminder</h2>
         <p>
           Keep it short: date, time, service, address, and a single button to reschedule or
-          cancel. Don't upsell in a reminder — that's what marketing emails are for.
+          cancel. Don't upsell in a reminder. That's what marketing emails are for.
           Reminders should feel like a favour, not a sales pitch.
         </p>
 
         <h2>Reminders in BookSuite</h2>
         <p>
           BookSuite automatically sends a confirmation email when you accept a booking and a
-          reminder email the day before, from a verified, authenticated sending domain — so
+          reminder email the day before, from a verified, authenticated sending domain, so
           they reach inboxes rather than spam folders.
           Your business name shows as the sender, and replies can land straight in your own inbox.{" "}
-          Reminders are included on every plan —{" "}
+          Reminders are included on every plan.{" "}
           <Link to="/pricing" className="text-primary underline">
-            see pricing
+            See pricing
           </Link>
           .
         </p>
@@ -222,7 +222,7 @@ const GUIDES: Guide[] = [
       <>
         <p>
           A barber's day runs on tight slots. A 45-minute skin fade that doesn't turn up
-          isn't just a gap — it's a chair that sat empty while someone else could have been
+          isn't just a gap. It's a chair that sat empty while someone else could have been
           in it. On a Saturday, that's the most expensive gap you'll have all week. No-shows
           are something a better booking process can reduce, and a few simple changes do
           most of the work.
@@ -262,13 +262,13 @@ const GUIDES: Guide[] = [
         </p>
         <p>
           With BookSuite, clients save their card online when they book, through Stripe,
-          and the deposit (or the full price, if you prefer) is taken when you confirm —
-          payouts go to your own Stripe account.
+          and the deposit (or the full price, if you prefer) is taken when you confirm.
+          Payouts go to your own Stripe account.
         </p>
 
         <h2>3. Remind clients before the cut</h2>
         <p>
-          Many no-shows aren't people who decided not to come — they just forgot. A
+          Many no-shows aren't people who decided not to come. They just forgot. A
           confirmation as soon as you accept the booking and a reminder email the day before
           catch a lot of those, and BookSuite sends both automatically. There's more on timing
           in our guide to{" "}
@@ -343,9 +343,9 @@ const GUIDES: Guide[] = [
           the Share kit. From there you can:
         </p>
         <ul>
-          <li><strong>Copy link</strong> — to paste anywhere you like.</li>
-          <li><strong>Share to socials</strong> — opens your phone's share options so you can send it to Instagram, WhatsApp and more (or copies the link).</li>
-          <li><strong>Download QR</strong> — a QR code that opens your booking page.</li>
+          <li><strong>Copy link:</strong> to paste anywhere you like.</li>
+          <li><strong>Share to socials:</strong> opens your phone's share options so you can send it to Instagram, WhatsApp and more (or copies the link).</li>
+          <li><strong>Download QR:</strong> a QR code that opens your booking page.</li>
           <li>
             <strong>Print counter poster</strong> — a ready-made poster that says "Book
             with" your business name and "Scan to book your appointment online".
@@ -354,10 +354,10 @@ const GUIDES: Guide[] = [
 
         <h2>2. Put the link where your clients already look</h2>
         <ul>
-          <li><strong>Instagram or TikTok bio</strong> — the first place people check.</li>
-          <li><strong>Story link stickers</strong> — add it whenever you post a free slot or new work.</li>
-          <li><strong>WhatsApp status</strong> — handy for regulars who message you there.</li>
-          <li><strong>The QR poster</strong> — on the counter, by the mirror or wherever people wait.</li>
+          <li><strong>Instagram or TikTok bio:</strong> the first place people check.</li>
+          <li><strong>Story link stickers:</strong> add it whenever you post a free slot or new work.</li>
+          <li><strong>WhatsApp status:</strong> handy for regulars who message you there.</li>
+          <li><strong>The QR poster:</strong> on the counter, by the mirror or wherever people wait.</li>
         </ul>
         <p>
           A couple of habits help it stick. Pin a post that says "Book via the link in bio",
@@ -370,7 +370,7 @@ const GUIDES: Guide[] = [
         <p>
           Booking takes seconds, with no app to download and no account to create. Clients
           pick a time, add their details and save a card. Their card is only charged if you
-          accept the request — if you take a deposit, that's charged when you accept. For
+          accept the request. If you take a deposit, that's charged when you accept. For
           help choosing an amount and the wording, see our guide to{" "}
           <Link to="/guides/how-to-take-deposits-for-appointments" className="text-primary underline">
             taking deposits for appointments
