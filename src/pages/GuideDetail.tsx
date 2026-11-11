@@ -26,8 +26,8 @@ const GUIDES: Guide[] = [
     body: (
       <>
         <p>
-          If you run a small service business — a salon, a gym, a mobile trade, a tutoring
-          practice — the booking system you pick has an outsized effect on how much time you
+          If you run a small service business (a salon, a gym, a mobile trade, a tutoring
+          practice), the booking system you pick has an outsized effect on how much time you
           spend on admin versus doing the work. This guide walks through what actually
           matters when you're comparing an online booking system for small business use, and
           the traps to avoid.
@@ -38,7 +38,7 @@ const GUIDES: Guide[] = [
           A good booking system does four jobs well: it takes bookings 24/7 without you
           being involved, it collects a deposit so people don't ghost, it reminds customers
           before their appointment, and it gives you a single view of your day. Anything
-          beyond that (staff scheduling, gift cards, reviews, analytics) is a bonus — but
+          beyond that (staff scheduling, gift cards, reviews, analytics) is a bonus, but
           if the core four aren't rock-solid, none of the extras matter.
         </p>
 
@@ -64,7 +64,7 @@ const GUIDES: Guide[] = [
 
         <h2>Traps to avoid</h2>
         <p>
-          Watch out for booking platforms that own the relationship with your customer —
+          Watch out for booking platforms that own the relationship with your customer:
           the ones that list you in their own marketplace and email your clients under their
           brand. That's fine if you want the marketing lift, but you don't own the
           audience. For a business with its own website and existing customers, you almost
@@ -143,7 +143,7 @@ const GUIDES: Guide[] = [
         <p>
           BookSuite saves the customer's card via Stripe when they book, takes the deposit
           when you confirm, and refunds it automatically when a customer cancels outside
-          your policy window — inside it, the deposit is kept.{" "}
+          your policy window. Inside it, the deposit is kept.{" "}
           <Link to="/auth?mode=signup" className="text-primary underline">
             Start a free trial
           </Link>{" "}
@@ -184,8 +184,8 @@ const GUIDES: Guide[] = [
         <h2>Channel: email vs SMS</h2>
         <p>
           SMS has higher open rates but is more expensive and easier to opt out of. Email is
-          free, universal, and — with a good subject line ("Your appointment tomorrow at 2
-          PM") — nearly as effective. Start with email reminders — that's what BookSuite
+          free, universal and, with a good subject line ("Your appointment tomorrow at 2
+          PM"), nearly as effective. Start with email reminders. That's what BookSuite
           sends.
         </p>
 
@@ -199,12 +199,12 @@ const GUIDES: Guide[] = [
         <h2>Reminders in BookSuite</h2>
         <p>
           BookSuite automatically sends a confirmation email when you accept a booking and a
-          reminder email the day before, from a verified, authenticated sending domain — so
+          reminder email the day before, from a verified, authenticated sending domain, so
           they reach inboxes rather than spam folders.
           Your business name shows as the sender, and replies can land straight in your own inbox.{" "}
-          Reminders are included on every plan —{" "}
+          Reminders are included on every plan.{" "}
           <Link to="/pricing" className="text-primary underline">
-            see pricing
+            See pricing
           </Link>
           .
         </p>
@@ -262,8 +262,8 @@ const GUIDES: Guide[] = [
         </p>
         <p>
           With BookSuite, clients save their card online when they book, through Stripe,
-          and the deposit (or the full price, if you prefer) is taken when you confirm —
-          payouts go to your own Stripe account.
+          and the deposit (or the full price, if you prefer) is taken when you confirm.
+          Payouts go to your own Stripe account.
         </p>
 
         <h2>3. Remind clients before the cut</h2>
@@ -343,21 +343,21 @@ const GUIDES: Guide[] = [
           the Share kit. From there you can:
         </p>
         <ul>
-          <li><strong>Copy link</strong> — to paste anywhere you like.</li>
-          <li><strong>Share to socials</strong> — opens your phone's share options so you can send it to Instagram, WhatsApp and more (or copies the link).</li>
-          <li><strong>Download QR</strong> — a QR code that opens your booking page.</li>
+          <li><strong>Copy link:</strong> to paste anywhere you like.</li>
+          <li><strong>Share to socials:</strong> opens your phone's share options so you can send it to Instagram, WhatsApp and more (or copies the link).</li>
+          <li><strong>Download QR:</strong> a QR code that opens your booking page.</li>
           <li>
-            <strong>Print counter poster</strong> — a ready-made poster that says "Book
+            <strong>Print counter poster:</strong> a ready-made poster that says "Book
             with" your business name and "Scan to book your appointment online".
           </li>
         </ul>
 
         <h2>2. Put the link where your clients already look</h2>
         <ul>
-          <li><strong>Instagram or TikTok bio</strong> — the first place people check.</li>
-          <li><strong>Story link stickers</strong> — add it whenever you post a free slot or new work.</li>
-          <li><strong>WhatsApp status</strong> — handy for regulars who message you there.</li>
-          <li><strong>The QR poster</strong> — on the counter, by the mirror or wherever people wait.</li>
+          <li><strong>Instagram or TikTok bio:</strong> the first place people check.</li>
+          <li><strong>Story link stickers:</strong> add it whenever you post a free slot or new work.</li>
+          <li><strong>WhatsApp status:</strong> handy for regulars who message you there.</li>
+          <li><strong>The QR poster:</strong> on the counter, by the mirror or wherever people wait.</li>
         </ul>
         <p>
           A couple of habits help it stick. Pin a post that says "Book via the link in bio",
@@ -370,7 +370,7 @@ const GUIDES: Guide[] = [
         <p>
           Booking takes seconds, with no app to download and no account to create. Clients
           pick a time, add their details and save a card. Their card is only charged if you
-          accept the request — if you take a deposit, that's charged when you accept. For
+          accept the request. If you take a deposit, that's charged when you accept. For
           help choosing an amount and the wording, see our guide to{" "}
           <Link to="/guides/how-to-take-deposits-for-appointments" className="text-primary underline">
             taking deposits for appointments
