@@ -611,6 +611,11 @@ const GuideDetail = () => {
     );
   }
 
+  const currentIndex = GUIDES.findIndex((g) => g.slug === guide.slug);
+  const moreGuides = [1, 2, 3].map(
+    (offset) => GUIDES[(currentIndex + offset) % GUIDES.length],
+  );
+
   const url = `https://booksuite.online/guides/${guide.slug}`;
   const articleLd = {
     "@context": "https://schema.org",
@@ -642,8 +647,8 @@ const GuideDetail = () => {
       <JsonLd data={[articleLd, breadcrumbLd]} />
       <Navbar />
       <main className="flex-1 px-6 md:px-16 py-12 max-w-3xl mx-auto w-full">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
-          <ArrowLeft size={16} /> Back to home
+        <Link to="/guides" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
+          <ArrowLeft size={16} /> All guides
         </Link>
         <article>
           <p className="text-xs text-muted-foreground mb-3">{guide.readTime}</p>
@@ -653,6 +658,22 @@ const GuideDetail = () => {
             {guide.body}
           </div>
         </article>
+
+        <section className="mt-14" aria-label="More guides">
+          <h2 className="text-xl font-bold mb-4">More guides</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {moreGuides.map((g) => (
+              <Link
+                key={g.slug}
+                to={`/guides/${g.slug}`}
+                className="block rounded-xl border border-border bg-card/40 p-4 hover:border-primary/40 transition-colors"
+              >
+                <p className="font-semibold text-foreground leading-snug">{g.title}</p>
+                <p className="text-xs text-muted-foreground mt-1">{g.readTime}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <div className="mt-16 p-8 rounded-2xl border border-primary/30 bg-primary/5 text-center">
           <h2 className="text-2xl font-bold mb-3">Try BookSuite free for 30 days</h2>
