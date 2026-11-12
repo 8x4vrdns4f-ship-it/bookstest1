@@ -13,6 +13,7 @@ import RequireVerifiedEmail from "./components/RequireVerifiedEmail.tsx";
 import AppLayout from "./components/app/AppLayout.tsx";
 import { LocaleProvider } from "./contexts/LocaleContext.tsx";
 import CookieBanner from "./components/CookieBanner.tsx";
+import ScrollToTop from "./components/ScrollToTop.tsx";
 
 const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 const Privacy = lazy(() => import("./pages/Privacy.tsx"));
@@ -102,6 +103,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <ErrorBoundary>
         <Suspense fallback={<PageFallback />}>
         <Routes>
