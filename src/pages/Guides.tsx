@@ -31,7 +31,7 @@ const Guides = () => {
         </Link>
         <h1 className="text-3xl md:text-4xl font-bold mb-3">Guides for growing a booking-based business</h1>
         <p className="text-muted-foreground max-w-2xl mb-10">
-          Short, practical guides on running a service business — from taking deposits to
+          Short, practical guides on running a service business, from taking deposits to
           cutting no-shows to embedding a booking widget on your own site.
         </p>
 

@@ -44,6 +44,12 @@ export const GUIDES = [
     excerpt: "Set a regular week, change single days, keep holidays in one place, and make sure clients only book people who are working.",
     readTime: "5 min read",
   },
+  {
+    slug: "take-bookings-without-a-website",
+    title: "How to take online bookings without a website",
+    excerpt: "No website? A booking page can do the job: your details, your hours, a live calendar and deposits, with one link for Google, Instagram and WhatsApp.",
+    readTime: "5 min read",
+  },
 ];
 
 const GuidesSection = () => {

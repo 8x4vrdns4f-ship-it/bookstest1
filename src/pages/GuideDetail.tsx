@@ -248,8 +248,9 @@ const GUIDES: Guide[] = [
         <p>
           A deposit is the clearest way to turn "I'll probably come" into "I'm coming". Aim
           for roughly 15% to 25% of the service price: small enough that a genuine client
-          won't think twice, big enough that a time-waster will. On a £25 skin fade, a £5
-          deposit sits right in that range.
+          won't think twice, big enough that a time-waster will. On a £45 cut and beard
+          trim, a £10 deposit sits right in that range, and £10 is the smallest deposit
+          BookSuite takes.
         </p>
         <p>
           Be clear about how it works. Tell clients that the deposit secures their slot and
@@ -577,6 +578,137 @@ const GUIDES: Guide[] = [
           approve. When you assign a booking, BookSuite shows who is working, off or on
           holiday, and it can also assign bookings automatically. Silver includes 3
           staff, Gold 10 and Platinum unlimited.{" "}
+          <Link to="/pricing" className="text-primary underline">
+            See pricing
+          </Link>{" "}
+          or{" "}
+          <Link to="/auth?mode=signup" className="text-primary underline">
+            start a 30-day free trial
+          </Link>
+          .
+        </p>
+      </>
+    ),
+  },
+  {
+    slug: "take-bookings-without-a-website",
+    title: "How to take online bookings without a website",
+    description:
+      "No website? You can still take bookings and deposits online. How to use a booking page as your website, what to put on it, and where to share the link so clients book themselves.",
+    datePublished: "2026-11-13",
+    readTime: "5 min read",
+    body: (
+      <>
+        <p>
+          Plenty of good small businesses have no website. Clients find them through
+          word of mouth, Instagram or Google Maps, and bookings happen by phone and
+          message. That works until you're answering "any space Thursday?" at 11pm.
+          You don't need to build a website to fix it. A booking page does the one job
+          you actually need online: let people see when you're free and book.
+        </p>
+
+        <h2>1. Use a booking page as your website</h2>
+        <p>
+          A booking page is a single web page with your details and a live calendar.
+          Clients open the link, pick a time and book, with no app to download and no
+          account to create. For most appointment businesses it covers what a website
+          would: who you are, where you are, and how to book.
+        </p>
+        <p>
+          Every BookSuite business gets its own booking page. It shows your business
+          name, the type of business, your address and phone number, and your star
+          rating once clients start leaving reviews.
+        </p>
+
+        <h2>2. Set it up to answer the usual questions</h2>
+        <p>
+          Most booking messages ask the same things: when are you open, what do you
+          offer, how long does it take, what does it cost. Set the page up once and it
+          answers them for you.
+        </p>
+        <ul>
+          <li>
+            <strong>Opening hours:</strong> clients can only book when you're open.
+          </li>
+          <li>
+            <strong>Services:</strong> list what you offer, with how long each one
+            takes, so nobody books a 30-minute slot for a two-hour job.
+          </li>
+          <li>
+            <strong>Breathing room:</strong> add a gap between appointments, and
+            choose how far ahead people can book.
+          </li>
+          <li>
+            <strong>Your cancellation policy:</strong> show it before people book. Our
+            guide to{" "}
+            <Link to="/guides/cancellation-policy-for-appointments" className="text-primary underline">
+              writing a cancellation policy
+            </Link>{" "}
+            has wording you can copy.
+          </li>
+        </ul>
+
+        <h2>3. Decide how clients pay</h2>
+        <p>
+          Taking a payment when someone books is what turns "I'll probably come" into
+          a real appointment. In BookSuite you choose a deposit (from £10), the full
+          price, or let the client choose. Clients save a card when they book, and
+          it's only charged when you accept the request. Our guide to{" "}
+          <Link to="/guides/how-to-take-deposits-for-appointments" className="text-primary underline">
+            taking deposits for appointments
+          </Link>{" "}
+          covers amounts and wording.
+        </p>
+
+        <h2>4. Put the link where people already find you</h2>
+        <p>
+          The page only works if people see the link. Put it everywhere you already
+          are:
+        </p>
+        <ul>
+          <li>
+            <strong>Your Google Business Profile:</strong> add it as your website or
+            booking link, so people who find you on Google Maps can book straight
+            away.
+          </li>
+          <li>
+            <strong>Instagram, TikTok and Facebook:</strong> in your bio and on your
+            page. There's more in our guide to{" "}
+            <Link to="/guides/take-bookings-from-instagram" className="text-primary underline">
+              taking bookings from Instagram
+            </Link>
+            .
+          </li>
+          <li>
+            <strong>WhatsApp and texts:</strong> when someone messages asking for a
+            time, reply with the link.
+          </li>
+          <li>
+            <strong>In person:</strong> BookSuite's Share kit makes a QR code and a
+            printable counter poster, so clients can book their next visit before they
+            leave.
+          </li>
+        </ul>
+
+        <h2>5. Let the emails do the follow-up</h2>
+        <p>
+          Once you accept a booking, BookSuite emails the client a confirmation with a
+          check-in code, then a reminder the day before. Clients get a secure link to
+          cancel or reschedule themselves, and you get an email for every new booking.
+          No chasing, no "just checking you're still OK for tomorrow".
+        </p>
+
+        <h2>6. If you build a website later</h2>
+        <p>
+          Nothing is wasted. The same booking widget can go on a website with one
+          snippet, so clients get the same booking experience wherever they find you.
+        </p>
+
+        <h2>How BookSuite handles it</h2>
+        <p>
+          Sign up, connect your Stripe account so payments go to your bank, add your
+          hours and services, choose your deposit, and copy your link from the Share
+          kit.{" "}
           <Link to="/pricing" className="text-primary underline">
             See pricing
           </Link>{" "}
