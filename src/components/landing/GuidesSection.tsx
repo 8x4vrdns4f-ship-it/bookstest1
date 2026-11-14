@@ -50,6 +50,12 @@ export const GUIDES = [
     excerpt: "No website? A booking page can do the job: your details, your hours, a live calendar and deposits, with one link for Google, Instagram and WhatsApp.",
     readTime: "5 min read",
   },
+  {
+    slug: "get-clients-to-rebook",
+    title: "How to get clients to rebook (without chasing them)",
+    excerpt: "Most lost clients just forget to book again. Book the next visit before they leave, make rebooking one tap, and nudge the ones who go quiet.",
+    readTime: "4 min read",
+  },
 ];
 
 const GuidesSection = () => {

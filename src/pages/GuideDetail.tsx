@@ -721,6 +721,109 @@ const GUIDES: Guide[] = [
       </>
     ),
   },
+  {
+    slug: "get-clients-to-rebook",
+    title: "How to get clients to rebook (without chasing them)",
+    description:
+      "Most lost clients don't leave, they just forget to book again. How to get regulars back in the diary: book the next visit before they leave, make rebooking one tap, and send a friendly reminder when they've gone quiet.",
+    datePublished: "2026-11-14",
+    readTime: "4 min read",
+    body: (
+      <>
+        <p>
+          Winning a new client takes effort. Keeping one mostly takes remembering.
+          Most clients who drift away haven't found someone better. Life got busy and
+          they never got round to booking again. A few simple habits bring most of
+          them back without you chasing anyone.
+        </p>
+
+        <h2>1. Book the next visit before they leave</h2>
+        <p>
+          The easiest rebooking happens in the chair. When a client is happy and
+          you're both looking at the diary, suggest the next date: "Same again in five
+          weeks?" Most regulars know roughly how often they come, so it takes ten
+          seconds.
+        </p>
+        <p>
+          If they'd rather check their own calendar, point them to the QR poster by
+          the counter so they can book from their phone before they walk out.
+        </p>
+
+        <h2>2. Make rebooking one tap</h2>
+        <p>
+          Every extra step loses people. If rebooking means sending a message and
+          waiting for a reply, plenty of clients will put it off. With BookSuite,
+          clients get a secure link in their emails to cancel, reschedule or book
+          again, and your booking link can sit in your Instagram bio and WhatsApp
+          status. There's more on that in our guide to{" "}
+          <Link to="/guides/take-bookings-from-instagram" className="text-primary underline">
+            taking bookings from Instagram
+          </Link>
+          .
+        </p>
+
+        <h2>3. Send a friendly nudge when someone goes quiet</h2>
+        <p>
+          Some clients will still drift. A short, friendly email after a quiet spell
+          brings back a surprising number of them. It works best when it's personal
+          and easy to act on: mention their last visit and give them one button to
+          book.
+        </p>
+        <ul>
+          <li>
+            <strong>Pick the right gap.</strong> Base it on how often people usually
+            come back. Around six to eight weeks suits a lot of hair and beauty work;
+            a regular trim might be shorter, a seasonal service longer.
+          </li>
+          <li>
+            <strong>Keep it warm, not salesy.</strong> "It's been a while, we'd love
+            to see you again" works better than a hard sell.
+          </li>
+          <li>
+            <strong>Don't overdo it.</strong> One reminder is a nudge. Several start
+            to feel like pressure.
+          </li>
+        </ul>
+
+        <h2>4. Keep the slots worth coming back for</h2>
+        <p>
+          If clients can never get a time that suits them, they'll book somewhere
+          else. Watch which days fill up first and put your hours where the demand is.
+          A waitlist helps too: when a full day has a cancellation, the people waiting
+          hear about it first. For more on cutting the gaps, see{" "}
+          <Link to="/guides/reduce-no-shows-appointment-reminders" className="text-primary underline">
+            the no-show playbook
+          </Link>
+          .
+        </p>
+
+        <h2>5. Ask happy clients for a review</h2>
+        <p>
+          Clients who've just had a good visit are the ones most likely to come back
+          and to recommend you. Asking for a quick review after the appointment keeps
+          you in their mind and helps new clients find you.
+        </p>
+
+        <h2>How BookSuite handles it</h2>
+        <p>
+          Turn on Rebooking Reminders in Settings → Notifications and choose how many
+          quiet days to wait (60 by default). BookSuite then emails clients whose last
+          appointment was that long ago, mentioning what they had and when, with a
+          link straight to your booking page. Each client gets at most one every 90
+          days, and never if they've unsubscribed. Rebooking reminders are included on
+          every plan. Review requests and the waitlist come with Gold and Platinum.{" "}
+          <Link to="/pricing" className="text-primary underline">
+            See pricing
+          </Link>{" "}
+          or{" "}
+          <Link to="/auth?mode=signup" className="text-primary underline">
+            start a 30-day free trial
+          </Link>
+          .
+        </p>
+      </>
+    ),
+  },
 ];
 
 const GuideDetail = () => {

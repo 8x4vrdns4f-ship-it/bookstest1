@@ -26,6 +26,7 @@ const entries: SitemapEntry[] = [
   { path: "/guides/cancellation-policy-for-appointments",    lastmod: "2026-11-07", changefreq: "monthly" as const, priority: "0.8" },
   { path: "/guides/staff-rota-for-salons-and-barbershops",   lastmod: "2026-11-09", changefreq: "monthly" as const, priority: "0.8" },
   { path: "/guides/take-bookings-without-a-website",        lastmod: "2026-11-13", changefreq: "monthly" as const, priority: "0.8" },
+  { path: "/guides/get-clients-to-rebook",                  lastmod: "2026-11-14", changefreq: "monthly" as const, priority: "0.8" },
   ...["barbers","hair-salons","personal-trainers","tattoo-artists","nail-technicians","dog-groomers","massage-therapists","lash-brow-artists","photographers","car-detailing","driving-instructors","piercing-studios","rentals"].map((s) => ({ path: `/for/${s}`, lastmod: today, changefreq: "monthly" as const, priority: "0.8" })),
   { path: "/tools/no-show-calculator", lastmod: today, changefreq: "monthly" as const, priority: "0.7" },
   { path: "/about",    lastmod: today, changefreq: "monthly", priority: "0.7" },
