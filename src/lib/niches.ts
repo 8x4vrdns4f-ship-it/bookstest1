@@ -30,8 +30,8 @@ export const NICHES: Niche[] = [
       { title: "Juggling several barbers", body: "Keeping track of who's in, who's off and who's free is a full-time job." },
     ],
     features: [
-      { title: "Deposits or pay in full", body: "Clients save their card when they book, and the deposit or full price is taken when you confirm — so no-shows don't leave you out of pocket." },
-      { title: "Automatic reminders", body: "Clients get a reminder email before their cut — fewer forgotten appointments." },
+      { title: "Deposits or pay in full", body: "Clients save their card when they book, and the deposit or full price is taken when you confirm, so no-shows don't leave you out of pocket." },
+      { title: "Automatic reminders", body: "Clients get a reminder email before their cut: fewer forgotten appointments." },
       { title: "Book with a chosen barber", body: "Each barber has their own schedule and weekly shift pattern." },
       { title: "Link in bio & QR code", body: "Share your booking page on Instagram or print a QR poster for the window." },
       { title: "Waitlist", body: "When you're fully booked, clients join a waitlist instead of going elsewhere." },
@@ -47,13 +47,13 @@ export const NICHES: Niche[] = [
       { q: "Can clients choose which barber they book with?", a: "Yes. Each barber on your team has their own working hours, and bookings are matched to who's actually on shift." },
       { q: "Can I take a deposit for every booking?", a: "Yes. Clients save their card securely online when they book, and the deposit or full payment is taken when you confirm the booking." },
       { q: "Can I put the booking link on Instagram?", a: "Yes. Every shop gets its own booking page link, plus a QR code and printable poster." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
     relatedGuide: {
       slug: "how-to-stop-no-shows-at-a-barber-shop",
       title: "How to stop no-shows at a barber shop (and take deposits that work)",
       excerpt:
-        "Saturday no-shows cost barbers real money. Five simple changes — a booking link, a sensible deposit, reminders, easy rescheduling and a waitlist — to reduce them.",
+        "Saturday no-shows cost barbers real money. Five simple changes (a booking link, a sensible deposit, reminders, easy rescheduling and a waitlist) to reduce them.",
     },
   },
   {
@@ -71,7 +71,7 @@ export const NICHES: Niche[] = [
       { title: "Messy rotas and holidays", body: "Spreadsheets and group chats make staff planning painful." },
     ],
     features: [
-      { title: "Deposits for long services", body: "Take a deposit or full payment for colour, extensions and treatments — the client's card is saved at booking and charged when you confirm." },
+      { title: "Deposits for long services", body: "Take a deposit or full payment for colour, extensions and treatments. The client's card is saved at booking and charged when you confirm." },
       { title: "Stylist schedules", body: "Set each stylist's permanent weekly pattern and change single days as needed." },
       { title: "Holiday allowance tracking", body: "Staff can see how many holiday days they have left; you approve requests." },
       { title: "Automatic reminders", body: "Clients get reminded before their appointment, so fewer forget." },
@@ -88,7 +88,7 @@ export const NICHES: Niche[] = [
       { q: "Can I take deposits only for some services?", a: "Yes. You choose how payment works for your bookings, so long colour services can be protected with a deposit." },
       { q: "Can my stylists see their own schedule?", a: "Yes. Staff get their own view with today's bookings, upcoming shifts and holiday balance." },
       { q: "Can clients reschedule without calling?", a: "Yes. Clients can manage their own bookings from a secure link sent by email." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
     relatedGuide: {
       slug: "staff-rota-for-salons-and-barbershops",
@@ -116,7 +116,7 @@ export const NICHES: Niche[] = [
       { title: "Easy rebooking", body: "Clients can rebook their next session from their bookings page in seconds." },
       { title: "Reminders", body: "Automatic reminder emails before every session." },
       { title: "Bookable spaces", body: "Manage studios, rooms or equipment as bookable resources." },
-      { title: "Gift codes", body: "Sell gift codes for sessions — great for birthdays and Christmas." },
+      { title: "Gift codes", body: "Sell gift codes for sessions: great for birthdays and Christmas." },
       { title: "Calendar files", body: "Clients can add their session straight to their phone calendar." },
     ],
     exampleServices: [
@@ -129,8 +129,14 @@ export const NICHES: Niche[] = [
       { q: "Can clients pay before the session?", a: "Yes. Clients save their card at booking, and the deposit or full payment is charged when you confirm." },
       { q: "Can I offer a free consultation?", a: "Yes. Add it as its own service so new clients can book a first chat." },
       { q: "Does it work if I train in different places?", a: "You can set up studios or spaces as bookable resources so the right one is reserved." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "get-clients-to-rebook",
+      title: "How to get clients to rebook (without chasing them)",
+      excerpt:
+        "Most lost clients just forget to book again. Book the next visit before they leave, make rebooking one tap, and nudge the ones who go quiet.",
+    },
   },
   {
     slug: "tattoo-artists",
@@ -147,7 +153,7 @@ export const NICHES: Niche[] = [
       { title: "Busy artists, full diaries", body: "Popular artists get booked out and clients drift away." },
     ],
     features: [
-      { title: "Deposits taken online", body: "Clients save their card when they book and the deposit is taken when you confirm — no more chasing transfers." },
+      { title: "Deposits taken online", body: "Clients save their card when they book and the deposit is taken when you confirm. No more chasing transfers." },
       { title: "Long or full-day bookings", body: "Set services from short piercings to all-day sessions." },
       { title: "Artist schedules", body: "Each artist has their own working pattern and time off." },
       { title: "Waitlist", body: "Fully booked? Clients join the waitlist and you fill cancellations fast." },
@@ -164,8 +170,14 @@ export const NICHES: Niche[] = [
       { q: "Can I require a deposit for every tattoo?", a: "Yes. The client saves their card online when they book, and the deposit is charged when you confirm." },
       { q: "Can I approve bookings before they're confirmed?", a: "Yes. You can review booking requests, and BookSuite reminds you if one's waiting too long." },
       { q: "Can each artist have their own diary?", a: "Yes. Every artist has their own schedule, shifts and holidays." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "how-to-take-deposits-for-appointments",
+      title: "How to take deposits for appointments (without losing customers)",
+      excerpt:
+        "Deposits help cut no-shows. Here's how to introduce them without scaring off first-time clients: the amount, the wording, and the refund policy that works.",
+    },
   },
   {
     slug: "nail-technicians",
@@ -179,7 +191,7 @@ export const NICHES: Niche[] = [
     pains: [
       { title: "Booking through DMs", body: "Answering every 'are you free Friday?' message eats your evenings." },
       { title: "Ghosted appointments", body: "Clients who don't turn up cost you time and product." },
-      { title: "Forgetting to rebook", body: "Clients mean to book their infill — then forget until it's too late." },
+      { title: "Forgetting to rebook", body: "Clients mean to book their infill, then forget until it's too late." },
     ],
     features: [
       { title: "Instagram booking link", body: "One link in your bio takes followers straight to booking." },
@@ -199,8 +211,14 @@ export const NICHES: Niche[] = [
       { q: "Can I use it if I work alone?", a: "Yes. BookSuite works just as well for one person as for a team." },
       { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "How do clients find my booking page?", a: "Share your booking link in your Instagram bio, or print the QR code poster for your studio." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "take-bookings-from-instagram",
+      title: "How to take bookings from Instagram (link in bio + QR code)",
+      excerpt:
+        "Still taking bookings by DM? Put one booking link in your bio, stories and WhatsApp status, and a QR code on the counter, so clients book themselves in seconds.",
+    },
   },
   {
     slug: "dog-groomers",
@@ -217,7 +235,7 @@ export const NICHES: Niche[] = [
       { title: "Clients forgetting the next groom", body: "Coats get matted when owners leave it too long between visits." },
     ],
     features: [
-      { title: "Deposits for long grooms", body: "Take a deposit or full payment for full grooms and hand-strips — the card is saved at booking and charged when you confirm." },
+      { title: "Deposits for long grooms", body: "Take a deposit or full payment for full grooms and hand-strips. The card is saved at booking and charged when you confirm." },
       { title: "Booking notes", body: "Owners can share their dog's name, breed and anything you should know." },
       { title: "Automatic reminders", body: "Owners get a reminder email before the appointment." },
       { title: "Easy rebooking", body: "Owners can book the next groom in a few taps from their bookings page." },
@@ -234,8 +252,14 @@ export const NICHES: Niche[] = [
       { q: "Can I set different lengths for small and large dogs?", a: "Yes. Create a separate service for each size, each with its own time and price." },
       { q: "Can I take a deposit?", a: "Yes. Owners save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Can owners tell me about their dog when booking?", a: "Yes. They can add notes to the booking so you know what to expect." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "get-clients-to-rebook",
+      title: "How to get clients to rebook (without chasing them)",
+      excerpt:
+        "Most lost clients just forget to book again. Book the next visit before they leave, make rebooking one tap, and nudge the ones who go quiet.",
+    },
   },
   {
     slug: "massage-therapists",
@@ -255,7 +279,7 @@ export const NICHES: Niche[] = [
       { title: "Deposits or full payment", body: "Take a deposit or full payment so cancellations don't cost you." },
       { title: "Treatment rooms", body: "Set up rooms as bookable resources so they're never double-booked." },
       { title: "Reminders", body: "Clients get a reminder email before every treatment." },
-      { title: "Gift codes", body: "Sell gift codes — a popular present for massages and treatments." },
+      { title: "Gift codes", body: "Sell gift codes: a popular present for massages and treatments." },
       { title: "Client portal", body: "Clients cancel or reschedule themselves from a secure link." },
       { title: "Booking notes", body: "Clients can mention injuries or preferences when they book." },
     ],
@@ -269,8 +293,14 @@ export const NICHES: Niche[] = [
       { q: "Can I manage several treatment rooms?", a: "Yes. Add each room as a bookable resource and BookSuite keeps them from being double-booked." },
       { q: "Can I sell gift vouchers?", a: "Yes. You can create gift codes that clients redeem when they book." },
       { q: "Can clients reschedule themselves?", a: "Yes. Clients get a secure link to cancel, reschedule or rebook." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "cancellation-policy-for-appointments",
+      title: "How to write a cancellation policy for appointments (with examples)",
+      excerpt:
+        "How to choose the notice period, what happens to the deposit, two-sentence wording you can copy, and how to show it so nobody feels tricked.",
+    },
   },
   {
     slug: "lash-brow-artists",
@@ -304,8 +334,14 @@ export const NICHES: Niche[] = [
       { q: "Does it work if I rent a chair in someone else's studio?", a: "Yes. BookSuite works for solo artists with their own booking page." },
       { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
       { q: "Can my booking page match my brand?", a: "Yes. On paid plans you can add your logo, colours and font." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "get-clients-to-rebook",
+      title: "How to get clients to rebook (without chasing them)",
+      excerpt:
+        "Most lost clients just forget to book again. Book the next visit before they leave, make rebooking one tap, and nudge the ones who go quiet.",
+    },
   },
   {
     slug: "photographers",
@@ -339,8 +375,14 @@ export const NICHES: Niche[] = [
       { q: "Can I approve shoots before they're confirmed?", a: "Yes. Turn on booking requests and confirm each one yourself." },
       { q: "Can I hire out my studio too?", a: "Yes. Add the studio as a bookable resource so it can't be double-booked." },
       { q: "Can I take a deposit for a shoot?", a: "Yes. The client saves their card online when they book, and the deposit is charged when you confirm." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "how-to-take-deposits-for-appointments",
+      title: "How to take deposits for appointments (without losing customers)",
+      excerpt:
+        "Deposits help cut no-shows. Here's how to introduce them without scaring off first-time clients: the amount, the wording, and the refund policy that works.",
+    },
   },
   {
     slug: "car-detailing",
@@ -350,7 +392,7 @@ export const NICHES: Niche[] = [
       "Online booking for car detailers and mobile valeters: customers book 24/7, save their card for a deposit, get reminders and reschedule easily. 30-day free trial.",
     headline: "Booking software for car detailers and mobile valeters",
     subheadline:
-      "Customers pick their valet, pay a deposit and get reminded — while you stay focused on the car in front of you.",
+      "Customers pick their valet, pay a deposit and get reminded, while you stay focused on the car in front of you.",
     pains: [
       { title: "Long jobs, big no-shows", body: "An empty half-day ceramic slot is money you can't get back." },
       { title: "Missed calls on the job", body: "You can't answer the phone with a polisher in your hand." },
@@ -374,8 +416,14 @@ export const NICHES: Niche[] = [
       { q: "Does it work for mobile valeting?", a: "Yes. Customers can add their address and car details in the booking notes." },
       { q: "Can customers reschedule if the weather's bad?", a: "Yes. They can move their booking themselves from a secure link." },
       { q: "Can I take a deposit for ceramic coatings?", a: "Yes. The customer saves their card online at booking, and the deposit or full payment is taken when you confirm." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "take-bookings-without-a-website",
+      title: "How to take online bookings without a website",
+      excerpt:
+        "No website? A booking page can do the job: your details, your hours, a live calendar and deposits, with one link for Google, Instagram and WhatsApp.",
+    },
   },
   {
     slug: "driving-instructors",
@@ -396,7 +444,7 @@ export const NICHES: Niche[] = [
       { title: "Easy rebooking", body: "Students book their next lesson from their bookings page." },
       { title: "Reminders", body: "Automatic reminder emails before every lesson." },
       { title: "Your weekly hours", body: "Set your regular teaching pattern and block off days as needed." },
-      { title: "Gift codes", body: "Sell gift codes for lessons — great for birthdays." },
+      { title: "Gift codes", body: "Sell gift codes for lessons: great for birthdays." },
       { title: "Calendar files", body: "Students add lessons straight to their phone calendar." },
     ],
     exampleServices: [
@@ -409,8 +457,14 @@ export const NICHES: Niche[] = [
       { q: "Can students pay before the lesson?", a: "Yes. Students save their card when they book, and you take full payment or a deposit when you confirm." },
       { q: "Can parents book lessons for their children?", a: "Yes. Anyone can book and add the student's name in the notes." },
       { q: "Can I offer a cheaper first lesson?", a: "Yes. Add a trial lesson as its own service with its own price." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "take-bookings-without-a-website",
+      title: "How to take online bookings without a website",
+      excerpt:
+        "No website? A booking page can do the job: your details, your hours, a live calendar and deposits, with one link for Google, Instagram and WhatsApp.",
+    },
   },
   {
     slug: "piercing-studios",
@@ -444,8 +498,14 @@ export const NICHES: Niche[] = [
       { q: "Can I set very short appointments?", a: "Yes. Each service can have its own length, even a few minutes." },
       { q: "Can clients choose their piercer?", a: "Yes. Bookings are matched to piercers who are actually on shift." },
       { q: "Can I take a deposit?", a: "Yes. Clients save their card online when they book, and the deposit or full price is charged when you confirm." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "reduce-no-shows-appointment-reminders",
+      title: "The no-show playbook: reminders that actually work",
+      excerpt:
+        "Automated reminders reduce no-shows dramatically, but the timing and channel matter. Here's the sequence we recommend for service businesses running BookSuite.",
+    },
   },
   {
     slug: "rentals",
@@ -455,7 +515,7 @@ export const NICHES: Niche[] = [
       "Booking software for car hire, van hire and tool rental: customers book by the day, save their card, and every item is tracked so nothing is double-booked. 30-day free trial.",
     headline: "Rental booking software for car, van and tool hire",
     subheadline:
-      "Customers pick what they want, choose their days and pay online — and BookSuite makes sure the same car or tool is never booked twice.",
+      "Customers pick what they want, choose their days and pay online, and BookSuite makes sure the same car or tool is never booked twice.",
     pains: [
       { title: "Double-booked items", body: "Two customers turning up for the same van is a nightmare." },
       { title: "Tracking who has what", body: "Paper diaries and spreadsheets lose track of what's out and when it's back." },
@@ -479,8 +539,14 @@ export const NICHES: Niche[] = [
       { q: "Can customers book for several days?", a: "Yes. Rentals can be booked by the day, with a start and end date." },
       { q: "How does it stop the same item being booked twice?", a: "Each car, van or tool is set up as its own resource, so once it's booked those days are blocked." },
       { q: "Does it work for both cars and tools?", a: "Yes. Anything you hire out can be added as a bookable item." },
-      { q: "Is there a free trial?", a: "Yes — every plan starts with a 30-day free trial." },
+      { q: "Is there a free trial?", a: "Yes. Every plan starts with a 30-day free trial." },
     ],
+    relatedGuide: {
+      slug: "online-booking-system-for-small-business",
+      title: "How to choose an online booking system for your small business",
+      excerpt:
+        "A plain-English walkthrough of what matters when you pick booking software: deposits, no-shows, staff scheduling, and embedding the widget on your own site.",
+    },
   },
 ];
 
