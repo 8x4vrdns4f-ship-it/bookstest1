@@ -90,7 +90,7 @@ const NicheLanding = () => {
 
         <section className="mb-16 rounded-2xl border border-border bg-card p-6 md:p-8">
           <h2 className="text-xl md:text-2xl font-bold mb-2">What your booking page could look like</h2>
-          <p className="text-sm text-muted-foreground mb-6">Example services — you set your own names, times and prices.</p>
+          <p className="text-sm text-muted-foreground mb-6">Example services: you set your own names, times and prices.</p>
           <ul className="divide-y divide-border">
             {niche.exampleServices.map((s) => (
               <li key={s.name} className="flex items-center justify-between py-3">
@@ -128,7 +128,7 @@ const NicheLanding = () => {
 
         <section className="p-8 rounded-2xl border border-primary/30 bg-primary/5 text-center mb-12">
           <h2 className="text-2xl font-bold mb-3">Ready to fill your diary?</h2>
-          <p className="text-muted-foreground mb-6">Set up in minutes. 30 days free.</p>
+          <p className="text-muted-foreground mb-6">Set up in minutes. 30 days free (card required, cancel before it ends).</p>
           <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
             <Link to="/auth?mode=signup">Start free trial</Link>
           </Button>
