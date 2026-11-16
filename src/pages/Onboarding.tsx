@@ -181,7 +181,7 @@ const Onboarding = () => {
     await markComplete();
     setFinishing(false);
     toast({
-      title: "No problem — you can finish later",
+      title: "No problem, you can finish later",
       description: "The 'Get set up' checklist on your dashboard has everything that's left.",
     });
     navigate("/dashboard", { replace: true });
@@ -236,7 +236,7 @@ const Onboarding = () => {
               <h1 className="text-xl md:text-2xl font-semibold text-foreground">{current.title}</h1>
               <p className="text-sm text-muted-foreground">
                 {step === 1 && "Tell us a bit about your business."}
-                {step === 2 && "Pick a starting schedule — you can fine-tune it later."}
+                {step === 2 && "Pick a starting schedule. You can fine-tune it later."}
                 {step === 3 && "Share this link anywhere to take bookings."}
                 {step === 4 && "Here's where you're up to, and what's next."}
               </p>
@@ -323,7 +323,7 @@ const Onboarding = () => {
                     })}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    You can edit individual days later in Settings → Hours.
+                    You can edit individual days later in Settings → Working Hours.
                   </p>
                   <div className="flex items-center justify-between pt-2">
                     <Button variant="ghost" onClick={() => setStep(1)}>
@@ -349,7 +349,9 @@ const Onboarding = () => {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Paste it in your Instagram bio, on your website, or share it directly with customers.
+                      Paste it in your Instagram bio, on your website, or share it directly with
+                      customers. Clients can book once you've connected Stripe (next, from your
+                      dashboard). Until then, your page shows that you're not taking bookings yet.
                     </p>
                   </div>
 
@@ -378,7 +380,7 @@ const Onboarding = () => {
                     {[
                       "Business details saved",
                       "Opening hours set",
-                      "Booking page live and ready to share",
+                      "Your booking link is ready",
                     ].map((item) => (
                       <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
                         <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
@@ -390,13 +392,14 @@ const Onboarding = () => {
                   <div className="rounded-xl border border-border/60 bg-card/40 p-4 text-sm space-y-1.5">
                     <p className="font-medium text-foreground">What's left</p>
                     <p className="text-muted-foreground">
-                      Connect Stripe to take deposits, add your team, and share your link. The
-                      "Get set up" checklist on your dashboard walks you through each one.
+                      Connect Stripe first: clients can't book until you do. Then add your team and
+                      share your link. The "Get set up" checklist on your dashboard walks you through
+                      each one.
                     </p>
                     <p className="text-muted-foreground">
                       Under <span className="text-foreground">Settings → Emails to your customers</span>{" "}
-                      you choose how customer emails are signed — your business name with replies in your
-                      own inbox — and can send yourself a sample first.
+                      you choose how customer emails are signed: your business name, with replies going to
+                      your own inbox, and can send yourself a sample first.
                     </p>
                   </div>
 
