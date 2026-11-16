@@ -824,6 +824,80 @@ const GUIDES: Guide[] = [
       </>
     ),
   },
+  {
+    slug: "get-more-reviews",
+    title: "How to get more reviews from happy clients",
+    description:
+      "Reviews win new clients, but most happy customers never leave one unless you ask. When to ask, how to make it easy, and how to answer the reviews you get.",
+    datePublished: "2026-11-16",
+    readTime: "4 min read",
+    body: (
+      <>
+        <p>
+          When someone finds you for the first time, reviews are what they check
+          before they book. The problem is that happy clients rarely leave one on
+          their own. Unhappy ones are more motivated. The fix is simple: ask
+          everyone, at the right moment, and make it take seconds.
+        </p>
+
+        <h2>1. Ask while the visit is fresh</h2>
+        <p>
+          The best time to ask is within a day of the appointment, while the client
+          still remembers how good they felt walking out. Wait a few weeks and the
+          moment has gone.
+        </p>
+
+        <h2>2. Make it take seconds</h2>
+        <p>
+          Every extra step loses reviews. No logins, no forms to fill in, no hunting
+          for the right page. A single link that opens straight to the stars works
+          best, with a comment box people can skip if they're busy.
+        </p>
+
+        <h2>3. Ask everyone, not just the regulars you like</h2>
+        <p>
+          Picking who to ask makes your reviews look too good to be true, and clients
+          notice. Ask every client after every visit. Most will be happy, and the odd
+          middling one makes the rest more believable.
+        </p>
+
+        <h2>4. Reply to every review</h2>
+        <p>
+          A short, personal reply shows new clients that a real person runs the
+          business. Thank people for good reviews by name and mention what they had
+          done. If a review is critical, stay calm, say sorry for the experience and
+          offer to put it right. Never argue in public.
+        </p>
+
+        <h2>5. Ask in person too</h2>
+        <p>
+          A quick "If you were happy today, a review really helps us" at the end of an
+          appointment goes a long way, especially when the client knows an email with
+          a link is coming.
+        </p>
+
+        <h2>How BookSuite handles it</h2>
+        <p>
+          On Gold and Platinum, BookSuite emails each client the day after their
+          appointment and asks them to rate their visit. They tap one to five stars
+          and can add a comment, with no account needed. Each booking gets one
+          request. You see every review in your dashboard and can reply to each one,
+          and your star rating and number of reviews show at the top of your booking
+          page. You can switch review requests off in Settings → Notifications at any
+          time. Reviews in BookSuite sit on your booking page, so if you also want
+          Google reviews, ask for those separately.{" "}
+          <Link to="/pricing" className="text-primary underline">
+            See pricing
+          </Link>{" "}
+          or{" "}
+          <Link to="/auth?mode=signup" className="text-primary underline">
+            start a 30-day free trial
+          </Link>
+          .
+        </p>
+      </>
+    ),
+  },
 ];
 
 const GuideDetail = () => {

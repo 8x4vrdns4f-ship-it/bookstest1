@@ -56,6 +56,12 @@ export const GUIDES = [
     excerpt: "Most lost clients just forget to book again. Book the next visit before they leave, make rebooking one tap, and nudge the ones who go quiet.",
     readTime: "4 min read",
   },
+  {
+    slug: "get-more-reviews",
+    title: "How to get more reviews from happy clients",
+    excerpt: "Most happy clients never leave a review unless you ask. When to ask, how to make it take seconds, and how to reply to the reviews you get.",
+    readTime: "4 min read",
+  },
 ];
 
 const GuidesSection = () => {
