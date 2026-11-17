@@ -197,7 +197,7 @@ const Settings = () => {
 
   const handleSave = async () => {
     if (!userId) return;
-    if (form.deposit_amount < 10) { toast({ title: "Deposit must be at least £10", variant: "destructive" }); return; }
+    if (form.deposit_amount < 10) { toast({ title: `Deposit must be at least ${form.currency === "USD" ? "$" : form.currency === "EUR" ? "€" : form.currency === "CAD" ? "C$" : form.currency === "AUD" ? "A$" : "£"}10`, variant: "destructive" }); return; }
     if (!form.self_checkin_enabled && !form.reception_checkin_enabled) {
       toast({ title: "Enable at least one check-in method", variant: "destructive" }); return;
     }
@@ -210,7 +210,10 @@ const Settings = () => {
       { onConflict: "user_id" }
     );
     setSaving(false);
-    if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    if (error) {
+      console.error("Settings save failed", error);
+      toast({ title: "Couldn't save your settings", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" });
+    }
     else toast({ title: "Settings saved" });
   };
 

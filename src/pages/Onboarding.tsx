@@ -147,7 +147,8 @@ const Onboarding = () => {
       .eq("user_id", userId);
     setSavingBasics(false);
     if (error) {
-      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+      console.error("Onboarding basics save failed", error);
+      toast({ title: "Couldn't save your details", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" });
       return;
     }
     setStep(2);
@@ -163,7 +164,8 @@ const Onboarding = () => {
       .eq("user_id", userId);
     setSavingHours(false);
     if (error) {
-      toast({ title: "Couldn't save hours", description: error.message, variant: "destructive" });
+      console.error("Onboarding hours save failed", error);
+      toast({ title: "Couldn't save your hours", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" });
       return;
     }
     setStep(3);
