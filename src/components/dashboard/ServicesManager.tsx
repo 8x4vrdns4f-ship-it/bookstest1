@@ -64,7 +64,7 @@ export default function ServicesManager({ userId, currency = "GBP" }: { userId: 
   const update = async (id: string, patch: Partial<Service>) => {
     setItems((cur) => cur.map((s) => (s.id === id ? { ...s, ...patch } as Service : s)));
     const { error } = await supabase.from("services").update(patch).eq("id", id);
-    if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); load(); }
+    if (error) { console.error("ServicesManager save failed", error); toast({ title: "Couldn't save", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" }); load(); }
   };
 
   const remove = async (id: string) => {

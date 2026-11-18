@@ -414,7 +414,7 @@ const Settings = () => {
                 )}
               </div>
 
-              <Field label={`Deposit per booking (${form.currency}) — min £10`} hint="Charged only when you accept a booking.">
+              <Field label={`Deposit per booking (${form.currency}), minimum ${form.currency === "USD" ? "$" : form.currency === "EUR" ? "€" : form.currency === "CAD" ? "C$" : form.currency === "AUD" ? "A$" : "£"}10`} hint="Charged only when you accept a booking.">
                 <NumberField min={10} step="0.50" value={form.deposit_amount} onChange={(e) => setForm({ ...form, deposit_amount: Number(e.target.value) })} className="bg-secondary border-border" />
                 <p className="mt-2 text-xs text-muted-foreground"><span className="font-medium text-foreground">Clients will see:</span> “{cancelPolicyText({ hours: form.cancellation_hours, deposit: form.deposit_amount, currency: form.currency, paidInFull: form.payment_mode === "full" })}”</p>
               </Field>

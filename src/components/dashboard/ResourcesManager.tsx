@@ -59,7 +59,7 @@ export default function ResourcesManager({ userId, label }: { userId: string; la
   const update = async (id: string, patch: Partial<Resource>) => {
     setItems((cur) => cur.map((r) => (r.id === id ? { ...r, ...patch } as Resource : r)));
     const { error } = await supabase.from("resources").update(patch).eq("id", id);
-    if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); load(); }
+    if (error) { console.error("ResourcesManager save failed", error); toast({ title: "Couldn't save", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" }); load(); }
   };
 
   const remove = async (id: string) => {

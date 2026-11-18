@@ -117,7 +117,7 @@ const WidgetDesignCard = ({ userId, canBrand }: { userId: string; canBrand: bool
       widget_font: theme.font, widget_radius: theme.radius, widget_logo_url: theme.logo,
     }).eq("user_id", userId);
     setSaving(false);
-    if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); return; }
+    if (error) { console.error("WidgetDesignCard save failed", error); toast({ title: "Couldn't save", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" }); return; }
     setSaved(theme);
     toast({ title: "Widget design saved", description: "Your booking page and embedded widgets now use this look." });
   };

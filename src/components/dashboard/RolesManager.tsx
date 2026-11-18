@@ -87,10 +87,10 @@ const RolesManager = ({ userId }: { userId: string }) => {
           }
         : { ...values };
       const { error } = await supabase.from("company_roles").update(payload).eq("id", editing.id);
-      if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); setBusy(false); return; }
+      if (error) { console.error("RolesManager save failed", error); toast({ title: "Couldn't save", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" }); setBusy(false); return; }
     } else {
       const { error } = await supabase.from("company_roles").insert({ ...values, user_id: userId, is_builtin: false } as any);
-      if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); setBusy(false); return; }
+      if (error) { console.error("RolesManager save failed", error); toast({ title: "Couldn't save", description: "Please try again. If it keeps happening, email help@booksuite.online.", variant: "destructive" }); setBusy(false); return; }
     }
     setBusy(false); setOpen(false); load();
     toast({ title: "Role saved" });

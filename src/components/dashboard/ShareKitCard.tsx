@@ -3,7 +3,8 @@ import QRCode from "qrcode";
 import { publicOrigin } from "@/lib/publicUrl";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Printer, Share2, Copy, Check, Instagram } from "lucide-react";
+import { Download, Printer, Share2, Copy, Check, Instagram, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import SectionCard from "@/components/app/SectionCard";
 import SocialLaunchKit from "./SocialLaunchKit";
 
@@ -16,6 +17,7 @@ type Props = { userId: string; businessName?: string | null; className?: string 
 export default function ShareKitCard({ userId, businessName, className }: Props) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const bookingUrl = `${publicOrigin()}/book/${userId}`;
   const name = businessName || "your business";
@@ -72,12 +74,19 @@ export default function ShareKitCard({ userId, businessName, className }: Props)
   };
 
   return (
-    <SectionCard
-      className={className}
-      icon={<Share2 size={18} />}
-      title="Share kit — get the word out"
-      description="Put your booking link where your customers already are: your Instagram or TikTok bio, WhatsApp status, or a QR code on your counter."
-    >
+    <SectionCard className={className}>
+      <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger asChild>
+        <button type="button" aria-expanded={open} className="flex w-full min-h-[44px] items-center gap-3 text-left">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><Share2 size={18} /></span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-base font-semibold text-foreground">Share your booking link</span>
+            <span className="block text-sm text-muted-foreground">Instagram, WhatsApp, QR code and counter poster</span>
+          </span>
+          <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="pt-4">
       <div className="flex flex-col sm:flex-row gap-5 items-start">
         {qrDataUrl && (
           <img
@@ -108,6 +117,8 @@ export default function ShareKitCard({ userId, businessName, className }: Props)
         </div>
       </div>
       <SocialLaunchKit bookingUrl={bookingUrl} name={businessName || "us"} />
+      </CollapsibleContent>
+      </Collapsible>
     </SectionCard>
   );
 }

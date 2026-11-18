@@ -145,6 +145,25 @@ export default function Dashboard() {
           ) : null}
 
 
+          {/* Recent bookings */}
+          <Card className="surface-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-base font-semibold">Recent bookings</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/dashboard/bookings")}
+                className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
+              >
+                View all <ArrowUpRight className="h-3.5 w-3.5" />
+              </Button>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-4">
+              <BookingRequestsCard userId={businessUserId} />
+              <BookingsList userId={businessUserId} />
+            </CardContent>
+          </Card>
+
           {isOwner && tier && TIER_LIMITS[tier].giftCodes && <GiftCodesCard />}
 
           {role.canApprove && <JoinRequestsCard businessUserId={businessUserId} />}
@@ -169,24 +188,6 @@ export default function Dashboard() {
           )}
 
 
-          {/* Recent bookings */}
-          <Card className="surface-card">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-base font-semibold">Recent bookings</CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/dashboard/bookings")}
-                className="text-primary hover:text-primary hover:bg-primary/10 gap-1"
-              >
-                View all <ArrowUpRight className="h-3.5 w-3.5" />
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-0 space-y-4">
-              <BookingRequestsCard userId={businessUserId} />
-              <BookingsList userId={businessUserId} />
-            </CardContent>
-          </Card>
 
           {isOwner && (
             <div className="flex justify-end">
