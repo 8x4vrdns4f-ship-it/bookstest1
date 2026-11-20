@@ -7,7 +7,7 @@ interface Props {
 const PublicBookingTrustStrip = ({ cancellationHours }: Props) => {
   const items = [
     { icon: ShieldCheck, label: "Secure booking" },
-    { icon: Zap, label: "Instant confirmation" },
+    { icon: Zap, label: "Confirmation by email" },
     {
       icon: CalendarX,
       label: cancellationHours && cancellationHours > 0
