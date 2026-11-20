@@ -106,7 +106,7 @@ const PaymentsCard = ({ userId }: { userId: string }) => {
       className="mb-6"
       icon={<CreditCard size={20} />}
       title="Payments"
-      description="Collect deposits at booking time and route money to your bank."
+      description="Take deposits when you accept a booking, paid out to your bank."
       actions={statusBadge}
     >
       <div className="flex flex-wrap items-center gap-3">
